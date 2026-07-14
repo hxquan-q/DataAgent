@@ -26,6 +26,7 @@ import com.alibaba.cloud.ai.dataagent.dto.schema.SchemaDTO;
 import com.alibaba.cloud.ai.dataagent.dto.schema.TableDTO;
 import com.alibaba.cloud.ai.dataagent.entity.SemanticModel;
 import com.alibaba.cloud.ai.dataagent.entity.UserPromptConfig;
+import org.springframework.stereotype.Component;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,10 +43,27 @@ import static com.alibaba.cloud.ai.dataagent.util.ReportTemplateUtil.cleanJsonEx
 /**
  * 提示词构建辅助工具类。
  * <p>
- * 提供各类提示词（Prompt）的构建方法，将用户输入、数据库 Schema、证据信息等
- * 填充到对应的提示词模板中，生成最终发送给大模型的提示文本。
+ * 提供各类提示词（Prompt）的构建方法，将用户输入、数据库 Schema、证据信息等 填充到对应的提示词模板中，生成最终发送给大模型的提示文本。
  */
+@Component
 public class PromptHelper {
+
+	private final SkillInjector skillInjector;
+
+	public PromptHelper(SkillInjector skillInjector) {
+		this.skillInjector = skillInjector;
+	}
+
+	/**
+	 * 按作用域注入智能体技能。report 作用域用于报告提示词，sql/python 作用域共用同一入口。
+	 * @param scope 作用域：report、sql 或 python
+	 * @param agentId 智能体 ID
+	 * @param basePrompt 基础提示词
+	 * @return 注入后的提示词
+	 */
+	public String injectSkills(String scope, Long agentId, String basePrompt) {
+		return skillInjector.inject(scope, agentId, basePrompt);
+	}
 
 	/**
 	 * 构建 Schema 混合选择器提示词。
