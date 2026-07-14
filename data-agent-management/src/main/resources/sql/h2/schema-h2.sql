@@ -267,3 +267,33 @@ CREATE TABLE IF NOT EXISTS `model_config` (
   `proxy_password` varchar(255) DEFAULT NULL COMMENT '代理密码（可选）',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
+
+-- Agent 技能表
+CREATE TABLE IF NOT EXISTS skill (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL COMMENT '技能名称',
+  description VARCHAR(512) COMMENT '技能描述（何时用）',
+  scope VARCHAR(32) NOT NULL COMMENT '作用域：report/sql/python 等',
+  triggers VARCHAR(512) COMMENT '触发关键词，逗号分隔，可空',
+  content TEXT NOT NULL COMMENT '技能正文/指令',
+  params_json TEXT COMMENT '预留参数 JSON',
+  enabled TINYINT DEFAULT 1 COMMENT '0-禁用 1-启用',
+  priority INT DEFAULT 0 COMMENT '优先级，大的先注入',
+  display_order INT DEFAULT 0 COMMENT '显示顺序',
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  INDEX idx_scope_enabled (scope, enabled)
+);
+
+-- Agent-技能绑定表
+CREATE TABLE IF NOT EXISTS agent_skill (
+  id INT NOT NULL AUTO_INCREMENT,
+  agent_id INT NOT NULL COMMENT '智能体ID（类型对齐 agent.id）',
+  skill_id INT NOT NULL COMMENT '技能ID',
+  enabled TINYINT DEFAULT 1 COMMENT '0-禁用 1-启用',
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_agent_skill (agent_id, skill_id),
+  INDEX idx_agent (agent_id)
+);

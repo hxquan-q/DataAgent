@@ -96,6 +96,9 @@ public final class Constant {
 	/** 重新生成 SQL 的原因 */
 	public static final String SQL_REGENERATE_REASON = "SQL_REGENERATE_REASON";
 
+	/** SQL 自愈累积错误历史 */
+	public static final String SQL_HEAL_ERRORS = "SQL_HEAL_ERRORS";
+
 	/** 语义一致性校验节点输出 */
 	public static final String SEMANTIC_CONSISTENCY_NODE_OUTPUT = "SEMANTIC_CONSISTENCY_NODE_OUTPUT";
 
@@ -104,6 +107,12 @@ public final class Constant {
 
 	/** SQL 执行节点输出 */
 	public static final String SQL_EXECUTE_NODE_OUTPUT = "SQL_EXECUTE_NODE_OUTPUT";
+
+	/** 图表步骤与服务端渲染图片 URL 的映射 */
+	public static final String CHART_IMAGE_MAP = "CHART_IMAGE_MAP";
+
+	/** 结果合理性重试标记 */
+	public static final String RESULT_SANITY_RETRY = "RESULT_SANITY_RETRY";
 
 	/** 数据库方言类型 */
 	public static final String DB_DIALECT_TYPE = "DB_DIALECT_TYPE";
