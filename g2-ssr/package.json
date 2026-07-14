@@ -1,0 +1,14 @@
+{
+  "name": "dataagent-g2-ssr-poc",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node app.js",
+    "samples": "node samples/render.js"
+  },
+  "dependencies": {
+    "@antv/g2-ssr": "0.2.0",
+    "canvas": "^3.2.0"
+  }
+}
