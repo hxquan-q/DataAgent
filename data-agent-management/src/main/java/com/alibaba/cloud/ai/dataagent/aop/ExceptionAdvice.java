@@ -21,14 +21,25 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+/**
+ * 全局异常处理切面。
+ * <p>
+ * 基于 Spring 的 {@link RestControllerAdvice} 统一捕获所有 Controller 层抛出的未处理异常，
+ * 返回标准化的错误响应。
+ */
 @Slf4j
 @RestControllerAdvice
 public class ExceptionAdvice {
 
+	/**
+	 * 处理所有未捕获的通用异常。
+	 * @param e 捕获到的异常
+	 * @return 包含错误信息的 HTTP 500 响应
+	 */
 	@ExceptionHandler(Exception.class)
 	public ResponseEntity<ApiResponse> handleException(Exception e) {
-		log.error("An error occurred: ", e);
-		return ResponseEntity.internalServerError().body(ApiResponse.error("An error occurred: " + e.getMessage()));
+		log.error("发生异常: ", e);
+		return ResponseEntity.internalServerError().body(ApiResponse.error("发生异常: " + e.getMessage()));
 	}
 
 }

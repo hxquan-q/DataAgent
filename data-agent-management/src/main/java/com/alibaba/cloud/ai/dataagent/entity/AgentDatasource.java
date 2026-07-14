@@ -23,31 +23,44 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 
+/**
+ * 智能体-数据源关联实体类
+ *
+ * <p>
+ * 维护智能体与数据源之间的多对多关联关系。记录某个智能体启用了哪些数据源， 以及当前数据源下选中的表。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class AgentDatasource {
 
+	/** 主键ID */
 	private Integer id;
 
+	/** 关联的智能体ID */
 	private Long agentId;
 
+	/** 关联的数据源ID */
 	private Integer datasourceId;
 
+	/** 是否启用（0-关闭，1-启用） */
 	private Integer isActive;
 
+	/** 创建时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime createTime;
 
+	/** 更新时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime updateTime;
 
-	// Associated data source object (for joint query)
+	/** 关联的数据源对象（用于联表查询） */
 	private Datasource datasource;
 
-	// 当前数据源选中的表
+	/** 当前数据源选中的表列表 */
 	private List<String> selectTables;
 
 	public AgentDatasource(Long agentId, Integer datasourceId) {

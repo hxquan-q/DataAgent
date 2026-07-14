@@ -25,7 +25,7 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
 /**
- * 运行Python任务的容器池（工厂Bean）
+ * 运行 Python 任务的容器池（工厂 Bean），根据配置创建 Docker、本地或 AI 模拟的执行器实例。
  *
  * @author vlsmb
  * @since 2025/7/28
@@ -34,12 +34,19 @@ import org.springframework.stereotype.Component;
 @AllArgsConstructor
 public class CodePoolExecutorServiceFactory implements FactoryBean<CodePoolExecutorService> {
 
+	/** 代码执行器配置属性 */
 	private final CodeExecutorProperties properties;
 
+	/** LLM 调用服务 */
 	private final LlmService llmService;
 
+	/** Docker 执行器工厂 */
 	private final DockerExecutorFactory dockerExecutorFactory;
 
+	/**
+	 * 根据配置创建对应的代码执行器实例。
+	 * @return 代码执行器实例
+	 */
 	@Override
 	public CodePoolExecutorService getObject() {
 		return switch (properties.getCodePoolExecutor()) {

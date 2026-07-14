@@ -19,21 +19,34 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 语义一致性校验 DTO
+ *
+ * <p>
+ * 封装用于校验生成 SQL 与用户意图语义一致性的上下文数据，包括数据库方言、 SQL 语句、执行结果描述、结构信息、用户查询和先验知识。
+ * </p>
+ */
 @AllArgsConstructor
 @Builder
 @Data
 public class SemanticConsistencyDTO {
 
+	/** 数据库方言类型 */
 	private String dialect;
 
+	/** 待校验的 SQL 语句 */
 	private String sql;
 
+	/** SQL 执行结果的描述 */
 	private String executionDescription;
 
+	/** 数据库结构信息 */
 	private String schemaInfo;
 
+	/** 用户自然语言查询 */
 	private String userQuery;
 
+	/** 先验知识（业务术语提示等） */
 	private String evidence;
 
 }

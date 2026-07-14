@@ -44,12 +44,19 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil.getCurrentExecutionStepInstruction;
 
 /**
- * Enhanced SQL generation node that handles SQL query regeneration with advanced
- * optimization features. This node is responsible for: - Multi-round SQL optimization and
- * refinement - Syntax validation and security analysis - Performance optimization and
- * intelligent caching - Handling execution exceptions and semantic consistency failures -
- * Managing retry logic with schema advice - Providing streaming feedback during
- * regeneration process
+ * SQL 生成节点，负责根据当前执行步骤生成或重新生成 SQL 查询。
+ *
+ * <p>
+ * 该节点支持多轮 SQL 优化与精炼，具备以下能力：
+ * <ul>
+ * <li>多轮 SQL 优化与改进</li>
+ * <li>语法校验与安全分析</li>
+ * <li>性能优化与智能缓存</li>
+ * <li>处理执行异常与语义一致性校验失败的情况</li>
+ * <li>基于 Schema 建议管理重试逻辑</li>
+ * <li>在重新生成过程中提供流式反馈</li>
+ * </ul>
+ * </p>
  *
  * @author zhangshenghang
  */
@@ -62,6 +69,15 @@ public class SqlGenerateNode implements NodeAction {
 
 	private final DataAgentProperties properties;
 
+	/**
+	 * 执行 SQL 生成逻辑。
+	 * <p>
+	 * 根据当前执行步骤生成或重新生成 SQL 查询。若达到最大尝试次数则结束流程； 否则根据重试原因（SQL 执行失败或语义一致性校验未通过）决定是重新生成还是首次生成。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含 SQL 生成结果的 Map，key 为 {@value SQL_GENERATE_OUTPUT}
+	 * @throws Exception 生成 SQL 时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 		// 判断是否达到最大尝试次数
@@ -71,45 +87,49 @@ public class SqlGenerateNode implements NodeAction {
 			String sqlGenerateOutput = String.format("步骤[%d]中，SQL次数生成超限，最大尝试次数：%d，已尝试次数:%d，该步骤内容: \n %s",
 					executionStep.getStep(), properties.getMaxSqlRetryCount(), count,
 					executionStep.getToolParameters().getInstruction());
-			log.error("SQL generation failed, reason: {}", sqlGenerateOutput);
+			log.error("SQL 生成失败，原因: {}", sqlGenerateOutput);
 			Flux<ChatResponse> preFlux = Flux.just(ChatResponseUtil.createResponse(sqlGenerateOutput));
 			Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(
 					this.getClass(), state, "正在进行重试评估...", "重试评估完成！",
 					retryOutput -> Map.of(SQL_GENERATE_OUTPUT, StateGraph.END, SQL_GENERATE_COUNT, 0), preFlux);
-			// reset the sql generate count
+			// 重置 SQL 生成计数
 			return Map.of(SQL_GENERATE_OUTPUT, generator);
 		}
 
-		// 获取planner分配的当前执行步骤的sql任务要求，每个步骤的sql任务是不同的。
-		// 不要拿 user query 这个总体的大任务。
+		// 获取 planner 分配的当前执行步骤的 SQL 任务要求，每个步骤的 SQL 任务不同
+		// 不要使用 user query 这个总体的大任务
 		String promptForSql = getCurrentExecutionStepInstruction(state);
 
-		// 准备生成SQL
+		// 准备生成 SQL
 		String displayMessage;
 		Flux<String> sqlFlux;
 		SqlRetryDto retryDto = StateUtil.getObjectValue(state, SQL_REGENERATE_REASON, SqlRetryDto.class,
 				SqlRetryDto.empty());
 
+		// 根据重试原因决定生成策略
 		if (retryDto.sqlExecuteFail()) {
+			// SQL 执行失败，重新生成
 			displayMessage = "检测到SQL执行异常，开始重新生成SQL...";
 			sqlFlux = handleRetryGenerateSql(state, StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT, ""),
 					retryDto.reason(), promptForSql);
 		}
 		else if (retryDto.semanticFail()) {
+			// 语义一致性校验未通过，重新生成
 			displayMessage = "语义一致性校验未通过，开始重新生成SQL...";
 			sqlFlux = handleRetryGenerateSql(state, StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT, ""),
 					retryDto.reason(), promptForSql);
 		}
 		else {
+			// 首次生成 SQL
 			displayMessage = "开始生成SQL...";
 			sqlFlux = handleGenerateSql(state, promptForSql);
 		}
 
-		// 准备返回结果，同时需要清除一些状态数据
+		// 准备返回结果，同时清除一些状态数据
 		Map<String, Object> result = new HashMap<>(Map.of(SQL_GENERATE_OUTPUT, StateGraph.END, SQL_GENERATE_COUNT,
 				count + 1, SQL_REGENERATE_REASON, SqlRetryDto.empty()));
 
-		// Create display flux for user experience only
+		// 创建展示流，仅用于提升用户体验；同时收集生成的 SQL
 		StringBuilder sqlCollector = new StringBuilder();
 		Flux<ChatResponse> preFlux = Flux.just(ChatResponseUtil.createResponse(displayMessage),
 				ChatResponseUtil.createPureResponse(TextType.SQL.getStartSign()));
@@ -120,6 +140,7 @@ public class SqlGenerateNode implements NodeAction {
 
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, v -> {
+					// 收集完整的 SQL 并写入结果
 					String sql = nl2SqlService.sqlTrim(sqlCollector.toString());
 					result.put(SQL_GENERATE_OUTPUT, sql);
 					return result;
@@ -128,6 +149,14 @@ public class SqlGenerateNode implements NodeAction {
 		return Map.of(SQL_GENERATE_OUTPUT, generator);
 	}
 
+	/**
+	 * 处理 SQL 重新生成（基于原有 SQL 和错误信息）。
+	 * @param state 工作流全局状态
+	 * @param originalSql 原 SQL 语句
+	 * @param errorMsg 错误信息
+	 * @param executionDescription 当前执行步骤的描述
+	 * @return SQL 生成流
+	 */
 	private Flux<String> handleRetryGenerateSql(OverAllState state, String originalSql, String errorMsg,
 			String executionDescription) {
 		String evidence = StateUtil.getStringValue(state, EVIDENCE);
@@ -135,6 +164,7 @@ public class SqlGenerateNode implements NodeAction {
 		String userQuery = StateUtil.getCanonicalQuery(state);
 		String dialect = StateUtil.getStringValue(state, DB_DIALECT_TYPE);
 
+		// 构建 SQL 生成所需的参数对象
 		SqlGenerationDTO sqlGenerationDTO = SqlGenerationDTO.builder()
 			.evidence(evidence)
 			.query(userQuery)
@@ -148,6 +178,12 @@ public class SqlGenerateNode implements NodeAction {
 		return nl2SqlService.generateSql(sqlGenerationDTO);
 	}
 
+	/**
+	 * 处理 SQL 首次生成。
+	 * @param state 工作流全局状态
+	 * @param executionDescription 当前执行步骤的描述
+	 * @return SQL 生成流
+	 */
 	private Flux<String> handleGenerateSql(OverAllState state, String executionDescription) {
 		return handleRetryGenerateSql(state, null, null, executionDescription);
 	}

@@ -24,7 +24,11 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 /**
- * 文件存储相关配置属性。
+ * 文件存储相关配置属性，绑定 {@code spring.ai.alibaba.data-agent.file.*} 前缀。
+ * <p>
+ * 支持 {@code local}（本地磁盘）和 {@code oss}（阿里云 OSS）两种存储方式。
+ * 通过 {@code type} 字段切换，OSS 相关配置见 {@link OssStorageProperties}。
+ * </p>
  */
 @Getter
 @Setter
@@ -33,17 +37,20 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 public class FileStorageProperties {
 
 	/**
-	 * 存储类型：local（本地存储）、oss（阿里云OSS）
+	 * 存储类型：{@code local}（本地存储）、{@code oss}（阿里云OSS）
 	 */
 	private FileStorageServiceEnum type = FileStorageServiceEnum.LOCAL;
 
 	/**
-	 * 对象存储路径前缀（通用配置，对OSS和本地存储都适用）
+	 * 对象存储路径前缀（通用配置，对OSS和本地存储都适用）。
 	 */
 	private String pathPrefix = "";
 
 	/**
 	 * 本地上传目录路径。
+	 * <p>
+	 * 注意：不要使用 {@code ./uploads} 形式，Windows 下路径拼接会解析失败。
+	 * </p>
 	 */
 	private String path = "./uploads";
 
@@ -58,7 +65,7 @@ public class FileStorageProperties {
 	private long imageSize = 2L * 1024 * 1024;
 
 	/**
-	 * 获取本地保存路径,并规范化
+	 * 获取本地保存路径，并规范化（去除 {@code .}、{@code ..} 等冗余段）。
 	 * @return 本地保存根路径
 	 */
 	public Path getLocalBasePath() {

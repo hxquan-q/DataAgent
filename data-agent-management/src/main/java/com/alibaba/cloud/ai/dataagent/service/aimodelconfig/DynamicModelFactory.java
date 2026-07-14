@@ -43,13 +43,23 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 
+/**
+ * 动态模型工厂，根据模型配置动态创建 ChatModel 和 EmbeddingModel 实例。
+ *
+ * <p>
+ * 统一使用 OpenAI 兼容的模型类（{@link OpenAiChatModel}、{@link OpenAiEmbeddingModel}），
+ * 通过 baseUrl 实现对多家厂商（DeepSeek、通义千问等）的兼容。支持代理配置。
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DynamicModelFactory {
 
 	/**
-	 * 统一使用 OpenAiChatModel，通过 baseUrl 实现多厂商兼容
+	 * 根据配置创建 ChatModel，统一使用 OpenAiChatModel 通过 baseUrl 实现多厂商兼容。
+	 * @param config 模型配置 DTO
+	 * @return 创建的 ChatModel 实例
 	 */
 	public ChatModel createChatModel(ModelConfigDTO config) {
 
@@ -83,7 +93,9 @@ public class DynamicModelFactory {
 	}
 
 	/**
-	 * Embedding 同理
+	 * 根据配置创建 EmbeddingModel，与 ChatModel 同理使用 OpenAI 兼容接口。
+	 * @param config 模型配置 DTO
+	 * @return 创建的 EmbeddingModel 实例
 	 */
 	public EmbeddingModel createEmbeddingModel(ModelConfigDTO config) {
 		log.info("Creating NEW EmbeddingModel instance. Provider: {}, Model: {}, BaseUrl: {}", config.getProvider(),

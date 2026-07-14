@@ -17,11 +17,20 @@ package com.alibaba.cloud.ai.dataagent.dto.datasource;
 
 import lombok.Data;
 
+/**
+ * 数据源启用/停用切换 DTO
+ *
+ * <p>
+ * 用于切换智能体关联的数据源启用状态。
+ * </p>
+ */
 @Data
 public class ToggleDatasourceDTO {
 
+	/** 数据源ID */
 	private Integer datasourceId;
 
+	/** 是否启用 */
 	private Boolean isActive;
 
 }

@@ -24,20 +24,31 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * Chat Message Service Class
+ * 聊天消息服务实现类，实现消息的查询和持久化保存。
  */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ChatMessageServiceImpl implements ChatMessageService {
 
+	/** 聊天消息数据访问层 */
 	private final ChatMessageMapper chatMessageMapper;
 
+	/**
+	 * 根据会话 ID 获取消息列表。
+	 * @param sessionId 会话唯一标识
+	 * @return 该会话下的消息列表
+	 */
 	@Override
 	public List<ChatMessage> findBySessionId(String sessionId) {
 		return chatMessageMapper.selectBySessionId(sessionId);
 	}
 
+	/**
+	 * 保存聊天消息到数据库。
+	 * @param message 待保存的消息对象
+	 * @return 保存后的消息对象
+	 */
 	@Override
 	public ChatMessage saveMessage(ChatMessage message) {
 		chatMessageMapper.insert(message);

@@ -34,17 +34,29 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-// 智能体知识的向量资源和文件资源管理
+/**
+ * Agent 知识资源管理器，负责将知识内容（QA/FAQ/文档）向量化存储到向量库，
+ * 以及从向量库和文件存储中清理知识关联的向量数据和文件资源。
+ */
 @Slf4j
 @Component
 public class AgentKnowledgeResourceManager {
 
+	/** 文本分割器工厂 */
 	private final TextSplitterFactory textSplitterFactory;
 
+	/** 文件存储服务 */
 	private final FileStorageService fileStorageService;
 
+	/** 向量存储服务 */
 	private final AgentVectorStoreService agentVectorStoreService;
 
+	/**
+	 * 构造方法。
+	 * @param textSplitterFactory 文本分割器工厂
+	 * @param fileStorageService 文件存储服务
+	 * @param agentVectorStoreService 向量存储服务
+	 */
 	public AgentKnowledgeResourceManager(TextSplitterFactory textSplitterFactory, FileStorageService fileStorageService,
 			AgentVectorStoreService agentVectorStoreService) {
 		this.textSplitterFactory = textSplitterFactory;
@@ -52,10 +64,16 @@ public class AgentKnowledgeResourceManager {
 		this.agentVectorStoreService = agentVectorStoreService;
 	}
 
+	/**
+	 * 将知识内容向量化并存储到向量库，先删除旧数据再按类型处理。
+	 * @param agentKnowledge 知识对象
+	 * @throws Exception 向量化或存储过程中发生异常时抛出
+	 */
 	public void doEmbedingToVectorStore(AgentKnowledge agentKnowledge) throws Exception {
-		// delete old data
+		// 先删除旧的向量数据
 		this.deleteFromVectorStore(agentKnowledge.getAgentId(), agentKnowledge.getId());
 
+		// 根据知识类型分发处理
 		if (KnowledgeType.QA.equals(agentKnowledge.getType()) || KnowledgeType.FAQ.equals(agentKnowledge.getType())) {
 			processQaKnowledge(agentKnowledge);
 		}
@@ -67,15 +85,23 @@ public class AgentKnowledgeResourceManager {
 		}
 	}
 
+	/**
+	 * 处理 QA/FAQ 类型知识，将其转换为文档后存入向量库。
+	 * @param knowledge 知识对象
+	 */
 	private void processQaKnowledge(AgentKnowledge knowledge) {
 		Document document = DocumentConverterUtil.convertQaFaqKnowledgeToDocument(knowledge);
 		agentVectorStoreService.addDocuments(knowledge.getAgentId().toString(), List.of(document));
 		log.info("Successfully vectorized AgentKnowledge: id={}, type={}", knowledge.getId(), knowledge.getType());
 	}
 
+	/**
+	 * 处理文档类型知识，读取文件、分割文本、添加元数据后存入向量库。
+	 * @param knowledge 知识对象
+	 */
 	private void processDocumentKnowledge(AgentKnowledge knowledge) {
 
-		// 处理文档
+		// 读取并分割文档
 		List<Document> documents = getAndSplitDocument(knowledge.getFilePath(), knowledge.getSplitterType());
 		if (documents == null || documents.isEmpty()) {
 			log.error("No documents extracted from file: knowledgeId={}, filePath={}", knowledge.getId(),
@@ -94,6 +120,12 @@ public class AgentKnowledgeResourceManager {
 
 	}
 
+	/**
+	 * 读取文件并按指定分割方式切分文档。
+	 * @param filePath 文件路径
+	 * @param splitterType 分割器类型
+	 * @return 分割后的文档列表
+	 */
 	private List<Document> getAndSplitDocument(String filePath, String splitterType) {
 		// 使用FileStorageService获取文件资源对象
 		Resource resource = fileStorageService.getFileResource(filePath);

@@ -19,15 +19,22 @@ import com.alibaba.cloud.ai.dataagent.entity.ChatMessage;
 
 import java.util.List;
 
+/**
+ * 聊天消息服务接口，提供会话消息的查询和保存能力。
+ */
 public interface ChatMessageService {
 
 	/**
-	 * Get message list by session ID
+	 * 根据会话 ID 获取消息列表。
+	 * @param sessionId 会话唯一标识
+	 * @return 该会话下的消息列表
 	 */
 	List<ChatMessage> findBySessionId(String sessionId);
 
 	/**
-	 * Save message
+	 * 保存聊天消息。
+	 * @param message 待保存的消息对象
+	 * @return 保存后的消息对象（包含生成的 ID）
 	 */
 	ChatMessage saveMessage(ChatMessage message);
 

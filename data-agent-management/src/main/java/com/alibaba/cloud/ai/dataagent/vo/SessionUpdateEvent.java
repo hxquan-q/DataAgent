@@ -18,16 +18,27 @@ package com.alibaba.cloud.ai.dataagent.vo;
 import lombok.Builder;
 import lombok.Value;
 
+/**
+ * 会话更新事件 VO
+ *
+ * <p>
+ * 表示会话状态变更的事件通知，目前支持标题更新事件。采用不可变值对象（@Value）定义。 通过 SSE 等机制推送给前端。
+ * </p>
+ */
 @Value
 @Builder
 public class SessionUpdateEvent {
 
+	/** 事件类型常量：标题已更新 */
 	public static final String TYPE_TITLE_UPDATED = "title-updated";
 
+	/** 事件类型 */
 	String type;
 
+	/** 会话ID */
 	String sessionId;
 
+	/** 会话标题 */
 	String title;
 
 	public static SessionUpdateEvent titleUpdated(String sessionId, String title) {

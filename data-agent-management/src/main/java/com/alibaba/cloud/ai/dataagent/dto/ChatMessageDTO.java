@@ -18,21 +18,25 @@ package com.alibaba.cloud.ai.dataagent.dto;
 import lombok.Data;
 
 /**
- * Request payload for saving chat messages.
+ * 保存聊天消息的请求 DTO
  */
 @Data
 public class ChatMessageDTO {
 
+	/** 消息角色：user-用户，assistant-助手，system-系统 */
 	private String role;
 
+	/** 消息内容 */
 	private String content;
 
+	/** 消息类型：text-文本，sql-SQL语句，result-查询结果，error-错误信息 */
 	private String messageType;
 
+	/** JSON 格式的元数据 */
 	private String metadata;
 
 	/**
-	 * Flag from frontend to trigger async title generation for newly created sessions.
+	 * 前端标志位，用于触发新建会话时的异步标题生成。
 	 */
 	private boolean titleNeeded;
 

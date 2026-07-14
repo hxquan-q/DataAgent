@@ -20,18 +20,27 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 外键信息业务对象。
+ * <p>
+ * 描述数据库表之间的外键引用关系，包括外键所在表/列和被引用的目标表/列。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ForeignKeyInfoBO {
 
+	/** 外键所在表名 */
 	private String table;
 
+	/** 外键列名 */
 	private String column;
 
+	/** 被引用的目标表名 */
 	private String referencedTable;
 
+	/** 被引用的目标列名 */
 	private String referencedColumn;
 
 }

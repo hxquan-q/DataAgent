@@ -26,11 +26,12 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 /**
- * Ensures the configured Docker image is locally available.
+ * Docker 镜像管理器，确保配置的 Docker 镜像在本地可用，不存在时自动拉取。
  */
 @Component
 public class DockerImageManager {
 
+	/** 拉取镜像回调工厂 */
 	private final Supplier<PullImageResultCallback> callbackFactory;
 
 	public DockerImageManager() {
@@ -41,6 +42,11 @@ public class DockerImageManager {
 		this.callbackFactory = Objects.requireNonNull(callbackFactory, "callbackFactory");
 	}
 
+	/**
+	 * 确保指定镜像在本地可用，不存在时从远程仓库拉取。
+	 * @param client Docker 客户端
+	 * @param imageName 镜像名称
+	 */
 	public void ensureAvailable(DockerClient client, String imageName) {
 		List<Image> images = client.listImagesCmd().withImageNameFilter(imageName).exec();
 		boolean imageExists = images != null && images.stream()

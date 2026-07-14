@@ -29,16 +29,28 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
+ * SimpleVectorStore 初始化与持久化服务。
+ *
+ * <p>
+ * 在应用启动时从本地文件加载向量数据，在应用关闭时将向量数据序列化到本地文件。
+ * 仅适用于 {@link SimpleVectorStore}（内存向量存储）。
+ * </p>
+ *
  * @author David Yu
  */
 @Slf4j
 @RequiredArgsConstructor
 public class SimpleVectorStoreInitialization implements ApplicationRunner, DisposableBean {
 
+	/** SimpleVectorStore 实例 */
 	private final SimpleVectorStore vectorStore;
 
+	/** DataAgent 配置属性 */
 	private final DataAgentProperties properties;
 
+	/**
+	 * 从本地文件加载向量数据库。
+	 */
 	public void load() {
 		File file = new File(properties.getVectorStore().getFilePath());
 
@@ -55,6 +67,9 @@ public class SimpleVectorStoreInitialization implements ApplicationRunner, Dispo
 		}
 	}
 
+	/**
+	 * 将向量数据库序列化到本地文件。
+	 */
 	public void save() {
 		log.info("Serialize the vector database to a local file.");
 		Path path = Paths.get(properties.getVectorStore().getFilePath());
@@ -73,11 +88,18 @@ public class SimpleVectorStoreInitialization implements ApplicationRunner, Dispo
 		}
 	}
 
+	/**
+	 * 应用启动时加载向量数据库。
+	 * @param args 应用启动参数
+	 */
 	@Override
 	public void run(ApplicationArguments args) throws Exception {
 		this.load();
 	}
 
+	/**
+	 * 应用关闭时保存向量数据库。
+	 */
 	@Override
 	public void destroy() {
 		this.save();

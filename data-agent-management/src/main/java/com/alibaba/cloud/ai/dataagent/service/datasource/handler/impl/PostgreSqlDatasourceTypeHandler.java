@@ -20,20 +20,33 @@ import com.alibaba.cloud.ai.dataagent.entity.Datasource;
 import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * PostgreSQL 数据源类型处理器，负责构建 PostgreSQL JDBC 连接 URL，
+ * 支持以 "database|schema" 格式指定数据库名和 Schema。
+ */
 @Component
 public class PostgreSqlDatasourceTypeHandler implements DatasourceTypeHandler {
 
+	/**
+	 * 返回 PostgreSQL 数据源类型名称。
+	 * @return PostgreSQL 类型名称
+	 */
 	@Override
 	public String typeName() {
 		return BizDataSourceTypeEnum.POSTGRESQL.getTypeName();
 	}
 
+	/**
+	 * 构建 PostgreSQL JDBC 连接 URL。
+	 * @param datasource 数据源实体
+	 * @return PostgreSQL JDBC 连接 URL
+	 */
 	@Override
 	public String buildConnectionUrl(Datasource datasource) {
 		if (!hasRequiredConnectionFields(datasource)) {
 			return datasource.getConnectionUrl();
 		}
-		// 提取数据库名（format: "database|schema"，只取database部分）
+		// 提取数据库名（格式为 "database|schema"，只取 database 部分）
 		String databaseName = datasource.getDatabaseName();
 		if (databaseName != null && databaseName.contains("|")) {
 			databaseName = databaseName.split("\\|")[0];
@@ -43,9 +56,14 @@ public class PostgreSqlDatasourceTypeHandler implements DatasourceTypeHandler {
 				datasource.getHost(), datasource.getPort(), databaseName);
 	}
 
+	/**
+	 * 提取 PostgreSQL 的 Schema 名称。
+	 * @param datasource 数据源实体
+	 * @return Schema 名称（格式为 "database|schema" 时取 schema 部分）
+	 */
 	@Override
 	public String extractSchemaName(Datasource datasource) {
-		// 提取schema名（format: "database|schema"，取schema部分）
+		// 提取 schema 名（格式为 "database|schema"，取 schema 部分）
 		String databaseName = datasource.getDatabaseName();
 		if (databaseName != null && databaseName.contains("|")) {
 			String[] parts = databaseName.split("\\|");

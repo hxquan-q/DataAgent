@@ -16,101 +16,100 @@
 package com.alibaba.cloud.ai.dataagent.enums;
 
 /**
- * Database connection related error code definitions.
+ * 数据库连接相关错误码定义。
  * <p>
- * Contains standard SQLState codes, custom codes and corresponding Chinese prompt
- * information. Can be used as a basic error code module for open source projects,
- * facilitating unified exception handling.
+ * 包含标准 SQLState 代码、自定义编码以及对应的中文提示信息。
+ * 可作为开源项目的基础错误码模块，便于统一异常处理。
  */
 public enum ErrorCodeEnum {
 
 	/**
-	 * Success status code
+	 * 成功状态码
 	 */
 	SUCCESS("0", "操作成功"),
 
 	/**
-	 * Invalid parameter
+	 * 无效参数
 	 */
 	INVALID_PARAM("10", "无效参数"),
 
 	/**
-	 * Data source connection failed (SQLState: 08001)
+	 * 数据源连接失败（SQLState: 08001）
 	 */
 	DATASOURCE_CONNECTION_FAILURE_08001("08001", "无法建立数据库连接，请检查配置的IP/域名是否正确，或将析言IP加入数据库白名单"),
 
 	/**
-	 * Data source connection failed (SQLState: 08S01)
+	 * 数据源连接失败（SQLState: 08S01）
 	 */
 	DATASOURCE_CONNECTION_FAILURE_08S01("08S01", "无法建立数据库连接，请检查配置的IP/域名是否正确，或将析言IP加入数据库白名单"),
 
 	/**
-	 * Connection lost (SQLState: 08002)
+	 * 连接丢失（SQLState: 08002）
 	 */
 	CONNECTION_LOST_08002("08002", "连接丢失：服务器关闭"),
 
 	/**
-	 * Operation executed on closed connection (SQLState: 08003)
+	 * 在已关闭的连接上执行操作（SQLState: 08003）
 	 */
 	CONNECTION_CLOSED_08003("08003", "试图在已经关闭的连接上操作"),
 
 	/**
-	 * Database rejected connection request (SQLState: 08004)
+	 * 数据库拒绝连接请求（SQLState: 08004）
 	 */
 	CONNECTION_DENIED_08004("08004", "数据库拒绝了连接请求"),
 
 	/**
-	 * Connection failed (SQLState: 08006)
+	 * 连接失败（SQLState: 08006）
 	 */
 	CONNECTION_FAILURE_08006("08006", "连接失败"),
 
 	/**
-	 * Insufficient permissions (SQLState: 42501)
+	 * 权限不足（SQLState: 42501）
 	 */
 	INSUFFICIENT_PRIVILEGE_42501("42501", "权限不足"),
 
 	/**
-	 * Wrong password (SQLState: 28P01)
+	 * 密码错误（SQLState: 28P01）
 	 */
 	PASSWORD_ERROR_28P01("28P01", "密码错误"),
 
 	/**
-	 * Wrong password (SQLState: 28000)
+	 * 密码错误（SQLState: 28000）
 	 */
 	PASSWORD_ERROR_28000("28000", "密码错误"),
 
 	/**
-	 * Password is empty
+	 * 密码为空
 	 */
 	PASSWORD_EMPTY("28001", "密码为空，请配置正确的数据库密码"),
 
 	/**
-	 * Database does not exist (SQLState: 3D000)
+	 * 数据库不存在（SQLState: 3D000）
 	 */
 	DATABASE_NOT_EXIST_3D000("3D000", "数据库不存在"),
 
 	/**
-	 * Database does not exist (SQLState: 42000)
+	 * 数据库不存在（SQLState: 42000）
 	 */
 	DATABASE_NOT_EXIST_42000("42000", "数据库不存在"),
 
 	/**
-	 * Time zone parameter error (SQLState: 01S00)
+	 * 时区参数错误（SQLState: 01S00）
 	 */
 	TIME_ZONE_ERROR_01S00("01S00", "时区参数错误"),
 
 	/**
-	 * SSL connection error (SQLState: 08P01)
+	 * SSL 连接错误（SQLState: 08P01）
 	 */
 	SSL_ERROR_08P01("08P01", "进行SSL连线时发生错误"),
 
 	/**
-	 * Schema does not exist (SQLState: 3D070)
+	 * 模式（Schema）不存在（SQLState: 3D070）
 	 */
 	SCHEMA_NOT_EXIST_3D070("3D070", "模式不存在"),
 
 	/**
-	 * Unknown error (fallback)
+	 * 未知错误（兜底项）
 	 */
 	OTHERS("100", "未知错误，请联系技术人员排查");
 
@@ -124,9 +123,9 @@ public enum ErrorCodeEnum {
 	}
 
 	/**
-	 * Find corresponding error information based on error code
-	 * @param code error code string
-	 * @return corresponding error object, return {@link #OTHERS} if no match
+	 * 根据错误码查找对应的错误信息。
+	 * @param code 错误码字符串
+	 * @return 对应的错误枚举对象，无匹配时返回 {@link #OTHERS}
 	 */
 	public static ErrorCodeEnum fromCode(String code) {
 		for (ErrorCodeEnum rc : values()) {
@@ -138,10 +137,9 @@ public enum ErrorCodeEnum {
 	}
 
 	/**
-	 * Find corresponding error information based on error code, return SUCCESS by default
-	 * if not found
-	 * @param code error code string
-	 * @return matched error code or default SUCCESS
+	 * 根据错误码查找对应的错误信息，未找到时默认返回 SUCCESS。
+	 * @param code 错误码字符串
+	 * @return 匹配到的错误枚举，或默认的 SUCCESS
 	 */
 	public static ErrorCodeEnum fromCodeWithSuccess(String code) {
 		for (ErrorCodeEnum rc : values()) {
@@ -153,18 +151,26 @@ public enum ErrorCodeEnum {
 	}
 
 	/**
-	 * Get error code description
-	 * @return error code + error description
+	 * 获取错误码描述。
+	 * @return 错误码 + 错误描述的格式化字符串
 	 */
 	@Override
 	public String toString() {
 		return "[" + code + "] " + message;
 	}
 
+	/**
+	 * 获取错误码。
+	 * @return 错误码字符串
+	 */
 	public String getCode() {
 		return code;
 	}
 
+	/**
+	 * 获取错误描述信息。
+	 * @return 错误描述信息
+	 */
 	public String getMessage() {
 		return message;
 	}

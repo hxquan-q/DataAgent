@@ -37,7 +37,11 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * 根据Python代码的运行结果做总结分析
+ * Python 结果分析节点，位于 Python 代码执行之后、报告生成之前。
+ *
+ * <p>
+ * 该节点根据 Python 代码的运行结果和用户查询，调用大模型生成分析总结， 并将分析结果写入步骤执行结果中。若处于降级模式，则返回固定提示信息。
+ * </p>
  *
  * @author vlsmb
  * @since 2025/7/30
@@ -49,10 +53,19 @@ public class PythonAnalyzeNode implements NodeAction {
 
 	private final LlmService llmService;
 
+	/**
+	 * 执行 Python 结果分析逻辑。
+	 * <p>
+	 * 获取用户查询、Python 输出和 SQL 执行结果，调用大模型生成分析总结。 分析结果会写入步骤执行结果中，并推进当前步骤号。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含分析结果的 Map，key 为 {@value PYTHON_ANALYSIS_NODE_OUTPUT}
+	 * @throws Exception 调用大模型时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
-		// Get context
+		// 获取上下文
 		String userQuery = StateUtil.getCanonicalQuery(state);
 		String pythonOutput = StateUtil.getStringValue(state, PYTHON_EXECUTE_NODE_OUTPUT);
 		int currentStep = PlanProcessUtil.getCurrentStepNumber(state);
@@ -64,7 +77,7 @@ public class PythonAnalyzeNode implements NodeAction {
 		boolean isFallbackMode = StateUtil.getObjectValue(state, PYTHON_FALLBACK_MODE, Boolean.class, false);
 
 		if (isFallbackMode) {
-			// 降级模式
+			// 降级模式：返回固定提示信息
 			String fallbackMessage = "Python 高级分析功能暂时不可用，出现错误";
 			log.warn("Python分析节点检测到降级模式，返回固定提示信息");
 
@@ -74,23 +87,25 @@ public class PythonAnalyzeNode implements NodeAction {
 					this.getClass(), state, "正在处理分析结果...\n", "\n处理完成。", aiResponse -> {
 						Map<String, String> updatedSqlResult = new HashMap<>(sqlExecuteResult);
 						updatedSqlResult.put("step_" + currentStep + "_analysis", fallbackMessage);
-						log.info("python fallback message: {}", fallbackMessage);
+						log.info("Python 降级提示信息: {}", fallbackMessage);
 						return Map.of(SQL_EXECUTE_NODE_OUTPUT, updatedSqlResult, PLAN_CURRENT_STEP, currentStep + 1);
 					}, fallbackFlux);
 
 			return Map.of(PYTHON_ANALYSIS_NODE_OUTPUT, generator);
 		}
 
+		// 构建系统提示词并调用大模型进行分析
 		String systemPrompt = PromptConstant.getPythonAnalyzePromptTemplate()
 			.render(Map.of("python_output", pythonOutput, "user_query", userQuery));
 
 		Flux<ChatResponse> pythonAnalyzeFlux = llmService.callSystem(systemPrompt);
 
+		// 创建流式生成器，将分析结果写入步骤执行结果
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, "正在分析代码运行结果...\n", "\n结果分析完成。", aiResponse -> {
 					Map<String, String> updatedSqlResult = new HashMap<>(sqlExecuteResult);
 					updatedSqlResult.put("step_" + currentStep + "_analysis", aiResponse);
-					log.info("python analyze result: {}", aiResponse);
+					log.info("Python 分析结果: {}", aiResponse);
 					return Map.of(SQL_EXECUTE_NODE_OUTPUT, updatedSqlResult, PLAN_CURRENT_STEP, currentStep + 1);
 				}, pythonAnalyzeFlux);
 

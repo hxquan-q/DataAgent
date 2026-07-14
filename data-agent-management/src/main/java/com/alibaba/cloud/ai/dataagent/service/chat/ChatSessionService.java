@@ -20,47 +20,62 @@ import com.alibaba.cloud.ai.dataagent.entity.ChatSession;
 import java.util.List;
 
 /**
- * Chat Session Service Class
+ * 聊天会话服务接口，提供会话的创建、查询、重命名、置顶、删除等管理能力。
  */
 public interface ChatSessionService {
 
 	/**
-	 * Get session list by agent ID
+	 * 根据 Agent ID 获取会话列表。
+	 * @param agentId Agent 主键 ID
+	 * @return 该 Agent 下的会话列表
 	 */
 	List<ChatSession> findByAgentId(Integer agentId);
 
 	/**
-	 * Create a new session
+	 * 创建新的聊天会话。
+	 * @param agentId 关联的 Agent 主键 ID
+	 * @param title 会话标题，为空时使用默认标题
+	 * @param userId 创建用户 ID
+	 * @return 创建的会话对象
 	 */
 	ChatSession createSession(Integer agentId, String title, Long userId);
 
 	/**
-	 * Find session by id.
+	 * 根据会话 ID 查询会话。
+	 * @param sessionId 会话唯一标识
+	 * @return 会话对象，不存在时返回 null
 	 */
 	ChatSession findBySessionId(String sessionId);
 
 	/**
-	 * Clear all sessions for an agent
+	 * 清除指定 Agent 的全部会话（软删除）。
+	 * @param agentId Agent 主键 ID
 	 */
 	void clearSessionsByAgentId(Integer agentId);
 
 	/**
-	 * Update the last activity time of a session
+	 * 更新会话的最后活动时间。
+	 * @param sessionId 会话唯一标识
 	 */
 	void updateSessionTime(String sessionId);
 
 	/**
-	 * 置顶/取消置顶会话
+	 * 置顶或取消置顶会话。
+	 * @param sessionId 会话唯一标识
+	 * @param isPinned 是否置顶
 	 */
 	void pinSession(String sessionId, boolean isPinned);
 
 	/**
-	 * Rename session
+	 * 重命名会话标题。
+	 * @param sessionId 会话唯一标识
+	 * @param newTitle 新的会话标题
 	 */
 	void renameSession(String sessionId, String newTitle);
 
 	/**
-	 * Delete a single session
+	 * 删除单个会话（软删除）。
+	 * @param sessionId 会话唯一标识
 	 */
 	void deleteSession(String sessionId);
 

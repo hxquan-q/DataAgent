@@ -83,11 +83,21 @@ public class SentenceSplitter extends TextSplitter {
 
 	}
 
+	/**
+	 * 将文本按句子级别提取为句子列表（内部使用的文本切分方法）。
+	 * @param text 待切分的文本
+	 * @return 句子列表
+	 */
 	@Override
 	protected List<String> splitText(String text) {
 		return extractSentences(text);
 	}
 
+	/**
+	 * 对文档列表进行句子级分块处理。
+	 * @param documents 待分块的文档列表
+	 * @return 分块后的文档列表
+	 */
 	@Override
 	public List<Document> apply(List<Document> documents) {
 		if (CollectionUtils.isEmpty(documents))

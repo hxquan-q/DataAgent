@@ -67,7 +67,7 @@ services:
         - saa-data-agent-frontend:1.0.0-SNAPSHOT
     container_name: data-agent-frontend
     ports:
-      - "3000:3000"  # 只暴露前端端口
+      - "3301:3301"  # 公网访问前端端口
     depends_on:
       - backend
     volumes:

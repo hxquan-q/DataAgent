@@ -26,7 +26,11 @@ import java.nio.file.Paths;
 import java.time.Duration;
 
 /**
- * Web配置类 (WebFlux 版本)
+ * Web 配置类（WebFlux 版本）。
+ * <p>
+ * 主要负责将本地文件存储目录映射为静态资源访问路径，
+ * 使上传的文件可通过 {@code urlPrefix} 对外访问。
+ * </p>
  */
 @Configuration
 @AllArgsConstructor
@@ -34,6 +38,13 @@ public class WebConfig implements WebFluxConfigurer {
 
 	private final FileStorageProperties fileStorageProperties;
 
+	/**
+	 * 注册静态资源处理器：将 {@code urlPrefix/**} 映射到本地上传目录。
+	 * <p>
+	 * 设置 1 小时浏览器缓存，减少重复请求。
+	 * </p>
+	 * @param registry 资源处理器注册器
+	 */
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 		String uploadDir = Paths.get(fileStorageProperties.getPath()).toAbsolutePath().toString();

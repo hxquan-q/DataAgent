@@ -29,21 +29,36 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+/**
+ * 模型配置操作服务，提供配置更新热刷新、激活切换和连接测试等聚合操作能力。
+ *
+ * <p>
+ * 该类整合了数据库操作与内存模型刷新逻辑，确保配置变更后内存中的模型实例同步更新。
+ * </p>
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class ModelConfigOpsService {
 
+	/** 模型配置数据服务 */
 	private final ModelConfigDataService modelConfigDataService;
 
+	/** 动态模型工厂 */
 	private final DynamicModelFactory modelFactory;
 
+	/** AI 模型注册中心 */
 	private final AiModelRegistry aiModelRegistry;
 
+	/** JSON 序列化对象 */
 	private final ObjectMapper objectMapper = JsonUtil.getObjectMapper();
 
 	/**
-	 * 专门处理：更新配置并热刷新的聚合逻辑
+	 * 更新配置并热刷新内存模型。
+	 * <p>
+	 * 如果更新的配置处于激活状态，则刷新内存中对应的模型实例。刷新失败时回滚数据库事务。
+	 * </p>
+	 * @param dto 待更新的模型配置 DTO
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public void updateAndRefresh(ModelConfigDTO dto) {
@@ -65,7 +80,8 @@ public class ModelConfigOpsService {
 	}
 
 	/**
-	 * 激活指定配置
+	 * 激活指定配置，先刷新内存模型再更新数据库激活状态。
+	 * @param id 配置主键 ID
 	 */
 	@Transactional(rollbackFor = Exception.class)
 	public void activateConfig(Integer id) {
@@ -86,7 +102,8 @@ public class ModelConfigOpsService {
 	}
 
 	/**
-	 * 私有方法：根据实体创建并替换内存代理
+	 * 根据模型类型刷新内存中的模型代理。
+	 * @param type 模型类型
 	 */
 	private void refreshMemoryModel(ModelType type) {
 		if (ModelType.CHAT.equals(type)) {
@@ -101,7 +118,8 @@ public class ModelConfigOpsService {
 	}
 
 	/**
-	 * 测试连接逻辑 注意：这里创建的模型是“临时”的，用完即丢，不会影响当前系统正在运行的模型
+	 * 测试模型连接，创建临时模型进行轻量级调用验证，不影响系统当前运行的模型。
+	 * @param config 待测试的模型配置 DTO
 	 */
 	public void testConnection(ModelConfigDTO config) {
 		String modelType = config.getModelType();
@@ -167,7 +185,9 @@ public class ModelConfigOpsService {
 	}
 
 	/**
-	 * 辅助方法：提取更友好的错误信息 Spring AI 抛出的异常有时候嵌套很深
+	 * 辅助方法，从异常信息中提取更友好的错误提示（如 401、404、429 等）。
+	 * @param e 异常对象
+	 * @return 友好的错误信息
 	 */
 	private String parseErrorMessage(Exception e) {
 		// 如果是 401，通常是 Key 错

@@ -25,6 +25,13 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 混合检索请求 DTO
+ *
+ * <p>
+ * 封装向量检索与关键词检索相结合的混合检索参数，支持权重配置、相似度阈值、重排序 及扩展参数。
+ * </p>
+ */
 @Data
 @Builder
 @NoArgsConstructor
@@ -32,28 +39,32 @@ import java.util.Map;
 public class HybridSearchRequest implements Serializable {
 
 	// === 基础参数 ===
+	/** 查询文本 */
 	private String query;
 
+	/** 返回结果数量上限 */
 	private Integer topK;
 
+	/** 相似度阈值（默认 0.0） */
 	@Builder.Default
 	private double similarityThreshold = 0.0;
 
+	/** 过滤表达式 */
 	private Filter.Expression filterExpression;
 
-	// 向量检索权重
+	/** 向量检索权重（默认 0.5） */
 	@Builder.Default
 	private Double vectorWeight = 0.5;
 
-	// 关键词检索权重
+	/** 关键词检索权重（默认 0.5） */
 	@Builder.Default
 	private Double keywordWeight = 0.5;
 
-	// 是否开启重排序模型
+	/** 是否开启重排序模型（默认关闭） */
 	@Builder.Default
 	private boolean useRerank = false;
 
-	// 扩展参数包将来某种数据库的特有参数
+	/** 扩展参数包，用于特定数据库的特有参数 */
 	@Builder.Default
 	private Map<String, Object> extraParams = new HashMap<>();
 

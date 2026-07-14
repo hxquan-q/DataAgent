@@ -44,47 +44,93 @@ import java.util.concurrent.ExecutorService;
 
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
+/**
+ * 图执行服务实现类，负责驱动 DataAgent 工作流图的编译与执行。
+ *
+ * <p>
+ * 主要职责包括：
+ * <ul>
+ * <li>同步执行自然语言转 SQL（NL2SQL）流程；</li>
+ * <li>基于 Reactor Flux 以流式（SSE）方式执行完整 DataAgent 流程，并支持人工反馈（Human Feedback）中断与恢复；</li>
+ * <li>管理每个会话线程（threadId）的流式上下文（{@link StreamContext}），保证线程安全地启动、停止和清理资源；</li>
+ * <li>集成 Langfuse 进行 LLM 调用链路追踪，并在多轮对话场景下管理上下文。
+ * </ul>
+ * </p>
+ *
+ * @author vlsmb
+ * @since 2025/10/30
+ */
 @Slf4j
 @Service
 public class GraphServiceImpl implements GraphService {
 
+	/** 已编译的工作流图，用于执行节点流转 */
 	private final CompiledGraph compiledGraph;
 
+	/** 异步执行线程池，用于在后台订阅 Flux 流 */
 	private final ExecutorService executor;
 
+	/** 以 threadId 为键的流式上下文映射，保存每个会话的运行状态 */
 	private final ConcurrentHashMap<String, StreamContext> streamContextMap = new ConcurrentHashMap<>();
 
+	/** 多轮对话上下文管理器，维护历史问答与计划 */
 	private final MultiTurnContextManager multiTurnContextManager;
 
+	/** Langfuse 链路追踪上报服务 */
 	private final LangfuseService langfuseReporter;
 
+	/**
+	 * 构造方法，编译状态图并注入所需依赖。
+	 * @param stateGraph 待编译的状态图定义
+	 * @param executorService 异步执行线程池
+	 * @param multiTurnContextManager 多轮对话上下文管理器
+	 * @param langfuseReporter Langfuse 追踪上报服务
+	 * @throws GraphStateException 当状态图编译失败时抛出
+	 */
 	public GraphServiceImpl(StateGraph stateGraph, ExecutorService executorService,
 			MultiTurnContextManager multiTurnContextManager, LangfuseService langfuseReporter)
 			throws GraphStateException {
+		// 编译状态图，并在人工反馈节点之前设置中断点
 		this.compiledGraph = stateGraph.compile(CompileConfig.builder().interruptBefore(HUMAN_FEEDBACK_NODE).build());
 		this.executor = executorService;
 		this.multiTurnContextManager = multiTurnContextManager;
 		this.langfuseReporter = langfuseReporter;
 	}
 
+	/**
+	 * 自然语言转 SQL，同步阻塞执行并返回生成的 SQL。
+	 * @param naturalQuery 用户的自然语言问题
+	 * @param agentId 目标 Agent 的唯一标识
+	 * @return 工作流执行后生成的 SQL 字符串
+	 * @throws GraphRunnerException 当图执行过程中发生异常时抛出
+	 */
 	@Override
 	public String nl2sql(String naturalQuery, String agentId) throws GraphRunnerException {
+		// 以仅生成 SQL 的模式同步调用工作流图
 		OverAllState state = compiledGraph
 			.invoke(Map.of(IS_ONLY_NL2SQL, true, INPUT_KEY, naturalQuery, AGENT_ID, agentId),
 					RunnableConfig.builder().build())
 			.orElseThrow();
+		// 从最终状态中取出 SQL 生成结果
 		return state.value(SQL_GENERATE_OUTPUT, "");
 	}
 
+	/**
+	 * 流式处理 NL2SQL 或 DataAgent 请求，根据请求内容路由到新流程或人工反馈恢复流程。
+	 * @param sink SSE 输出 Sink，用于向前端推送节点输出
+	 * @param graphRequest 图执行请求体
+	 */
 	@Override
 	public void graphStreamProcess(Sinks.Many<ServerSentEvent<GraphNodeResponse>> sink, GraphRequest graphRequest) {
+		// 若未指定 threadId，则生成新的唯一会话标识
 		if (!StringUtils.hasText(graphRequest.getThreadId())) {
 			graphRequest.setThreadId(UUID.randomUUID().toString());
 		}
 		String threadId = graphRequest.getThreadId();
-		// 创建或获取 StreamContext
+		// 创建或获取当前线程对应的流式上下文
 		StreamContext context = streamContextMap.computeIfAbsent(threadId, k -> new StreamContext());
 		context.setSink(sink);
+		// 根据是否携带人工反馈内容，路由到不同的处理分支
 		if (StringUtils.hasText(graphRequest.getHumanFeedbackContent())) {
 			handleHumanFeedback(graphRequest);
 		}
@@ -115,10 +161,15 @@ public class GraphServiceImpl implements GraphService {
 		}
 	}
 
+	/**
+	 * 处理新的流式请求，构建多轮上下文并启动工作流图的流式执行。
+	 * @param graphRequest 图执行请求体
+	 */
 	private void handleNewProcess(GraphRequest graphRequest) {
 		String query = graphRequest.getQuery();
 		String agentId = graphRequest.getAgentId();
 		String threadId = graphRequest.getThreadId();
+		// 仅当非纯 NL2SQL 模式时才允许人工审核
 		boolean nl2sqlOnly = graphRequest.isNl2sqlOnly();
 		boolean humanReviewEnabled = graphRequest.isHumanFeedback() & !(nl2sqlOnly);
 		if (!StringUtils.hasText(threadId) || !StringUtils.hasText(agentId) || !StringUtils.hasText(query)) {
@@ -146,6 +197,10 @@ public class GraphServiceImpl implements GraphService {
 		subscribeToFlux(context, nodeOutputFlux, graphRequest, agentId, threadId);
 	}
 
+	/**
+	 * 处理人工反馈，根据反馈内容更新图状态并恢复被中断的流式执行。
+	 * @param graphRequest 携带人工反馈内容的图执行请求体
+	 */
 	private void handleHumanFeedback(GraphRequest graphRequest) {
 		String agentId = graphRequest.getAgentId();
 		String threadId = graphRequest.getThreadId();
@@ -277,6 +332,11 @@ public class GraphServiceImpl implements GraphService {
 	/**
 	 * 处理节点输出
 	 */
+	/**
+	 * 处理节点输出，根据输出类型分发到对应的流式处理逻辑。
+	 * @param request 图执行请求体
+	 * @param output 工作流节点输出
+	 */
 	private void handleNodeOutput(GraphRequest request, NodeOutput output) {
 		log.debug("Received output: {}", output.getClass().getSimpleName());
 		if (output instanceof StreamingOutput streamingOutput) {
@@ -284,6 +344,11 @@ public class GraphServiceImpl implements GraphService {
 		}
 	}
 
+	/**
+	 * 处理流式节点输出，解析文本类型标记，收集输出内容并向前端推送 SSE 事件。
+	 * @param request 图执行请求体
+	 * @param output 流式输出数据块
+	 */
 	private void handleStreamNodeOutput(GraphRequest request, StreamingOutput output) {
 		String threadId = request.getThreadId();
 		StreamContext context = streamContextMap.get(threadId);

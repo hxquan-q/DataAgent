@@ -16,21 +16,36 @@
 package com.alibaba.cloud.ai.dataagent.dto.prompt;
 
 /**
- * Prompt configuration request DTO
+ * 提示词配置请求 DTO
+ *
+ * <p>
+ * 用于创建和更新用户自定义提示词配置的请求数据传输对象。采用 record 形式定义不可变数据。
+ * </p>
  *
  * @author Makoto
  */
 
-public record PromptConfigDTO(String id, // Configuration ID (required for update)
-		String name, // Configuration name
-		String promptType, // Prompt type
-		Long agentId, // Associated agent ID, null means global
-		String optimizationPrompt, // User-defined system prompt content
-		Boolean enabled, // Whether to enable this configuration
-		String description, // Configuration description
-		String creator, // Creator
-		Integer priority, // Configuration priority
-		Integer displayOrder // Configuration display order
+public record PromptConfigDTO(
+		/** 配置ID（更新时必填） */
+		String id,
+		/** 配置名称 */
+		String name,
+		/** 提示词类型 */
+		String promptType,
+		/** 关联的智能体ID，为 null 表示全局配置 */
+		Long agentId,
+		/** 用户自定义的系统提示词内容 */
+		String optimizationPrompt,
+		/** 是否启用该配置 */
+		Boolean enabled,
+		/** 配置描述 */
+		String description,
+		/** 创建者 */
+		String creator,
+		/** 配置优先级 */
+		Integer priority,
+		/** 展示排序值 */
+		Integer displayOrder
 ) {
 
 }

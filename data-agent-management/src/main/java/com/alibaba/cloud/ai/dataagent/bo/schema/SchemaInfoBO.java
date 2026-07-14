@@ -20,14 +20,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 数据库 Schema 信息业务对象。
+ * <p>
+ * 描述数据库 Schema（模式）的基本信息，包括名称和描述。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SchemaInfoBO {
 
+	/** Schema 名称 */
 	private String name;
 
+	/** Schema 描述 */
 	private String description;
 
 }

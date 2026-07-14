@@ -39,8 +39,21 @@ import org.springframework.ai.converter.BeanOutputConverter;
 
 import static com.alibaba.cloud.ai.dataagent.util.ReportTemplateUtil.cleanJsonExample;
 
+/**
+ * 提示词构建辅助工具类。
+ * <p>
+ * 提供各类提示词（Prompt）的构建方法，将用户输入、数据库 Schema、证据信息等
+ * 填充到对应的提示词模板中，生成最终发送给大模型的提示文本。
+ */
 public class PromptHelper {
 
+	/**
+	 * 构建 Schema 混合选择器提示词。
+	 * @param evidence 参考信息
+	 * @param question 用户问题
+	 * @param schemaDTO 数据库 Schema 信息
+	 * @return 渲染后的提示词
+	 */
 	public static String buildMixSelectorPrompt(String evidence, String question, SchemaDTO schemaDTO) {
 		String schemaInfo = buildMixMacSqlDbPrompt(schemaDTO, true);
 		Map<String, Object> params = new HashMap<>();
@@ -135,11 +148,12 @@ public class PromptHelper {
 	}
 
 	/**
-	 * Build report generation prompt with custom prompt
-	 * @param userRequirementsAndPlan user requirements and plan
-	 * @param analysisStepsAndData analysis steps and data
-	 * @param summaryAndRecommendations summary and recommendations
-	 * @return built prompt
+	 * 构建带自定义优化的报告生成提示词。
+	 * @param userRequirementsAndPlan 用户需求和执行计划
+	 * @param analysisStepsAndData 分析步骤和数据
+	 * @param summaryAndRecommendations 总结和建议
+	 * @param optimizationConfigs 用户自定义优化配置列表
+	 * @return 渲染后的报告生成提示词
 	 */
 	public static String buildReportGeneratorPromptWithOptimization(String userRequirementsAndPlan,
 			String analysisStepsAndData, String summaryAndRecommendations, List<UserPromptConfig> optimizationConfigs) {

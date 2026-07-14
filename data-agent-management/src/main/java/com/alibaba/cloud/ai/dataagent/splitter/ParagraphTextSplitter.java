@@ -48,6 +48,14 @@ public class ParagraphTextSplitter extends TextSplitter {
 
 	private static final Pattern sentencePattern = Pattern.compile("[^。！？.!?\\n]+[。！？.!?\\n]*");
 
+	/**
+	 * 将文本按段落切分为多个块。
+	 * <p>
+	 * 处理流程：按段落分隔符粗切 -> 积累普通段落直至超限 -> 超大段落递归降级切分（段落->句子->字符），
+	 * 并在每个块之间保留 Overlap 以保持上下文连续性。
+	 * @param text 待切分的原始文本
+	 * @return 切分后的文本块列表
+	 */
 	@Override
 	public List<String> splitText(String text) {
 		if (text == null || text.trim().isEmpty()) {
@@ -232,6 +240,11 @@ public class ParagraphTextSplitter extends TextSplitter {
 		return subChunks;
 	}
 
+	/**
+	 * 按固定字符数硬切分文本（最终降级策略）。
+	 * @param text 待切分的文本
+	 * @return 切分后的文本块列表
+	 */
 	private List<String> splitByChars(String text) {
 		List<String> chunks = new ArrayList<>();
 		int start = 0;

@@ -21,28 +21,39 @@ import com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum;
 import java.sql.Connection;
 
 /**
- * DataAgent data connection pool, used to maintain the data source connection information
- * required by DataAgent
+ * 数据库连接池接口，用于维护 DataAgent 所需的数据源连接信息。
+ * <p>
+ * 各数据库类型（MySQL、PostgreSQL、Oracle、H2、Hive、达梦、SQL Server 等）提供各自的实现。
+ * </p>
  */
 
 public interface DBConnectionPool extends AutoCloseable {
 
 	/**
-	 * Ping the database to check if the connection is valid.
-	 * @param config the database configuration
-	 * @return ErrorCodeEnum indicating the result of the ping operation
+	 * 测试数据库连接是否有效。
+	 * @param config 数据库配置信息
+	 * @return 错误码枚举，表示连接测试结果
 	 */
 	ErrorCodeEnum ping(DbConfigBO config);
 
 	/**
-	 * Get a database connection from the pool.
-	 * @param config the database configuration
-	 * @return a Connection object representing the database connection
+	 * 从连接池中获取数据库连接。
+	 * @param config 数据库配置信息
+	 * @return 数据库连接对象
 	 */
 	Connection getConnection(DbConfigBO config);
 
+	/**
+	 * 判断当前连接池是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否支持该数据源类型
+	 */
 	boolean supportedDataSourceType(String type);
 
+	/**
+	 * 获取当前连接池的类型标识。
+	 * @return 连接池类型名称
+	 */
 	String getConnectionPoolType();
 
 }

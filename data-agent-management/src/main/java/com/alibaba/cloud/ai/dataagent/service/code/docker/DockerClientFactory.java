@@ -24,19 +24,32 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Connects to the first reachable Docker endpoint.
+ * Docker 客户端工厂，依次尝试候选主机列表，连接到第一个可用的 Docker 端点。
  */
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class DockerClientFactory {
 
+	/** Docker 客户端连接器 */
 	private final DockerClientConnector connector;
 
+	/**
+	 * 创建连接到第一个可用候选主机的 Docker 客户端。
+	 * @param candidateHosts 候选 Docker 主机列表
+	 * @return Docker 客户端
+	 */
 	public DockerClient create(List<String> candidateHosts) {
 		return connect(candidateHosts).client();
 	}
 
+	/**
+	 * 连接到第一个可用的 Docker 端点。
+	 * @param candidateHosts 候选 Docker 主机列表
+	 * @return Docker 连接信息（客户端 + 主机地址）
+	 * @throws IllegalArgumentException 当候选主机列表为空时抛出
+	 * @throws IllegalStateException 当所有候选主机都无法连接时抛出
+	 */
 	public DockerConnection connect(List<String> candidateHosts) {
 		if (candidateHosts == null || candidateHosts.isEmpty()) {
 			throw new IllegalArgumentException("At least one Docker host candidate is required");

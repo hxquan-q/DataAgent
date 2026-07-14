@@ -23,23 +23,40 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.FEASIBILITY_ASSES
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.PLANNER_NODE;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
+/**
+ * 可行性评估分发器，根据可行性评估结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>需求类型为"《数据分析》"：进入计划生成节点</li>
+ * <li>其他需求类型：结束流程</li>
+ * </ul>
+ * </p>
+ */
 @Slf4j
 public class FeasibilityAssessmentDispatcher implements EdgeAction {
 
+	/**
+	 * 根据可行性评估结果决定下一个节点。
+	 * @param state 工作流全局状态，包含可行性评估结果
+	 * @return 下一个节点名称：{@value PLANNER_NODE} 或 {@code END}
+	 * @throws Exception 读取状态时可能抛出的异常
+	 */
 	@Override
 	public String apply(OverAllState state) throws Exception {
-		// value的值是和 resources/feasibility-assessment.txt的输出一致，例如
+		// value 的值与 resources/feasibility-assessment.txt 的输出一致，例如
 		// 【需求类型】：《数据分析》
 		// 【语种类型】：《中文》
-		// 【需求内容】：查询所有“核心用户”的数量
+		// 【需求内容】：查询所有"核心用户"的数量
 		String value = state.value(FEASIBILITY_ASSESSMENT_NODE_OUTPUT, END);
 
 		if (value != null && value.contains("【需求类型】：《数据分析》")) {
-			log.info("[FeasibilityAssessmentNodeDispatcher]需求类型为数据分析，进入PlannerNode节点");
+			log.info("[可行性评估分发器] 需求类型为数据分析，进入计划生成节点");
 			return PLANNER_NODE;
 		}
 		else {
-			log.info("[FeasibilityAssessmentNodeDispatcher]需求类型非数据分析，返回END节点");
+			log.info("[可行性评估分发器] 需求类型非数据分析，结束流程");
 			return END;
 		}
 	}

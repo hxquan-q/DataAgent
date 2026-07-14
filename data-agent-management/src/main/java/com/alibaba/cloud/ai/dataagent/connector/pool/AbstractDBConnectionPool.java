@@ -31,38 +31,69 @@ import java.sql.Statement;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 数据库连接池抽象实现类。
+ * <p>
+ * 基于 Druid 连接池实现，提供数据源缓存、连接获取重试、连接测试（ping）等通用功能。
+ * 子类需要实现 {@link #getDriver()} 和 {@link #errorMapping(String)} 方法以适配不同数据库类型。
+ * </p>
+ */
 @Slf4j
 public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 
 	/**
-	 * DataSource cache to ensure that each configuration creates DataSource only once.
+	 * 数据源缓存，确保每套连接配置只创建一次 DataSource，避免重复创建。
 	 */
 	private static final ConcurrentHashMap<String, DataSource> DATA_SOURCE_CACHE = new ConcurrentHashMap<>();
 
+	/** 连接获取重试策略 */
 	private final ConnectionRetryPolicy retryPolicy;
 
+	/**
+	 * 使用默认重试策略构造连接池。
+	 */
 	protected AbstractDBConnectionPool() {
 		this(ConnectionRetryPolicy.defaults());
 	}
 
+	/**
+	 * 使用指定重试策略构造连接池。
+	 * @param retryPolicy 重试策略
+	 */
 	protected AbstractDBConnectionPool(ConnectionRetryPolicy retryPolicy) {
 		this.retryPolicy = Objects.requireNonNull(retryPolicy, "retryPolicy");
 	}
 
 	/**
-	 * Driver
+	 * 获取当前数据库类型的 JDBC 驱动类名。
+	 * @return JDBC 驱动类全限定名
 	 */
 	public abstract String getDriver();
 
 	/**
-	 * Error message mapping
+	 * 将 SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常的 sqlState 状态码
+	 * @return 对应的错误码枚举
 	 */
 	public abstract ErrorCodeEnum errorMapping(String sqlState);
 
+	/**
+	 * 获取查询指定 schema 是否存在的 SQL 语句。
+	 * @param schema schema 名称
+	 * @return 查询 SQL 语句
+	 */
 	protected String getSelectSchemaSQL(String schema) {
 		return String.format("SELECT count(*) FROM information_schema.schemata WHERE schema_name = '%s'", schema);
 	}
 
+	/**
+	 * 测试数据库连接是否有效。
+	 * <p>
+	 * 对于非 H2 数据库要求密码非空；对 PostgreSQL 方言的数据库额外校验 schema 是否存在。
+	 * </p>
+	 * @param config 数据库配置信息
+	 * @return 连接测试结果错误码
+	 */
 	public ErrorCodeEnum ping(DbConfigBO config) {
 		String jdbcUrl = config.getUrl();
 		// H2 内嵌数据库允许空密码，其他数据库类型必须配置密码
@@ -73,6 +104,7 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 		}
 		try (Connection connection = DriverManager.getConnection(jdbcUrl, config.getUsername(), config.getPassword());
 				Statement stmt = connection.createStatement();) {
+			// PostgreSQL 方言数据库需要额外校验 schema 是否存在
 			if (BizDataSourceTypeEnum.isPgDialect(config.getConnectionType())) {
 				ResultSet rs = stmt.executeQuery(getSelectSchemaSQL(config.getSchema()));
 				if (rs.next()) {
@@ -94,6 +126,15 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 		}
 	}
 
+	/**
+	 * 从连接池中获取数据库连接。
+	 * <p>
+	 * 基于连接参数生成缓存键，确保同一配置只创建一个 DataSource。
+	 * 获取失败时按照重试策略进行退避重试。
+	 * </p>
+	 * @param config 数据库配置信息
+	 * @return 数据库连接对象
+	 */
 	public Connection getConnection(DbConfigBO config) {
 
 		String jdbcUrl = config.getUrl();
@@ -101,12 +142,10 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 
 		for (int attempt = 1; attempt <= maxAttempts; attempt++) {
 			try {
-				// Generate cache key based on connection parameters
+				// 基于连接参数生成缓存键
 				String cacheKey = generateCacheKey(jdbcUrl, config.getUsername(), config.getPassword());
 
-				// Use computeIfAbsent to ensure thread safety and avoid duplicate
-				// DataSource
-				// creation
+				// 使用 computeIfAbsent 保证线程安全，避免重复创建 DataSource
 				DataSource dataSource = DATA_SOURCE_CACHE.computeIfAbsent(cacheKey, key -> {
 					try {
 						log.debug("Creating new DataSource for key: {}", key);
@@ -137,7 +176,7 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 							e);
 				}
 
-				// Wait before retry with incremental backoff
+				// 失败后按递增退避策略等待重试
 				try {
 					retryPolicy.pauseAfterFailure(attempt);
 				}
@@ -152,16 +191,19 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 	}
 
 	/**
-	 * Generate cache key based on connection parameters.
-	 * @param url the database URL
-	 * @param username the database username
-	 * @param password the database password
-	 * @return the cache key
+	 * 根据连接参数生成缓存键。
+	 * @param url 数据库连接 URL
+	 * @param username 数据库用户名
+	 * @param password 数据库密码
+	 * @return 缓存键字符串
 	 */
 	private String generateCacheKey(String url, String username, String password) {
 		return url + "|" + username + "|" + Objects.hashCode(password);
 	}
 
+	/**
+	 * 关闭并清空所有缓存的数据源。
+	 */
 	@Override
 	public void close() {
 		DATA_SOURCE_CACHE.values().forEach(dataSource -> {
@@ -174,14 +216,22 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 	}
 
 	/**
-	 * Clear DataSource cache and close all cached DataSource instances. This method is
-	 * useful for resource cleanup in special scenarios.
+	 * 创建 Druid 数据源实例。
+	 * <p>
+	 * 配置初始连接数 5、最小空闲 5、最大活跃 20、最大等待 10 秒。
+	 * 对于达梦数据库禁用 wall 过滤器（仅保留 stat）。
+	 * </p>
+	 * @param url 数据库连接 URL
+	 * @param username 数据库用户名
+	 * @param password 数据库密码
+	 * @return 创建好的数据源实例
+	 * @throws Exception 数据源创建异常
 	 */
-
 	public DataSource createdDataSource(String url, String username, String password) throws Exception {
 
 		String driver = getDriver();
 
+		// 默认启用 wall 和 stat 过滤器；达梦数据库驱动不兼容 wall 过滤器
 		String filters = "wall,stat";
 		if (driver != null && driver.toLowerCase().contains("dm.jdbc.driver.dmdriver")) {
 			filters = "stat";

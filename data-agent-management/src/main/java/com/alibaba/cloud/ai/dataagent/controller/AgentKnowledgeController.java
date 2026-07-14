@@ -38,7 +38,12 @@ import reactor.core.scheduler.Schedulers;
 import java.util.List;
 
 /**
- * Agent Knowledge Management Controller
+ * Agent 知识库管理控制器。
+ * <p>
+ * 管理智能体的知识文档（支持文本和文件上传），包括创建、更新、删除、
+ * 分页查询、召回状态切换、重新向量化等操作。
+ * 上传文件时支持自定义分块策略（splitterType）。
+ * </p>
  */
 @Slf4j
 @RestController

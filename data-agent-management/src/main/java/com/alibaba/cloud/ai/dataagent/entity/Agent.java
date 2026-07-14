@@ -25,7 +25,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Agent Entity Class
+ * 智能体（Agent）实体类
+ *
+ * <p>
+ * 对应数据库中智能体的核心配置信息，包含智能体名称、描述、状态、API 密钥、提示词等。 一个智能体实例代表一个可被用户调用的数据分析助手。
+ * </p>
  */
 @Builder
 @NoArgsConstructor
@@ -33,35 +37,47 @@ import java.time.LocalDateTime;
 @Data
 public class Agent {
 
+	/** 主键ID */
 	private Long id;
 
-	private String name; // Agent name
+	/** 智能体名称 */
+	private String name;
 
-	private String description; // Agent description
+	/** 智能体描述 */
+	private String description;
 
-	private String avatar; // Avatar URL
+	/** 头像URL */
+	private String avatar;
 
+	/** 状态：draft-待发布，published-已发布，offline-已下线 */
 	// todo: 改为枚举
-	private String status; // Status: draft-pending publication, published-published,
-							// offline-offline
+	private String status;
 
+	/** 外部访问使用的 API Key，格式为 sk-xxx */
 	@JsonIgnore
-	private String apiKey; // API Key for external access, format sk-xxx
+	private String apiKey;
 
+	/** 是否启用 API 访问（0-关闭，1-开启） */
 	@Builder.Default
-	private Integer apiKeyEnabled = 0; // 0/1 toggle for API access
+	private Integer apiKeyEnabled = 0;
 
-	private String prompt; // Custom Prompt configuration
+	/** 自定义提示词（Prompt）配置 */
+	private String prompt;
 
-	private String category; // Category
+	/** 分类 */
+	private String category;
 
-	private Long adminId; // Admin ID
+	/** 管理员ID */
+	private Long adminId;
 
-	private String tags; // Tags, comma separated
+	/** 标签，多个标签以逗号分隔 */
+	private String tags;
 
+	/** 创建时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime createTime;
 
+	/** 更新时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime updateTime;
 

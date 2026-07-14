@@ -33,40 +33,54 @@ import java.util.Set;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * Plan execution and validation node, decides next execution node based on plan, and
- * validates before execution.
+ * 计划执行与校验节点，位于计划生成之后、具体工具节点之前。
+ *
+ * <p>
+ * 该节点负责校验执行计划的结构和每一步的参数，并根据计划内容和当前步骤决定下一个执行节点。 若开启人工复核，则在校验通过后暂停执行，跳转到人工反馈节点。
+ * </p>
  *
  * @author zhangshenghang
+ * @see PlannerNode
+ * @see HumanFeedbackNode
  */
 @Slf4j
 @Component
 public class PlanExecutorNode implements NodeAction {
 
-	// Supported node types
+	// 支持的节点类型
 	private static final Set<String> SUPPORTED_NODES = Set.of(SQL_GENERATE_NODE, PYTHON_GENERATE_NODE,
 			REPORT_GENERATOR_NODE);
 
+	/**
+	 * 执行计划校验与路由逻辑。
+	 * <p>
+	 * 先校验计划结构，再校验每个执行步骤的参数。校验通过后根据当前步骤决定下一个节点； 若开启人工复核则跳转到人工反馈节点。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含下一个执行节点和校验状态的 Map
+	 * @throws Exception 解析计划时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 		// TODO 待优化，校验应该在生成计划之后而不是这里，这里导致每次运行一个计划都校验一次
-		// 1. Validate the Plan
+		// 1. 校验计划结构
 		Plan plan;
 		try {
 			plan = PlanProcessUtil.getPlan(state);
 		}
 		catch (Exception e) {
-			log.error("Plan validation failed due to a parsing error.", e);
+			log.error("计划校验失败，解析错误。", e);
 			return buildValidationResult(state, false,
-					"Validation failed: The plan is not a valid JSON structure. Error: " + e.getMessage());
+					"校验失败：计划不是有效的 JSON 结构。错误: " + e.getMessage());
 		}
 
-		// Validate execution plan structure
+		// 校验执行计划结构
 		if (!validateExecutionPlanStructure(plan)) {
 			return buildValidationResult(state, false,
-					"Validation failed: The generated plan is empty or has no execution steps.");
+					"校验失败：生成的计划为空或没有执行步骤。");
 		}
 
-		// Validate each execution step
+		// 校验每个执行步骤
 		for (ExecutionStep step : plan.getExecutionPlan()) {
 			String validationResult = validateExecutionStep(step);
 			if (validationResult != null) {
@@ -74,27 +88,28 @@ public class PlanExecutorNode implements NodeAction {
 			}
 		}
 
-		log.info("Plan validation successful.");
-		// 2. If开启人工复核，则在执行前暂停，跳转到human_feedback节点
+		log.info("计划校验成功。");
+		// 2. 若开启人工复核，则在执行前暂停，跳转到人工反馈节点
 		Boolean humanReviewEnabled = state.value(HUMAN_REVIEW_ENABLED, false);
 		if (Boolean.TRUE.equals(humanReviewEnabled)) {
-			log.info("Human review enabled: routing to human_feedback node");
+			log.info("已开启人工复核：路由到人工反馈节点");
 			return Map.of(PLAN_VALIDATION_STATUS, true, PLAN_NEXT_NODE, HUMAN_FEEDBACK_NODE);
 		}
 
+		// 获取当前步骤号和执行计划
 		int currentStep = PlanProcessUtil.getCurrentStepNumber(state);
 		List<ExecutionStep> executionPlan = plan.getExecutionPlan();
 
 		boolean isOnlyNl2Sql = state.value(IS_ONLY_NL2SQL, false);
 
-		// Check if the plan is completed
+		// 检查计划是否已完成
 		if (currentStep > executionPlan.size()) {
-			log.info("Plan completed, current step: {}, total steps: {}", currentStep, executionPlan.size());
+			log.info("计划已完成，当前步骤: {}, 总步骤数: {}", currentStep, executionPlan.size());
 			return Map.of(PLAN_CURRENT_STEP, 1, PLAN_NEXT_NODE, isOnlyNl2Sql ? StateGraph.END : REPORT_GENERATOR_NODE,
 					PLAN_VALIDATION_STATUS, true);
 		}
 
-		// Get current step and determine next node
+		// 获取当前步骤并确定下一个节点
 		ExecutionStep executionStep = executionPlan.get(currentStep - 1);
 		String toolToUse = executionStep.getToolToUse();
 
@@ -102,82 +117,91 @@ public class PlanExecutorNode implements NodeAction {
 	}
 
 	/**
-	 * Determine the next node to execute
+	 * 根据要使用的工具确定下一个执行节点。
+	 * @param toolToUse 要使用的工具名称
+	 * @return 包含下一个执行节点和校验状态的 Map
 	 */
 	private Map<String, Object> determineNextNode(String toolToUse) {
 		if (SUPPORTED_NODES.contains(toolToUse)) {
-			log.info("Determined next execution node: {}", toolToUse);
+			log.info("确定下一个执行节点: {}", toolToUse);
 			return Map.of(PLAN_NEXT_NODE, toolToUse, PLAN_VALIDATION_STATUS, true);
 		}
 		else if (HUMAN_FEEDBACK_NODE.equals(toolToUse)) {
-			log.info("Determined next execution node: {}", toolToUse);
+			log.info("确定下一个执行节点: {}", toolToUse);
 			return Map.of(PLAN_NEXT_NODE, toolToUse, PLAN_VALIDATION_STATUS, true);
 		}
 		else {
-			// This case should ideally not be reached if validation is done correctly
-			// before.
-			return Map.of(PLAN_VALIDATION_STATUS, false, PLAN_VALIDATION_ERROR, "Unsupported node type: " + toolToUse);
+			// 正常情况下不会到达此处，因为前面已经做了校验
+			return Map.of(PLAN_VALIDATION_STATUS, false, PLAN_VALIDATION_ERROR, "不支持的节点类型: " + toolToUse);
 		}
 	}
 
 	/**
-	 * Validate the execution plan structure
+	 * 校验执行计划结构是否有效。
+	 * @param plan 执行计划
+	 * @return 若计划非空且包含执行步骤则返回 true
 	 */
 	private boolean validateExecutionPlanStructure(Plan plan) {
 		return plan != null && plan.getExecutionPlan() != null && !plan.getExecutionPlan().isEmpty();
 	}
 
 	/**
-	 * Validate a single execution step
-	 * @return error message if validation fails, null if validation passes
+	 * 校验单个执行步骤。
+	 * @param step 执行步骤
+	 * @return 校验失败时返回错误信息，校验通过返回 null
 	 */
 	private String validateExecutionStep(ExecutionStep step) {
-		// Validate tool name
+		// 校验工具名称
 		if (step.getToolToUse() == null || !SUPPORTED_NODES.contains(step.getToolToUse())) {
-			return "Validation failed: Plan contains an invalid tool name: '" + step.getToolToUse() + "' in step "
-					+ step.getStep();
+			return "校验失败：步骤 " + step.getStep() + " 中包含无效的工具名称: '" + step.getToolToUse() + "'";
 		}
 
-		// Validate tool parameters
+		// 校验工具参数
 		if (step.getToolParameters() == null) {
-			return "Validation failed: Tool parameters are missing for step " + step.getStep();
+			return "校验失败：步骤 " + step.getStep() + " 缺少工具参数";
 		}
 
-		// Validate specific parameters based on node type
+		// 根据节点类型校验特定参数
 		switch (step.getToolToUse()) {
 			case SQL_GENERATE_NODE:
 				if (!StringUtils.hasText(step.getToolParameters().getInstruction())) {
-					return "Validation failed: SQL generation node is missing description in step " + step.getStep();
+					return "校验失败：步骤 " + step.getStep() + " 的 SQL 生成节点缺少描述信息";
 				}
 				break;
 
 			case PYTHON_GENERATE_NODE:
 				if (!StringUtils.hasText(step.getToolParameters().getInstruction())) {
-					return "Validation failed: Python generation node is missing instruction in step " + step.getStep();
+					return "校验失败：步骤 " + step.getStep() + " 的 Python 生成节点缺少指令信息";
 				}
 				break;
 
 			case REPORT_GENERATOR_NODE:
 				if (!StringUtils.hasText(step.getToolParameters().getSummaryAndRecommendations())) {
-					return "Validation failed: Report generation node is missing summary_and_recommendations in step "
-							+ step.getStep();
+					return "校验失败：步骤 " + step.getStep() + " 的报告生成节点缺少总结和建议信息";
 				}
 				break;
 
 			default:
-				// This should not happen due to the earlier validation
+				// 前面的校验已经排除了这种情况
 				break;
 		}
 
-		return null; // Validation passed
+		return null; // 校验通过
 	}
 
+	/**
+	 * 构建校验结果 Map。
+	 * @param state 工作流全局状态
+	 * @param isValid 校验是否通过
+	 * @param errorMessage 错误信息
+	 * @return 校验结果 Map
+	 */
 	private Map<String, Object> buildValidationResult(OverAllState state, boolean isValid, String errorMessage) {
 		if (isValid) {
 			return Map.of(PLAN_VALIDATION_STATUS, true);
 		}
 		else {
-			// When validation fails, increment the repair count here.
+			// 校验失败时，递增修复次数
 			int repairCount = StateUtil.getObjectValue(state, PLAN_REPAIR_COUNT, Integer.class, 0);
 			return Map.of(PLAN_VALIDATION_STATUS, false, PLAN_VALIDATION_ERROR, errorMessage, PLAN_REPAIR_COUNT,
 					repairCount + 1);

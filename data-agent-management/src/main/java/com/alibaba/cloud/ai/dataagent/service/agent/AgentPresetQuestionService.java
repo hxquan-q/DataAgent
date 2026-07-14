@@ -19,43 +19,55 @@ import com.alibaba.cloud.ai.dataagent.entity.AgentPresetQuestion;
 
 import java.util.List;
 
+/**
+ * Agent 预设问题服务接口，提供 Agent 预设问题的增删改查及批量管理能力。
+ */
 public interface AgentPresetQuestionService {
 
 	/**
-	 * Get the list of preset questions by agent ID (only active ones, ordered by
-	 * sort_order and id)
+	 * 根据 Agent ID 获取预设问题列表（仅返回激活的问题，按 sort_order 和 id 排序）。
+	 * @param agentId Agent 主键 ID
+	 * @return 激活的预设问题列表
 	 */
 	List<AgentPresetQuestion> findByAgentId(Long agentId);
 
 	/**
-	 * Get all preset questions by agent ID (including inactive ones, ordered by
-	 * sort_order and id)
+	 * 根据 Agent ID 获取全部预设问题（包含未激活的，按 sort_order 和 id 排序）。
+	 * @param agentId Agent 主键 ID
+	 * @return 全部预设问题列表
 	 */
 	List<AgentPresetQuestion> findAllByAgentId(Long agentId);
 
 	/**
-	 * Create a new preset question
+	 * 创建新的预设问题。
+	 * @param question 待创建的预设问题对象
+	 * @return 创建后的预设问题对象（包含生成的 ID）
 	 */
 	AgentPresetQuestion create(AgentPresetQuestion question);
 
 	/**
-	 * Update an existing preset question
+	 * 更新已存在的预设问题。
+	 * @param id 预设问题主键 ID
+	 * @param question 待更新的预设问题对象
 	 */
 	void update(Long id, AgentPresetQuestion question);
 
 	/**
-	 * Delete a preset question by ID
+	 * 根据主键 ID 删除预设问题。
+	 * @param id 预设问题主键 ID
 	 */
 	void deleteById(Long id);
 
 	/**
-	 * Delete all preset questions for a given agent
+	 * 删除指定 Agent 的全部预设问题。
+	 * @param agentId Agent 主键 ID
 	 */
 	void deleteByAgentId(Long agentId);
 
 	/**
-	 * Batch save preset questions: delete all existing ones for the agent, then insert
-	 * the new list
+	 * 批量保存预设问题：先删除该 Agent 已有的全部预设问题，再插入新的列表。
+	 * @param agentId Agent 主键 ID
+	 * @param questions 待批量保存的预设问题列表
 	 */
 	void batchSave(Long agentId, List<AgentPresetQuestion> questions);
 

@@ -95,6 +95,8 @@ npm install && npm run dev
 | [开发者指南](docs/DEVELOPER_GUIDE.md) | 开发环境搭建、详细配置手册、代码规范、扩展开发(向量库/模型) |
 | [高级功能](docs/ADVANCED_FEATURES.md) | API Key 调用、MCP 服务器配置、自定义混合检索策略、Python执行器配置 |
 | [知识配置最佳实践](docs/KNOWLEDGE_USAGE.md) | 语义模型，业务知识，智能体知识的解释和使用 |
+| [工程化系统思维入门](docs/ENGINEERING_SYSTEM_THINKING.md) | 面向新手的系统建模/分析/设计/优化方法论、21 天阅读路线图、二次开发实战清单 |
+| [系统设计：顶层到落地（图解）](docs/SYSTEM_DESIGN_TOP_DOWN.md) | 结合 20+ Mermaid 图：问题定义→分层→StateGraph 控制律→状态空间→反馈回路→前端 SSE |
 
 ## 🤝 加入社区 & 贡献
 

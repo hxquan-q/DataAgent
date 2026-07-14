@@ -23,6 +23,15 @@ package com.alibaba.cloud.ai.dataagent.enums;
  */
 public enum CodePoolExecutorEnum {
 
-	DOCKER, CONTAINERD, KATA, AI_SIMULATION, LOCAL;
+	/** 基于 Docker 容器的执行器 */
+	DOCKER,
+	/** 基于 containerd 的容器执行器 */
+	CONTAINERD,
+	/** 基于 Kata Containers 的安全容器执行器 */
+	KATA,
+	/** AI 模拟执行器（非真实容器，用于测试/演示） */
+	AI_SIMULATION,
+	/** 本地进程执行器 */
+	LOCAL;
 
 }

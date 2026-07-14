@@ -17,10 +17,21 @@ package com.alibaba.cloud.ai.dataagent.util;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+/**
+ * JSON 工具类。
+ * <p>
+ * 持有全局共享的 {@link ObjectMapper} 实例，统一 Jackson 序列化/反序列化配置，避免重复创建。
+ * </p>
+ */
 public class JsonUtil {
 
+	/** 全局共享的 ObjectMapper 实例 */
 	private static final ObjectMapper objectMapper = new ObjectMapper();
 
+	/**
+	 * 获取全局共享的 {@link ObjectMapper} 实例。
+	 * @return ObjectMapper 实例
+	 */
 	public static ObjectMapper getObjectMapper() {
 		return objectMapper;
 	}

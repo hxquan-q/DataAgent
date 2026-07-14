@@ -22,11 +22,30 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * MCP Server 工具类。
+ * <p>
+ * 用于在 Spring 容器中按类型筛选 Bean，并排除标注了 {@link McpServerTool} 的 Bean。 便于在工作流节点中只获取非 MCP Server 工具，避免对外暴露的 MCP 工具被节点误用。
+ * </p>
+ */
 public final class McpServerToolUtil {
 
+	private McpServerToolUtil() {
+	}
+
+	/**
+	 * 获取指定类型的所有 Bean，但排除标注了 {@link McpServerTool} 的 Bean。
+	 * @param <T> Bean 类型
+	 * @param context Spring 应用上下文
+	 * @param type 目标 Bean 类型
+	 * @return 不包含 MCP Server 工具的 Bean 列表
+	 */
 	public static <T> List<T> excludeMcpServerTool(GenericApplicationContext context, Class<T> type) {
+		// 获取指定类型的所有 Bean 名称
 		String[] namesForType = context.getBeanNamesForType(type);
+		// 获取标注了 McpServerTool 的 Bean 名称集合
 		Set<String> namesForAnnotation = Set.of(context.getBeanNamesForAnnotation(McpServerTool.class));
+		// 过滤掉 MCP Server 工具 Bean，剩余 Bean 实例化后返回
 		return Arrays.stream(namesForType)
 			.filter(name -> !namesForAnnotation.contains(name))
 			.map(name -> context.getBean(name, type))

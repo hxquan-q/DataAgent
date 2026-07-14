@@ -26,20 +26,35 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.INTENT_RECOGNITIO
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
- * 根据意图识别结果决定下一个节点的分发器
+ * 意图识别分发器，根据意图识别节点的结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>分类为"《闲聊或无关指令》"：结束流程</li>
+ * <li>其他分类（潜在数据分析请求）：进入证据召回节点</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 public class IntentRecognitionDispatcher implements EdgeAction {
 
+	/**
+	 * 根据意图识别结果决定下一个节点。
+	 * @param state 工作流全局状态，包含意图识别结果
+	 * @return 下一个节点名称：{@value EVIDENCE_RECALL_NODE} 或 {@code END}
+	 * @throws Exception 读取状态时可能抛出的异常
+	 */
 	@Override
 	public String apply(OverAllState state) throws Exception {
 		// 获取意图识别结果
 		IntentRecognitionOutputDTO intentResult = StateUtil.getObjectValue(state, INTENT_RECOGNITION_NODE_OUTPUT,
 				IntentRecognitionOutputDTO.class);
 
+		// 结果为空时默认结束流程
 		if (intentResult == null || intentResult.getClassification() == null
 				|| intentResult.getClassification().trim().isEmpty()) {
-			log.warn("Intent recognition result is null or empty, defaulting to END");
+			log.warn("意图识别结果为空，默认结束流程");
 			return END;
 		}
 
@@ -47,11 +62,11 @@ public class IntentRecognitionDispatcher implements EdgeAction {
 
 		// 根据分类结果决定下一个节点
 		if ("《闲聊或无关指令》".equals(classification)) {
-			log.warn("Intent classified as chat or irrelevant, ending conversation");
+			log.warn("意图分类为闲聊或无关指令，结束对话");
 			return END;
 		}
 		else {
-			log.info("Intent classified as potential data analysis request, proceeding to evidence recall");
+			log.info("意图分类为潜在数据分析请求，进入证据召回节点");
 			return EVIDENCE_RECALL_NODE;
 		}
 	}

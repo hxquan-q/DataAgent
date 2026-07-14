@@ -20,23 +20,37 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * SQL 生成 DTO
+ *
+ * <p>
+ * 封装 NL2SQL 流程中用于 SQL 生成的上下文数据，包括用户查询、数据库结构、 先验知识、已生成 SQL 及其执行结果等信息。
+ * </p>
+ */
 @AllArgsConstructor
 @Builder
 @Data
 public class SqlGenerationDTO {
 
+	/** 先验知识（业务术语提示等） */
 	private String evidence;
 
+	/** 用户自然语言查询 */
 	private String query;
 
+	/** 数据库结构信息 */
 	private SchemaDTO schemaDTO;
 
+	/** 已生成的 SQL 语句 */
 	private String sql;
 
+	/** 执行异常信息 */
 	private String exceptionMessage;
 
+	/** SQL 执行结果的描述 */
 	private String executionDescription;
 
+	/** 数据库方言类型 */
 	private String dialect;
 
 }

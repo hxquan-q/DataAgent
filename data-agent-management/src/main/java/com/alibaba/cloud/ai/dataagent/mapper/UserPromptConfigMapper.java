@@ -25,11 +25,21 @@ import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
+/**
+ * 用户提示词配置 Mapper，操作 {@code user_prompt_config} 表。
+ * <p>
+ * 管理按提示词类型（prompt_type）分类的系统提示词配置，支持按类型/智能体查询、启用/禁用切换、
+ * 互斥启用及增删改。
+ * </p>
+ */
 @Mapper
 public interface UserPromptConfigMapper {
 
 	/**
-	 * Query configuration list by prompt type
+	 * 根据提示词类型查询配置列表（可选按智能体过滤），按更新时间倒序返回。
+	 * @param promptType 提示词类型
+	 * @param agentId 智能体 ID（可为 {@code null}）
+	 * @return 配置列表
 	 */
 	@Select("""
 			<script>
@@ -42,7 +52,10 @@ public interface UserPromptConfigMapper {
 	List<UserPromptConfig> selectByPromptType(@Param("promptType") String promptType, @Param("agentId") Long agentId);
 
 	/**
-	 * Query enabled configuration by prompt type
+	 * 根据提示词类型查询已启用的配置（可选按智能体过滤），至多返回一条。
+	 * @param promptType 提示词类型
+	 * @param agentId 智能体 ID（可为 {@code null}）
+	 * @return 已启用的配置；不存在返回 {@code null}
 	 */
 	@Select("""
 			<script>
@@ -56,7 +69,10 @@ public interface UserPromptConfigMapper {
 	UserPromptConfig selectActiveByPromptType(@Param("promptType") String promptType, @Param("agentId") Long agentId);
 
 	/**
-	 * Disable all configurations of a specified type
+	 * 禁用指定类型（可选按智能体）下的全部配置。
+	 * @param promptType 提示词类型
+	 * @param agentId 智能体 ID（可为 {@code null}）
+	 * @return 受影响行数
 	 */
 	@Update("""
 			<script>
@@ -69,20 +85,34 @@ public interface UserPromptConfigMapper {
 	int disableAllByPromptType(@Param("promptType") String promptType, @Param("agentId") Long agentId);
 
 	/**
-	 * Enable a specified configuration
+	 * 启用指定配置。
+	 * @param id 配置 ID
+	 * @return 受影响行数
 	 */
 	@Update("UPDATE user_prompt_config SET enabled = 1 WHERE id = #{id}")
 	int enableById(@Param("id") String id);
 
 	/**
-	 * Disable a specified configuration
+	 * 禁用指定配置。
+	 * @param id 配置 ID
+	 * @return 受影响行数
 	 */
 	@Update("UPDATE user_prompt_config SET enabled = 0 WHERE id = #{id}")
 	int disableById(@Param("id") String id);
 
+	/**
+	 * 根据主键查询配置。
+	 * @param id 配置 ID
+	 * @return 配置；不存在返回 {@code null}
+	 */
 	@Select("SELECT * FROM user_prompt_config WHERE id = #{id}")
 	UserPromptConfig selectById(String id);
 
+	/**
+	 * 根据主键动态更新配置（仅更新非空字段），并刷新 {@code update_time}。
+	 * @param config 配置实体（需携带 {@code id}）
+	 * @return 受影响行数
+	 */
 	@Update("""
 			<script>
 			UPDATE user_prompt_config
@@ -102,6 +132,11 @@ public interface UserPromptConfigMapper {
 			""")
 	int updateById(UserPromptConfig config);
 
+	/**
+	 * 新增配置记录。
+	 * @param config 配置实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 			INSERT INTO user_prompt_config
 			(id, name, prompt_type, agent_id, system_prompt, enabled, description, priority, display_order, create_time, update_time, creator)
@@ -109,6 +144,12 @@ public interface UserPromptConfigMapper {
 			""")
 	int insert(UserPromptConfig config);
 
+	/**
+	 * 根据提示词类型查询已启用的配置列表（可选按智能体过滤），按优先级、展示顺序、更新时间排序。
+	 * @param promptType 提示词类型
+	 * @param agentId 智能体 ID（可为 {@code null}）
+	 * @return 已启用的配置列表
+	 */
 	@Select("""
 			<script>
 			SELECT * FROM user_prompt_config
@@ -121,6 +162,12 @@ public interface UserPromptConfigMapper {
 	List<UserPromptConfig> getActiveConfigsByType(@Param("promptType") String promptType,
 			@Param("agentId") Long agentId);
 
+	/**
+	 * 根据提示词类型查询全部配置（可选按智能体过滤），按优先级、展示顺序、更新时间排序。
+	 * @param promptType 提示词类型
+	 * @param agentId 智能体 ID（可为 {@code null}）
+	 * @return 配置列表
+	 */
 	@Select("""
 			<script>
 			SELECT * FROM user_prompt_config
@@ -131,9 +178,18 @@ public interface UserPromptConfigMapper {
 			""")
 	List<UserPromptConfig> getConfigsByType(@Param("promptType") String promptType, @Param("agentId") Long agentId);
 
+	/**
+	 * 查询全部配置，按优先级、展示顺序、更新时间排序。
+	 * @return 配置列表
+	 */
 	@Select("SELECT * FROM user_prompt_config ORDER BY priority DESC, display_order, update_time DESC")
 	List<UserPromptConfig> selectAll();
 
+	/**
+	 * 根据主键删除配置。
+	 * @param id 配置 ID
+	 * @return 受影响行数
+	 */
 	@Delete("DELETE FROM user_prompt_config WHERE id = #{id}")
 	int deleteById(String id);
 

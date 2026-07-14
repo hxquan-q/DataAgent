@@ -18,7 +18,7 @@ package com.alibaba.cloud.ai.dataagent.prompt;
 import org.springframework.ai.chat.prompt.PromptTemplate;
 
 /**
- * Prompt constant class, dynamically loads prompt files
+ * 提示词常量类，动态加载提示词模板文件。
  *
  * @author zhangshenghang
  */

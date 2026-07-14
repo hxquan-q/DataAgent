@@ -63,13 +63,17 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
 /**
- * Table relationship inference node that automatically completes complex structures like
- * JOINs and foreign keys.
+ * 表关系推断节点，位于 Schema 召回之后、可行性评估之前。
  *
  * <p>
- * This node is responsible for: - Inferring relationships between tables and fields -
- * Building initial schema from documents - Processing schema selection based on input and
- * evidence - Handling schema advice for missing information
+ * 该节点负责自动推断表与字段之间的关系，完成诸如 JOIN 和外键等复杂结构的构建。 主要职责：
+ * <ul>
+ * <li>推断表与表、字段与字段之间的关系</li>
+ * <li>根据召回的列文档和表文档构建初始 Schema</li>
+ * <li>基于用户输入和证据信息进行 Schema 精细选择</li>
+ * <li>处理缺失信息时的 Schema 补充建议</li>
+ * </ul>
+ * </p>
  *
  * @author zhangshenghang
  */
@@ -90,10 +94,19 @@ public class TableRelationNode implements NodeAction {
 
 	private final AgentDatasourceService agentDatasourceService;
 
+	/**
+	 * 执行表关系推断逻辑。
+	 * <p>
+	 * 获取必要的输入参数，构建初始 Schema，然后进行精细的 Schema 选择， 最终将表关系结果、数据库方言类型、语义模型提示等信息写入状态。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含表关系推断结果的 Map
+	 * @throws Exception 推断过程中可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
-		// Get necessary input parameters
+		// 获取必要的输入参数
 		String canonicalQuery = StateUtil.getCanonicalQuery(state);
 
 		String evidence = StateUtil.getStringValue(state, EVIDENCE);
@@ -101,12 +114,14 @@ public class TableRelationNode implements NodeAction {
 		List<Document> columnDocuments = StateUtil.getDocumentList(state, COLUMN_DOCUMENTS__FOR_SCHEMA_OUTPUT);
 		String agentIdStr = StateUtil.getStringValue(state, AGENT_ID);
 
-		// Execute business logic first - get final result immediately
+		// 先执行业务逻辑，立即获取最终结果
 		DbConfigBO agentDbConfig = databaseUtil.getAgentDbConfig(Long.valueOf(agentIdStr));
 
+		// 获取逻辑外键信息
 		List<String> logicalForeignKeys = getLogicalForeignKeys(Long.valueOf(agentIdStr), tableDocuments);
-		log.info("Found {} logical foreign keys for agent: {}", logicalForeignKeys.size(), agentIdStr);
+		log.info("为智能体 {} 找到 {} 个逻辑外键", agentIdStr, logicalForeignKeys.size());
 
+		// 构建初始 Schema
 		SchemaDTO initialSchema = buildInitialSchema(agentIdStr, columnDocuments, tableDocuments, agentDbConfig,
 				logicalForeignKeys);
 
@@ -116,24 +131,25 @@ public class TableRelationNode implements NodeAction {
 		resultMap.put(TABLE_RELATION_RETRY_COUNT, 0);
 		resultMap.put(TABLE_RELATION_EXCEPTION_OUTPUT, "");
 
+		// 进行精细的 Schema 选择
 		Flux<ChatResponse> schemaFlux = processSchemaSelection(initialSchema, canonicalQuery, evidence, state,
 				agentDbConfig, result -> {
-					log.info("[{}] Schema processing result: {}", this.getClass().getSimpleName(), result);
+					log.info("[{}] Schema 处理结果: {}", this.getClass().getSimpleName(), result);
 					resultMap.put(TABLE_RELATION_OUTPUT, result);
 
-					// 从最终的SchemaDTO中获取表名列表
+					// 从最终的 SchemaDTO 中获取表名列表
 					List<String> tableNames = result.getTable().stream().map(TableDTO::getName).toList();
 
-					// 根据agentId和表名列表获取语义模型
+					// 根据智能体 ID 和表名列表获取语义模型
 					List<SemanticModel> semanticModels = semanticModelService
 						.getByAgentIdAndTableNames(Long.valueOf(agentIdStr), tableNames);
 
-					// 构建语义模型提示并存储到resultMap中
+					// 构建语义模型提示并存储到 resultMap 中
 					String semanticModelPrompt = buildSemanticModelPrompt(semanticModels);
 					resultMap.put(GENEGRATED_SEMANTIC_MODEL_PROMPT, semanticModelPrompt);
 				});
 
-		// Create display stream for user experience only
+		// 创建展示流，仅用于提升用户体验
 		Flux<ChatResponse> preFlux = Flux.create(emitter -> {
 			emitter.next(ChatResponseUtil.createResponse("开始构建初始Schema..."));
 			emitter.next(ChatResponseUtil.createResponse("初始Schema构建完成."));
@@ -145,20 +161,25 @@ public class TableRelationNode implements NodeAction {
 			emitter.complete();
 		}));
 
-		// Use utility class to create generator, directly return business logic computed
-		// result
+		// 使用工具类创建生成器，直接返回预先计算好的业务结果
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, v -> resultMap, displayFlux);
 
-		// Return generator and essential state values that need to be available
-		// immediately
-		// DB_DIALECT_TYPE must be returned directly so it's available in state for
-		// subsequent nodes
+		// 返回生成器及需要立即可用的状态值
+		// DB_DIALECT_TYPE 必须直接返回，以便后续节点能从状态中获取
 		return Map.of(TABLE_RELATION_OUTPUT, generator, DB_DIALECT_TYPE, agentDbConfig.getDialectType(),
 				TABLE_RELATION_RETRY_COUNT, 0, TABLE_RELATION_EXCEPTION_OUTPUT, "");
 	}
 
-	/** Builds initial schema from column and table documents. */
+	/**
+	 * 根据列文档和表文档构建初始 Schema。
+	 * @param agentId 智能体 ID
+	 * @param columnDocuments 列文档列表
+	 * @param tableDocuments 表文档列表
+	 * @param agentDbConfig 数据库配置
+	 * @param logicalForeignKeys 逻辑外键列表
+	 * @return 构建完成的初始 SchemaDTO
+	 */
 	private SchemaDTO buildInitialSchema(String agentId, List<Document> columnDocuments, List<Document> tableDocuments,
 			DbConfigBO agentDbConfig, List<String> logicalForeignKeys) {
 		SchemaDTO schemaDTO = new SchemaDTO();
@@ -179,25 +200,36 @@ public class TableRelationNode implements NodeAction {
 				allForeignKeys.addAll(logicalForeignKeys);
 				schemaDTO.setForeignKeys(allForeignKeys);
 			}
-			log.info("Merged {} logical foreign keys into schema for agent: {}", logicalForeignKeys.size(), agentId);
+			log.info("为智能体 {} 合并了 {} 个逻辑外键到 Schema 中", logicalForeignKeys.size(), agentId);
 		}
 
 		return schemaDTO;
 	}
 
-	/** Processes schema selection based on input, evidence, and optional advice. */
+	/**
+	 * 根据用户输入、证据信息和可选的补充建议进行精细的 Schema 选择。
+	 * @param schemaDTO 初始 Schema
+	 * @param input 用户输入
+	 * @param evidence 证据信息
+	 * @param state 工作流全局状态
+	 * @param agentDbConfig 数据库配置
+	 * @param dtoConsumer Schema 处理结果回调
+	 * @return 展示用流式响应
+	 */
 	private Flux<ChatResponse> processSchemaSelection(SchemaDTO schemaDTO, String input, String evidence,
 			OverAllState state, DbConfigBO agentDbConfig, Consumer<SchemaDTO> dtoConsumer) {
+		// 获取 Schema 缺失信息的补充建议
 		String schemaAdvice = StateUtil.getStringValue(state, SQL_GENERATE_SCHEMA_MISSING_ADVICE, null);
 
 		Flux<ChatResponse> schemaFlux;
 		if (schemaAdvice != null) {
-			log.info("[{}] Processing with schema supplement advice: {}", this.getClass().getSimpleName(),
-					schemaAdvice);
+			// 带补充建议的精细选择
+			log.info("[{}] 带补充建议处理 Schema: {}", this.getClass().getSimpleName(), schemaAdvice);
 			schemaFlux = nl2SqlService.fineSelect(schemaDTO, input, evidence, schemaAdvice, agentDbConfig, dtoConsumer);
 		}
 		else {
-			log.info("[{}] Executing regular schema selection", this.getClass().getSimpleName());
+			// 常规 Schema 选择
+			log.info("[{}] 执行常规 Schema 选择", this.getClass().getSimpleName());
 			schemaFlux = nl2SqlService.fineSelect(schemaDTO, input, evidence, null, agentDbConfig, dtoConsumer);
 		}
 		return Flux
@@ -208,13 +240,18 @@ public class TableRelationNode implements NodeAction {
 					ChatResponseUtil.createResponse("\n\n选择数据表完成。")));
 	}
 
-	/** 获取逻辑外键信息，并过滤只保留与当前召回表相关的外键 */
+	/**
+	 * 获取逻辑外键信息，并过滤只保留与当前召回表相关的外键。
+	 * @param agentId 智能体 ID
+	 * @param tableDocuments 召回的表文档列表
+	 * @return 格式化后的逻辑外键列表
+	 */
 	private List<String> getLogicalForeignKeys(Long agentId, List<Document> tableDocuments) {
 		try {
-			// 获取当前 agent 激活的数据源
+			// 获取当前智能体激活的数据源
 			AgentDatasource agentDatasource = agentDatasourceService.getCurrentAgentDatasource(agentId);
 			if (agentDatasource == null || agentDatasource.getDatasourceId() == null) {
-				log.warn("No active datasource found for agent: {}", agentId);
+				log.warn("未找到智能体 {} 的激活数据源", agentId);
 				return Collections.emptyList();
 			}
 
@@ -226,11 +263,11 @@ public class TableRelationNode implements NodeAction {
 				.filter(name -> name != null && !name.isEmpty())
 				.collect(Collectors.toSet());
 
-			log.info("Recalled table names for agent {}: {}", agentId, recalledTableNames);
+			log.info("智能体 {} 召回的表名: {}", agentId, recalledTableNames);
 
 			// 查询该数据源的所有逻辑外键
 			List<LogicalRelation> allLogicalRelations = datasourceService.getLogicalRelations(datasourceId);
-			log.info("Found {} logical relations in datasource: {}", allLogicalRelations.size(), datasourceId);
+			log.info("数据源 {} 中共有 {} 个逻辑关系", datasourceId, allLogicalRelations.size());
 
 			// 过滤只保留与召回表相关的外键（源表或目标表在召回列表中）
 			List<String> formattedForeignKeys = allLogicalRelations.stream()
@@ -241,11 +278,11 @@ public class TableRelationNode implements NodeAction {
 				.distinct()
 				.collect(Collectors.toList());
 
-			log.info("Filtered {} relevant logical relations for recalled tables", formattedForeignKeys.size());
+			log.info("为召回表筛选出 {} 个相关逻辑关系", formattedForeignKeys.size());
 			return formattedForeignKeys;
 		}
 		catch (Exception e) {
-			log.error("Error fetching logical foreign keys for agent: {}", agentId, e);
+			log.error("获取智能体 {} 的逻辑外键时出错", agentId, e);
 			return Collections.emptyList();
 		}
 	}

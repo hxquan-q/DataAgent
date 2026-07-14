@@ -20,14 +20,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 数据库信息业务对象。
+ * <p>
+ * 描述数据库的基本信息，包括数据库名称和描述。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DatabaseInfoBO {
 
+	/** 数据库名称 */
 	private String name;
 
+	/** 数据库描述 */
 	private String description;
 
 }

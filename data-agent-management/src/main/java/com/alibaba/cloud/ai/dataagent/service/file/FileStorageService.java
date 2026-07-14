@@ -20,6 +20,13 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 
+/**
+ * 文件存储服务接口，提供文件的上传、删除、URL 获取和资源读取能力。
+ *
+ * <p>
+ * 支持响应式（WebFlux）和同步（传统 Servlet）两种文件上传方式。
+ * </p>
+ */
 public interface FileStorageService {
 
 	/**

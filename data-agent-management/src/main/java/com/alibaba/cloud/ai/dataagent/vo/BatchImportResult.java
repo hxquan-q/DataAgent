@@ -23,18 +23,29 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 批量导入结果 VO
+ *
+ * <p>
+ * 表示批量导入操作的结果汇总，包含总数、成功数、失败数和错误信息列表。
+ * </p>
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class BatchImportResult {
 
+	/** 总记录数 */
 	private int total;
 
+	/** 成功记录数 */
 	private int successCount;
 
+	/** 失败记录数 */
 	private int failCount;
 
+	/** 错误信息列表 */
 	@Builder.Default
 	private List<String> errors = new ArrayList<>();
 

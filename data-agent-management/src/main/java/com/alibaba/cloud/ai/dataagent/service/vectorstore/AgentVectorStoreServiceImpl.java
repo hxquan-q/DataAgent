@@ -34,20 +34,40 @@ import java.util.*;
 
 import static com.alibaba.cloud.ai.dataagent.service.vectorstore.DynamicFilterService.buildFilterExpressionString;
 
+/**
+ * Agent 向量存储服务实现类，实现文档的向量检索（支持混合检索）、添加、删除和存在性检查。
+ *
+ * <p>
+ * 通过 {@link DynamicFilterService} 构建动态过滤条件，根据向量类型适配不同的检索策略。
+ * 支持 SimpleVectorStore（本地内存）和外部向量数据库（如 Milvus、Elasticsearch）。
+ * </p>
+ */
 @Slf4j
 @Service
 public class AgentVectorStoreServiceImpl implements AgentVectorStoreService {
 
+	/** 默认查询字符串 */
 	private static final String DEFAULT = "default";
 
+	/** 向量存储实例 */
 	private final VectorStore vectorStore;
 
+	/** 混合检索策略（可选） */
 	private final Optional<HybridRetrievalStrategy> hybridRetrievalStrategy;
 
+	/** DataAgent 配置属性 */
 	private final DataAgentProperties dataAgentProperties;
 
+	/** 动态过滤条件构建服务 */
 	private final DynamicFilterService dynamicFilterService;
 
+	/**
+	 * 构造方法。
+	 * @param vectorStore 向量存储实例
+	 * @param hybridRetrievalStrategy 混合检索策略（可选）
+	 * @param dataAgentProperties DataAgent 配置属性
+	 * @param dynamicFilterService 动态过滤条件构建服务
+	 */
 	public AgentVectorStoreServiceImpl(VectorStore vectorStore,
 			Optional<HybridRetrievalStrategy> hybridRetrievalStrategy, DataAgentProperties dataAgentProperties,
 			DynamicFilterService dynamicFilterService) {

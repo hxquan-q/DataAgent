@@ -29,23 +29,36 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+/**
+ * AI 模型注册中心，以懒加载 + 缓存的方式管理全局的 ChatClient 和 EmbeddingModel 实例。
+ *
+ * <p>
+ * 支持通过 {@link #refreshChat()} 和 {@link #refreshEmbedding()} 方法清除缓存以实现模型热切换。
+ * 当未配置 Embedding 模型时，使用 {@link DummyEmbeddingModel} 作为兜底，避免向量库初始化崩溃。
+ * </p>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class AiModelRegistry {
 
+	/** 动态模型工厂 */
 	private final DynamicModelFactory modelFactory;
 
+	/** 模型配置数据服务 */
 	private final ModelConfigDataService modelConfigDataService;
 
-	// 缓存对象 (volatile 保证可见性)
+	/** 当前缓存的 ChatClient（volatile 保证可见性） */
 	private volatile ChatClient currentChatClient;
 
+	/** 当前缓存的 EmbeddingModel（volatile 保证可见性） */
 	private volatile EmbeddingModel currentEmbeddingModel;
 
-	// =========================================================
-	// 1. 获取 ChatClient (懒加载 + 缓存)
-	// =========================================================
+	/**
+	 * 获取全局 ChatClient，使用双重检查锁实现懒加载。未配置时抛出异常提示用户配置。
+	 * @return 全局 ChatClient
+	 * @throws RuntimeException 当没有激活的 CHAT 模型配置时抛出
+	 */
 	public ChatClient getChatClient() {
 		if (currentChatClient == null) {
 			synchronized (this) {
@@ -74,9 +87,10 @@ public class AiModelRegistry {
 		return currentChatClient;
 	}
 
-	// =========================================================
-	// 2. 获取 EmbeddingModel (懒加载 + Dummy 兜底)
-	// =========================================================
+	/**
+	 * 获取全局 EmbeddingModel，使用双重检查锁实现懒加载。未配置时使用 DummyEmbeddingModel 兜底。
+	 * @return 全局 EmbeddingModel
+	 */
 	public EmbeddingModel getEmbeddingModel() {
 		if (currentEmbeddingModel == null) {
 			synchronized (this) {
@@ -105,22 +119,28 @@ public class AiModelRegistry {
 	}
 
 	// =========================================================
-	// 3. 刷新/重置缓存 (用于热切换)
+	// 缓存刷新方法（用于热切换）
 	// =========================================================
 
+	/**
+	 * 清除 ChatClient 缓存，下次获取时重新初始化。
+	 */
 	public void refreshChat() {
 		this.currentChatClient = null;
 		log.info("Chat cache cleared.");
 	}
 
+	/**
+	 * 清除 EmbeddingModel 缓存，下次获取时重新初始化。
+	 */
 	public void refreshEmbedding() {
 		this.currentEmbeddingModel = null;
 		log.info("Embedding cache cleared.");
 	}
 
-	// =========================================================
-	// 4. 内部类：哑巴嵌入模型 (仅用于启动时防崩)
-	// =========================================================
+	/**
+	 * 哑巴嵌入模型，仅在未配置真实 Embedding 模型时用于启动防崩，返回常用维度 1536 骗过向量库初始化检查。
+	 */
 	private static class DummyEmbeddingModel implements EmbeddingModel {
 
 		@Override
@@ -148,7 +168,7 @@ public class AiModelRegistry {
 			return null;
 		}
 
-		// 关键：返回一个常用维度 (1536是OpenAI的维度)，骗过向量库的初始化检查
+		// 返回常用维度 1536（OpenAI 标准），骗过向量库的初始化检查
 		@Override
 		public int dimensions() {
 			return 1536;

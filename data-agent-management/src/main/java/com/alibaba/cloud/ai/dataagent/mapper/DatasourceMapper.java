@@ -28,19 +28,36 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Data Source Mapper Interface
+ * 数据源 Mapper 接口，操作 {@code datasource} 表。
+ * <p>
+ * 管理数据源连接信息（类型、主机、端口、凭证、连接串、状态）及其统计查询、增删改。
+ * </p>
  *
  * @author Alibaba Cloud AI
  */
 @Mapper
 public interface DatasourceMapper {
 
+	/**
+	 * 根据主键查询数据源。
+	 * @param id 数据源 ID
+	 * @return 数据源；不存在返回 {@code null}
+	 */
 	@Select("SELECT * FROM datasource WHERE id = #{id}")
 	Datasource selectById(@Param("id") Integer id);
 
+	/**
+	 * 查询全部数据源，按创建时间倒序返回。
+	 * @return 数据源列表
+	 */
 	@Select("SELECT * FROM datasource ORDER BY create_time DESC")
 	List<Datasource> selectAll();
 
+	/**
+	 * 新增数据源，并将自增主键回填到入参对象的 {@code id} 字段。
+	 * @param datasource 数据源实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 			INSERT INTO datasource
 			    (name, type, host, port, database_name, username, password, connection_url, status, test_status, description, creator_id, create_time, update_time)
@@ -50,7 +67,9 @@ public interface DatasourceMapper {
 	int insert(Datasource datasource);
 
 	/**
-	 * Update data source by id, only update non-null fields
+	 * 根据主键动态更新数据源（仅更新非空字段），并刷新 {@code update_time}。
+	 * @param datasource 数据源实体（需携带 {@code id}）
+	 * @return 受影响行数
 	 */
 	@Update("""
 			<script>
@@ -75,42 +94,64 @@ public interface DatasourceMapper {
 			""")
 	int updateById(Datasource datasource);
 
+	/**
+	 * 更新指定数据源的连通性测试状态。
+	 * @param id 数据源 ID
+	 * @param testStatus 测试状态
+	 * @return 受影响行数
+	 */
 	@Update("UPDATE datasource SET test_status = #{testStatus} WHERE id = #{id}")
 	int updateTestStatusById(@Param("id") Integer id, @Param("testStatus") String testStatus);
 
 	/**
-	 * Query data source list by status
+	 * 根据状态查询数据源列表，按创建时间倒序返回。
+	 * @param status 数据源状态
+	 * @return 数据源列表
 	 */
 	@Select("SELECT * FROM datasource WHERE status = #{status} ORDER BY create_time DESC")
 	List<Datasource> selectByStatus(@Param("status") String status);
 
 	/**
-	 * Query data source list by type
+	 * 根据类型查询数据源列表，按创建时间倒序返回。
+	 * @param type 数据源类型
+	 * @return 数据源列表
 	 */
 	@Select("SELECT * FROM datasource WHERE type = #{type} ORDER BY create_time DESC")
 	List<Datasource> selectByType(@Param("type") String type);
 
 	/**
-	 * Get data source statistics - by status
+	 * 按状态分组统计数据源数量。
+	 * @return 每组的状态与数量（key 为 status、count）
 	 */
 	@Select("SELECT status, COUNT(*) as count FROM datasource GROUP BY status")
 	List<Map<String, Object>> selectStatusStats();
 
 	/**
-	 * Get data source statistics - by type
+	 * 按类型分组统计数据源数量。
+	 * @return 每组的类型与数量（key 为 type、count）
 	 */
 	@Select("SELECT type, COUNT(*) as count FROM datasource GROUP BY type")
 	List<Map<String, Object>> selectTypeStats();
 
 	/**
-	 * Get data source statistics - by test status
+	 * 按连通性测试状态分组统计数据源数量。
+	 * @return 每组的测试状态与数量（key 为 test_status、count）
 	 */
 	@Select("SELECT test_status, COUNT(*) as count FROM datasource GROUP BY test_status")
 	List<Map<String, Object>> selectTestStatusStats();
 
+	/**
+	 * 查询数据源总数。
+	 * @return 数据源总数
+	 */
 	@Select("SELECT COUNT(*) FROM datasource")
 	Long selectCount();
 
+	/**
+	 * 根据主键物理删除数据源。
+	 * @param id 数据源 ID
+	 * @return 受影响行数
+	 */
 	@Delete("DELETE FROM datasource WHERE id = #{id}")
 	int deleteById(Integer id);
 

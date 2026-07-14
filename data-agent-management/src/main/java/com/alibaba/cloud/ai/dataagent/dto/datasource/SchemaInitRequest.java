@@ -21,10 +21,19 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Schema 初始化请求 DTO
+ *
+ * <p>
+ * 用于初始化数据库结构信息的请求数据，包含数据库连接配置和需要加载的表列表。 该类手动实现了 getter/setter、equals 和 hashCode 方法。
+ * </p>
+ */
 public class SchemaInitRequest implements Serializable {
 
+	/** 数据库连接配置 */
 	private DbConfigBO dbConfig;
 
+	/** 需要加载结构的表名列表 */
 	private List<String> tables;
 
 	public DbConfigBO getDbConfig() {

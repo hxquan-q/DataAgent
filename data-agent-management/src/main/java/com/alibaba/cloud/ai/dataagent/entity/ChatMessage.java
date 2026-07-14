@@ -22,7 +22,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Chat Message Entity Class
+ * 聊天消息实体类
+ *
+ * <p>
+ * 记录用户与智能体之间的单条对话消息。每条消息归属一个会话（ChatSession）， 并区分角色（用户/助手/系统）与消息类型（文本/SQL/结果/错误）。
+ * </p>
  */
 @Data
 @NoArgsConstructor
@@ -30,18 +34,25 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatMessage {
 
+	/** 主键ID */
 	private Long id;
 
+	/** 所属会话ID */
 	private String sessionId;
 
-	private String role; // user, assistant, system
+	/** 消息角色：user-用户，assistant-助手，system-系统 */
+	private String role;
 
+	/** 消息内容 */
 	private String content;
 
-	private String messageType; // text, sql, result, error
+	/** 消息类型：text-文本，sql-SQL语句，result-查询结果，error-错误信息 */
+	private String messageType;
 
-	private String metadata; // JSON格式的元数据
+	/** JSON 格式的元数据 */
+	private String metadata;
 
+	/** 创建时间 */
 	private LocalDateTime createTime;
 
 }

@@ -23,7 +23,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Business knowledge management entity class
+ * 创建业务知识 DTO
+ *
+ * <p>
+ * 用于新增业务术语知识的请求数据传输对象，包含业务术语、描述、同义词、召回标志 及关联的智能体ID。
+ * </p>
  */
 @Data
 @NoArgsConstructor
@@ -31,18 +35,23 @@ import lombok.NoArgsConstructor;
 @Builder
 public class CreateBusinessKnowledgeDTO {
 
+	/** 业务术语 */
 	@NotBlank(message = "Business term cannot be empty")
-	private String businessTerm; // Business term
+	private String businessTerm;
 
+	/** 业务术语描述 */
 	@NotBlank(message = "Description cannot be empty")
-	private String description; // Description
+	private String description;
 
-	private String synonyms; // Synonyms, comma separated
+	/** 同义词，多个以逗号分隔 */
+	private String synonyms;
 
+	/** 是否召回（默认 true） */
 	@Builder.Default
-	private Boolean isRecall = true; // Whether to recall
+	private Boolean isRecall = true;
 
+	/** 关联的智能体ID */
 	@NotNull(message = "Agent ID cannot be Null")
-	private Long agentId; // Associated agent ID
+	private Long agentId;
 
 }

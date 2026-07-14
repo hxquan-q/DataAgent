@@ -46,9 +46,17 @@ public class EnhancedTokenCountBatchingStrategy implements BatchingStrategy {
 		this.maxTextCount = maxTextCount;
 	}
 
+	/**
+	 * 对文档列表进行分批处理。
+	 * <p>
+	 * 先使用 {@link TokenCountBatchingStrategy} 按 Token 数量分批，
+	 * 再对每个批次按最大文本数量限制进行二次分割，确保同时满足 Token 和文本数量约束。
+	 * @param documents 待分批的文档列表
+	 * @return 分批后的文档列表（二维列表）
+	 */
 	@Override
 	public List<List<Document>> batch(List<Document> documents) {
-		// 首先使用原始的TokenCountBatchingStrategy进行批处理
+		// 首先使用原始的 TokenCountBatchingStrategy 进行基于 Token 数量的分批
 		List<List<Document>> tokenBasedBatches = tokenCountBatchingStrategy.batch(documents);
 
 		// 然后对每个批次检查是否超过文本数量限制，如果超过则进一步分割
@@ -56,11 +64,11 @@ public class EnhancedTokenCountBatchingStrategy implements BatchingStrategy {
 
 		for (List<Document> batch : tokenBasedBatches) {
 			if (batch.size() <= maxTextCount) {
-				// 如果批次大小在限制内，直接添加
+				// 批次大小在限制内，直接添加
 				finalBatches.add(batch);
 			}
 			else {
-				// 如果批次大小超过限制，按文本数量进一步分割
+				// 批次大小超过限制，按文本数量进一步分割
 				for (int i = 0; i < batch.size(); i += maxTextCount) {
 					int endIndex = Math.min(i + maxTextCount, batch.size());
 					finalBatches.add(batch.subList(i, endIndex));

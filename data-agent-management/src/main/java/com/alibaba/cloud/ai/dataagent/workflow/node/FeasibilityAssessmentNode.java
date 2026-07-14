@@ -34,7 +34,20 @@ import java.util.Map;
 
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
-// 可行性评估节点，看需求是 数据分析/需要澄清 或者最终确认为自由闲聊
+/**
+ * 可行性评估节点，位于表关系推断之后、计划生成之前。
+ *
+ * <p>
+ * 该节点基于召回的 Schema 和证据信息，通过大模型评估当前需求是否可执行数据分析。 评估结果决定后续路由：
+ * <ul>
+ * <li>需求类型为"数据分析"：进入计划生成节点（{@code PlannerNode}）</li>
+ * <li>需要澄清或为自由闲聊：结束流程</li>
+ * </ul>
+ * </p>
+ *
+ * @see TableRelationNode
+ * @see PlannerNode
+ */
 @Slf4j
 @Component
 @AllArgsConstructor
@@ -42,12 +55,21 @@ public class FeasibilityAssessmentNode implements NodeAction {
 
 	private final LlmService llmService;
 
+	/**
+	 * 执行可行性评估逻辑。
+	 * <p>
+	 * 获取规范化查询、召回的 Schema 和证据信息，构建可行性评估提示词并调用大模型， 最终将评估结果写入状态。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含可行性评估结果的 Map，key 为 {@value FEASIBILITY_ASSESSMENT_NODE_OUTPUT}
+	 * @throws Exception 调用大模型时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
-		// 获取canonical_query
+		// 获取规范化查询
 		String canonicalQuery = StateUtil.getCanonicalQuery(state);
 
-		// 获取召回的Schema
+		// 获取召回的 Schema
 		SchemaDTO recalledSchema = StateUtil.getObjectValue(state, TABLE_RELATION_OUTPUT, SchemaDTO.class);
 
 		// 获取证据信息
@@ -58,16 +80,17 @@ public class FeasibilityAssessmentNode implements NodeAction {
 		// 构建可行性评估提示词
 		String prompt = PromptHelper.buildFeasibilityAssessmentPrompt(canonicalQuery, recalledSchema, evidence,
 				multiTurn);
-		log.debug("Built feasibility assessment prompt as follows \n {} \n", prompt);
+		log.debug("构建的可行性评估提示词如下 \n {} \n", prompt);
 
-		// 调用LLM进行可行性评估
+		// 调用大模型进行可行性评估
 		Flux<ChatResponse> responseFlux = llmService.callUser(prompt);
 
+		// 创建流式生成器，前置/后置提示信息 + 结果解析回调
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, "正在进行可行性评估...", "可行性评估完成！", llmOutput -> {
 					// 获取评估结果
 					String assessmentResult = llmOutput.trim();
-					log.info("Feasibility assessment result: {}", assessmentResult);
+					log.info("可行性评估结果: {}", assessmentResult);
 					// 返回评估结果
 					return Map.of(FEASIBILITY_ASSESSMENT_NODE_OUTPUT, assessmentResult);
 				}, responseFlux);

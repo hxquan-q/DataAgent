@@ -28,9 +28,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * Manages multi-turn dialogue context for each thread. The context keeps a lightweight
- * history of user questions and the corresponding planner outputs so downstream prompts
- * can reference prior turns.
+ * 多轮对话上下文管理器，为每个会话线程维护多轮对话上下文。
+ *
+ * <p>
+ * 该管理器保留一份轻量级的历史记录，包含用户问题和对应的计划（Planner）输出，
+ * 以便下游提示词（Prompt）可以引用之前的多轮对话内容，从而实现上下文连贯的多轮交互。
+ * </p>
+ *
+ * @author Makoto
+ * @since 2025/11/28
  */
 @Slf4j
 @Component
@@ -40,14 +46,16 @@ public class MultiTurnContextManager {
 	private final DataAgentProperties properties;
 
 	// todo：考虑持久化存储
+	/** 以 threadId 为键的对话历史记录，存储已完成的多轮对话 */
 	private final Map<String, Deque<ConversationTurn>> history = new ConcurrentHashMap<>();
 
+	/** 以 threadId 为键的待处理轮次，记录当前轮次用户问题与计划输出构建器 */
 	private final Map<String, PendingTurn> pendingTurns = new ConcurrentHashMap<>();
 
 	/**
-	 * Start tracking a new turn for the given thread.
-	 * @param threadId conversation thread id
-	 * @param userQuestion latest user question
+	 * 开始追踪指定会话线程的新一轮对话。
+	 * @param threadId 会话线程标识
+	 * @param userQuestion 本轮用户问题
 	 */
 	public void beginTurn(String threadId, String userQuestion) {
 		if (StringUtils.isAnyBlank(threadId, userQuestion)) {
@@ -57,9 +65,9 @@ public class MultiTurnContextManager {
 	}
 
 	/**
-	 * Append planner output chunk for the current turn.
-	 * @param threadId conversation thread id
-	 * @param chunk planner streaming chunk
+	 * 为当前轮次追加计划（Planner）输出的流式片段。
+	 * @param threadId 会话线程标识
+	 * @param chunk 计划流式输出片段
 	 */
 	public void appendPlannerChunk(String threadId, String chunk) {
 		if (StringUtils.isAnyBlank(threadId, chunk)) {
@@ -72,8 +80,8 @@ public class MultiTurnContextManager {
 	}
 
 	/**
-	 * Finalize current turn and add to history if planner output is available.
-	 * @param threadId conversation thread id
+	 * 完成当前轮次，若存在计划输出则将其加入历史记录。
+	 * @param threadId 会话线程标识
 	 */
 	public void finishTurn(String threadId) {
 		PendingTurn pending = pendingTurns.remove(threadId);
@@ -86,9 +94,11 @@ public class MultiTurnContextManager {
 			return;
 		}
 
+		// 根据配置限制计划长度，避免上下文过长
 		String trimmedPlan = StringUtils.abbreviate(plan, properties.getMaxplanlength());
 		Deque<ConversationTurn> deque = history.computeIfAbsent(threadId, k -> new ArrayDeque<>());
 		synchronized (deque) {
+			// 当历史记录超过最大轮数限制时，移除最早的记录
 			while (deque.size() >= properties.getMaxturnhistory()) {
 				deque.pollFirst();
 			}
@@ -97,18 +107,17 @@ public class MultiTurnContextManager {
 	}
 
 	/**
-	 * Remove any pending turn data without touching persisted history. Typically used
-	 * when a run is aborted.
-	 * @param threadId conversation thread id
+	 * 移除待处理的轮次数据，但不影响已持久化的历史记录。通常在运行被中止时调用。
+	 * @param threadId 会话线程标识
 	 */
 	public void discardPending(String threadId) {
 		pendingTurns.remove(threadId);
 	}
 
 	/**
-	 * Restart the latest turn so a new planner output can replace it (e.g. after human
-	 * feedback). The last stored turn will be removed and its question reused.
-	 * @param threadId conversation thread id
+	 * 重启最近一轮对话，使新的计划输出可以替换它（例如人工反馈后）。
+	 * 将移除最后一条存储的轮次，并复用其中的用户问题。
+	 * @param threadId 会话线程标识
 	 */
 	public void restartLastTurn(String threadId) {
 		Deque<ConversationTurn> deque = history.get(threadId);
@@ -120,14 +129,15 @@ public class MultiTurnContextManager {
 			lastTurn = deque.pollLast();
 		}
 		if (lastTurn != null) {
+			// 复用上一轮的用户问题，重新开启待处理轮次
 			pendingTurns.put(threadId, new PendingTurn(lastTurn.userQuestion()));
 		}
 	}
 
 	/**
-	 * Build multi-turn context string for prompt injection.
-	 * @param threadId conversation thread id
-	 * @return formatted history string
+	 * 构建用于提示词注入的多轮上下文字符串。
+	 * @param threadId 会话线程标识
+	 * @return 格式化后的历史记录字符串，无历史时返回 "(无)"
 	 */
 	public String buildContext(String threadId) {
 		Deque<ConversationTurn> deque = history.get(threadId);
@@ -139,13 +149,24 @@ public class MultiTurnContextManager {
 			.collect(Collectors.joining("\n"));
 	}
 
+	/**
+	 * 对话轮次记录，包含用户问题与计划输出
+	 *
+	 * @param userQuestion 用户问题
+	 * @param plan 计划输出
+	 */
 	private record ConversationTurn(String userQuestion, String plan) {
 	}
 
+	/**
+	 * 待处理轮次，记录当前轮次的用户问题和计划输出构建器。
+	 */
 	private static class PendingTurn {
 
+		/** 本轮用户问题 */
 		private final String userQuestion;
 
+		/** 计划输出构建器，用于流式拼接计划文本 */
 		private final StringBuilder planBuilder = new StringBuilder();
 
 		private PendingTurn(String userQuestion) {

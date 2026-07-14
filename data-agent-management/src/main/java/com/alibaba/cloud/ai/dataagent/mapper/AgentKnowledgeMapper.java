@@ -22,19 +22,41 @@ import org.apache.ibatis.annotations.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 智能体知识库 Mapper，操作 {@code agent_knowledge} 表。
+ * <p>
+ * 管理智能体挂载的知识文档（标题、正文、文件元信息、向量化状态等），支持条件分页查询、
+ * 软删除与待清理“僵尸”记录检索。
+ * </p>
+ */
 @Mapper
 public interface AgentKnowledgeMapper {
 
+	/**
+	 * 根据主键查询未删除的知识记录。
+	 * @param id 知识记录 ID
+	 * @return 知识记录；不存在返回 {@code null}
+	 */
 	@Select("""
 			SELECT * FROM agent_knowledge WHERE id = #{id} AND is_deleted = 0
 			""")
 	AgentKnowledge selectById(@Param("id") Integer id);
 
+	/**
+	 * 根据主键查询知识记录（包含已软删除的记录）。
+	 * @param id 知识记录 ID
+	 * @return 知识记录；不存在返回 {@code null}
+	 */
 	@Select("""
 			    SELECT * FROM agent_knowledge WHERE id = #{id}
 			""")
 	AgentKnowledge selectByIdIncludeDeleted(@Param("id") Integer id);
 
+	/**
+	 * 插入一条知识记录，并将自增主键回填到入参对象的 {@code id} 字段。
+	 * @param knowledge 知识记录实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 
 			INSERT INTO agent_knowledge (agent_id, title, content, type, question, is_recall, embedding_status, source_filename, file_path, file_size, file_type, splitter_type, is_deleted, is_resource_cleaned, created_time, updated_time)
@@ -44,6 +66,11 @@ public interface AgentKnowledgeMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
 	int insert(AgentKnowledge knowledge);
 
+	/**
+	 * 根据主键动态更新知识记录（仅更新非空字段），并刷新 {@code updated_time}。
+	 * @param knowledge 知识记录实体（需携带 {@code id}）
+	 * @return 受影响行数
+	 */
 	@Update("""
 			<script>
 			UPDATE agent_knowledge
@@ -69,6 +96,13 @@ public interface AgentKnowledgeMapper {
 			""")
 	int update(AgentKnowledge knowledge);
 
+	/**
+	 * 按条件分页查询未删除的知识记录。
+	 * <p>支持按标题模糊匹配、类型与向量化状态过滤。</p>
+	 * @param queryDTO 查询条件
+	 * @param offset 偏移量（已计算好的分页起始位置）
+	 * @return 当前页的知识记录列表
+	 */
 	@Select("""
 			<script>
 			SELECT * FROM agent_knowledge
@@ -89,6 +123,11 @@ public interface AgentKnowledgeMapper {
 	List<AgentKnowledge> selectByConditionsWithPage(@Param("queryDTO") AgentKnowledgeQueryDTO queryDTO,
 			@Param("offset") Integer offset);
 
+	/**
+	 * 按条件统计未删除的知识记录总数（用于分页计算）。
+	 * @param queryDTO 查询条件
+	 * @return 满足条件的记录总数
+	 */
 	@Select("""
 			<script>
 			SELECT COUNT(*) FROM agent_knowledge
@@ -107,14 +146,22 @@ public interface AgentKnowledgeMapper {
 			""")
 	Long countByConditions(@Param("queryDTO") AgentKnowledgeQueryDTO queryDTO);
 
+	/**
+	 * 查询某智能体下需要参与召回且未删除的知识记录 ID 列表。
+	 * @param agentId 智能体 ID
+	 * @return 需召回的知识记录 ID 列表
+	 */
 	@Select("""
 			SELECT id FROM agent_knowledge WHERE agent_id = #{agentId} AND is_recall = 1 AND is_deleted = 0
 			""")
 	List<Integer> selectRecalledKnowledgeIds(@Param("agentId") Integer agentId);
 
 	/**
-	 * 查询待清理的“僵尸”记录 条件：is_deleted = 1 AND is_resource_cleaned = 0 AND updated_time <(当前时间
-	 * - N分钟)
+	 * 查询待清理的“僵尸”记录。
+	 * <p>条件：{@code is_deleted = 1} 且 {@code is_resource_cleaned = 0} 且 {@code updated_time} 早于指定时间。</p>
+	 * @param beforeTime 时间下限，仅返回在该时间之前更新的记录
+	 * @param limit 单次查询的最大记录数
+	 * @return 待清理记录列表
 	 */
 	@Select("""
 			    SELECT * FROM agent_knowledge

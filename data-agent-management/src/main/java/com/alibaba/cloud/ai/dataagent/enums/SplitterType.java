@@ -17,13 +17,31 @@ package com.alibaba.cloud.ai.dataagent.enums;
 
 import lombok.Getter;
 
+/**
+ * 文本分块器类型枚举。
+ * <p>
+ * 定义知识库文档分块（Chunking）时使用的不同策略类型。
+ */
 @Getter
 public enum SplitterType {
 
-	TOKEN("token"), RECURSIVE("recursive"), SENTENCE("sentence"), PARAGRAPH("paragraph"), SEMANTIC("semantic");
+	/** 基于 Token 数量的分块 */
+	TOKEN("token"),
+	/** 基于递归字符的分块 */
+	RECURSIVE("recursive"),
+	/** 基于句子的分块 */
+	SENTENCE("sentence"),
+	/** 基于段落的分块 */
+	PARAGRAPH("paragraph"),
+	/** 基于语义的分块 */
+	SEMANTIC("semantic");
 
 	private final String value;
 
+	/**
+	 * 构造分块器类型枚举。
+	 * @param value 分块策略标识
+	 */
 	SplitterType(String value) {
 		this.value = value;
 	}

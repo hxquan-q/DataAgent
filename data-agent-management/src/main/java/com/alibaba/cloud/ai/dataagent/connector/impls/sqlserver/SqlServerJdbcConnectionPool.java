@@ -23,17 +23,32 @@ import org.springframework.stereotype.Service;
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.*;
 
 /**
+ * SQL Server JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用 Microsoft SQL Server JDBC 驱动（com.microsoft.sqlserver.jdbc.SQLServerDriver），
+ * 支持连接测试（ping）和错误码映射。
+ * </p>
+ *
  * @author zihen
  * @date 2025/12/14 17:34
  */
 @Service("sqlServerJdbcConnectionPool")
 public class SqlServerJdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/**
+	 * 获取 SQL Server JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return "com.microsoft.sqlserver.jdbc.SQLServerDriver";
 	}
 
+	/**
+	 * 将 SQL Server SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 		ErrorCodeEnum ret = ErrorCodeEnum.fromCode(sqlState);
@@ -49,11 +64,20 @@ public class SqlServerJdbcConnectionPool extends AbstractDBConnectionPool {
 		};
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 SQL Server 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.SQL_SERVER.getTypeName().equalsIgnoreCase(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return SQL Server 类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return BizDataSourceTypeEnum.SQL_SERVER.getTypeName();

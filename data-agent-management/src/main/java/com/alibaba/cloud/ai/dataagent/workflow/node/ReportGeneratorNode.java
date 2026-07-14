@@ -43,12 +43,17 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * Report generation node that creates comprehensive analysis reports based on execution
- * results.
+ * 报告生成节点，位于所有执行步骤完成之后，负责生成最终的分析报告。
  *
- * This node is responsible for: - Generating detailed analysis reports from SQL execution
- * results - Summarizing data insights and findings - Providing comprehensive answers to
- * user queries - Creating structured final output for users
+ * <p>
+ * 该节点的职责包括：
+ * <ul>
+ * <li>根据 SQL 执行结果生成详细的分析报告</li>
+ * <li>总结数据洞察和发现</li>
+ * <li>为用户查询提供全面的回答</li>
+ * <li>创建结构化的最终输出</li>
+ * </ul>
+ * </p>
  *
  * @author zhangshenghang
  */
@@ -69,10 +74,19 @@ public class ReportGeneratorNode implements NodeAction {
 		this.promptConfigService = promptConfigService;
 	}
 
+	/**
+	 * 执行报告生成逻辑。
+	 * <p>
+	 * 获取执行计划、用户输入、执行结果和当前步骤信息，构建报告生成提示词并调用大模型， 最终将报告内容写入状态。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含报告内容的 Map，key 为 {@value RESULT}
+	 * @throws Exception 调用大模型时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
-		// Get necessary input parameters
+		// 获取必要的输入参数
 		String plannerNodeOutput = StateUtil.getStringValue(state, PLANNER_NODE_OUTPUT);
 		String userInput = StateUtil.getCanonicalQuery(state);
 		Integer currentStep = StateUtil.getObjectValue(state, PLAN_CURRENT_STEP, Integer.class, 1);
@@ -80,12 +94,12 @@ public class ReportGeneratorNode implements NodeAction {
 		HashMap<String, String> executionResults = StateUtil.getObjectValue(state, SQL_EXECUTE_NODE_OUTPUT,
 				HashMap.class, new HashMap<>());
 
-		// Parse plan and get current step
+		// 解析计划并获取当前步骤
 		Plan plan = converter.convert(plannerNodeOutput);
 		ExecutionStep executionStep = getCurrentExecutionStep(plan, currentStep);
 		String summaryAndRecommendations = executionStep.getToolParameters().getSummaryAndRecommendations();
 
-		// Get agent id from state
+		// 从状态中获取智能体 ID
 		String agentIdStr = StateUtil.getStringValue(state, AGENT_ID);
 		Long agentId = null;
 		try {
@@ -94,19 +108,19 @@ public class ReportGeneratorNode implements NodeAction {
 			}
 		}
 		catch (NumberFormatException ignore) {
-			// ignore parse error, treat as global config
+			// 忽略解析错误，视为全局配置
 		}
 
-		// Generate report streaming flux
+		// 生成报告的流式输出
 		Flux<ChatResponse> reportGenerationFlux = generateReport(userInput, plan, executionResults,
 				summaryAndRecommendations, agentId);
 
 		TextType reportTextType = TextType.MARK_DOWN;
 
-		// Use utility class to create streaming generator with content collection
+		// 使用工具类创建流式生成器，收集报告内容
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, "开始生成报告...", "报告生成完成！", reportContent -> {
-					log.info("Generated report content: {}", reportContent);
+					log.info("生成的报告内容: {}", reportContent);
 					Map<String, Object> result = new HashMap<>();
 					result.put(RESULT, reportContent);
 					result.put(SQL_EXECUTE_NODE_OUTPUT, null);
@@ -122,45 +136,62 @@ public class ReportGeneratorNode implements NodeAction {
 	}
 
 	/**
-	 * Gets the current execution step from the plan.
+	 * 从执行计划中获取当前执行步骤。
+	 * @param plan 执行计划
+	 * @param currentStep 当前步骤号
+	 * @return 当前执行步骤
+	 * @throws IllegalStateException 若执行计划为空或步骤索引越界
 	 */
 	private ExecutionStep getCurrentExecutionStep(Plan plan, Integer currentStep) {
 		List<ExecutionStep> executionPlan = plan.getExecutionPlan();
 		if (executionPlan == null || executionPlan.isEmpty()) {
-			throw new IllegalStateException("Execution plan is empty");
+			throw new IllegalStateException("执行计划为空");
 		}
 
 		int stepIndex = currentStep - 1;
 		if (stepIndex < 0 || stepIndex >= executionPlan.size()) {
-			throw new IllegalStateException("Current step index out of range: " + stepIndex);
+			throw new IllegalStateException("当前步骤索引越界: " + stepIndex);
 		}
 
 		return executionPlan.get(stepIndex);
 	}
 
 	/**
-	 * Generates the analysis report.
+	 * 生成分析报告。
+	 * <p>
+	 * 构建用户需求和计划描述、分析步骤和数据结果描述，加载优化配置， 最终调用大模型生成报告。
+	 * </p>
+	 * @param userInput 用户输入
+	 * @param plan 执行计划
+	 * @param executionResults 执行结果
+	 * @param summaryAndRecommendations 总结和建议
+	 * @param agentId 智能体 ID
+	 * @return 报告生成的流式响应
 	 */
 	private Flux<ChatResponse> generateReport(String userInput, Plan plan, HashMap<String, String> executionResults,
 			String summaryAndRecommendations, Long agentId) {
-		// Build user requirements and plan description
+		// 构建用户需求和计划描述
 		String userRequirementsAndPlan = buildUserRequirementsAndPlan(userInput, plan);
 
-		// Build analysis steps and data results description
+		// 构建分析步骤和数据结果描述
 		String analysisStepsAndData = buildAnalysisStepsAndData(plan, executionResults);
 
-		// Get optimization configs if available (优先按智能体加载)
+		// 获取优化配置（优先按智能体加载）
 		List<UserPromptConfig> optimizationConfigs = promptConfigService.getOptimizationConfigs("report-generator",
 				agentId);
 
+		// 构建报告生成提示词
 		String reportPrompt = PromptHelper.buildReportGeneratorPromptWithOptimization(userRequirementsAndPlan,
 				analysisStepsAndData, summaryAndRecommendations, optimizationConfigs);
-		log.debug("Report Node Prompt: \n {} \n", reportPrompt);
+		log.debug("报告节点提示词: \n {} \n", reportPrompt);
 		return llmService.callUser(reportPrompt);
 	}
 
 	/**
-	 * Builds user requirements and plan description.
+	 * 构建用户需求和计划描述。
+	 * @param userInput 用户输入
+	 * @param plan 执行计划
+	 * @return 用户需求和计划描述字符串
 	 */
 	private String buildUserRequirementsAndPlan(String userInput, Plan plan) {
 		StringBuilder sb = new StringBuilder();
@@ -186,7 +217,10 @@ public class ReportGeneratorNode implements NodeAction {
 	}
 
 	/**
-	 * Builds analysis steps and data results description.
+	 * 构建分析步骤和数据结果描述。
+	 * @param plan 执行计划
+	 * @param executionResults 执行结果
+	 * @return 分析步骤和数据结果描述字符串
 	 */
 	private String buildAnalysisStepsAndData(Plan plan, HashMap<String, String> executionResults) {
 		StringBuilder sb = new StringBuilder();

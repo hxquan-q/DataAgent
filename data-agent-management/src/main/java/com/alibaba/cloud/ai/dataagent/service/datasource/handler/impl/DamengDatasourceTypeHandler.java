@@ -20,14 +20,26 @@ import com.alibaba.cloud.ai.dataagent.entity.Datasource;
 import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * 达梦（Dameng）数据库类型处理器，负责构建达梦 JDBC 连接 URL。
+ */
 @Component
 public class DamengDatasourceTypeHandler implements DatasourceTypeHandler {
 
+	/**
+	 * 返回达梦数据源类型名称。
+	 * @return 达梦类型名称
+	 */
 	@Override
 	public String typeName() {
 		return BizDataSourceTypeEnum.DAMENG.getTypeName();
 	}
 
+	/**
+	 * 构建达梦 JDBC 连接 URL，格式为 jdbc:dm://host:port。
+	 * @param datasource 数据源实体
+	 * @return 达梦 JDBC 连接 URL
+	 */
 	@Override
 	public String buildConnectionUrl(Datasource datasource) {
 		if (!hasRequiredConnectionFields(datasource)) {

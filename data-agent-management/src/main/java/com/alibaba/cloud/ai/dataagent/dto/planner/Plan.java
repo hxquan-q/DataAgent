@@ -26,6 +26,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 执行计划 DTO
+ *
+ * <p>
+ * 表示 Planner 节点生成的完整执行计划，包含分析思路和步骤列表。 同时提供 NL2SQL 模式下的单步计划快速构建方法。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

@@ -22,6 +22,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 执行步骤 DTO
+ *
+ * <p>
+ * 表示工作流执行计划中的单个步骤，包含步骤序号、使用的工具名称及工具参数。 内部类 {@link ToolParameters} 封装了各类工具的统一参数定义。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

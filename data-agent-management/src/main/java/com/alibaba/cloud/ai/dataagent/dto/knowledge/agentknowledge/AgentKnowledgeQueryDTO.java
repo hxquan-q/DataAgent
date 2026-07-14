@@ -24,6 +24,13 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 智能体知识查询 DTO
+ *
+ * <p>
+ * 用于分页查询智能体知识的请求数据传输对象，支持按标题模糊查询、按知识类型 和向量化状态筛选。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor

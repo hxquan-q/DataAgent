@@ -30,7 +30,10 @@ import reactor.core.publisher.Flux;
 import java.util.Map;
 
 /**
- * JSON解析工具类，支持自动修复格式错误的JSON
+ * JSON 解析工具类，支持自动修复格式错误的 JSON。
+ * <p>
+ * 当原始 JSON 解析失败时，会调用 LLM 对 JSON 进行修复，最多重试 {@value #MAX_RETRY_COUNT} 次； 解析前会自动剥离思考过程（{@code </think>} 标签之前的内容）以及 Markdown 代码块。
+ * </p>
  */
 @Slf4j
 @Component
@@ -39,10 +42,23 @@ public class JsonParseUtil {
 
 	private LlmService llmService;
 
+	/** LLM 修复 JSON 的最大重试次数 */
 	private static final int MAX_RETRY_COUNT = 3;
 
+	/** 思考过程的结束标签 */
 	private static final String THINK_END_TAG = "</think>";
 
+	/**
+	 * 尝试将 JSON 字符串转换为指定类型的对象。
+	 * <p>
+	 * 解析失败时会调用 LLM 修复 JSON 并重试，最多重试 {@value #MAX_RETRY_COUNT} 次。
+	 * </p>
+	 * @param <T> 目标类型
+	 * @param json JSON 字符串
+	 * @param clazz 目标类型的 Class 对象
+	 * @return 转换后的对象
+	 * @throws IllegalArgumentException 当入参非法或在多次修复后仍无法解析时抛出
+	 */
 	public <T> T tryConvertToObject(String json, Class<T> clazz) {
 		Assert.hasText(json, "Input JSON string cannot be null or empty");
 		Assert.notNull(clazz, "Target class cannot be null");
@@ -51,10 +67,12 @@ public class JsonParseUtil {
 	}
 
 	/**
-	 * 尝试将JSON字符串转换为指定类型，支持TypeReference（如List<String>等复杂类型）
-	 * @param json JSON字符串
+	 * 尝试将 JSON 字符串转换为指定类型，支持通过 {@link TypeReference} 描述复杂泛型类型（如 {@code List<String>}）。
+	 * @param <T> 目标类型
+	 * @param json JSON 字符串
 	 * @param typeReference 类型引用
 	 * @return 转换后的对象
+	 * @throws IllegalArgumentException 当入参非法或在多次修复后仍无法解析时抛出
 	 */
 	public <T> T tryConvertToObject(String json, TypeReference<T> typeReference) {
 		Assert.hasText(json, "Input JSON string cannot be null or empty");
@@ -64,17 +82,21 @@ public class JsonParseUtil {
 	}
 
 	/**
-	 * 内部通用方法，用于JSON解析和修复
-	 * @param json JSON字符串
-	 * @param parser 解析器函数
+	 * 内部通用解析方法：先尝试直接解析，失败后调用 LLM 修复并重试。
+	 * @param <T> 目标类型
+	 * @param json JSON 字符串
+	 * @param parser 具体的解析函数
 	 * @return 转换后的对象
+	 * @throws IllegalArgumentException 当多次修复后仍无法解析时抛出
 	 */
 	private <T> T tryConvertToObjectInternal(String json, JsonParserFunction<T> parser) {
 		log.info("Trying to convert JSON to object: {}", json);
+		// 先剥离思考过程标签
 		String currentJson = removeThinkTags(json);
 		Exception lastException = null;
 		ObjectMapper objectMapper = JsonUtil.getObjectMapper();
 
+		// 第一次尝试直接解析
 		try {
 			return parser.parse(objectMapper, currentJson);
 		}
@@ -82,6 +104,7 @@ public class JsonParseUtil {
 			log.warn("Initial parsing failed, preparing to call LLM: {}", e.getMessage());
 		}
 
+		// 直接解析失败，进入 LLM 修复重试流程
 		for (int i = 0; i < MAX_RETRY_COUNT; i++) {
 			try {
 				currentJson = callLlmToFix(currentJson,
@@ -93,6 +116,7 @@ public class JsonParseUtil {
 				lastException = e;
 				log.warn("Still failed after {} fix attempt: {}", i + 1, e.getMessage());
 
+				// 最后一次重试失败时记录完整上下文，便于排查
 				if (i == MAX_RETRY_COUNT - 1) {
 					log.error("Finally failed after {} fix attempts", MAX_RETRY_COUNT);
 					log.warn("Last fix result: {}", currentJson);
@@ -105,7 +129,8 @@ public class JsonParseUtil {
 	}
 
 	/**
-	 * 函数式接口，用于JSON解析
+	 * 用于 JSON 解析的函数式接口。
+	 * @param <T> 解析结果类型
 	 */
 	@FunctionalInterface
 	private interface JsonParserFunction<T> {
@@ -114,6 +139,15 @@ public class JsonParseUtil {
 
 	}
 
+	/**
+	 * 调用 LLM 修复格式错误的 JSON。
+	 * <p>
+	 * 修复流程：渲染修复 Prompt -> 调用 LLM -> 收集返回 -> 剥离思考标签 -> 提取 Markdown 代码块中的纯 JSON。
+	 * </p>
+	 * @param json 待修复的 JSON 字符串
+	 * @param errorMessage 解析失败的错误信息
+	 * @return 修复后的 JSON 字符串；若 LLM 调用异常则返回原始 JSON
+	 */
 	private String callLlmToFix(String json, String errorMessage) {
 		try {
 			String prompt = PromptConstant.getJsonFixPromptTemplate()

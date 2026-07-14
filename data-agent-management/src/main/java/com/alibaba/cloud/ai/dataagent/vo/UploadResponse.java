@@ -27,12 +27,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UploadResponse {
 
+	/** 是否上传成功 */
 	private boolean success;
 
+	/** 响应消息 */
 	private String message;
 
+	/** 文件访问URL */
 	private String url;
 
+	/** 文件名 */
 	private String filename;
 
 	public static UploadResponse ok(String message, String url, String filename) {

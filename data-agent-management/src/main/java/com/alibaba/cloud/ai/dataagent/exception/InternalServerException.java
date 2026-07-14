@@ -15,8 +15,17 @@
  */
 package com.alibaba.cloud.ai.dataagent.exception;
 
+/**
+ * 内部服务器异常。
+ * <p>
+ * 表示服务端在处理请求过程中发生的内部错误，对应 HTTP 500 状态码。
+ */
 public class InternalServerException extends RuntimeException {
 
+	/**
+	 * 构造内部服务器异常。
+	 * @param message 异常描述信息
+	 */
 	public InternalServerException(String message) {
 		super(message);
 	}

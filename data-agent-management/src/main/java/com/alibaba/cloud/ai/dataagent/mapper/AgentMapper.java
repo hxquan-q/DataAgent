@@ -20,24 +20,49 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
+/**
+ * 智能体 Mapper，操作 {@code agent} 表。
+ * <p>
+ * 提供智能体（Agent）的基础 CRUD、按状态/关键词查询、API Key 维护与删除等操作。
+ * </p>
+ */
 @Mapper
 public interface AgentMapper {
 
+	/**
+	 * 查询全部智能体，按创建时间倒序返回。
+	 * @return 智能体列表
+	 */
 	@Select("""
 			SELECT * FROM agent ORDER BY create_time DESC
 			""")
 	List<Agent> findAll();
 
+	/**
+	 * 根据主键查询智能体。
+	 * @param id 智能体 ID
+	 * @return 智能体；不存在返回 {@code null}
+	 */
 	@Select("""
 			SELECT * FROM agent WHERE id = #{id}
 			""")
 	Agent findById(Long id);
 
+	/**
+	 * 根据状态查询智能体列表，按创建时间倒序返回。
+	 * @param status 智能体状态
+	 * @return 智能体列表
+	 */
 	@Select("""
 			SELECT * FROM agent WHERE status = #{status} ORDER BY create_time DESC
 			""")
 	List<Agent> findByStatus(String status);
 
+	/**
+	 * 按关键词检索智能体（匹配名称、描述、标签），按创建时间倒序返回。
+	 * @param keyword 关键词
+	 * @return 匹配的智能体列表
+	 */
 	@Select("""
 			SELECT * FROM agent
 			WHERE (name LIKE CONCAT('%', #{keyword}, '%')
@@ -47,6 +72,12 @@ public interface AgentMapper {
 			""")
 	List<Agent> searchByKeyword(@Param("keyword") String keyword);
 
+	/**
+	 * 按状态与关键词组合条件查询智能体（条件均可选），按创建时间倒序返回。
+	 * @param status 智能体状态（可为 {@code null}）
+	 * @param keyword 关键词（可为 {@code null}）
+	 * @return 匹配的智能体列表
+	 */
 	@Select("""
 			<script>
 				SELECT * FROM agent
@@ -65,6 +96,11 @@ public interface AgentMapper {
 			""")
 	List<Agent> findByConditions(@Param("status") String status, @Param("keyword") String keyword);
 
+	/**
+	 * 新增智能体，并将自增主键回填到入参对象的 {@code id} 字段。
+	 * @param agent 智能体实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 			INSERT INTO agent (name, description, avatar, status, api_key, api_key_enabled, prompt, category, admin_id, tags, create_time, update_time)
 			VALUES (#{name}, #{description}, #{avatar}, #{status}, #{apiKey}, #{apiKeyEnabled}, #{prompt}, #{category}, #{adminId}, #{tags}, #{createTime}, #{updateTime})
@@ -72,6 +108,11 @@ public interface AgentMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
 	int insert(Agent agent);
 
+	/**
+	 * 根据主键动态更新智能体（仅更新非空字段），并刷新 {@code update_time}。
+	 * @param agent 智能体实体（需携带 {@code id}）
+	 * @return 受影响行数
+	 */
 	@Update("""
 			<script>
 			          UPDATE agent
@@ -93,6 +134,13 @@ public interface AgentMapper {
 			""")
 	int updateById(Agent agent);
 
+	/**
+	 * 更新指定智能体的 API Key 及其启用状态。
+	 * @param id 智能体 ID
+	 * @param apiKey 新的 API Key
+	 * @param apiKeyEnabled API Key 启用状态：1 启用、0 禁用
+	 * @return 受影响行数
+	 */
 	@Update("""
 			UPDATE agent
 			SET api_key = #{apiKey}, api_key_enabled = #{apiKeyEnabled}, update_time = NOW()
@@ -101,6 +149,12 @@ public interface AgentMapper {
 	int updateApiKey(@Param("id") Long id, @Param("apiKey") String apiKey,
 			@Param("apiKeyEnabled") Integer apiKeyEnabled);
 
+	/**
+	 * 切换指定智能体的 API Key 启用状态。
+	 * @param id 智能体 ID
+	 * @param enabled 启用状态：1 启用、0 禁用
+	 * @return 受影响行数
+	 */
 	@Update("""
 			UPDATE agent
 			SET api_key_enabled = #{enabled}, update_time = NOW()
@@ -108,6 +162,11 @@ public interface AgentMapper {
 			""")
 	int toggleApiKey(@Param("id") Long id, @Param("enabled") Integer enabled);
 
+	/**
+	 * 根据主键物理删除智能体。
+	 * @param id 智能体 ID
+	 * @return 受影响行数
+	 */
 	@Delete("""
 			DELETE FROM agent WHERE id = #{id}
 			""")

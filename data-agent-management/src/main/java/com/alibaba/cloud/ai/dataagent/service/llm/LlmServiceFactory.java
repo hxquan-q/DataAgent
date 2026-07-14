@@ -23,14 +23,28 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
+/**
+ * LLM 服务工厂，实现 {@link FactoryBean} 根据配置创建对应的 LLM 服务实例。
+ *
+ * <p>
+ * 根据配置中的 {@code llmServiceType} 决定创建 {@link BlockLlmService}（阻塞式）
+ * 还是 {@link StreamLlmService}（流式）。
+ * </p>
+ */
 @Component
 @AllArgsConstructor
 public class LlmServiceFactory implements FactoryBean<LlmService> {
 
+	/** DataAgent 配置属性 */
 	private final DataAgentProperties properties;
 
+	/** AI 模型注册中心 */
 	private final AiModelRegistry aiModelRegistry;
 
+	/**
+	 * 根据配置创建对应的 LLM 服务实例。
+	 * @return LLM 服务实例
+	 */
 	@Override
 	public LlmService getObject() {
 		if (LlmServiceEnum.BLOCK.equals(properties.getLlmServiceType())) {
@@ -41,6 +55,10 @@ public class LlmServiceFactory implements FactoryBean<LlmService> {
 		}
 	}
 
+	/**
+	 * 返回工厂生产的对象类型。
+	 * @return LLM 服务接口类型
+	 */
 	@Override
 	public Class<?> getObjectType() {
 		return LlmService.class;

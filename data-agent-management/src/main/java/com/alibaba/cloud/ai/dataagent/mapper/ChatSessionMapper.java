@@ -21,11 +21,19 @@ import org.apache.ibatis.annotations.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 聊天会话 Mapper，操作 {@code chat_session} 表。
+ * <p>
+ * 管理智能体会话（标题、状态、置顶、用户）的生命周期，支持查询、更新、置顶切换与软删除。
+ * </p>
+ */
 @Mapper
 public interface ChatSessionMapper {
 
 	/**
-	 * Query session list by agent ID
+	 * 根据智能体 ID 查询未删除的会话列表，按置顶优先、更新时间倒序返回。
+	 * @param agentId 智能体 ID
+	 * @return 会话列表
 	 */
 	@Select("""
 			SELECT * FROM chat_session
@@ -35,7 +43,9 @@ public interface ChatSessionMapper {
 	List<ChatSession> selectByAgentId(@Param("agentId") Integer agentId);
 
 	/**
-	 * Query session details by session ID
+	 * 根据会话 ID 查询未删除的会话详情。
+	 * @param sessionId 会话 ID
+	 * @return 会话；不存在或已删除返回 {@code null}
 	 */
 	@Select("""
 			SELECT * FROM chat_session
@@ -44,7 +54,9 @@ public interface ChatSessionMapper {
 	ChatSession selectBySessionId(@Param("sessionId") String sessionId);
 
 	/**
-	 * Update session
+	 * 根据会话 ID 动态更新会话（仅更新非空字段），并刷新 {@code update_time}。
+	 * @param session 会话实体（需携带 {@code sessionId}）
+	 * @return 受影响行数
 	 */
 	@Update("""
 			<script>
@@ -62,7 +74,10 @@ public interface ChatSessionMapper {
 	int updateById(ChatSession session);
 
 	/**
-	 * Soft delete all sessions for an agent
+	 * 软删除某智能体下的全部会话（将状态置为 {@code deleted}）。
+	 * @param agentId 智能体 ID
+	 * @param updateTime 更新时间
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE chat_session
@@ -72,7 +87,10 @@ public interface ChatSessionMapper {
 	int softDeleteByAgentId(@Param("agentId") Integer agentId, @Param("updateTime") LocalDateTime updateTime);
 
 	/**
-	 * Update session time
+	 * 更新会话的最后活跃时间。
+	 * @param sessionId 会话 ID
+	 * @param updateTime 更新时间
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE chat_session
@@ -82,7 +100,11 @@ public interface ChatSessionMapper {
 	int updateSessionTime(@Param("sessionId") String sessionId, @Param("updateTime") LocalDateTime updateTime);
 
 	/**
-	 * Update session pinned status
+	 * 更新会话的置顶状态。
+	 * @param sessionId 会话 ID
+	 * @param isPinned 是否置顶
+	 * @param updateTime 更新时间
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE chat_session SET
@@ -94,7 +116,11 @@ public interface ChatSessionMapper {
 			@Param("updateTime") LocalDateTime updateTime);
 
 	/**
-	 * Update session title
+	 * 更新会话标题。
+	 * @param sessionId 会话 ID
+	 * @param title 新标题
+	 * @param updateTime 更新时间
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE chat_session SET
@@ -106,7 +132,10 @@ public interface ChatSessionMapper {
 			@Param("updateTime") LocalDateTime updateTime);
 
 	/**
-	 * Soft delete session
+	 * 软删除单个会话（将状态置为 {@code deleted}）。
+	 * @param sessionId 会话 ID
+	 * @param updateTime 更新时间
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE chat_session
@@ -115,6 +144,11 @@ public interface ChatSessionMapper {
 			""")
 	int softDeleteById(@Param("sessionId") String sessionId, @Param("updateTime") LocalDateTime updateTime);
 
+	/**
+	 * 新增会话记录。
+	 * @param session 会话实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 			INSERT INTO chat_session (id, agent_id, title, status, is_pinned, user_id, create_time, update_time)
 			VALUES (#{id}, #{agentId}, #{title}, #{status}, #{isPinned}, #{userId}, #{createTime}, #{updateTime})

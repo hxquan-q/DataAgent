@@ -33,6 +33,14 @@ import java.util.stream.Collectors;
 
 import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
 
+/**
+ * 达梦（Dameng）JDBC DDL 执行器实现。
+ * <p>
+ * 通过 USER_TABLES、USER_TAB_COLUMNS、USER_CONSTRAINTS 等系统视图查询达梦数据库的元数据信息。
+ * 达梦数据库以实例+用户作为 schema，数据库枚举返回空集。
+ * 使用 FETCH FIRST N ROWS ONLY 语法限制结果行数。
+ * </p>
+ */
 @Service
 public class DamengJdbcDdl extends AbstractJdbcDdl {
 

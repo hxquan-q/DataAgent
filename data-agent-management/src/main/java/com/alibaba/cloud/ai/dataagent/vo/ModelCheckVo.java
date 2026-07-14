@@ -20,16 +20,26 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 模型就绪状态检查 VO
+ *
+ * <p>
+ * 表示对话模型和向量模型的连接检查结果，用于前端展示模型配置的健康状态。
+ * </p>
+ */
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 public class ModelCheckVo {
 
+	/** 对话模型是否就绪 */
 	boolean chatModelReady;
 
+	/** 向量模型是否就绪 */
 	boolean embeddingModelReady;
 
+	/** 整体是否就绪（对话模型和向量模型均就绪时为 true） */
 	boolean ready;
 
 }

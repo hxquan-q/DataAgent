@@ -78,7 +78,16 @@ import static com.alibaba.cloud.ai.graph.StateGraph.START;
 import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
 
 /**
- * DataAgent的自动配置类
+ * DataAgent 的自动配置类。
+ * <p>
+ * 集中装配 DataAgent 运行所需的全部 Bean：
+ * </p>
+ * <ul>
+ *   <li>HTTP 客户端（RestClient / WebClient 超时配置）</li>
+ *   <li>NL2SQL 工作流状态图（{@link StateGraph}），定义全部节点与边</li>
+ *   <li>向量存储、文本分块、Embedding 批处理等 AI 组件</li>
+ *   <li>MCP 工具、ChatClient 等 LLM 交互组件</li>
+ * </ul>
  *
  * @author vlsmb
  * @since 2025/9/28
@@ -90,10 +99,16 @@ import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
 public class DataAgentConfiguration implements DisposableBean {
 
 	/**
-	 * 专用线程池，用于数据库操作的并行处理
+	 * 专用线程池，用于数据库操作的并行处理（如多表 Schema 召回）。
 	 */
 	private ExecutorService dbOperationExecutor;
 
+	/**
+	 * 自定义 RestClient 超时配置。
+	 * @param connectTimeout 连接超时（秒），默认 600
+	 * @param readTimeout    读取超时（秒），默认 600
+	 * @return RestClientCustomizer
+	 */
 	@Bean
 	@ConditionalOnMissingBean(RestClientCustomizer.class)
 	public RestClientCustomizer restClientCustomizer(@Value("${rest.connect.timeout:600}") long connectTimeout,
@@ -105,6 +120,11 @@ public class DataAgentConfiguration implements DisposableBean {
 			}).build());
 	}
 
+	/**
+	 * 自定义 WebClient 超时配置（用于流式 LLM 调用）。
+	 * @param responseTimeout 响应超时（秒），默认 600
+	 * @return WebClient.Builder
+	 */
 	@Bean
 	@ConditionalOnMissingBean(WebClient.Builder.class)
 	public WebClient.Builder webClientBuilder(@Value("${webclient.response.timeout:600}") long responseTimeout) {
@@ -114,6 +134,18 @@ public class DataAgentConfiguration implements DisposableBean {
 					HttpClient.create().responseTimeout(Duration.ofSeconds(responseTimeout))));
 	}
 
+	/**
+	 * 构建 NL2SQL 工作流状态图。
+	 * <p>
+	 * 定义 DataAgent 从用户输入到生成最终报告的完整流程，
+	 * 包含意图识别、Schema 召回、SQL 生成/执行、Python 分析、报告生成等节点，
+	 * 以及节点间的条件路由（Dispatcher）。
+	 * </p>
+	 * @param nodeBeanUtil           节点工具类（将节点实例转为 Graph 节点）
+	 * @param codeExecutorProperties Python 执行器配置（用于重试控制）
+	 * @return 工作流状态图
+	 * @throws GraphStateException 图构建异常
+	 */
 	@Bean
 	public StateGraph nl2sqlGraph(NodeBeanUtil nodeBeanUtil, CodeExecutorProperties codeExecutorProperties)
 			throws GraphStateException {

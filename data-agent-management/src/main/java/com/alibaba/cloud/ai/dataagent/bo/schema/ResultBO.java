@@ -20,14 +20,21 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 查询结果业务对象。
+ * <p>
+ * 封装 SQL 查询的最终返回结果，包含结果集数据和建议的显示样式。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ResultBO {
 
+	/** 结果集数据 */
 	private ResultSetBO resultSet;
 
+	/** 结果显示样式配置 */
 	private DisplayStyleBO displayStyle;
 
 }

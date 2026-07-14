@@ -17,25 +17,47 @@ package com.alibaba.cloud.ai.dataagent.enums;
 
 import lombok.Getter;
 
+/**
+ * 向量化嵌入状态枚举。
+ * <p>
+ * 表示知识库文档的向量化处理生命周期状态，用于跟踪异步嵌入任务的进度。
+ */
 @Getter
 public enum EmbeddingStatus {
 
-	PENDING("PENDING"), PROCESSING("PROCESSING"), COMPLETED("COMPLETED"), FAILED("FAILED");
+	/** 待处理：任务已创建，尚未开始执行 */
+	PENDING("PENDING"),
+	/** 处理中：正在执行向量化 */
+	PROCESSING("PROCESSING"),
+	/** 已完成：向量化成功结束 */
+	COMPLETED("COMPLETED"),
+	/** 已失败：向量化过程中发生错误 */
+	FAILED("FAILED");
 
 	private final String value;
 
+	/**
+	 * 构造嵌入状态枚举。
+	 * @param value 状态值字符串
+	 */
 	EmbeddingStatus(String value) {
 		this.value = value;
 	}
 
+	/**
+	 * 根据字符串值获取对应的枚举实例。
+	 * @param value 状态值字符串
+	 * @return 匹配的嵌入状态枚举
+	 * @throws IllegalArgumentException 如果传入的状态值无法匹配任何枚举
+	 */
 	public static EmbeddingStatus fromValue(String value) {
 		for (EmbeddingStatus status : EmbeddingStatus.values()) {
-			// 严格比对
+			// 严格比对状态值
 			if (status.value.equals(value)) {
 				return status;
 			}
 		}
-		throw new IllegalArgumentException("Unknown embedding status: " + value);
+		throw new IllegalArgumentException("未知的嵌入状态: " + value);
 	}
 
 }

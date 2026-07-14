@@ -21,9 +21,20 @@ import com.alibaba.cloud.ai.dataagent.enums.EmbeddingStatus;
 import com.alibaba.cloud.ai.dataagent.vo.BusinessKnowledgeVO;
 import org.springframework.stereotype.Component;
 
+/**
+ * 业务知识对象转换器。
+ * <p>
+ * 负责在持久化实体（BusinessKnowledge）、数据传输对象（CreateBusinessKnowledgeDTO）
+ * 和视图对象（BusinessKnowledgeVO）之间进行双向转换。
+ */
 @Component
 public class BusinessKnowledgeConverter {
 
+	/**
+	 * 将持久化实体转换为视图对象。
+	 * @param po 持久化实体
+	 * @return 视图对象
+	 */
 	public BusinessKnowledgeVO toVo(BusinessKnowledge po) {
 		return BusinessKnowledgeVO.builder()
 			.id(po.getId())
@@ -39,7 +50,13 @@ public class BusinessKnowledgeConverter {
 			.build();
 	}
 
-	// toEntityForCreate
+	/**
+	 * 根据创建 DTO 构建持久化实体。
+	 * <p>
+	 * 设置默认值（未删除、嵌入状态为处理中）。
+	 * @param dto 业务知识创建 DTO
+	 * @return 新建的持久化实体
+	 */
 	public BusinessKnowledge toEntityForCreate(CreateBusinessKnowledgeDTO dto) {
 		return BusinessKnowledge.builder()
 			.businessTerm(dto.getBusinessTerm())

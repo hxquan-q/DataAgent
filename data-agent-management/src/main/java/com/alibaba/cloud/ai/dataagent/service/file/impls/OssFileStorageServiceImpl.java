@@ -40,22 +40,37 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 /**
- * 阿里云OSS文件存储服务实现
+ * 阿里云 OSS 文件存储服务实现类，将文件存储到阿里云对象存储服务。
+ *
+ * <p>
+ * 支持响应式和同步两种文件上传方式，支持自定义域名，在 Bean 初始化时创建 OSS 客户端，销毁时关闭。
+ * </p>
  */
 @Slf4j
 public class OssFileStorageServiceImpl implements FileStorageService {
 
+	/** 文件存储配置属性 */
 	private final FileStorageProperties fileStorageProperties;
 
+	/** OSS 存储配置属性 */
 	private final OssStorageProperties ossProperties;
 
+	/** OSS 客户端实例 */
 	private OSS ossClient;
 
+	/**
+	 * 构造方法。
+	 * @param fileStorageProperties 文件存储配置属性
+	 * @param ossProperties OSS 存储配置属性
+	 */
 	public OssFileStorageServiceImpl(FileStorageProperties fileStorageProperties, OssStorageProperties ossProperties) {
 		this.fileStorageProperties = fileStorageProperties;
 		this.ossProperties = ossProperties;
 	}
 
+	/**
+	 * Bean 初始化时创建 OSS 客户端。
+	 */
 	@PostConstruct
 	public void init() {
 		this.ossClient = new OSSClientBuilder().build(ossProperties.getEndpoint(), ossProperties.getAccessKeyId(),
@@ -63,6 +78,9 @@ public class OssFileStorageServiceImpl implements FileStorageService {
 		log.info("OSS客户端初始化完成，endpoint: {}, bucket: {}", ossProperties.getEndpoint(), ossProperties.getBucketName());
 	}
 
+	/**
+	 * Bean 销毁时关闭 OSS 客户端。
+	 */
 	@PreDestroy
 	public void destroy() {
 		if (ossClient != null) {

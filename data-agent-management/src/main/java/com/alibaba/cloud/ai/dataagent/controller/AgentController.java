@@ -36,7 +36,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-/** Agent Management Controller */
+/**
+ * Agent 管理控制器，提供智能体的增删改查、发布/下线、API Key 管理等接口。
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/agent")
@@ -46,7 +48,13 @@ public class AgentController {
 
 	private final AgentService agentService;
 
-	/** Get agent list */
+	/**
+	 * 查询 Agent 列表。
+	 * <p>支持按关键词搜索或按状态过滤；两个参数都为空时返回全部。</p>
+	 * @param status  状态过滤（如 draft/published/offline）
+	 * @param keyword 关键词搜索（名称模糊匹配）
+	 * @return Agent 列表
+	 */
 	@GetMapping("/list")
 	public List<Agent> list(@RequestParam(value = "status", required = false) String status,
 			@RequestParam(value = "keyword", required = false) String keyword) {
@@ -63,23 +71,36 @@ public class AgentController {
 		return result;
 	}
 
-	/** Get agent details by ID */
+	/**
+	 * 根据 ID 获取 Agent 详情。
+	 * @param id Agent ID
+	 * @return Agent 详情
+	 */
 	@GetMapping("/{id}")
 	public Agent get(@PathVariable Long id) {
 		return checkAgentExists(id);
 	}
 
-	/** Create agent */
+	/**
+	 * 创建 Agent。
+	 * <p>未指定状态时默认设置为 draft。</p>
+	 * @param agent Agent 信息
+	 * @return 创建后的 Agent
+	 */
 	@PostMapping
 	public Agent create(@RequestBody Agent agent) {
-		// Set default status
 		if (StringUtils.isBlank(agent.getStatus())) {
 			agent.setStatus("draft");
 		}
 		return agentService.save(agent);
 	}
 
-	/** Update agent */
+	/**
+	 * 更新 Agent 信息。
+	 * @param id    Agent ID
+	 * @param agent 更新内容
+	 * @return 更新后的 Agent
+	 */
 	@PutMapping("/{id}")
 	public Agent update(@PathVariable Long id, @RequestBody Agent agent) {
 		checkAgentExists(id);
@@ -87,14 +108,21 @@ public class AgentController {
 		return agentService.save(agent);
 	}
 
-	/** Delete agent */
+	/**
+	 * 删除 Agent。
+	 * @param id Agent ID
+	 */
 	@DeleteMapping("/{id}")
 	public void delete(@PathVariable Long id) {
 		checkAgentExists(id);
 		agentService.deleteById(id);
 	}
 
-	/** Publish agent */
+	/**
+	 * 发布 Agent（状态改为 published）。
+	 * @param id Agent ID
+	 * @return 更新后的 Agent
+	 */
 	@PostMapping("/{id}/publish")
 	public Agent publish(@PathVariable Long id) {
 		Agent agent = checkAgentExists(id);
@@ -102,7 +130,11 @@ public class AgentController {
 		return agentService.save(agent);
 	}
 
-	/** Offline agent */
+	/**
+	 * 下线 Agent（状态改为 offline）。
+	 * @param id Agent ID
+	 * @return 更新后的 Agent
+	 */
 	@PostMapping("/{id}/offline")
 	public Agent offline(@PathVariable Long id) {
 		Agent agent = checkAgentExists(id);
@@ -110,7 +142,11 @@ public class AgentController {
 		return agentService.save(agent);
 	}
 
-	/** Get masked API Key status */
+	/**
+	 * 获取脱敏后的 API Key 状态。
+	 * @param id Agent ID
+	 * @return 包含掩码 Key 和启用状态的响应
+	 */
 	@GetMapping("/{id}/api-key")
 	public ApiResponse<ApiKeyResponse> getApiKey(@PathVariable Long id) {
 		Agent agent = checkAgentExists(id);
@@ -118,7 +154,11 @@ public class AgentController {
 		return buildApiKeyResponse(masked, agent.getApiKeyEnabled(), "获取 API Key 成功");
 	}
 
-	/** Generate API Key */
+	/**
+	 * 生成新的 API Key。
+	 * @param id Agent ID
+	 * @return 包含明文 Key 的响应（仅此一次返回明文）
+	 */
 	@PostMapping("/{id}/api-key/generate")
 	public ApiResponse<ApiKeyResponse> generateApiKey(@PathVariable Long id) {
 		checkAgentExists(id);
@@ -126,7 +166,11 @@ public class AgentController {
 		return buildApiKeyResponse(agent.getApiKey(), agent.getApiKeyEnabled(), "生成 API Key 成功");
 	}
 
-	/** Reset API Key */
+	/**
+	 * 重置 API Key（旧 Key 失效，生成新 Key）。
+	 * @param id Agent ID
+	 * @return 包含新明文 Key 的响应
+	 */
 	@PostMapping("/{id}/api-key/reset")
 	public ApiResponse<ApiKeyResponse> resetApiKey(@PathVariable Long id) {
 		checkAgentExists(id);
@@ -134,7 +178,11 @@ public class AgentController {
 		return buildApiKeyResponse(agent.getApiKey(), agent.getApiKeyEnabled(), "重置 API Key 成功");
 	}
 
-	/** Delete API Key */
+	/**
+	 * 删除 API Key。
+	 * @param id Agent ID
+	 * @return 操作结果
+	 */
 	@DeleteMapping("/{id}/api-key")
 	public ApiResponse<ApiKeyResponse> deleteApiKey(@PathVariable Long id) {
 		checkAgentExists(id);
@@ -142,7 +190,12 @@ public class AgentController {
 		return buildApiKeyResponse(agent.getApiKey(), agent.getApiKeyEnabled(), "删除 API Key 成功");
 	}
 
-	/** Toggle API Key enable flag */
+	/**
+	 * 切换 API Key 的启用/禁用状态。
+	 * @param id      Agent ID
+	 * @param enabled 是否启用
+	 * @return 操作结果
+	 */
 	@PostMapping("/{id}/api-key/enable")
 	public ApiResponse<ApiKeyResponse> toggleApiKey(@PathVariable Long id, @RequestParam("enabled") boolean enabled) {
 		checkAgentExists(id);
@@ -151,6 +204,11 @@ public class AgentController {
 				"更新 API Key 状态成功");
 	}
 
+	/**
+	 * 校验 Agent 是否存在，不存在则抛出 404。
+	 * @param id Agent ID
+	 * @return 查到的 Agent
+	 */
 	private Agent checkAgentExists(Long id) {
 		Agent agent = agentService.findById(id);
 		if (agent == null) {
@@ -159,6 +217,13 @@ public class AgentController {
 		return agent;
 	}
 
+	/**
+	 * 构建 API Key 统一响应体。
+	 * @param apiKey       密钥值（可能脱敏）
+	 * @param apiKeyEnabled 启用状态
+	 * @param message      提示消息
+	 * @return 统一响应
+	 */
 	private ApiResponse<ApiKeyResponse> buildApiKeyResponse(String apiKey, Integer apiKeyEnabled, String message) {
 		return ApiResponse.success(message, new ApiKeyResponse(apiKey, apiKeyEnabled));
 	}

@@ -29,25 +29,42 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Service;
 
+/**
+ * Agent 启动初始化服务，在应用启动时自动初始化所有已发布（published）状态的 Agent 的数据源和向量数据。
+ *
+ * <p>
+ * 通过实现 {@link ApplicationRunner} 在应用启动后异步执行初始化逻辑，避免阻塞 Spring 主启动线程；
+ * 通过实现 {@link DisposableBean} 在应用关闭时释放线程池资源。
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AgentStartupInitialization implements ApplicationRunner, DisposableBean {
 
+	/** Agent 管理服务 */
 	private final AgentService agentService;
 
+	/** 向量存储服务，用于检查初始化状态 */
 	private final AgentVectorStoreService agentVectorStoreService;
 
+	/** Agent 数据源服务，用于初始化数据源 Schema */
 	private final AgentDatasourceService agentDatasourceService;
 
+	/** 异步执行线程池，用于后台执行初始化任务 */
 	private final ExecutorService executorService;
 
+	/**
+	 * 应用启动入口，异步触发已发布 Agent 的自动初始化。
+	 * @param args 应用启动参数
+	 */
 	@Override
 	public void run(ApplicationArguments args) {
 		log.info("Starting automatic initialization of published agents...");
 
 		try {
-			// 因为异步可以让初始化过程在后台运行，不会阻塞Spring启动主线程，提高启动速度和响应性；即使初始化很耗时也不会影响主程序正常启动。
+			// 异步执行初始化，让初始化过程在后台运行，不阻塞 Spring 启动主线程，
+			// 提高启动速度和响应性；即使初始化很耗时也不会影响主程序正常启动
 			CompletableFuture.runAsync(this::initializePublishedAgents, executorService).exceptionally(throwable -> {
 				log.error("Error during agent initialization: {}", throwable.getMessage());
 				return null;
@@ -59,9 +76,10 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 		}
 	}
 
-	/** Initialize all published agents */
+	/** 初始化所有已发布状态的 Agent */
 	private void initializePublishedAgents() {
 		try {
+			// 查询所有已发布状态的 Agent
 			List<Agent> publishedAgents = agentService.findByStatus("published");
 
 			if (publishedAgents.isEmpty()) {
@@ -74,6 +92,7 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 			int successCount = 0;
 			int failureCount = 0;
 
+			// 逐个初始化已发布的 Agent
 			for (Agent agent : publishedAgents) {
 				try {
 					boolean initialized = initializeAgentDataSource(agent);
@@ -93,6 +112,7 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 							e.getMessage());
 				}
 
+				// 每个 Agent 初始化之间间隔 1 秒，避免资源争抢
 				try {
 					Thread.sleep(1000);
 				}
@@ -112,14 +132,15 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 	}
 
 	/**
-	 * Initialize the data source for a single agent
-	 * @param agent The agent
-	 * @return Whether the initialization was successful
+	 * 初始化单个 Agent 的数据源。
+	 * @param agent 待初始化的 Agent
+	 * @return 初始化是否成功
 	 */
 	private boolean initializeAgentDataSource(Agent agent) {
 		try {
 			Long agentId = agent.getId();
 
+			// 检查是否已有向量数据，避免重复初始化
 			boolean hasData = isAlreadyInitialized(agentId);
 
 			if (hasData) {
@@ -127,6 +148,7 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 				return true;
 			}
 
+			// 获取 Agent 当前激活的数据源配置
 			AgentDatasource activeDatasource = agentDatasourceService.getCurrentAgentDatasource(agentId);
 
 			Integer datasourceId = activeDatasource.getDatasourceId();
@@ -140,6 +162,7 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 
 			log.info("Initializing agent {} with datasource {} and {} tables", agentId, datasourceId, tables.size());
 
+			// 调用数据源服务初始化 Agent 的 Schema 向量数据
 			Boolean result = agentDatasourceService.initializeSchemaForAgentWithDatasource(agentId, datasourceId,
 					tables);
 
@@ -159,20 +182,25 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 		}
 	}
 
+	/**
+	 * 检查指定 Agent 是否已经初始化过向量数据。
+	 * @param agentId Agent 主键 ID
+	 * @return 是否已存在向量数据
+	 */
 	private boolean isAlreadyInitialized(Long agentId) {
 		try {
 			String agentIdStr = String.valueOf(agentId);
 			return agentVectorStoreService.hasDocuments(agentIdStr);
 		}
 		catch (Exception e) {
+			// 检查失败时假定为未初始化
 			log.error("Failed to check initialization status for agent: {}, assuming not initialized", agentId, e);
 			return false;
 		}
 	}
 
 	/**
-	 * Clean up resources when the application shuts down. Implement the destroy method of
-	 * the DisposableBean interface
+	 * 应用关闭时清理资源，关闭初始化线程池。
 	 */
 	@Override
 	public void destroy() {

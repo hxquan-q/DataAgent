@@ -19,9 +19,16 @@ import com.alibaba.cloud.ai.dataagent.enums.BizDataSourceTypeEnum;
 import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * SQL Server 数据源类型处理器，使用默认连接 URL 构建逻辑。
+ */
 @Component
 public class SqlServerDatasourceTypeHandler implements DatasourceTypeHandler {
 
+	/**
+	 * 返回 SQL Server 数据源类型名称。
+	 * @return SQL Server 类型名称
+	 */
 	@Override
 	public String typeName() {
 		return BizDataSourceTypeEnum.SQL_SERVER.getTypeName();

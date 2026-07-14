@@ -28,7 +28,12 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * Human feedback node for plan review and modification.
+ * 人工反馈节点，用于执行计划的人工审核与修改。
+ *
+ * <p>
+ * 该节点在工作流中处理用户对执行计划的反馈。若用户批准计划，则进入计划执行节点； 若用户拒绝计划，则返回计划生成节点重新生成，并将用户反馈作为提示信息传入。
+ * 支持最大修复次数（默认 3 次）限制。
+ * </p>
  *
  * @author Makoto
  */
@@ -36,6 +41,15 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 @Component
 public class HumanFeedbackNode implements NodeAction {
 
+	/**
+	 * 处理人工反馈逻辑。
+	 * <p>
+	 * 检查修复次数是否超限，解析反馈数据。若反馈为空则等待用户输入； 若用户批准则进入执行节点，否则返回计划生成节点并清空旧计划。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含下一个节点路由信息的 Map
+	 * @throws Exception 处理反馈时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 		Map<String, Object> updated = new HashMap<>();
@@ -43,29 +57,33 @@ public class HumanFeedbackNode implements NodeAction {
 		// 检查最大修复次数
 		int repairCount = StateUtil.getObjectValue(state, PLAN_REPAIR_COUNT, Integer.class, 0);
 		if (repairCount >= 3) {
-			log.warn("Max repair attempts (3) exceeded, ending process");
+			log.warn("超过最大修复次数（3 次），结束流程");
 			updated.put("human_next_node", "END");
 			return updated;
 		}
 
+		// 获取反馈数据
 		Map<String, Object> feedbackData = StateUtil.getObjectValue(state, HUMAN_FEEDBACK_DATA, Map.class, Map.of());
 		if (feedbackData.isEmpty()) {
+			// 反馈数据为空，等待用户输入
 			updated.put("human_next_node", "WAIT_FOR_FEEDBACK");
 			return updated;
 		}
 
-		// 处理反馈结果
+		// 解析反馈结果：是否批准
 		Object approvedValue = feedbackData.getOrDefault("feedback", true);
 		boolean approved = approvedValue instanceof Boolean approvedBoolean ? approvedBoolean
 				: Boolean.parseBoolean(approvedValue.toString());
 
 		if (approved) {
-			log.info("Plan approved → execution");
+			// 用户批准计划，进入执行节点
+			log.info("计划已批准 → 进入执行");
 			updated.put("human_next_node", PLAN_EXECUTOR_NODE);
 			updated.put(HUMAN_REVIEW_ENABLED, false);
 		}
 		else {
-			log.info("Plan rejected → regeneration (attempt {})", repairCount + 1);
+			// 用户拒绝计划，返回计划生成节点重新生成
+			log.info("计划被拒绝 → 重新生成（第 {} 次尝试）", repairCount + 1);
 			updated.put("human_next_node", PLANNER_NODE);
 			updated.put(PLAN_REPAIR_COUNT, repairCount + 1);
 			updated.put(PLAN_CURRENT_STEP, 1);
@@ -74,8 +92,8 @@ public class HumanFeedbackNode implements NodeAction {
 			// 保存用户反馈内容
 			String feedbackContent = feedbackData.getOrDefault("feedback_content", "").toString();
 			updated.put(PLAN_VALIDATION_ERROR,
-					StringUtils.hasLength(feedbackContent) ? feedbackContent : "Plan rejected by user");
-			// 这边清空旧的计划输出
+					StringUtils.hasLength(feedbackContent) ? feedbackContent : "用户拒绝了计划");
+			// 清空旧的计划输出
 			updated.put(PLANNER_NODE_OUTPUT, "");
 		}
 

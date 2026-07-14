@@ -20,9 +20,20 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
+/**
+ * 模型配置 Mapper，操作 {@code model_config} 表。
+ * <p>
+ * 管理大语言模型/嵌入模型的供应商、接入地址、凭证、参数、代理及启用状态，
+ * 支持条件查询、按类型激活、互斥停用与软删除。
+ * </p>
+ */
 @Mapper
 public interface ModelConfigMapper {
 
+	/**
+	 * 查询全部未删除的模型配置，按创建时间倒序返回。
+	 * @return 模型配置列表
+	 */
 	@Select("""
 			SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			       model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -31,6 +42,11 @@ public interface ModelConfigMapper {
 			""")
 	List<ModelConfig> findAll();
 
+	/**
+	 * 根据主键查询未删除的模型配置。
+	 * @param id 模型配置 ID
+	 * @return 模型配置；不存在返回 {@code null}
+	 */
 	@Select("""
 			SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			       model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -39,6 +55,11 @@ public interface ModelConfigMapper {
 			""")
 	ModelConfig findById(Integer id);
 
+	/**
+	 * 根据模型类型查询当前启用的模型配置（至多一条）。
+	 * @param modelType 模型类型
+	 * @return 启用的模型配置；不存在返回 {@code null}
+	 */
 	@Select("""
 			SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			       model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -47,9 +68,23 @@ public interface ModelConfigMapper {
 			""")
 	ModelConfig selectActiveByType(@Param("modelType") String modelType);
 
+	/**
+	 * 将同类型下除当前配置外的其他模型全部停用（用于实现“同类型仅一个启用”的互斥逻辑）。
+	 * @param modelType 模型类型
+	 * @param currentId 当前启用的模型配置 ID
+	 */
 	@Update("UPDATE model_config SET is_active = 0 WHERE model_type = #{modelType} AND id != #{currentId} AND is_deleted = 0")
 	void deactivateOthers(@Param("modelType") String modelType, @Param("currentId") Integer currentId);
 
+	/**
+	 * 按多条件组合查询未删除的模型配置（供应商、关键词、启用状态、最大 token、类型均可选），按创建时间倒序返回。
+	 * @param provider 供应商（可为 {@code null}）
+	 * @param keyword 关键词（可为 {@code null}）
+	 * @param isActive 启用状态（可为 {@code null}）
+	 * @param maxTokens 最大 token 数（可为 {@code null}）
+	 * @param modelType 模型类型（可为 {@code null}）
+	 * @return 匹配的模型配置列表
+	 */
 	@Select("""
 			<script>
 			   SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
@@ -83,6 +118,11 @@ public interface ModelConfigMapper {
 			@Param("isActive") Boolean isActive, @Param("maxTokens") Integer maxTokens,
 			@Param("modelType") String modelType);
 
+	/**
+	 * 新增模型配置，并将自增主键回填到入参对象的 {@code id} 字段。
+	 * @param modelConfig 模型配置实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 			INSERT INTO model_config (provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			                         model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -94,6 +134,11 @@ public interface ModelConfigMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
 	int insert(ModelConfig modelConfig);
 
+	/**
+	 * 根据主键动态更新模型配置（仅更新非空字段），并刷新 {@code updated_time}。
+	 * @param modelConfig 模型配置实体（需携带 {@code id}）
+	 * @return 受影响行数
+	 */
 	@Update("""
 			<script>
 			          UPDATE model_config
@@ -121,6 +166,11 @@ public interface ModelConfigMapper {
 			""")
 	int updateById(ModelConfig modelConfig);
 
+	/**
+	 * 根据主键软删除模型配置（将 {@code is_deleted} 置为 1）。
+	 * @param id 模型配置 ID
+	 * @return 受影响行数
+	 */
 	@Update("""
 			UPDATE model_config SET is_deleted = 1 WHERE id = #{id}
 			""")

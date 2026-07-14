@@ -27,7 +27,11 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 /**
- * 语义模型批量导入DTO
+ * 语义模型批量导入 DTO
+ *
+ * <p>
+ * 用于批量导入语义模型配置的请求数据，包含目标智能体ID和导入项列表。
+ * </p>
  */
 @Data
 @Builder
@@ -35,9 +39,11 @@ import java.util.List;
 @AllArgsConstructor
 public class SemanticModelBatchImportDTO {
 
+	/** 关联的智能体ID */
 	@NotNull(message = "智能体ID不能为空")
 	private Long agentId;
 
+	/** 导入项列表 */
 	@NotEmpty(message = "导入数据不能为空")
 	@Valid
 	private List<SemanticModelImportItem> items;

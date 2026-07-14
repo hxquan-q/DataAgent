@@ -27,6 +27,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * AI 模型配置管理控制器。
+ * <p>
+ * 管理聊天模型（Chat）和嵌入模型（Embedding）的配置，
+ * 支持增删改查、启用/切换、连通性测试、就绪状态检查等。
+ * </p>
+ */
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/model-config")

@@ -21,53 +21,72 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * DataAgent 核心配置属性类，绑定 {@code spring.ai.alibaba.data-agent.*} 前缀。
+ * <p>
+ * 涵盖 LLM 调用方式、向量检索阈值、报告模板、SQL 重试、文本分块等全部业务参数。
+ * </p>
+ *
+ * @author vlsmb
+ */
 @Getter
 @Setter
 @ConfigurationProperties(prefix = Constant.PROJECT_PROPERTIES_PREFIX)
 public class DataAgentProperties {
 
+	/**
+	 * LLM 服务调用方式：{@code stream}（流式）/ {@code block}（阻塞）
+	 */
 	private LlmServiceEnum llmServiceType = LlmServiceEnum.STREAM;
 
 	/**
-	 * spring.ai.alibaba.data-agent.embedding-batch.encoding-type=cl100k_base
-	 * spring.ai.alibaba.data-agent.embedding-batch.max-token-count=2000
-	 * spring.ai.alibaba.data-agent.embedding-batch.reserve-percentage=0.2
-	 * spring.ai.alibaba.data-agent.embedding-batch.max-text-count=10
+	 * Embedding 批处理配置（分批调用向量化接口，避免超 token/条数限制）
 	 */
 	private EmbeddingBatch embeddingBatch = new EmbeddingBatch();
 
+	/**
+	 * 向量存储检索配置（Top-K、相似度阈值等）
+	 */
 	private VectorStoreProperties vectorStore = new VectorStoreProperties();
 
+	/**
+	 * 报告生成模板配置（Marked.js、ECharts CDN 地址）
+	 */
 	private ReportTemplate reportTemplate = new ReportTemplate();
 
 	/**
-	 * sql执行失败重试次数
+	 * SQL 执行失败重试次数
 	 */
 	private int maxSqlRetryCount = 10;
 
 	/**
-	 * sql优化最多次数
+	 * SQL 优化最多次数
 	 */
 	private int maxSqlOptimizeCount = 10;
 
 	/**
-	 * sql优化分数阈值
+	 * SQL 优化分数阈值（达到该分数即认为 SQL 质量合格）
 	 */
 	private double sqlScoreThreshold = 0.95;
 
+	/**
+	 * 文本分块策略配置
+	 */
 	private TextSplitter textSplitter = new TextSplitter();
 
 	/**
-	 * 最多保留的对话轮数
+	 * 多轮对话中最多保留的历史轮数
 	 */
 	private int maxturnhistory = 5;
 
 	/**
-	 * 单次规划最大长度限制
+	 * 单次规划（Plan）最大长度限制
 	 */
 	private int maxplanlength = 2000;
 
-	// 每张表的最大预估列数
+	/**
+	 * 每张表的最大预估列数（用于 Schema 召回时的截断控制）
+	 */
 	private int maxColumnsPerTable = 50;
 
 	/**
@@ -80,6 +99,9 @@ public class DataAgentProperties {
 	 */
 	private Long enrichSqlResultTimeout = 3000L;
 
+	/**
+	 * 报告生成模板配置：Markdown 解析器与图表库的 CDN 地址。
+	 */
 	@Getter
 	@Setter
 	public static class ReportTemplate {
@@ -92,6 +114,9 @@ public class DataAgentProperties {
 
 	}
 
+	/**
+	 * 文本分块策略配置，支持 Token、递归字符、句子、语义、段落五种分块方式。
+	 */
 	@Getter
 	@Setter
 	public static class TextSplitter {
@@ -228,6 +253,10 @@ public class DataAgentProperties {
 
 	}
 
+	/**
+	 * Embedding 批处理配置：控制每次向量化请求的 token 上限与文本条数，
+	 * 避免超出 Embedding 模型 API 限制（如 DashScope 单批最多 10 条）。
+	 */
 	@Getter
 	@Setter
 	public static class EmbeddingBatch {
@@ -254,19 +283,28 @@ public class DataAgentProperties {
 
 	}
 
+	/**
+	 * 向量存储检索配置：控制召回 Top-K、相似度阈值、混合搜索等。
+	 * <p>
+	 * 表级召回（tableTopkLimit）阈值较低，尽量不漏表；通用召回（defaultTopkLimit）阈值较高，保证精度。
+	 * </p>
+	 */
 	@Getter
 	@Setter
 	public static class VectorStoreProperties {
 
-		// 专门给召回Table 用的配置
+		/**
+		 * 表级召回返回的最大表数量（Top-K）
+		 */
 		private int tableTopkLimit = 10;
 
-		// 设置低尽可能保证表不会召回漏掉
+		/**
+		 * 表级相似度下限；设置较低以避免漏召回表
+		 */
 		private double tableSimilarityThreshold = 0.2;
 
-		// 全局默认配置（给 BusinessTerm, AgentKnowledge 等使用）
 		/**
-		 * 相似度阈值配置，用于过滤相似度分数大于等于此阈值的文档
+		 * 全局默认相似度阈值（用于 BusinessTerm、AgentKnowledge 等），过滤分数低于此值的文档
 		 */
 		private double defaultSimilarityThreshold = 0.4;
 
@@ -281,7 +319,7 @@ public class DataAgentProperties {
 		private int batchDelTopkLimit = 5000;
 
 		/**
-		 * 是否启用混合搜索
+		 * 是否启用混合搜索（向量 + 关键词）
 		 */
 		private boolean enableHybridSearch = false;
 
