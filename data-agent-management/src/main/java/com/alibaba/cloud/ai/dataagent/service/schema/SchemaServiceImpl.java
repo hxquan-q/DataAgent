@@ -30,10 +30,10 @@ import com.alibaba.cloud.ai.dataagent.dto.datasource.SchemaInitRequest;
 import com.alibaba.cloud.ai.dataagent.dto.schema.ColumnDTO;
 import com.alibaba.cloud.ai.dataagent.dto.schema.SchemaDTO;
 import com.alibaba.cloud.ai.dataagent.dto.schema.TableDTO;
+import com.alibaba.cloud.ai.dataagent.service.cache.SchemaCache;
 import com.alibaba.cloud.ai.dataagent.service.vectorstore.AgentVectorStoreService;
 import com.alibaba.cloud.ai.dataagent.service.vectorstore.DynamicFilterService;
 import com.fasterxml.jackson.core.type.TypeReference;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -42,9 +42,11 @@ import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
@@ -61,7 +63,6 @@ import static com.alibaba.cloud.ai.dataagent.util.DocumentConverterUtil.convertT
  */
 @Slf4j
 @Service
-@AllArgsConstructor
 public class SchemaServiceImpl implements SchemaService {
 
 	private final ExecutorService dbOperationExecutor;
@@ -80,6 +81,31 @@ public class SchemaServiceImpl implements SchemaService {
 	 * Vector storage service
 	 */
 	private final AgentVectorStoreService agentVectorStoreService;
+
+	private final SchemaCache schemaCache;
+
+	@Autowired
+	public SchemaServiceImpl(ExecutorService dbOperationExecutor, AccessorFactory accessorFactory,
+			TableMetadataService tableMetadataService, BatchingStrategy batchingStrategy,
+			DynamicFilterService dynamicFilterService, DataAgentProperties dataAgentProperties,
+			AgentVectorStoreService agentVectorStoreService, SchemaCache schemaCache) {
+		this.dbOperationExecutor = dbOperationExecutor;
+		this.accessorFactory = accessorFactory;
+		this.tableMetadataService = tableMetadataService;
+		this.batchingStrategy = batchingStrategy;
+		this.dynamicFilterService = dynamicFilterService;
+		this.dataAgentProperties = dataAgentProperties;
+		this.agentVectorStoreService = agentVectorStoreService;
+		this.schemaCache = schemaCache;
+	}
+
+	public SchemaServiceImpl(ExecutorService dbOperationExecutor, AccessorFactory accessorFactory,
+			TableMetadataService tableMetadataService, BatchingStrategy batchingStrategy,
+			DynamicFilterService dynamicFilterService, DataAgentProperties dataAgentProperties,
+			AgentVectorStoreService agentVectorStoreService) {
+		this(dbOperationExecutor, accessorFactory, tableMetadataService, batchingStrategy, dynamicFilterService,
+				dataAgentProperties, agentVectorStoreService, new SchemaCache(Duration.ofMinutes(10)));
+	}
 
 	@Override
 	public void buildSchemaFromDocuments(String agentId, List<Document> currentColumnDocuments,
@@ -272,6 +298,7 @@ public class SchemaServiceImpl implements SchemaService {
 	}
 
 	protected void clearSchemaDataForDatasource(Integer datasourceId) throws Exception {
+		schemaCache.invalidate(datasourceId);
 		// 检查是否有文档需要删除
 		Map<String, Object> metadata = new HashMap<>();
 		metadata.put(Constant.DATASOURCE_ID, datasourceId.toString());
@@ -499,7 +526,12 @@ public class SchemaServiceImpl implements SchemaService {
 			log.error("FilterExpression is null.This should not happen when tableNames is not Empty, ");
 			return Collections.emptyList();
 		}
-		return agentVectorStoreService.getDocumentsOnlyByFilter(filterExpression, tableNames.size() + 5);
+		return schemaCache.getTables(datasourceId, tableNames).orElseGet(() -> {
+			List<Document> documents = agentVectorStoreService.getDocumentsOnlyByFilter(filterExpression,
+					tableNames.size() + 5);
+			schemaCache.putTables(datasourceId, tableNames, documents);
+			return documents;
+		});
 	}
 
 	@Override
@@ -517,8 +549,17 @@ public class SchemaServiceImpl implements SchemaService {
 		}
 		// 通过元数据过滤查找目标表下的所有列
 		// TopK=表数量×最大预估列数
-		return agentVectorStoreService.getDocumentsOnlyByFilter(filterExpression,
-				tableNames.size() * dataAgentProperties.getMaxColumnsPerTable());
+		return schemaCache.getColumns(datasourceId, tableNames).orElseGet(() -> {
+			List<Document> documents = agentVectorStoreService.getDocumentsOnlyByFilter(filterExpression,
+					tableNames.size() * dataAgentProperties.getMaxColumnsPerTable());
+			schemaCache.putColumns(datasourceId, tableNames, documents);
+			return documents;
+		});
+	}
+
+	@Override
+	public void invalidateCache(Integer datasourceId) {
+		schemaCache.invalidate(datasourceId);
 	}
 
 }

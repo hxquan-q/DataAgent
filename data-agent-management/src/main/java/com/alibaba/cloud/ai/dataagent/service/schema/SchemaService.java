@@ -37,4 +37,6 @@ public interface SchemaService {
 
 	List<Document> getColumnDocumentsByTableName(Integer datasourceId, List<String> tableNames);
 
+	void invalidateCache(Integer datasourceId);
+
 }
