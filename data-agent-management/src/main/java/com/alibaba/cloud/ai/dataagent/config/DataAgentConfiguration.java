@@ -210,6 +210,9 @@ public class DataAgentConfiguration implements DisposableBean {
 			keyStrategyHashMap.put(TRACE_THREAD_ID, KeyStrategy.REPLACE);
 			// Final result
 			keyStrategyHashMap.put(RESULT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_HEAL_ERRORS, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(CHART_IMAGE_MAP, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(RESULT_SANITY_RETRY, KeyStrategy.REPLACE);
 			return keyStrategyHashMap;
 		};
 
