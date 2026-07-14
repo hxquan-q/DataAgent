@@ -27,6 +27,7 @@ import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
+import com.alibaba.cloud.ai.dataagent.util.DataSummarizer;
 import com.alibaba.cloud.ai.dataagent.util.FluxUtil;
 import com.alibaba.cloud.ai.dataagent.util.StateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -256,7 +257,7 @@ public class ReportGeneratorNode implements NodeAction {
 				}
 
 				if (stepResult != null && !stepResult.trim().isEmpty()) {
-					sb.append("**执行结果**: \n```json\n").append(stepResult).append("\n```\n\n");
+					sb.append(DataSummarizer.summarize(stepResult)).append("\n");
 				}
 				if (analysisResult != null && !analysisResult.trim().isEmpty()) {
 					sb.append("**Python 分析结果**: ").append(analysisResult).append("\n\n");
