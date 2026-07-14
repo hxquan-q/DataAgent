@@ -39,15 +39,26 @@ import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
 import { useTypewriter } from '~/composables/useTypewriter';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
+import { useChatStore } from '~/stores/chat';
 
 const props = defineProps<{ content: string }>();
 const bodyRef = ref<HTMLElement | null>(null);
 
-const { displayedText, append, reset } = useTypewriter();
+const { displayedText, append, reset, flush } = useTypewriter();
+const store = useChatStore();
 const { renderECharts } = useEchartsRenderer();
 
 // Track what we've already fed to the typewriter
 let lastFedLength = 0;
+
+// 流结束时同步清空队列，避免组件卸载前继续等待打字机动画。
+watch(
+	() => store.isReportStreaming,
+	(isStreaming) => {
+		if (!isStreaming) flush();
+	},
+	{ flush: 'sync' },
+);
 
 watch(
 	() => props.content,
