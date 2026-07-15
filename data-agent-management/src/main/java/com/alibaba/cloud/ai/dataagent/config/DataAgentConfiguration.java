@@ -341,9 +341,13 @@ public class DataAgentConfiguration implements DisposableBean {
 			keyStrategyHashMap.put(DB_DIALECT_TYPE, KeyStrategy.REPLACE);
 			// SQL 执行 / 最终结果 / 报告相关
 			keyStrategyHashMap.put(SQL_EXECUTE_NODE_OUTPUT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_GENERATE_OUTPUT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_REGENERATE_REASON, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_GENERATE_COUNT, KeyStrategy.REPLACE);
 			keyStrategyHashMap.put(RESULT, KeyStrategy.REPLACE);
 			keyStrategyHashMap.put(CHART_IMAGE_MAP, KeyStrategy.REPLACE);
 			keyStrategyHashMap.put(SQL_RESULT_LIST_MEMORY, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(RESULT_SANITY_RETRY, KeyStrategy.REPLACE);
 			// Human Review / 反馈
 			keyStrategyHashMap.put(HUMAN_REVIEW_ENABLED, KeyStrategy.REPLACE);
 			keyStrategyHashMap.put(HUMAN_FEEDBACK_DATA, KeyStrategy.REPLACE);
