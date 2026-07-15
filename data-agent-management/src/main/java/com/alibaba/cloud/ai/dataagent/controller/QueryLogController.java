@@ -18,6 +18,7 @@ package com.alibaba.cloud.ai.dataagent.controller;
 import com.alibaba.cloud.ai.dataagent.entity.QueryLog;
 import com.alibaba.cloud.ai.dataagent.service.semantic.QueryLogService;
 import com.alibaba.cloud.ai.dataagent.vo.ApiResponse;
+import com.alibaba.cloud.ai.dataagent.vo.PageResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
@@ -41,6 +42,28 @@ import java.util.List;
 public class QueryLogController {
 
 	private final QueryLogService queryLogService;
+
+	/**
+	 * 分页查询证据链日志（管理端全局列表，支持按智能体/状态/反馈过滤）。
+	 * <p>
+	 * SQLBot ChatRecord 式分页：所有过滤条件可选，页码从 1 起。 用于「查询证据链」管理页默认展示最近查询， 无需预先知道会话 ID。
+	 * </p>
+	 * @param agentId 智能体ID（可选）
+	 * @param status 状态 SUCCESS/FAIL/CLARIFY（可选）
+	 * @param feedback 反馈 0/1/2（可选）
+	 * @param pageNum 页码（默认 1）
+	 * @param pageSize 每页大小（默认 20，上限 200）
+	 * @return 分页结果
+	 */
+	@GetMapping
+	public ApiResponse<PageResult<QueryLog>> list(@RequestParam(value = "agentId", required = false) Integer agentId,
+			@RequestParam(value = "status", required = false) String status,
+			@RequestParam(value = "feedback", required = false) Integer feedback,
+			@RequestParam(value = "pageNum", defaultValue = "1") int pageNum,
+			@RequestParam(value = "pageSize", defaultValue = "20") int pageSize) {
+		PageResult<QueryLog> result = queryLogService.listByConditions(agentId, status, feedback, pageNum, pageSize);
+		return ApiResponse.success("success list query log", result);
+	}
 
 	/**
 	 * 按会话ID查询证据链列表（回放追溯）。

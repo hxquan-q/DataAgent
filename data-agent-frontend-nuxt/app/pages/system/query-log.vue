@@ -27,7 +27,6 @@
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
-					:disabled="!sessionIdInput"
 					@click="loadLogs"
 				>
 					刷新
@@ -37,37 +36,66 @@
 
 		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
 			<div class="d-flex flex-wrap ga-3 align-center">
-				<v-text-field
-					v-model="sessionIdInput"
-					placeholder="请输入会话 ID（Session ID）"
-					prepend-inner-icon="mdi-link-variant"
+				<v-select
+					v-model="filterAgentId"
+					:items="agentItems"
+					item-title="name"
+					item-value="id"
+					placeholder="全部智能体"
+					prepend-inner-icon="mdi-robot"
 					variant="outlined"
 					density="compact"
 					clearable
 					hide-details
-					class="search-field"
-					style="max-width: 420px"
-					@keyup.enter="loadLogs"
+					style="max-width: 220px"
+					@update:model-value="onFilterChange"
+				/>
+				<v-select
+					v-model="filterStatus"
+					:items="statusOptions"
+					item-title="label"
+					item-value="value"
+					placeholder="全部状态"
+					prepend-inner-icon="mdi-flag-outline"
+					variant="outlined"
+					density="compact"
+					clearable
+					hide-details
+					style="max-width: 180px"
+					@update:model-value="onFilterChange"
+				/>
+				<v-select
+					v-model="filterFeedback"
+					:items="feedbackOptions"
+					item-title="label"
+					item-value="value"
+					placeholder="全部反馈"
+					prepend-inner-icon="mdi-thumb-up-outline"
+					variant="outlined"
+					density="compact"
+					clearable
+					hide-details
+					style="max-width: 160px"
+					@update:model-value="onFilterChange"
 				/>
 				<v-btn
 					color="blue-darken-3"
-					prepend-icon="mdi-magnify"
+					prepend-icon="mdi-refresh"
 					class="text-none px-6"
 					elevation="0"
 					:loading="loading"
-					:disabled="!sessionIdInput"
 					@click="loadLogs"
 				>
-					查询
+					刷新
 				</v-btn>
 				<v-spacer />
 				<v-chip
-					v-if="logList.length"
+					v-if="total > 0"
 					color="blue-lighten-5"
 					variant="flat"
 					class="font-weight-medium"
 				>
-					共 {{ logList.length }} 条
+					共 {{ total }} 条
 				</v-chip>
 			</div>
 		</v-card>
@@ -76,9 +104,14 @@
 			<v-data-table
 				:headers="headers"
 				:items="logList"
+				:page="pageNum"
+				:items-per-page="pageSize"
+				:server-items-length="total"
 				item-value="id"
 				hover
 				:loading="loading"
+				@update:page="onPageChange"
+				@update:items-per-page="onPageSizeChange"
 			>
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.createdTime="{ item }">
@@ -170,7 +203,7 @@
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">
-							{{ searched && !loading ? '该会话暂无查询记录' : '请输入会话 ID 查询证据链' }}
+							{{ !loading ? '暂无查询记录' : '加载中...' }}
 						</p>
 						<p class="text-body-2 text-disabled">
 							证据链回放：语义对象 → SQL → 结果 → 口径版本
@@ -347,14 +380,34 @@
 import queryLogService, {
 	type QueryLog,
 } from '~/services/queryLog/index';
+import agentService from '~/services/agent/index';
 
 const { $tip } = useNuxtApp();
 
-// ——— 查询条件 ———
-const sessionIdInput = ref('');
-const searched = ref(false);
+// ——— 智能体下拉（过滤用） ———
+const agentItems = ref<Array<{ id?: number; name?: string }>>([]);
+
+// ——— 过滤条件 ———
+const filterAgentId = ref<number | null>(null);
+const filterStatus = ref<string | null>(null);
+const filterFeedback = ref<number | null>(null);
+
+const statusOptions = [
+	{ label: '成功', value: 'SUCCESS' },
+	{ label: '失败', value: 'FAIL' },
+	{ label: '需澄清', value: 'CLARIFY' },
+];
+const feedbackOptions = [
+	{ label: '已点赞', value: 1 },
+	{ label: '已点踩', value: 2 },
+];
+
+// ——— 列表与分页 ———
 const loading = ref(false);
 const logList = ref<QueryLog[]>([]);
+const pageNum = ref(1);
+const pageSize = ref(20);
+const total = ref(0);
 
 // ——— 反馈中（避免重复点击） ———
 const feedbackIds = ref<Set<number>>(new Set());
@@ -386,24 +439,41 @@ const prettySemanticObject = computed(() => {
 });
 
 async function loadLogs() {
-	const sid = sessionIdInput.value?.trim();
-	if (!sid) {
-		$tip('请输入会话 ID', { color: 'warning', icon: 'mdi-alert' });
-		return;
-	}
 	loading.value = true;
-	searched.value = true;
 	try {
-		logList.value = await queryLogService.getSessionLog(sid);
-		if (!logList.value.length) {
-			$tip('该会话暂无查询记录', { color: 'info', icon: 'mdi-information' });
-		}
+		const result = await queryLogService.list({
+			agentId: filterAgentId.value,
+			status: filterStatus.value,
+			feedback: filterFeedback.value,
+			pageNum: pageNum.value,
+			pageSize: pageSize.value,
+		});
+		logList.value = result.data;
+		total.value = result.total;
 	} catch {
 		logList.value = [];
+		total.value = 0;
 		$tip('查询失败', { color: 'error', icon: 'mdi-alert-circle' });
 	} finally {
 		loading.value = false;
 	}
+}
+
+// 过滤条件变更：回到第一页重新加载
+function onFilterChange() {
+	pageNum.value = 1;
+	loadLogs();
+}
+
+function onPageChange(page: number) {
+	pageNum.value = page;
+	loadLogs();
+}
+
+function onPageSizeChange(size: number) {
+	pageSize.value = size;
+	pageNum.value = 1;
+	loadLogs();
 }
 
 async function toggleFeedback(item: QueryLog, target: 1 | 2) {
@@ -485,8 +555,14 @@ function formatDateTime(dateTime?: string) {
 	}
 }
 
-onMounted(() => {
-	// 空挂载：等待用户输入会话 ID 后再查询
+onMounted(async () => {
+	// 默认加载最近查询证据链 + 智能体下拉（无需预知会话 ID）
+	try {
+		agentItems.value = await agentService.list();
+	} catch {
+		agentItems.value = [];
+	}
+	await loadLogs();
 });
 </script>
 

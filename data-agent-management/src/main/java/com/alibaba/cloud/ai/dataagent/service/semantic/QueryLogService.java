@@ -17,6 +17,7 @@ package com.alibaba.cloud.ai.dataagent.service.semantic;
 
 import com.alibaba.cloud.ai.dataagent.entity.QueryLog;
 import com.alibaba.cloud.ai.dataagent.mapper.QueryLogMapper;
+import com.alibaba.cloud.ai.dataagent.vo.PageResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -102,6 +103,31 @@ public class QueryLogService {
 	 */
 	public List<QueryLog> getBySessionId(String sessionId) {
 		return queryLogMapper.selectBySessionId(sessionId);
+	}
+
+	/**
+	 * 按可选条件分页查询证据链日志（管理端全局列表，SQLBot ChatRecord 式分页）。
+	 * <p>
+	 * 所有过滤条件均可选（为空则不过滤）。页码从 1 开始；每页大小有上下界保护（[1,200]）。 返回 {@link PageResult}
+	 * 含数据列表、总数与分页信息，供前端表格直接渲染。
+	 * </p>
+	 * @param agentId 智能体ID（可空）
+	 * @param status 状态 SUCCESS/FAIL/CLARIFY（可空）
+	 * @param feedback 反馈 0/1/2（可空）
+	 * @param pageNum 页码（从 1 起；&lt;1 视为 1）
+	 * @param pageSize 每页大小（钳制到 [1,200]）
+	 * @return 分页结果
+	 */
+	public PageResult<QueryLog> listByConditions(Integer agentId, String status, Integer feedback, int pageNum,
+			int pageSize) {
+		int safePageNum = Math.max(1, pageNum);
+		int safePageSize = Math.min(200, Math.max(1, pageSize));
+		int offset = (safePageNum - 1) * safePageSize;
+		List<QueryLog> data = queryLogMapper.selectByConditions(agentId, status, feedback, offset, safePageSize);
+		long total = queryLogMapper.countByConditions(agentId, status, feedback);
+		PageResult<QueryLog> result = new PageResult<>(data, total, safePageNum, safePageSize, null);
+		result.calculateTotalPages();
+		return result;
 	}
 
 	/**

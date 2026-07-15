@@ -40,6 +40,53 @@ public interface QueryLogMapper {
 	List<QueryLog> selectBySessionId(@Param("sessionId") String sessionId);
 
 	/**
+	 * 按可选条件分页查询日志（管理端全局列表，SQLBot ChatRecord 式分页）。
+	 * <p>
+	 * 所有条件均可选（为空则不过滤），结果按创建时间倒序。分页通过 LIMIT/OFFSET 实现。
+	 * </p>
+	 * @param agentId 智能体ID（可空）
+	 * @param status 状态 SUCCESS/FAIL/CLARIFY（可空）
+	 * @param feedback 反馈 0/1/2（可空）
+	 * @param offset 偏移量
+	 * @param pageSize 每页大小
+	 * @return 日志列表
+	 */
+	@Select("""
+			<script>
+				SELECT * FROM query_log
+				<where>
+					<if test='agentId != null'>AND agent_id = #{agentId}</if>
+					<if test='status != null and status != ""'>AND status = #{status}</if>
+					<if test='feedback != null'>AND feedback = #{feedback}</if>
+				</where>
+				ORDER BY created_time DESC
+				LIMIT #{pageSize} OFFSET #{offset}
+			</script>
+			""")
+	List<QueryLog> selectByConditions(@Param("agentId") Integer agentId, @Param("status") String status,
+			@Param("feedback") Integer feedback, @Param("offset") int offset, @Param("pageSize") int pageSize);
+
+	/**
+	 * 按可选条件统计日志总数（配合分页）。
+	 * @param agentId 智能体ID（可空）
+	 * @param status 状态（可空）
+	 * @param feedback 反馈（可空）
+	 * @return 总数
+	 */
+	@Select("""
+			<script>
+				SELECT COUNT(*) FROM query_log
+				<where>
+					<if test='agentId != null'>AND agent_id = #{agentId}</if>
+					<if test='status != null and status != ""'>AND status = #{status}</if>
+					<if test='feedback != null'>AND feedback = #{feedback}</if>
+				</where>
+			</script>
+			""")
+	long countByConditions(@Param("agentId") Integer agentId, @Param("status") String status,
+			@Param("feedback") Integer feedback);
+
+	/**
 	 * 写入查询日志（证据链）。
 	 * @param log 日志实体
 	 * @return 受影响行数

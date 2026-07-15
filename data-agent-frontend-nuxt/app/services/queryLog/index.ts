@@ -77,12 +77,60 @@ export interface QueryLog {
 	createdTime?: string;
 }
 
+/**
+ * @description 分页结果（与后端 PageResult<T> 对齐）
+ */
+export interface PageResult<T> {
+	/** 数据列表 */
+	data: T[];
+	/** 总记录数 */
+	total: number;
+	/** 当前页码 */
+	pageNum: number;
+	/** 每页大小 */
+	pageSize: number;
+	/** 总页数 */
+	totalPages: number;
+}
+
+/** 查询日志列表过滤参数 */
+export interface QueryLogFilter {
+	agentId?: number | null;
+	status?: string | null;
+	feedback?: number | null;
+	pageNum?: number;
+	pageSize?: number;
+}
+
 const API_BASE = '/api/query-log';
 
 /**
  * @description 查询证据链业务逻辑处理类
  */
 class QueryLogService {
+	/**
+	 * @description 分页查询证据链日志（管理端全局列表，支持按智能体/状态/反馈过滤）
+	 * @param {QueryLogFilter} filter - 过滤与分页参数
+	 * @returns {Promise<PageResult<QueryLog>>} 分页结果
+	 */
+	async list(filter: QueryLogFilter = {}): Promise<PageResult<QueryLog>> {
+		const response = await axios.get<ApiResponse<PageResult<QueryLog>>>(
+			API_BASE,
+			{
+				params: {
+					agentId: filter.agentId ?? undefined,
+					status: filter.status ?? undefined,
+					feedback: filter.feedback ?? undefined,
+					pageNum: filter.pageNum ?? 1,
+					pageSize: filter.pageSize ?? 20,
+				},
+			},
+		);
+		return (
+			response.data.data ?? { data: [], total: 0, pageNum: 1, pageSize: 20, totalPages: 0 }
+		);
+	}
+
 	/**
 	 * @description 按会话获取查询证据链列表（倒序）
 	 * @param {string} sessionId - 会话 ID

@@ -17,6 +17,7 @@ package com.alibaba.cloud.ai.dataagent.service.semantic;
 
 import com.alibaba.cloud.ai.dataagent.entity.QueryLog;
 import com.alibaba.cloud.ai.dataagent.mapper.QueryLogMapper;
+import com.alibaba.cloud.ai.dataagent.vo.PageResult;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -138,6 +139,81 @@ class QueryLogServiceTest {
 
 		// then：参数透传到 mapper
 		verify(queryLogMapper).updateFeedback(7L, 1);
+	}
+
+	@Test
+	void listByConditions_noFilters_passesNullParamsAndComputesOffset() {
+		// given：无过滤，第 2 页每页 20 → offset=20
+		given(queryLogMapper.selectByConditions(null, null, null, 20, 20))
+			.willReturn(List.of(QueryLog.builder().id(21L).build()));
+		given(queryLogMapper.countByConditions(null, null, null)).willReturn(55L);
+
+		// when
+		PageResult<QueryLog> result = queryLogService.listByConditions(null, null, null, 2, 20);
+
+		// then：offset 计算正确，分页字段填充正确
+		verify(queryLogMapper).selectByConditions(null, null, null, 20, 20);
+		assertThat(result.getData()).hasSize(1);
+		assertThat(result.getTotal()).isEqualTo(55L);
+		assertThat(result.getPageNum()).isEqualTo(2);
+		assertThat(result.getPageSize()).isEqualTo(20);
+		assertThat(result.getTotalPages()).isEqualTo(3); // ceil(55/20)=3
+	}
+
+	@Test
+	void listByConditions_withFilters_passesParamsToMapper() {
+		// given：按智能体 + 状态 + 反馈过滤，第 1 页
+		given(queryLogMapper.selectByConditions(1, "SUCCESS", 1, 0, 20))
+			.willReturn(List.of(QueryLog.builder().id(1L).build()));
+		given(queryLogMapper.countByConditions(1, "SUCCESS", 1)).willReturn(1L);
+
+		// when
+		PageResult<QueryLog> result = queryLogService.listByConditions(1, "SUCCESS", 1, 1, 20);
+
+		// then：过滤参数透传
+		verify(queryLogMapper).selectByConditions(1, "SUCCESS", 1, 0, 20);
+		assertThat(result.getTotal()).isEqualTo(1L);
+		assertThat(result.getTotalPages()).isEqualTo(1);
+	}
+
+	@Test
+	void listByConditions_clampsPageSizeToUpperBound() {
+		// given：pageSize=1000 应被钳制到 200
+		given(queryLogMapper.selectByConditions(null, null, null, 0, 200)).willReturn(List.of());
+		given(queryLogMapper.countByConditions(null, null, null)).willReturn(0L);
+
+		// when
+		PageResult<QueryLog> result = queryLogService.listByConditions(null, null, null, 1, 1000);
+
+		// then：pageSize 钳制到 200
+		assertThat(result.getPageSize()).isEqualTo(200);
+	}
+
+	@Test
+	void listByConditions_clampsPageNumToLowerBound() {
+		// given：pageNum=0 / 负数 应被钳制到 1（offset=0）
+		given(queryLogMapper.selectByConditions(null, null, null, 0, 20)).willReturn(List.of());
+		given(queryLogMapper.countByConditions(null, null, null)).willReturn(0L);
+
+		// when
+		PageResult<QueryLog> result = queryLogService.listByConditions(null, null, null, 0, 20);
+
+		// then：pageNum 钳制到 1
+		assertThat(result.getPageNum()).isEqualTo(1);
+	}
+
+	@Test
+	void listByConditions_emptyResult_totalPagesZero() {
+		// given
+		given(queryLogMapper.selectByConditions(null, null, null, 0, 20)).willReturn(List.of());
+		given(queryLogMapper.countByConditions(null, null, null)).willReturn(0L);
+
+		// when
+		PageResult<QueryLog> result = queryLogService.listByConditions(null, null, null, 1, 20);
+
+		// then
+		assertThat(result.getData()).isEmpty();
+		assertThat(result.getTotalPages()).isEqualTo(0);
 	}
 
 }
