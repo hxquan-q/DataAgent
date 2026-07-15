@@ -16,6 +16,7 @@
 package com.alibaba.cloud.ai.dataagent.service.graph;
 
 import com.alibaba.cloud.ai.dataagent.dto.GraphRequest;
+import com.alibaba.cloud.ai.dataagent.mapper.AgentMapper;
 import com.alibaba.cloud.ai.dataagent.service.graph.Context.MultiTurnContextManager;
 import com.alibaba.cloud.ai.dataagent.service.langfuse.LangfuseService;
 import com.alibaba.cloud.ai.dataagent.vo.GraphNodeResponse;
@@ -65,14 +66,21 @@ class GraphServiceImplTest {
 
 	private ExecutorService executor;
 
+	@Mock
+	private AgentMapper agentMapper;
+
 	@BeforeEach
 	void setUp() throws Exception {
 		executor = Executors.newSingleThreadExecutor();
 
 		StateGraph mockStateGraph = mock(StateGraph.class);
+		StateGraph mockSemanticStateGraph = mock(StateGraph.class);
 		when(mockStateGraph.compile(any())).thenReturn(compiledGraph);
+		when(mockSemanticStateGraph.compile(any())).thenReturn(mock(CompiledGraph.class));
 
-		graphService = new GraphServiceImpl(mockStateGraph, executor, multiTurnContextManager, langfuseReporter);
+		// 默认走 NL2SQL 图：findById 返回非 semantic 模式的 Agent（或 null），保证既有测试行为不变
+		graphService = new GraphServiceImpl(mockStateGraph, mockSemanticStateGraph, agentMapper, executor,
+				multiTurnContextManager, langfuseReporter);
 
 		when(langfuseReporter.startLLMSpan(anyString(), any())).thenReturn(mockSpan);
 		when(mockSpan.isRecording()).thenReturn(true);

@@ -45,6 +45,7 @@ import com.alibaba.cloud.ai.dataagent.util.JsonParseUtil;
 import com.alibaba.cloud.ai.dataagent.workflow.node.EvidenceRecallNode;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
+import com.alibaba.cloud.ai.dataagent.service.semantic.SqlExampleRecallHelper;
 
 import reactor.core.publisher.Flux;
 
@@ -74,8 +75,8 @@ class EvidenceRecallNodeTest {
 
 	@BeforeEach
 	void setUp() {
-		evidenceRecallNode = new EvidenceRecallNode(llmService, vectorStoreService, jsonParseUtil,
-				agentKnowledgeMapper);
+		evidenceRecallNode = new EvidenceRecallNode(llmService, vectorStoreService, jsonParseUtil, agentKnowledgeMapper,
+				new SqlExampleRecallHelper(null));
 	}
 
 	private OverAllState createTestState() {

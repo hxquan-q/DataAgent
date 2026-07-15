@@ -37,6 +37,7 @@
 import { ref, watch, computed, nextTick, onBeforeUnmount } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
+import { transformTableTagsInHtml } from '~/utils/tableTag';
 import { useTypewriter } from '~/composables/useTypewriter';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
 import { useChatStore } from '~/stores/chat';
@@ -90,7 +91,7 @@ const renderedHtml = computed(() => {
 	const text = displayedText.value;
 	if (!text) return '';
 	return DOMPurify.sanitize(
-		renderMarkdownContent(text),
+		transformTableTagsInHtml(renderMarkdownContent(text)),
 		SANITIZE_OPTIONS,
 	) as string;
 });

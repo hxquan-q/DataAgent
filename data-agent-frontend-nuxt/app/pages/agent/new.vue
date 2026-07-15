@@ -162,6 +162,21 @@
 							hide-details="auto"
 						/>
 					</v-col>
+					<v-col cols="12" md="6">
+						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							工作流模式
+						</p>
+						<v-select
+							v-model="agentForm.workflowMode"
+							:items="workflowModeOptions"
+							item-title="label"
+							item-value="value"
+							variant="outlined"
+							density="compact"
+							hint="语义层模式下，LLM 从已定义指标中受控选择并拼装 SQL（需先配置指标）"
+							persistent-hint
+						/>
+					</v-col>
 				</v-row>
 			</v-form>
 		</v-card>
@@ -186,6 +201,11 @@ const statusOptions = [
 	{ label: '已下线', value: 'offline' },
 ];
 
+const workflowModeOptions = [
+	{ label: 'NL2SQL 自由生成', value: 'nl2sql' },
+	{ label: '语义层受控拼装', value: 'semantic' },
+];
+
 const agentForm = reactive({
 	name: '',
 	description: '',
@@ -194,6 +214,7 @@ const agentForm = reactive({
 	tags: '',
 	prompt: '',
 	status: 'draft',
+	workflowMode: 'nl2sql',
 	humanReviewEnabled: false,
 });
 
@@ -280,6 +301,7 @@ async function createAgent() {
 			tags: agentForm.tags.trim(),
 			prompt: agentForm.prompt.trim(),
 			status: agentForm.status,
+			workflowMode: agentForm.workflowMode,
 			humanReviewEnabled: agentForm.humanReviewEnabled ? 1 : 0,
 		};
 		const result = await agentService.create(payload);

@@ -144,6 +144,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
+import { transformTableTagsInHtml } from '~/utils/tableTag';
 import { buildReportHtml } from '~/utils/report-html-template';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
 import { useChatStore } from '~/stores/chat';
@@ -158,10 +159,16 @@ const { renderECharts } = useEchartsRenderer();
 
 function renderMarkdown(md: string): string {
 	if (!md) return '';
-	return DOMPurify.sanitize(renderMarkdownContent(md), {
-		ADD_TAGS: ['div'],
-		ADD_ATTR: ['style', 'class', 'data-echarts-config'],
-	});
+	// 1) markdown → HTML（html:false，标记 [table::xxx] 作为纯文本保留在文本节点中）
+	// 2) 将文本节点中的 [table::tableName] 转为 <span class="table-tag">（表名已转义）
+	// 3) DOMPurify 消毒（默认允许 span + class，table-tag 可通过）
+	return DOMPurify.sanitize(
+		transformTableTagsInHtml(renderMarkdownContent(md)),
+		{
+			ADD_TAGS: ['div'],
+			ADD_ATTR: ['style', 'class', 'data-echarts-config'],
+		},
+	);
 }
 
 function loadHtmlToIframe(

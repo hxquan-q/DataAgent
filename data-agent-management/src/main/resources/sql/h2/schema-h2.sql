@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS agent (
     category VARCHAR(100) COMMENT '分类',
     admin_id BIGINT COMMENT '管理员ID',
     tags TEXT COMMENT '标签，逗号分隔',
+    workflow_mode VARCHAR(20) DEFAULT 'nl2sql' COMMENT '工作流模式：nl2sql-自由生成SQL，semantic-语义层受控拼装(NL2Semantic2SQL)',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id),
@@ -296,4 +297,90 @@ CREATE TABLE IF NOT EXISTS agent_skill (
   PRIMARY KEY (id),
   UNIQUE KEY uk_agent_skill (agent_id, skill_id),
   INDEX idx_agent (agent_id)
+);
+
+-- ====================== v0.2 语义层（NL2Semantic2SQL，H2 兼容版）======================
+-- 指标定义表（JSON 字段在 H2 用 TEXT 替代）
+CREATE TABLE IF NOT EXISTS metric (
+  id INT NOT NULL AUTO_INCREMENT,
+  metric_code VARCHAR(100) NOT NULL,
+  metric_name VARCHAR(200) NOT NULL,
+  agent_id INT NOT NULL,
+  datasource_id INT NOT NULL,
+  source_table VARCHAR(200) NOT NULL,
+  agg_field VARCHAR(200),
+  agg_func VARCHAR(50),
+  default_time_field VARCHAR(200),
+  sql_template CLOB,
+  description CLOB,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_metric_code (metric_code),
+  CONSTRAINT fk_metric_agent FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE,
+  CONSTRAINT fk_metric_ds FOREIGN KEY (datasource_id) REFERENCES datasource(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS metric_version (
+  id INT NOT NULL AUTO_INCREMENT,
+  metric_id INT NOT NULL,
+  ver_code VARCHAR(100) NOT NULL,
+  time_field VARCHAR(200),
+  filter_condition CLOB,
+  is_default TINYINT NOT NULL DEFAULT 0,
+  description CLOB,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_metric_ver (metric_id, ver_code),
+  CONSTRAINT fk_metricver_metric FOREIGN KEY (metric_id) REFERENCES metric(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS semantic_alias (
+  id INT NOT NULL AUTO_INCREMENT,
+  agent_id INT NOT NULL,
+  alias_text VARCHAR(255) NOT NULL,
+  target_type VARCHAR(20) NOT NULL,
+  target_code VARCHAR(100) NOT NULL,
+  match_type VARCHAR(20) NOT NULL DEFAULT 'EXACT',
+  priority INT NOT NULL DEFAULT 0,
+  status TINYINT NOT NULL DEFAULT 1,
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_alias_agent FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS query_log (
+  id INT NOT NULL AUTO_INCREMENT,
+  session_id VARCHAR(64),
+  agent_id INT,
+  datasource_id INT,
+  user_query CLOB NOT NULL,
+  semantic_object CLOB,
+  generated_sql CLOB,
+  metric_versions CLOB,
+  exec_time_ms INT,
+  row_count INT,
+  status VARCHAR(20),
+  feedback TINYINT DEFAULT 0,
+  trace_id VARCHAR(64),
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS sql_example (
+  id INT NOT NULL AUTO_INCREMENT,
+  agent_id INT,
+  datasource_id INT,
+  question CLOB NOT NULL,
+  sql_text CLOB NOT NULL,
+  dialect VARCHAR(50),
+  sql_hash VARCHAR(64) NOT NULL,
+  source VARCHAR(20) NOT NULL DEFAULT 'AUTO',
+  reviewed TINYINT NOT NULL DEFAULT 0,
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  CONSTRAINT fk_sqlexample_agent FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE
 );

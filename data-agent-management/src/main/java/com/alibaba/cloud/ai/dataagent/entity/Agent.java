@@ -73,6 +73,13 @@ public class Agent {
 	/** 标签，多个标签以逗号分隔 */
 	private String tags;
 
+	/**
+	 * 工作流模式：{@code nl2sql}（默认，自由生成SQL）/ {@code semantic}（语义层受控拼装
+	 * NL2Semantic2SQL）。为空或未知值时按 {@code nl2sql} 处理（fail-open，保证旧行为不变）。
+	 */
+	@Builder.Default
+	private String workflowMode = "nl2sql";
+
 	/** 创建时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime createTime;

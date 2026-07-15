@@ -23,6 +23,7 @@ import com.alibaba.cloud.ai.dataagent.entity.AgentKnowledge;
 import com.alibaba.cloud.ai.dataagent.mapper.AgentKnowledgeMapper;
 import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.service.llm.LlmService;
+import com.alibaba.cloud.ai.dataagent.service.semantic.SqlExampleRecallHelper;
 import com.alibaba.cloud.ai.dataagent.service.vectorstore.AgentVectorStoreService;
 import com.alibaba.cloud.ai.dataagent.util.*;
 import com.alibaba.cloud.ai.graph.GraphResponse;
@@ -72,6 +73,8 @@ public class EvidenceRecallNode implements NodeAction {
 	private final JsonParseUtil jsonParseUtil;
 
 	private final AgentKnowledgeMapper agentKnowledgeMapper;
+
+	private final SqlExampleRecallHelper sqlExampleRecallHelper;
 
 	/**
 	 * 执行证据召回逻辑。
@@ -156,9 +159,9 @@ public class EvidenceRecallNode implements NodeAction {
 				return Map.of(EVIDENCE, "无");
 			}
 
-			// 将召回的文档格式化为证据内容
+			// 将召回的文档格式化为证据内容（传入 standaloneQuery 增强 SQL 样例关键词召回）
 			String evidence = buildFormattedEvidenceContent(retrievalResult.businessTermDocuments(),
-					retrievalResult.agentKnowledgeDocuments());
+					retrievalResult.agentKnowledgeDocuments(), agentId, standaloneQuery);
 			log.info("构建的证据内容如下 \n {} \n", evidence);
 			// 向用户输出证据召回结果
 			outputEvidenceContent(retrievalResult.allDocuments(), sink);
@@ -225,12 +228,18 @@ public class EvidenceRecallNode implements NodeAction {
 	// 2. [来源: 客服FAQ] Q: 退款怎么算? A: 只统计已入库退货...
 	/**
 	 * 将召回的业务术语与智能体知识文档格式化为证据内容字符串。
+	 * <p>
+	 * 末尾额外追加 sql_example 训练库的 few-shot 样例（vanna get_similar_question_sql 的 Java 等价），
+	 * 作为第三路证据增强后续 NL2SQL 生成。few-shot 召回失败不阻断主流程。
+	 * </p>
 	 * @param businessTermDocuments 业务术语文档列表
 	 * @param agentKnowledgeDocuments 智能体知识文档列表
-	 * @return 格式化后的证据内容字符串；若两端均为空则返回 "无"
+	 * @param agentId 智能体ID，用于召回已审核 SQL 样例
+	 * @param userQuestion 用户当前独立查询（重写后），用于 SQL 样例关键词相似度召回；可为空（降级全量）
+	 * @return 格式化后的证据内容字符串；若三路均为空则返回 "无"
 	 */
 	private String buildFormattedEvidenceContent(List<Document> businessTermDocuments,
-			List<Document> agentKnowledgeDocuments) {
+			List<Document> agentKnowledgeDocuments, String agentId, String userQuestion) {
 		// 构建业务知识内容
 		String businessKnowledgeContent = buildBusinessKnowledgeContent(businessTermDocuments);
 
@@ -241,12 +250,50 @@ public class EvidenceRecallNode implements NodeAction {
 		String businessPrompt = PromptHelper.buildBusinessKnowledgePrompt(businessKnowledgeContent);
 		String agentPrompt = PromptHelper.buildAgentKnowledgePrompt(agentKnowledgeContent);
 
-		// 输出证据构建日志
-		log.info("构建证据内容: 业务知识长度 {}, 智能体知识长度 {}", businessKnowledgeContent.length(), agentKnowledgeContent.length());
+		// 第三路：召回 sql_example 已审核样例，拼成 few-shot（有 question 时关键词过滤，失败降级为空串）
+		Integer agentIdInt = parseAgentId(agentId);
+		String sqlFewShot = agentIdInt == null ? "" : sqlExampleRecallHelper.recallFewShot(agentIdInt, userQuestion);
 
-		// 拼接业务知识和智能体知识作为最终证据
-		return businessKnowledgeContent.isEmpty() && agentKnowledgeContent.isEmpty() ? "无"
-				: businessPrompt + (agentKnowledgeContent.isEmpty() ? "" : "\n\n" + agentPrompt);
+		// 输出证据构建日志
+		log.info("构建证据内容: 业务知识长度 {}, 智能体知识长度 {}, SQL样例few-shot长度 {}", businessKnowledgeContent.length(),
+				agentKnowledgeContent.length(), sqlFewShot.length());
+
+		// 拼接业务知识、智能体知识与 SQL few-shot 作为最终证据
+		StringBuilder evidence = new StringBuilder();
+		if (!businessKnowledgeContent.isEmpty()) {
+			evidence.append(businessPrompt);
+		}
+		if (!agentKnowledgeContent.isEmpty()) {
+			if (evidence.length() > 0) {
+				evidence.append("\n\n");
+			}
+			evidence.append(agentPrompt);
+		}
+		if (!sqlFewShot.isEmpty()) {
+			if (evidence.length() > 0) {
+				evidence.append("\n\n");
+			}
+			evidence.append(sqlFewShot);
+		}
+		return evidence.length() == 0 ? "无" : evidence.toString();
+	}
+
+	/**
+	 * 将字符串形式的 agentId 解析为 Integer，非法值返回 {@code null}（不阻断召回）。
+	 * @param agentId 原始字符串
+	 * @return 解析后的整数；空或非数字返回 {@code null}
+	 */
+	private Integer parseAgentId(String agentId) {
+		if (agentId == null || agentId.isBlank()) {
+			return null;
+		}
+		try {
+			return Integer.valueOf(agentId.trim());
+		}
+		catch (NumberFormatException e) {
+			log.warn("agentId 非数字格式，跳过 SQL 样例召回: {}", agentId);
+			return null;
+		}
 	}
 
 	/**

@@ -244,6 +244,42 @@
 									color="primary"
 									@click="navigateToPath('/system/model-config')"
 								/>
+								<v-list-item
+									prepend-icon="mdi-chart-line"
+									title="指标配置"
+									:active="isActive('/system/metrics')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/metrics')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-format-list-bulleted-type"
+									title="口径版本"
+									:active="isActive('/system/metric-versions')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/metric-versions')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-tag-multiple"
+									title="语义别名"
+									:active="isActive('/system/semantic-aliases')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/semantic-aliases')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-shield-search"
+									title="查询证据链"
+									:active="isActive('/system/query-log')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/query-log')"
+								/>
 							</v-list-group>
 
 							<div class="mt-6 pt-4 border-t border-white/5">
@@ -345,6 +381,10 @@ const routeTitleMap: Record<string, string> = {
 	'/knowledge/semantic-models': '语义模型配置',
 	'/system/data-sources': '数据连接',
 	'/system/model-config': '模型配置',
+	'/system/metrics': '指标配置',
+	'/system/metric-versions': '口径版本配置',
+	'/system/semantic-aliases': '语义别名配置',
+	'/system/query-log': '查询证据链',
 	'/system/settings': '通用设置',
 	'/agent/new': '新建智能体',
 };

@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.dataagent.service.graph;
 
+import com.alibaba.cloud.ai.dataagent.entity.Agent;
+import com.alibaba.cloud.ai.dataagent.mapper.AgentMapper;
 import com.alibaba.cloud.ai.dataagent.service.langfuse.LangfuseService;
 import com.alibaba.cloud.ai.dataagent.enums.TextType;
 import com.alibaba.cloud.ai.dataagent.workflow.node.PlannerNode;
@@ -28,6 +30,7 @@ import com.alibaba.cloud.ai.graph.exception.GraphStateException;
 import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import io.opentelemetry.api.trace.Span;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -64,8 +67,22 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 @Service
 public class GraphServiceImpl implements GraphService {
 
-	/** 已编译的工作流图，用于执行节点流转 */
-	private final CompiledGraph compiledGraph;
+	/**
+	 * 已编译的工作流图集合（按 graphName 索引）。 启动期编译两类图：默认 NL2SQL 图与 v0.2 语义层图，按 Agent 的
+	 * {@code workflow_mode} 透明路由（η₁ 分类定方法：自由生成走 {@code nl2sql}，受控拼装走 {@code semantic}）。
+	 */
+	private final Map<String, CompiledGraph> compiledGraphs = new ConcurrentHashMap<>();
+
+	/**
+	 * 测试可见的图集合快照（只读），供路由单测按图名取实例做引用断言。非生产 API。
+	 * @return 不可修改的图名 → 已编译图 映射
+	 */
+	Map<String, CompiledGraph> getCompiledGraphsView() {
+		return java.util.Collections.unmodifiableMap(compiledGraphs);
+	}
+
+	/** Agent 数据访问，用于查询 Agent 的工作流模式以选图 */
+	private final AgentMapper agentMapper;
 
 	/** 异步执行线程池，用于在后台订阅 Flux 流 */
 	private final ExecutorService executor;
@@ -80,21 +97,61 @@ public class GraphServiceImpl implements GraphService {
 	private final LangfuseService langfuseReporter;
 
 	/**
-	 * 构造方法，编译状态图并注入所需依赖。
-	 * @param stateGraph 待编译的状态图定义
+	 * 构造方法，编译两个状态图并注入所需依赖。
+	 * <p>
+	 * 默认 {@code nl2sqlGraph}（{@code @Primary}）与 {@code nl2sqlSemanticGraph} 在启动期各编译一次， 均在
+	 * {@code HUMAN_FEEDBACK_NODE} 前设置中断点。运行时按 Agent 的 {@code workflow_mode}
+	 * 选择，缺省/fail-open 走默认图， 保证既有 NL2SQL 行为零回归。
+	 * </p>
+	 * @param defaultStateGraph 默认 NL2SQL 状态图（@Primary）
+	 * @param semanticStateGraph v0.2 语义层状态图
+	 * @param agentMapper Agent 数据访问（选图用）
 	 * @param executorService 异步执行线程池
 	 * @param multiTurnContextManager 多轮对话上下文管理器
 	 * @param langfuseReporter Langfuse 追踪上报服务
 	 * @throws GraphStateException 当状态图编译失败时抛出
 	 */
-	public GraphServiceImpl(StateGraph stateGraph, ExecutorService executorService,
-			MultiTurnContextManager multiTurnContextManager, LangfuseService langfuseReporter)
-			throws GraphStateException {
-		// 编译状态图，并在人工反馈节点之前设置中断点
-		this.compiledGraph = stateGraph.compile(CompileConfig.builder().interruptBefore(HUMAN_FEEDBACK_NODE).build());
+	public GraphServiceImpl(StateGraph defaultStateGraph,
+			@Qualifier("nl2sqlSemanticGraph") StateGraph semanticStateGraph, AgentMapper agentMapper,
+			ExecutorService executorService, MultiTurnContextManager multiTurnContextManager,
+			LangfuseService langfuseReporter) throws GraphStateException {
+		// 两图均在人工反馈节点前中断，复用既有人工审核/反问机制
+		CompileConfig compileConfig = CompileConfig.builder().interruptBefore(HUMAN_FEEDBACK_NODE).build();
+		this.compiledGraphs.put(NL2SQL_GRAPH_NAME, defaultStateGraph.compile(compileConfig));
+		this.compiledGraphs.put(NL2SQL_SEMANTIC_GRAPH_NAME, semanticStateGraph.compile(compileConfig));
+		this.agentMapper = agentMapper;
 		this.executor = executorService;
 		this.multiTurnContextManager = multiTurnContextManager;
 		this.langfuseReporter = langfuseReporter;
+	}
+
+	/**
+	 * 按 Agent 的工作流模式选择已编译的图（η₂ 最少自由度 + η₅ fail-open）。
+	 * <p>
+	 * 查询 Agent 的 {@code workflow_mode}：为 {@code semantic} 时走语义层图，其余（含 null、未知、查询异常）一律走默认
+	 * NL2SQL 图。Agent 查询异常只记日志不阻断，保证既有用户体验零回归。
+	 * </p>
+	 * @param agentId Agent ID（字符串）
+	 * @return 选中的已编译图；agentId 非法或 Agent 不存在时返回默认图
+	 */
+	CompiledGraph resolveGraph(String agentId) {
+		if (StringUtils.hasText(agentId)) {
+			try {
+				Agent agent = agentMapper.findById(Long.valueOf(agentId));
+				if (agent != null && "semantic".equalsIgnoreCase(agent.getWorkflowMode())) {
+					return compiledGraphs.get(NL2SQL_SEMANTIC_GRAPH_NAME);
+				}
+			}
+			catch (NumberFormatException e) {
+				log.debug("agentId 非数字，走默认 NL2SQL 图：{}", agentId);
+			}
+			catch (Exception e) {
+				// fail-open：Agent 查询失败不应阻断请求，降级为默认图
+				log.warn("查询 Agent workflow_mode 失败，fail-open 走默认 NL2SQL 图，agentId={}，error={}", agentId,
+						e.getMessage());
+			}
+		}
+		return compiledGraphs.get(NL2SQL_GRAPH_NAME);
 	}
 
 	/**
@@ -106,8 +163,8 @@ public class GraphServiceImpl implements GraphService {
 	 */
 	@Override
 	public String nl2sql(String naturalQuery, String agentId) throws GraphRunnerException {
-		// 以仅生成 SQL 的模式同步调用工作流图
-		OverAllState state = compiledGraph
+		// 以仅生成 SQL 的模式同步调用工作流图（按 Agent 模式选图）
+		OverAllState state = resolveGraph(agentId)
 			.invoke(Map.of(IS_ONLY_NL2SQL, true, INPUT_KEY, naturalQuery, AGENT_ID, agentId),
 					RunnableConfig.builder().build())
 			.orElseThrow();
@@ -190,7 +247,7 @@ public class GraphServiceImpl implements GraphService {
 
 		String multiTurnContext = multiTurnContextManager.buildContext(threadId);
 		multiTurnContextManager.beginTurn(threadId, query);
-		Flux<NodeOutput> nodeOutputFlux = compiledGraph.stream(
+		Flux<NodeOutput> nodeOutputFlux = resolveGraph(agentId).stream(
 				Map.of(IS_ONLY_NL2SQL, nl2sqlOnly, INPUT_KEY, query, AGENT_ID, agentId, HUMAN_REVIEW_ENABLED,
 						humanReviewEnabled, MULTI_TURN_CONTEXT, multiTurnContext, TRACE_THREAD_ID, threadId),
 				RunnableConfig.builder().threadId(threadId).build());
@@ -230,9 +287,11 @@ public class GraphServiceImpl implements GraphService {
 		stateUpdate.put(MULTI_TURN_CONTEXT, multiTurnContextManager.buildContext(threadId));
 
 		RunnableConfig baseConfig = RunnableConfig.builder().threadId(threadId).build();
+		// 反馈恢复须用与该轮次相同的工作流图（按 Agent 模式选图）
+		CompiledGraph graph = resolveGraph(agentId);
 		RunnableConfig updatedConfig;
 		try {
-			updatedConfig = compiledGraph.updateState(baseConfig, stateUpdate);
+			updatedConfig = graph.updateState(baseConfig, stateUpdate);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException("Failed to update graph state for human feedback", e);
@@ -241,7 +300,7 @@ public class GraphServiceImpl implements GraphService {
 			.addMetadata(RunnableConfig.HUMAN_FEEDBACK_METADATA_KEY, feedbackData)
 			.build();
 
-		Flux<NodeOutput> nodeOutputFlux = compiledGraph.stream(null, resumeConfig);
+		Flux<NodeOutput> nodeOutputFlux = graph.stream(null, resumeConfig);
 		subscribeToFlux(context, nodeOutputFlux, graphRequest, agentId, threadId);
 	}
 

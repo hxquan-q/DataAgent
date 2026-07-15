@@ -83,6 +83,9 @@ spring:
           default-similarity-threshold: 0.4
         # LLM 调用方式：stream（流式）| block（阻塞）
         llm-service-type: stream
+        # 语义层缓存定时刷新间隔（毫秒），默认 5 分钟
+        semantic-layer:
+          refresh-interval: 300000
         # Python 代码执行器配置
         code-executor:
           # 运行环境：local（本机，仅开发）| docker（生产推荐）

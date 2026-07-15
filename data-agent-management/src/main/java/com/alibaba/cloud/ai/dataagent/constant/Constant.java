@@ -50,6 +50,9 @@ public final class Constant {
 	/** NL2SQL 工作流图名称 */
 	public static final String NL2SQL_GRAPH_NAME = "nl2sqlGraph";
 
+	/** v0.2 语义层工作流图名称（双 Graph opt-in：NL2Semantic2SQL） */
+	public static final String NL2SQL_SEMANTIC_GRAPH_NAME = "nl2sqlSemanticGraph";
+
 	/** 意图识别节点输出 */
 	public static final String INTENT_RECOGNITION_NODE_OUTPUT = "INTENT_RECOGNITION_NODE_OUTPUT";
 
@@ -165,6 +168,14 @@ public final class Constant {
 
 	/** SQL 执行节点 */
 	public static final String SQL_EXECUTE_NODE = "SQL_EXECUTE_NODE";
+
+	// ---- v0.2 语义层（NL2Semantic2SQL）节点名称 ----
+
+	/** 语义解析节点（v0.2 双 Graph：nl2sqlSemanticGraph 起点节点） */
+	public static final String SEMANTIC_PARSE_NODE = "semantic_parse_node";
+
+	/** 受控 SQL 拼装节点（v0.2 双 Graph：SemanticParseDispatcher 返回值对齐此常量） */
+	public static final String BUILD_SQL_NODE = "build_sql_node";
 
 	/** 语义一致性校验节点 */
 	public static final String SEMANTIC_CONSISTENCY_NODE = "SEMANTIC_CONSISTENCY_NODE";

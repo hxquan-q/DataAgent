@@ -17,11 +17,13 @@ package com.alibaba.cloud.ai.dataagent.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.Set;
+
 import com.alibaba.cloud.ai.dataagent.util.SqlGuard.GuardResult;
 import org.junit.jupiter.api.Test;
 
 /**
- * {@link SqlGuard} 单测（#17 只读护栏）。
+ * {@link SqlGuard} 单测（v0.2 M1：三层只读护栏 + 表名白名单）。
  *
  * @author xquan
  */
@@ -50,9 +52,7 @@ class SqlGuardTest {
 
 	@Test
 	void insertIsBlocked() {
-		GuardResult result = SqlGuard.check("INSERT INTO users (id) VALUES (1)");
-		assertThat(result.allowed()).isFalse();
-		assertThat(result.reason()).contains("拦截");
+		assertThat(SqlGuard.check("INSERT INTO users (id) VALUES (1)").allowed()).isFalse();
 	}
 
 	@Test
@@ -85,10 +85,75 @@ class SqlGuardTest {
 		assertThat(SqlGuard.check("CREATE TABLE t (id INT)").allowed()).isFalse();
 	}
 
+	// ===== v0.2 M1 新增：预处理 + 首词白名单 + 危险模式 =====
+
 	@Test
-	void unparseableIsFailOpen() {
-		// 无法解析的语句 fail-open 放行，不阻断主流程
-		assertThat(SqlGuard.check("not a real sql @@@ !!!").allowed()).isTrue();
+	void nonSelectFirstWordIsBlocked() {
+		// 首词非 SELECT/WITH 直接拦截（fail-safe）
+		assertThat(SqlGuard.check("not a real sql @@@ !!!").allowed()).isFalse();
+		assertThat(SqlGuard.check("SHOW TABLES").allowed()).isFalse();
+		assertThat(SqlGuard.check("EXPLAIN SELECT * FROM t").allowed()).isFalse();
+	}
+
+	@Test
+	void multipleStatementsAreBlocked() {
+		assertThat(SqlGuard.check("SELECT 1; DROP TABLE users").allowed()).isFalse();
+		assertThat(SqlGuard.check("SELECT 1; SELECT 2").allowed()).isFalse();
+	}
+
+	@Test
+	void dangerousPatternsAreBlocked() {
+		assertThat(SqlGuard.check("SELECT * FROM t INTO OUTFILE '/tmp/x'").allowed()).isFalse();
+		assertThat(SqlGuard.check("SELECT pg_sleep(5)").allowed()).isFalse();
+		assertThat(SqlGuard.check("SELECT xp_cmdshell('dir')").allowed()).isFalse();
+		assertThat(SqlGuard.check("SELECT LOAD_FILE('/etc/passwd')").allowed()).isFalse();
+	}
+
+	@Test
+	void commentObfuscationIsHandled() {
+		// 注释内 DROP 不影响（注释被剥离），首词 SELECT 放行
+		assertThat(SqlGuard.check("-- DROP TABLE x\nSELECT 1").allowed()).isTrue();
+		// 剥注释后首词为 DROP → 拦截
+		assertThat(SqlGuard.check("-- comment\nDROP TABLE users").allowed()).isFalse();
+	}
+
+	@Test
+	void unparseableSelectIsFailOpen() {
+		// SELECT 开头但 AST 解析失败 → fail-open 放行（方言兜底）
+		assertThat(SqlGuard.check("SELECT FROM WHERE").allowed()).isTrue();
+	}
+
+	// ===== 表名白名单 =====
+
+	@Test
+	void checkTablesAllowsWhitelistedTable() {
+		assertThat(SqlGuard.checkTables("SELECT * FROM users WHERE id = 1", Set.of("users")))
+			.isEqualTo(GuardResult.pass());
+	}
+
+	@Test
+	void checkTablesBlocksUnauthorizedTable() {
+		GuardResult result = SqlGuard.checkTables("SELECT * FROM secret_table", Set.of("users"));
+		assertThat(result.allowed()).isFalse();
+		assertThat(result.reason()).contains("越权表");
+	}
+
+	@Test
+	void checkTablesBlocksWhenParseFails() {
+		// 表名校验 fail-safe：解析失败当安全事件拒绝
+		assertThat(SqlGuard.checkTables("not sql", Set.of("users")).allowed()).isFalse();
+	}
+
+	@Test
+	void validateCombinesReadonlyAndTableCheck() {
+		// 合法只读 + 合法表 → 过
+		assertThat(SqlGuard.validate("SELECT * FROM users", Set.of("users")).allowed()).isTrue();
+		// 越权表 → 拦
+		assertThat(SqlGuard.validate("SELECT * FROM secret", Set.of("users")).allowed()).isFalse();
+		// 非只读（DDL）→ check 先拦
+		assertThat(SqlGuard.validate("DROP TABLE users", Set.of("users")).allowed()).isFalse();
+		// allowedTables 为空 → 跳过表名校验，仅只读校验
+		assertThat(SqlGuard.validate("SELECT * FROM users", Set.of()).allowed()).isTrue();
 	}
 
 }
