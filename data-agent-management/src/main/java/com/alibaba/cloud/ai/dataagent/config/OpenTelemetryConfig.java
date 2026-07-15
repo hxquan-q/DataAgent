@@ -39,9 +39,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * OpenTelemetry / Langfuse 可观测性配置。
  * <p>
- * 绑定 {@code spring.ai.alibaba.data-agent.langfuse.*} 前缀，
- * 通过 OTLP HTTP 协议将 Trace 数据上报到 Langfuse 平台，
- * 实现 LLM 调用链路追踪、Prompt 监控与性能分析。
+ * 绑定 {@code spring.ai.alibaba.data-agent.langfuse.*} 前缀， 通过 OTLP HTTP 协议将 Trace 数据上报到
+ * Langfuse 平台， 实现 LLM 调用链路追踪、Prompt 监控与性能分析。
  * </p>
  * <p>
  * 当 {@code enabled=false} 时返回 Noop 实现，不产生任何上报开销。
@@ -77,8 +76,7 @@ public class OpenTelemetryConfig {
 	/**
 	 * 创建 OpenTelemetry 实例。
 	 * <p>
-	 * 启用时构建 OTLP HTTP Span Exporter，将 Trace 批量上报到 Langfuse；
-	 * 禁用时返回 Noop 实例。
+	 * 启用时构建 OTLP HTTP Span Exporter，将 Trace 批量上报到 Langfuse； 禁用时返回 Noop 实例。
 	 * </p>
 	 * @return OpenTelemetry 实例
 	 */

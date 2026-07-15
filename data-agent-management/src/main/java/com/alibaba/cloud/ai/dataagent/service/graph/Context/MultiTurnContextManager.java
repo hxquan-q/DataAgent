@@ -31,8 +31,7 @@ import java.util.stream.Collectors;
  * 多轮对话上下文管理器，为每个会话线程维护多轮对话上下文。
  *
  * <p>
- * 该管理器保留一份轻量级的历史记录，包含用户问题和对应的计划（Planner）输出，
- * 以便下游提示词（Prompt）可以引用之前的多轮对话内容，从而实现上下文连贯的多轮交互。
+ * 该管理器保留一份轻量级的历史记录，包含用户问题和对应的计划（Planner）输出， 以便下游提示词（Prompt）可以引用之前的多轮对话内容，从而实现上下文连贯的多轮交互。
  * </p>
  *
  * @author Makoto
@@ -115,8 +114,7 @@ public class MultiTurnContextManager {
 	}
 
 	/**
-	 * 重启最近一轮对话，使新的计划输出可以替换它（例如人工反馈后）。
-	 * 将移除最后一条存储的轮次，并复用其中的用户问题。
+	 * 重启最近一轮对话，使新的计划输出可以替换它（例如人工反馈后）。 将移除最后一条存储的轮次，并复用其中的用户问题。
 	 * @param threadId 会话线程标识
 	 */
 	public void restartLastTurn(String threadId) {

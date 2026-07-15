@@ -39,8 +39,8 @@ import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
  * SQL Server JDBC DDL 执行器实现。
  * <p>
  * 通过 sys 系统视图和 INFORMATION_SCHEMA 查询 SQL Server 数据库的元数据信息，
- * 支持数据库、schema、表、列、外键查询以及表数据扫描和列值采样。
- * 使用 OFFSET-FETCH NEXT 语法限制结果行数，通过扩展属性（extended_properties）获取表和列的注释。
+ * 支持数据库、schema、表、列、外键查询以及表数据扫描和列值采样。 使用 OFFSET-FETCH NEXT
+ * 语法限制结果行数，通过扩展属性（extended_properties）获取表和列的注释。
  * </p>
  *
  * @author zihen

@@ -18,8 +18,7 @@ package com.alibaba.cloud.ai.dataagent.enums;
 /**
  * 业务数据源类型枚举。
  * <p>
- * 定义系统支持的各种数据库类型，包含类型编码、类型名称、方言标识和访问协议。
- * 用于数据源配置、连接池管理和 SQL 方言路由。
+ * 定义系统支持的各种数据库类型，包含类型编码、类型名称、方言标识和访问协议。 用于数据源配置、连接池管理和 SQL 方言路由。
  */
 public enum BizDataSourceTypeEnum {
 

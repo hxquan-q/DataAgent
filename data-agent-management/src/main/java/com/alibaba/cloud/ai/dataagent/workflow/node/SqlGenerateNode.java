@@ -37,7 +37,10 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
@@ -79,6 +82,7 @@ public class SqlGenerateNode implements NodeAction {
 	 * @throws Exception 生成 SQL 时可能抛出的异常
 	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 		// 判断是否达到最大尝试次数
 		int count = state.value(SQL_GENERATE_COUNT, 0);
@@ -89,9 +93,11 @@ public class SqlGenerateNode implements NodeAction {
 					executionStep.getToolParameters().getInstruction());
 			log.error("SQL 生成失败，原因: {}", sqlGenerateOutput);
 			Flux<ChatResponse> preFlux = Flux.just(ChatResponseUtil.createResponse(sqlGenerateOutput));
-			Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(
-					this.getClass(), state, "正在进行重试评估...", "重试评估完成！",
-					retryOutput -> Map.of(SQL_GENERATE_OUTPUT, StateGraph.END, SQL_GENERATE_COUNT, 0), preFlux);
+			Flux<GraphResponse<StreamingOutput>> generator = FluxUtil
+				.createStreamingGeneratorWithMessages(
+						this.getClass(), state, "正在进行重试评估...", "重试评估完成！", retryOutput -> Map.of(SQL_GENERATE_OUTPUT,
+								StateGraph.END, SQL_GENERATE_COUNT, 0, SQL_HEAL_ERRORS, Collections.emptyList()),
+						preFlux);
 			// 重置 SQL 生成计数
 			return Map.of(SQL_GENERATE_OUTPUT, generator);
 		}
@@ -105,19 +111,35 @@ public class SqlGenerateNode implements NodeAction {
 		Flux<String> sqlFlux;
 		SqlRetryDto retryDto = StateUtil.getObjectValue(state, SQL_REGENERATE_REASON, SqlRetryDto.class,
 				SqlRetryDto.empty());
+		boolean isRetry = retryDto.sqlExecuteFail() || retryDto.semanticFail();
+
+		// 自愈错误累积（#13）：每次重试把当前错误追加进历史，让 LLM 看到全部失败原因，避免重蹈覆辙
+		List<String> healErrors = StateUtil.getObjectValue(state, SQL_HEAL_ERRORS, List.class, Collections.emptyList());
+		List<String> updatedHealErrors;
+		String errorForPrompt;
+		if (isRetry) {
+			updatedHealErrors = new ArrayList<>(healErrors);
+			updatedHealErrors.add(retryDto.reason());
+			errorForPrompt = buildHealErrorMessage(updatedHealErrors);
+		}
+		else {
+			// 首次生成，清空历史错误
+			updatedHealErrors = Collections.emptyList();
+			errorForPrompt = null;
+		}
 
 		// 根据重试原因决定生成策略
 		if (retryDto.sqlExecuteFail()) {
-			// SQL 执行失败，重新生成
+			// SQL 执行失败，重新生成（注入累积错误历史）
 			displayMessage = "检测到SQL执行异常，开始重新生成SQL...";
 			sqlFlux = handleRetryGenerateSql(state, StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT, ""),
-					retryDto.reason(), promptForSql);
+					errorForPrompt, promptForSql);
 		}
 		else if (retryDto.semanticFail()) {
-			// 语义一致性校验未通过，重新生成
+			// 语义一致性校验未通过，重新生成（注入累积错误历史）
 			displayMessage = "语义一致性校验未通过，开始重新生成SQL...";
 			sqlFlux = handleRetryGenerateSql(state, StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT, ""),
-					retryDto.reason(), promptForSql);
+					errorForPrompt, promptForSql);
 		}
 		else {
 			// 首次生成 SQL
@@ -125,9 +147,9 @@ public class SqlGenerateNode implements NodeAction {
 			sqlFlux = handleGenerateSql(state, promptForSql);
 		}
 
-		// 准备返回结果，同时清除一些状态数据
+		// 准备返回结果，同时清除一些状态数据；回写累积错误历史供下一轮自愈使用
 		Map<String, Object> result = new HashMap<>(Map.of(SQL_GENERATE_OUTPUT, StateGraph.END, SQL_GENERATE_COUNT,
-				count + 1, SQL_REGENERATE_REASON, SqlRetryDto.empty()));
+				count + 1, SQL_REGENERATE_REASON, SqlRetryDto.empty(), SQL_HEAL_ERRORS, updatedHealErrors));
 
 		// 创建展示流，仅用于提升用户体验；同时收集生成的 SQL
 		StringBuilder sqlCollector = new StringBuilder();
@@ -186,6 +208,26 @@ public class SqlGenerateNode implements NodeAction {
 	 */
 	private Flux<String> handleGenerateSql(OverAllState state, String executionDescription) {
 		return handleRetryGenerateSql(state, null, null, executionDescription);
+	}
+
+	/**
+	 * 构建自愈错误历史提示文本（#13）。
+	 * <p>
+	 * 将累积的历史错误按次序拼接，提示 LLM 避免重复同样的错误。
+	 * </p>
+	 * @param errors 累积的历史错误列表
+	 * @return 拼接后的错误历史文本；列表为空时返回 null
+	 */
+	private String buildHealErrorMessage(List<String> errors) {
+		if (errors == null || errors.isEmpty()) {
+			return null;
+		}
+		StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < errors.size(); i++) {
+			sb.append("第 ").append(i + 1).append(" 次尝试错误：").append(errors.get(i)).append("\n");
+		}
+		sb.append("以上为历史失败原因，请避免重复同样的错误。");
+		return sb.toString();
 	}
 
 }

@@ -33,8 +33,8 @@ import java.util.List;
  * AI 模型注册中心，以懒加载 + 缓存的方式管理全局的 ChatClient 和 EmbeddingModel 实例。
  *
  * <p>
- * 支持通过 {@link #refreshChat()} 和 {@link #refreshEmbedding()} 方法清除缓存以实现模型热切换。
- * 当未配置 Embedding 模型时，使用 {@link DummyEmbeddingModel} 作为兜底，避免向量库初始化崩溃。
+ * 支持通过 {@link #refreshChat()} 和 {@link #refreshEmbedding()} 方法清除缓存以实现模型热切换。 当未配置
+ * Embedding 模型时，使用 {@link DummyEmbeddingModel} 作为兜底，避免向量库初始化崩溃。
  * </p>
  */
 @Slf4j

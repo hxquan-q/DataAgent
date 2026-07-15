@@ -48,12 +48,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 // todo: 检查Mapper的返回值，判断是否执行成功（或者对Mapper进行AOP）
 /**
- * 数据源管理服务实现类，提供数据源增删改查、连接测试、表与字段查询、
- * 逻辑外键管理等功能的完整实现。
+ * 数据源管理服务实现类，提供数据源增删改查、连接测试、表与字段查询、 逻辑外键管理等功能的完整实现。
  *
  * <p>
- * 通过 {@link DatasourceTypeHandlerRegistry} 实现多数据库类型适配，
- * 通过 {@link AccessorFactory} 和 {@link DBConnectionPoolFactory} 管理数据库访问器与连接池。
+ * 通过 {@link DatasourceTypeHandlerRegistry} 实现多数据库类型适配， 通过 {@link AccessorFactory} 和
+ * {@link DBConnectionPoolFactory} 管理数据库访问器与连接池。
  * </p>
  */
 @Slf4j

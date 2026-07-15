@@ -44,6 +44,7 @@ import com.alibaba.cloud.ai.dataagent.dto.prompt.SemanticConsistencyDTO;
 import com.alibaba.cloud.ai.dataagent.dto.prompt.SqlGenerationDTO;
 import com.alibaba.cloud.ai.dataagent.dto.schema.SchemaDTO;
 import com.alibaba.cloud.ai.dataagent.mapper.AgentDatasourceMapper;
+import com.alibaba.cloud.ai.dataagent.mapper.LogicalRelationMapper;
 import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
 import com.alibaba.cloud.ai.dataagent.service.nl2sql.Nl2SqlService;
 import com.alibaba.cloud.ai.dataagent.service.schema.SchemaService;
@@ -167,9 +168,11 @@ class DataAgentBaselineEvalTest {
 
 		SchemaService schemaService = mock(SchemaService.class);
 		AgentDatasourceMapper datasourceMapper = mock(AgentDatasourceMapper.class);
+		LogicalRelationMapper logicalRelationMapper = mock(LogicalRelationMapper.class);
 		when(datasourceMapper.selectActiveDatasourceIdByAgentId(1L)).thenReturn(1);
 		when(schemaService.getColumnDocumentsByTableName(eq(1), anyList())).thenReturn(List.of());
-		SchemaRecallNode schemaRecallNode = new SchemaRecallNode(schemaService, datasourceMapper);
+		SchemaRecallNode schemaRecallNode = new SchemaRecallNode(schemaService, datasourceMapper,
+				logicalRelationMapper);
 		double schemaF1Total = 0;
 		for (SchemaCase evalCase : SCHEMA_CASES) {
 			List<Document> recalledDocuments = evalCase.recalled()

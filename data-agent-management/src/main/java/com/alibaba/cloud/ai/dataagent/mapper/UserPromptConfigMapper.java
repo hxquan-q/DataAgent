@@ -28,8 +28,7 @@ import java.util.List;
 /**
  * 用户提示词配置 Mapper，操作 {@code user_prompt_config} 表。
  * <p>
- * 管理按提示词类型（prompt_type）分类的系统提示词配置，支持按类型/智能体查询、启用/禁用切换、
- * 互斥启用及增删改。
+ * 管理按提示词类型（prompt_type）分类的系统提示词配置，支持按类型/智能体查询、启用/禁用切换、 互斥启用及增删改。
  * </p>
  */
 @Mapper

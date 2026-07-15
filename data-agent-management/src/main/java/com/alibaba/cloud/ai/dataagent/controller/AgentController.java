@@ -50,8 +50,10 @@ public class AgentController {
 
 	/**
 	 * 查询 Agent 列表。
-	 * <p>支持按关键词搜索或按状态过滤；两个参数都为空时返回全部。</p>
-	 * @param status  状态过滤（如 draft/published/offline）
+	 * <p>
+	 * 支持按关键词搜索或按状态过滤；两个参数都为空时返回全部。
+	 * </p>
+	 * @param status 状态过滤（如 draft/published/offline）
 	 * @param keyword 关键词搜索（名称模糊匹配）
 	 * @return Agent 列表
 	 */
@@ -83,7 +85,9 @@ public class AgentController {
 
 	/**
 	 * 创建 Agent。
-	 * <p>未指定状态时默认设置为 draft。</p>
+	 * <p>
+	 * 未指定状态时默认设置为 draft。
+	 * </p>
 	 * @param agent Agent 信息
 	 * @return 创建后的 Agent
 	 */
@@ -97,7 +101,7 @@ public class AgentController {
 
 	/**
 	 * 更新 Agent 信息。
-	 * @param id    Agent ID
+	 * @param id Agent ID
 	 * @param agent 更新内容
 	 * @return 更新后的 Agent
 	 */
@@ -192,7 +196,7 @@ public class AgentController {
 
 	/**
 	 * 切换 API Key 的启用/禁用状态。
-	 * @param id      Agent ID
+	 * @param id Agent ID
 	 * @param enabled 是否启用
 	 * @return 操作结果
 	 */
@@ -219,9 +223,9 @@ public class AgentController {
 
 	/**
 	 * 构建 API Key 统一响应体。
-	 * @param apiKey       密钥值（可能脱敏）
+	 * @param apiKey 密钥值（可能脱敏）
 	 * @param apiKeyEnabled 启用状态
-	 * @param message      提示消息
+	 * @param message 提示消息
 	 * @return 统一响应
 	 */
 	private ApiResponse<ApiKeyResponse> buildApiKeyResponse(String apiKey, Integer apiKeyEnabled, String message) {

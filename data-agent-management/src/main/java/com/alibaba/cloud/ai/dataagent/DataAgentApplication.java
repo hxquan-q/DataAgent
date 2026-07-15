@@ -22,16 +22,16 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 /**
  * DataAgent Management 服务启动入口。
  * <p>
- * 基于 Spring Boot 3.x，整合 Spring AI、MyBatis、Druid、WebFlux 等组件，
- * 提供 NL2SQL、数据分析、报告生成等 Agent 能力。
+ * 基于 Spring Boot 3.x，整合 Spring AI、MyBatis、Druid、WebFlux 等组件， 提供 NL2SQL、数据分析、报告生成等 Agent
+ * 能力。
  * </p>
  * <ul>
- *   <li>{@code @SpringBootApplication} —— 开启自动装配与组件扫描</li>
- *   <li>{@code @EnableScheduling} —— 开启定时任务（向量存储持久化、清理等）</li>
+ * <li>{@code @SpringBootApplication} —— 开启自动装配与组件扫描</li>
+ * <li>{@code @EnableScheduling} —— 开启定时任务（向量存储持久化、清理等）</li>
  * </ul>
  * <p>
- * 默认 Profile 读取 {@code application.yml}（MySQL）；本地开发可用
- * {@code --spring.profiles.active=h2} 切换为内存 H2 数据库。
+ * 默认 Profile 读取 {@code application.yml}（MySQL）；本地开发可用 {@code --spring.profiles.active=h2}
+ * 切换为内存 H2 数据库。
  * </p>
  */
 @EnableScheduling

@@ -31,7 +31,8 @@ import java.util.stream.Collectors;
 /**
  * 业务对象到 {@link Document} 的转换工具类。
  * <p>
- * 将表、列、业务名词以及 QA/FAQ 等知识对象转换为向量存储所需的 Document， 统一封装元数据（如数据源 ID、向量类型、Agent ID 等），便于后续检索与过滤。
+ * 将表、列、业务名词以及 QA/FAQ 等知识对象转换为向量存储所需的 Document， 统一封装元数据（如数据源 ID、向量类型、Agent ID
+ * 等），便于后续检索与过滤。
  * </p>
  */
 @Slf4j

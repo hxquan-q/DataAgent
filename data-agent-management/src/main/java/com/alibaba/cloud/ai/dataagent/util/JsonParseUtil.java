@@ -32,7 +32,8 @@ import java.util.Map;
 /**
  * JSON 解析工具类，支持自动修复格式错误的 JSON。
  * <p>
- * 当原始 JSON 解析失败时，会调用 LLM 对 JSON 进行修复，最多重试 {@value #MAX_RETRY_COUNT} 次； 解析前会自动剥离思考过程（{@code </think>} 标签之前的内容）以及 Markdown 代码块。
+ * 当原始 JSON 解析失败时，会调用 LLM 对 JSON 进行修复，最多重试 {@value #MAX_RETRY_COUNT} 次；
+ * 解析前会自动剥离思考过程（{@code </think>} 标签之前的内容）以及 Markdown 代码块。
  * </p>
  */
 @Slf4j
@@ -130,6 +131,7 @@ public class JsonParseUtil {
 
 	/**
 	 * 用于 JSON 解析的函数式接口。
+	 *
 	 * @param <T> 解析结果类型
 	 */
 	@FunctionalInterface

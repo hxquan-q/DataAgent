@@ -25,8 +25,8 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.*;
 /**
  * SQL Server JDBC 连接池实现。
  * <p>
- * 基于 Druid 连接池，使用 Microsoft SQL Server JDBC 驱动（com.microsoft.sqlserver.jdbc.SQLServerDriver），
- * 支持连接测试（ping）和错误码映射。
+ * 基于 Druid 连接池，使用 Microsoft SQL Server JDBC
+ * 驱动（com.microsoft.sqlserver.jdbc.SQLServerDriver）， 支持连接测试（ping）和错误码映射。
  * </p>
  *
  * @author zihen

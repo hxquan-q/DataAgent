@@ -26,8 +26,7 @@ import org.springframework.stereotype.Component;
 /**
  * 工作流节点入口日志切面。
  * <p>
- * 通过 AOP 拦截所有工作流节点的 {@code apply} 方法，在方法执行前记录节点入口日志，
- * 便于调试和追踪工作流执行流程。
+ * 通过 AOP 拦截所有工作流节点的 {@code apply} 方法，在方法执行前记录节点入口日志， 便于调试和追踪工作流执行流程。
  */
 @Aspect
 @Component

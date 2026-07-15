@@ -25,8 +25,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 数据源类型处理器注册中心，在启动时自动收集所有 {@link DatasourceTypeHandler} 实现，
- * 并以类型名称为键建立映射，提供按类型查找处理器的统一入口。
+ * 数据源类型处理器注册中心，在启动时自动收集所有 {@link DatasourceTypeHandler} 实现， 并以类型名称为键建立映射，提供按类型查找处理器的统一入口。
  */
 @Component
 public class DatasourceTypeHandlerRegistry {

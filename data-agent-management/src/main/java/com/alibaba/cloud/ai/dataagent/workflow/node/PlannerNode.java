@@ -43,8 +43,8 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
  * 计划生成节点，位于可行性评估之后、计划执行之前。
  *
  * <p>
- * 该节点根据规范化查询、Schema 和证据信息，通过大模型生成执行计划（{@link Plan}）。 执行计划定义了后续每一步需要使用的工具（SQL 生成、Python 生成、报告生成等）。
- * 支持两种模式：
+ * 该节点根据规范化查询、Schema 和证据信息，通过大模型生成执行计划（{@link Plan}）。 执行计划定义了后续每一步需要使用的工具（SQL 生成、Python
+ * 生成、报告生成等）。 支持两种模式：
  * <ul>
  * <li>纯 NL2SQL 模式：直接生成单步 SQL 计划</li>
  * <li>完整规划模式：生成多步骤执行计划，并可基于用户反馈重新生成</li>
@@ -158,8 +158,7 @@ public class PlannerNode implements NodeAction {
 		// 附加用户反馈、原始问题和被拒绝的旧计划
 		String previousPlan = StateUtil.getStringValue(state, PLANNER_NODE_OUTPUT, "");
 		return String.format(
-				"重要提示：用户拒绝了之前的计划，反馈内容：\"%s\"\n\n" + "原始问题：%s\n\n" + "被拒绝的旧计划：\n%s\n\n"
-						+ "关键要求：请根据用户反馈（\"%s\"）生成新的计划",
+				"重要提示：用户拒绝了之前的计划，反馈内容：\"%s\"\n\n" + "原始问题：%s\n\n" + "被拒绝的旧计划：\n%s\n\n" + "关键要求：请根据用户反馈（\"%s\"）生成新的计划",
 				validationError, input, previousPlan, validationError);
 	}
 
@@ -169,8 +168,7 @@ public class PlannerNode implements NodeAction {
 	 * @return 格式化后的错误信息字符串
 	 */
 	private String formatValidationError(String validationError) {
-		return validationError != null ? String
-			.format("**用户反馈（关键）**: %s\n\n**必须融合此反馈。**", validationError) : "";
+		return validationError != null ? String.format("**用户反馈（关键）**: %s\n\n**必须融合此反馈。**", validationError) : "";
 	}
 
 }

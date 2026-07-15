@@ -21,8 +21,7 @@ import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeH
 import org.springframework.stereotype.Component;
 
 /**
- * Oracle 数据源类型处理器，负责构建 Oracle JDBC 连接 URL，
- * 支持以 "serviceName|schemaName" 格式指定服务名和 Schema。
+ * Oracle 数据源类型处理器，负责构建 Oracle JDBC 连接 URL， 支持以 "serviceName|schemaName" 格式指定服务名和 Schema。
  */
 @Component
 public class OracleDatasourceTypeHandler implements DatasourceTypeHandler {
@@ -65,8 +64,8 @@ public class OracleDatasourceTypeHandler implements DatasourceTypeHandler {
 	/**
 	 * 提取 Oracle 的 Schema 名称。
 	 * <p>
-	 * Oracle 的 Schema 存储在 databaseName 中，格式为 "serviceName|schemaName"，
-	 * 取分隔符后的 schema 部分；未指定时返回 null，由方言层使用用户名作为 Schema。
+	 * Oracle 的 Schema 存储在 databaseName 中，格式为 "serviceName|schemaName"， 取分隔符后的 schema
+	 * 部分；未指定时返回 null，由方言层使用用户名作为 Schema。
 	 * </p>
 	 * @param datasource 数据源实体
 	 * @return Schema 名称，未指定时返回 null

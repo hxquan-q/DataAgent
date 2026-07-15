@@ -36,8 +36,7 @@ import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
  * Oracle JDBC DDL 执行器实现。
  * <p>
  * 通过 ALL_TABLES、ALL_TAB_COLUMNS、ALL_CONSTRAINTS 等系统视图查询 Oracle 数据库的元数据信息，
- * 支持数据库（用户）、schema、表、列、外键查询以及表数据扫描和列值采样。
- * Oracle 中对象名不区分大小写，内部统一转换为大写处理。
+ * 支持数据库（用户）、schema、表、列、外键查询以及表数据扫描和列值采样。 Oracle 中对象名不区分大小写，内部统一转换为大写处理。
  * </p>
  */
 @Service

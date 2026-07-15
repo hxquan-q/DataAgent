@@ -30,8 +30,8 @@ import java.util.List;
 /**
  * 数据访问接口定义。
  * <p>
- * 提供数据库、schema、表、列、外键等元数据查询以及 SQL 执行能力。
- * 各数据库类型（MySQL、PostgreSQL、Oracle、H2、Hive、达梦、SQL Server 等）提供各自的实现。
+ * 提供数据库、schema、表、列、外键等元数据查询以及 SQL 执行能力。 各数据库类型（MySQL、PostgreSQL、Oracle、H2、Hive、达梦、SQL
+ * Server 等）提供各自的实现。
  * </p>
  *
  * @author yuluo

@@ -18,8 +18,7 @@ package com.alibaba.cloud.ai.dataagent.constant;
 /**
  * 文档元数据（Metadata）键名常量。
  * <p>
- * 定义存储在向量库文档 Metadata 中的标准键名，用于标识列信息、表信息、
- * 知识 ID、业务术语等元数据。
+ * 定义存储在向量库文档 Metadata 中的标准键名，用于标识列信息、表信息、 知识 ID、业务术语等元数据。
  */
 public final class DocumentMetadataConstant {
 

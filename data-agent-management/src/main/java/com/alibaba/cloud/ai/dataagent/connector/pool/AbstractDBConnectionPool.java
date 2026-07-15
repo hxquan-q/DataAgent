@@ -34,8 +34,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 数据库连接池抽象实现类。
  * <p>
- * 基于 Druid 连接池实现，提供数据源缓存、连接获取重试、连接测试（ping）等通用功能。
- * 子类需要实现 {@link #getDriver()} 和 {@link #errorMapping(String)} 方法以适配不同数据库类型。
+ * 基于 Druid 连接池实现，提供数据源缓存、连接获取重试、连接测试（ping）等通用功能。 子类需要实现 {@link #getDriver()} 和
+ * {@link #errorMapping(String)} 方法以适配不同数据库类型。
  * </p>
  */
 @Slf4j
@@ -129,8 +129,7 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 	/**
 	 * 从连接池中获取数据库连接。
 	 * <p>
-	 * 基于连接参数生成缓存键，确保同一配置只创建一个 DataSource。
-	 * 获取失败时按照重试策略进行退避重试。
+	 * 基于连接参数生成缓存键，确保同一配置只创建一个 DataSource。 获取失败时按照重试策略进行退避重试。
 	 * </p>
 	 * @param config 数据库配置信息
 	 * @return 数据库连接对象
@@ -218,8 +217,7 @@ public abstract class AbstractDBConnectionPool implements DBConnectionPool {
 	/**
 	 * 创建 Druid 数据源实例。
 	 * <p>
-	 * 配置初始连接数 5、最小空闲 5、最大活跃 20、最大等待 10 秒。
-	 * 对于达梦数据库禁用 wall 过滤器（仅保留 stat）。
+	 * 配置初始连接数 5、最小空闲 5、最大活跃 20、最大等待 10 秒。 对于达梦数据库禁用 wall 过滤器（仅保留 stat）。
 	 * </p>
 	 * @param url 数据库连接 URL
 	 * @param username 数据库用户名

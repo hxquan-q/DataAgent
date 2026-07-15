@@ -28,8 +28,7 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.PASSWORD_ERROR_
 /**
  * H2 JDBC 连接池实现。
  * <p>
- * 基于 Druid 连接池，使用 H2 数据库驱动（org.h2.Driver），支持连接测试（ping）和错误码映射。
- * H2 为内嵌数据库，支持空密码连接。
+ * 基于 Druid 连接池，使用 H2 数据库驱动（org.h2.Driver），支持连接测试（ping）和错误码映射。 H2 为内嵌数据库，支持空密码连接。
  * </p>
  */
 @Service("h2JdbcConnectionPool")

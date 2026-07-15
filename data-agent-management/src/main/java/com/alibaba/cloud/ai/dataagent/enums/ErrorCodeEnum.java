@@ -18,8 +18,7 @@ package com.alibaba.cloud.ai.dataagent.enums;
 /**
  * 数据库连接相关错误码定义。
  * <p>
- * 包含标准 SQLState 代码、自定义编码以及对应的中文提示信息。
- * 可作为开源项目的基础错误码模块，便于统一异常处理。
+ * 包含标准 SQLState 代码、自定义编码以及对应的中文提示信息。 可作为开源项目的基础错误码模块，便于统一异常处理。
  */
 public enum ErrorCodeEnum {
 

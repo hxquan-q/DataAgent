@@ -68,11 +68,15 @@ public class ReportGeneratorNode implements NodeAction {
 
 	private final UserPromptService promptConfigService;
 
-	public ReportGeneratorNode(LlmService llmService, UserPromptService promptConfigService) {
+	private final PromptHelper promptHelper;
+
+	public ReportGeneratorNode(LlmService llmService, UserPromptService promptConfigService,
+			PromptHelper promptHelper) {
 		this.llmService = llmService;
 		this.converter = new BeanOutputConverter<>(new ParameterizedTypeReference<>() {
 		});
 		this.promptConfigService = promptConfigService;
+		this.promptHelper = promptHelper;
 	}
 
 	/**
@@ -184,6 +188,8 @@ public class ReportGeneratorNode implements NodeAction {
 		// 构建报告生成提示词
 		String reportPrompt = PromptHelper.buildReportGeneratorPromptWithOptimization(userRequirementsAndPlan,
 				analysisStepsAndData, summaryAndRecommendations, optimizationConfigs);
+		// 注入智能体绑定的报告技能（管理驾驶舱 / 深度分析 / 数据探索等），按 agent 生效
+		reportPrompt = promptHelper.injectSkills("report", agentId, reportPrompt);
 		log.debug("报告节点提示词: \n {} \n", reportPrompt);
 		return llmService.callUser(reportPrompt);
 	}
@@ -258,6 +264,11 @@ public class ReportGeneratorNode implements NodeAction {
 
 				if (stepResult != null && !stepResult.trim().isEmpty()) {
 					sb.append(DataSummarizer.summarize(stepResult)).append("\n");
+					// #6 图文并茂：若该步骤已渲染图表，嵌入图片（Markdown 图片语法，前端 markdown 渲染）
+					String chartUrl = executionResults.get(stepKey + "_chart_url");
+					if (chartUrl != null && !chartUrl.isBlank()) {
+						sb.append("![图表](").append(chartUrl).append(")\n\n");
+					}
 				}
 				if (analysisResult != null && !analysisResult.trim().isEmpty()) {
 					sb.append("**Python 分析结果**: ").append(analysisResult).append("\n\n");

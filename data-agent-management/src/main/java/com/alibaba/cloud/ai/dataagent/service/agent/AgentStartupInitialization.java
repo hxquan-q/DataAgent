@@ -33,8 +33,8 @@ import org.springframework.stereotype.Service;
  * Agent 启动初始化服务，在应用启动时自动初始化所有已发布（published）状态的 Agent 的数据源和向量数据。
  *
  * <p>
- * 通过实现 {@link ApplicationRunner} 在应用启动后异步执行初始化逻辑，避免阻塞 Spring 主启动线程；
- * 通过实现 {@link DisposableBean} 在应用关闭时释放线程池资源。
+ * 通过实现 {@link ApplicationRunner} 在应用启动后异步执行初始化逻辑，避免阻塞 Spring 主启动线程； 通过实现
+ * {@link DisposableBean} 在应用关闭时释放线程池资源。
  * </p>
  */
 @Slf4j

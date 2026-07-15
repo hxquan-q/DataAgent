@@ -45,7 +45,6 @@ public record PromptConfigDTO(
 		/** 配置优先级 */
 		Integer priority,
 		/** 展示排序值 */
-		Integer displayOrder
-) {
+		Integer displayOrder) {
 
 }

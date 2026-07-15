@@ -18,14 +18,22 @@ package com.alibaba.cloud.ai.dataagent.workflow.node;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.StateGraph;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
+import com.alibaba.cloud.ai.dataagent.bo.DbConfigBO;
 import com.alibaba.cloud.ai.dataagent.dto.planner.ExecutionStep;
 import com.alibaba.cloud.ai.dataagent.dto.planner.Plan;
+import com.alibaba.cloud.ai.dataagent.dto.schema.SchemaDTO;
+import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
+import com.alibaba.cloud.ai.dataagent.service.plan.ConcurrentSqlStepExecutor;
+import com.alibaba.cloud.ai.dataagent.util.DatabaseUtil;
+import com.alibaba.cloud.ai.dataagent.util.PlanDependencyAnalyzer;
 import com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil;
 import com.alibaba.cloud.ai.dataagent.util.StateUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -51,6 +59,16 @@ public class PlanExecutorNode implements NodeAction {
 	private static final Set<String> SUPPORTED_NODES = Set.of(SQL_GENERATE_NODE, PYTHON_GENERATE_NODE,
 			REPORT_GENERATOR_NODE);
 
+	// #10 并发执行（字段注入以保留无参构造，测试 new PlanExecutorNode() 时为 null，flag 关→不触发）
+	@Autowired
+	private ConcurrentSqlStepExecutor concurrentSqlStepExecutor;
+
+	@Autowired
+	private DataAgentProperties properties;
+
+	@Autowired
+	private DatabaseUtil databaseUtil;
+
 	/**
 	 * 执行计划校验与路由逻辑。
 	 * <p>
@@ -70,14 +88,12 @@ public class PlanExecutorNode implements NodeAction {
 		}
 		catch (Exception e) {
 			log.error("计划校验失败，解析错误。", e);
-			return buildValidationResult(state, false,
-					"校验失败：计划不是有效的 JSON 结构。错误: " + e.getMessage());
+			return buildValidationResult(state, false, "校验失败：计划不是有效的 JSON 结构。错误: " + e.getMessage());
 		}
 
 		// 校验执行计划结构
 		if (!validateExecutionPlanStructure(plan)) {
-			return buildValidationResult(state, false,
-					"校验失败：生成的计划为空或没有执行步骤。");
+			return buildValidationResult(state, false, "校验失败：生成的计划为空或没有执行步骤。");
 		}
 
 		// 校验每个执行步骤
@@ -112,6 +128,15 @@ public class PlanExecutorNode implements NodeAction {
 		// 获取当前步骤并确定下一个节点
 		ExecutionStep executionStep = executionPlan.get(currentStep - 1);
 		String toolToUse = executionStep.getToolToUse();
+
+		// #10 并发执行（flag 默认关）：当前步骤起一个 >1 步的独立 SQL 波次时，并发执行整波后跳过
+		if (properties != null && properties.isEnableConcurrentSteps() && concurrentSqlStepExecutor != null
+				&& databaseUtil != null && SQL_GENERATE_NODE.equals(toolToUse)) {
+			Map<String, Object> concurrent = tryConcurrentWave(state, plan, currentStep, executionPlan);
+			if (concurrent != null) {
+				return concurrent;
+			}
+		}
 
 		return determineNextNode(toolToUse);
 	}
@@ -150,6 +175,69 @@ public class PlanExecutorNode implements NodeAction {
 	 * @param step 执行步骤
 	 * @return 校验失败时返回错误信息，校验通过返回 null
 	 */
+	/**
+	 * 尝试并发执行当前步骤所在的独立 SQL 波次（#10）。fail-safe：任何异常回退串行。
+	 * @param state 工作流状态
+	 * @param plan 执行计划
+	 * @param currentStep 当前步骤号
+	 * @param executionPlan 执行步骤列表
+	 * @return 并发执行后的路由结果；不适合并发时返回 null（走串行）
+	 */
+	private Map<String, Object> tryConcurrentWave(OverAllState state, Plan plan, int currentStep,
+			List<ExecutionStep> executionPlan) {
+		try {
+			List<List<ExecutionStep>> waves = PlanDependencyAnalyzer.concurrentWaves(plan);
+			for (List<ExecutionStep> wave : waves) {
+				if (wave.stream().noneMatch(s -> s.getStep() == currentStep)) {
+					continue;
+				}
+				// 仅当波次 >1 步且全部为 SQL 生成时并发
+				if (wave.size() <= 1 || !wave.stream().allMatch(s -> SQL_GENERATE_NODE.equals(s.getToolToUse()))) {
+					return null;
+				}
+				return runConcurrentWave(state, wave, executionPlan);
+			}
+		}
+		catch (Exception e) {
+			log.warn("并发波次识别失败，回退串行：{}", e.getMessage());
+		}
+		return null;
+	}
+
+	/**
+	 * 并发执行一个独立 SQL 波次并产出路由结果（#10）。fail-safe：异常回退串行。
+	 */
+	@SuppressWarnings("unchecked")
+	private Map<String, Object> runConcurrentWave(OverAllState state, List<ExecutionStep> wave,
+			List<ExecutionStep> executionPlan) {
+		try {
+			Long agentId = Long.valueOf(StateUtil.getStringValue(state, AGENT_ID));
+			DbConfigBO dbConfig = databaseUtil.getAgentDbConfig(agentId);
+			SchemaDTO schemaDTO = StateUtil.getObjectValue(state, TABLE_RELATION_OUTPUT, SchemaDTO.class);
+			String evidence = StateUtil.getStringValue(state, EVIDENCE);
+			String dialect = StateUtil.getStringValue(state, DB_DIALECT_TYPE);
+			String canonicalQuery = StateUtil.getCanonicalQuery(state);
+			Map<String, String> results = StateUtil.getObjectValue(state, SQL_EXECUTE_NODE_OUTPUT, Map.class,
+					new HashMap<>());
+			concurrentSqlStepExecutor.executeWave(wave, agentId, dbConfig, schemaDTO, evidence, dialect, canonicalQuery,
+					results);
+			int lastStep = wave.stream().mapToInt(ExecutionStep::getStep).max().getAsInt();
+			int nextStep = lastStep + 1;
+			boolean isOnlyNl2sql = state.value(IS_ONLY_NL2SQL, false);
+			if (nextStep > executionPlan.size()) {
+				return Map.of(SQL_EXECUTE_NODE_OUTPUT, results, PLAN_CURRENT_STEP, nextStep, PLAN_NEXT_NODE,
+						isOnlyNl2sql ? StateGraph.END : REPORT_GENERATOR_NODE, PLAN_VALIDATION_STATUS, true);
+			}
+			String nextTool = executionPlan.get(nextStep - 1).getToolToUse();
+			return Map.of(SQL_EXECUTE_NODE_OUTPUT, results, PLAN_CURRENT_STEP, nextStep, PLAN_NEXT_NODE, nextTool,
+					PLAN_VALIDATION_STATUS, true);
+		}
+		catch (Exception e) {
+			log.warn("并发波次执行失败，回退串行：{}", e.getMessage());
+			return null;
+		}
+	}
+
 	private String validateExecutionStep(ExecutionStep step) {
 		// 校验工具名称
 		if (step.getToolToUse() == null || !SUPPORTED_NODES.contains(step.getToolToUse())) {

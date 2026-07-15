@@ -36,8 +36,7 @@ import java.util.List;
 /**
  * 访问器抽象实现类。
  * <p>
- * 通过 DDL 执行器和连接池实现数据库元数据查询和 SQL 执行。
- * 利用反射式方法分发（accessDb）将各查询操作委托给对应的 DDL 执行器。
+ * 通过 DDL 执行器和连接池实现数据库元数据查询和 SQL 执行。 利用反射式方法分发（accessDb）将各查询操作委托给对应的 DDL 执行器。
  * </p>
  *
  * @author yuluo
@@ -55,7 +54,8 @@ public abstract class AbstractAccessor implements Accessor {
 	 * 访问数据库并执行指定的方法。
 	 * <p>
 	 * 通过方法名分发到对应的 DDL 执行器方法，支持 showDatabases、showSchemas、showTables、
-	 * fetchTables、showColumns、showForeignKeys、sampleColumn、scanTable、executeSqlAndReturnObject 等操作。
+	 * fetchTables、showColumns、showForeignKeys、sampleColumn、scanTable、executeSqlAndReturnObject
+	 * 等操作。
 	 * </p>
 	 * @param dbConfig 数据库配置信息
 	 * @param method 方法名称

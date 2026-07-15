@@ -49,8 +49,7 @@ import org.springframework.web.server.ResponseStatusException;
 /**
  * 数据源管理控制器。
  * <p>
- * 管理数据源的增删改查、连接测试、表/字段获取，
- * 以及逻辑外键（Logical Relation）的配置，用于补充数据库物理外键无法覆盖的关联关系。
+ * 管理数据源的增删改查、连接测试、表/字段获取， 以及逻辑外键（Logical Relation）的配置，用于补充数据库物理外键无法覆盖的关联关系。
  * </p>
  */
 @Slf4j

@@ -21,8 +21,8 @@ import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeH
 import org.springframework.stereotype.Component;
 
 /**
- * PostgreSQL 数据源类型处理器，负责构建 PostgreSQL JDBC 连接 URL，
- * 支持以 "database|schema" 格式指定数据库名和 Schema。
+ * PostgreSQL 数据源类型处理器，负责构建 PostgreSQL JDBC 连接 URL， 支持以 "database|schema" 格式指定数据库名和
+ * Schema。
  */
 @Component
 public class PostgreSqlDatasourceTypeHandler implements DatasourceTypeHandler {

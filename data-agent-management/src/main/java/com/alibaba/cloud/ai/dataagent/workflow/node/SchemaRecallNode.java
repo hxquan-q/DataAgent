@@ -16,7 +16,9 @@
 package com.alibaba.cloud.ai.dataagent.workflow.node;
 
 import com.alibaba.cloud.ai.dataagent.dto.prompt.QueryEnhanceOutputDTO;
+import com.alibaba.cloud.ai.dataagent.entity.LogicalRelation;
 import com.alibaba.cloud.ai.dataagent.mapper.AgentDatasourceMapper;
+import com.alibaba.cloud.ai.dataagent.mapper.LogicalRelationMapper;
 import com.alibaba.cloud.ai.graph.GraphResponse;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
@@ -34,8 +36,11 @@ import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
@@ -64,6 +69,8 @@ public class SchemaRecallNode implements NodeAction {
 	private final SchemaService schemaService;
 
 	private final AgentDatasourceMapper agentDatasourceMapper;
+
+	private final LogicalRelationMapper logicalRelationMapper;
 
 	/**
 	 * 执行 Schema 召回逻辑。
@@ -120,6 +127,9 @@ public class SchemaRecallNode implements NodeAction {
 		List<String> recalledTableNames = extractTableName(tableDocuments);
 		// 根据召回的表名检索列文档
 		List<Document> columnDocuments = schemaService.getColumnDocumentsByTableName(datasourceId, recalledTableNames);
+		// FK 子图扩展（#12）：纳入已召回表的关联/桥接表列文档，提升多表 JOIN 召回（fail-safe）
+		List<Document> expandedColumnDocuments = expandWithLogicalRelations(datasourceId, recalledTableNames,
+				columnDocuments);
 
 		String failMessage = """
 				\n 未检索到相关数据表
@@ -146,7 +156,7 @@ public class SchemaRecallNode implements NodeAction {
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, currentState -> {
 					return Map.of(TABLE_DOCUMENTS_FOR_SCHEMA_OUTPUT, tableDocuments,
-							COLUMN_DOCUMENTS__FOR_SCHEMA_OUTPUT, columnDocuments);
+							COLUMN_DOCUMENTS__FOR_SCHEMA_OUTPUT, expandedColumnDocuments);
 				}, displayFlux);
 
 		// 返回 Schema 召回结果
@@ -170,6 +180,62 @@ public class SchemaRecallNode implements NodeAction {
 		log.info("SchemaRecallNode 节点召回的表: {}", tableNames);
 		return tableNames;
 
+	}
+
+	/**
+	 * 基于逻辑外键扩展 Schema 召回（#12）。
+	 * <p>
+	 * 在已召回表的基础上，沿逻辑外键（{@code logical_relation}）扩展一跳关联/桥接表的列文档， 使后续 SQL 生成能正确处理多表
+	 * JOIN。任何异常都 fail-safe 回退到原始召回，不阻断主流程。
+	 * </p>
+	 * @param datasourceId 数据源 ID
+	 * @param recalledTableNames 已召回的表名集合
+	 * @param columnDocuments 已召回的列文档
+	 * @return 扩展后的列文档（含关联表列文档）
+	 */
+	private List<Document> expandWithLogicalRelations(Integer datasourceId, List<String> recalledTableNames,
+			List<Document> columnDocuments) {
+		try {
+			List<LogicalRelation> relations = logicalRelationMapper.selectByDatasourceId(datasourceId);
+			if (relations == null || relations.isEmpty() || recalledTableNames.isEmpty()) {
+				return columnDocuments;
+			}
+			Set<String> recalled = new HashSet<>(recalledTableNames);
+			Set<String> neighborTables = new HashSet<>();
+			for (LogicalRelation relation : relations) {
+				String source = relation.getSourceTableName();
+				String target = relation.getTargetTableName();
+				if (source != null && target != null) {
+					if (recalled.contains(source) && !recalled.contains(target)) {
+						neighborTables.add(target);
+					}
+					else if (recalled.contains(target) && !recalled.contains(source)) {
+						neighborTables.add(source);
+					}
+				}
+			}
+			if (neighborTables.isEmpty()) {
+				return columnDocuments;
+			}
+			List<Document> extraColumns = schemaService.getColumnDocumentsByTableName(datasourceId,
+					new ArrayList<>(neighborTables));
+			Set<String> existingIds = columnDocuments.stream()
+				.map(Document::getId)
+				.filter(java.util.Objects::nonNull)
+				.collect(Collectors.toSet());
+			List<Document> merged = new ArrayList<>(columnDocuments);
+			for (Document document : extraColumns) {
+				if (document.getId() == null || !existingIds.contains(document.getId())) {
+					merged.add(document);
+				}
+			}
+			log.info("FK 子图扩展：新增关联/桥接表 {} 的列文档", neighborTables);
+			return merged;
+		}
+		catch (Exception e) {
+			log.warn("FK 子图扩展失败，回退到原始召回：{}", e.getMessage());
+			return columnDocuments;
+		}
 	}
 
 }

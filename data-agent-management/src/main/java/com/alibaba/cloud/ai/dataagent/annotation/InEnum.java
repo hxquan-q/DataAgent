@@ -23,9 +23,8 @@ import java.lang.annotation.*;
 /**
  * 枚举值校验注解。
  * <p>
- * 用于验证字段或参数值是否为指定枚举类的合法值。
- * 可通过 {@link #method()} 指定使用枚举的哪个方法（如 {@code name()}、{@code getCode()}）
- * 来提取合法值集合进行比对。
+ * 用于验证字段或参数值是否为指定枚举类的合法值。 可通过 {@link #method()} 指定使用枚举的哪个方法（如
+ * {@code name()}、{@code getCode()}） 来提取合法值集合进行比对。
  *
  * @see InEnumValidator
  */

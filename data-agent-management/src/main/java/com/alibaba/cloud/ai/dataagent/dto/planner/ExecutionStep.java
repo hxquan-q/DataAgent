@@ -22,6 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 执行步骤 DTO
  *
@@ -45,6 +47,11 @@ public class ExecutionStep {
 	@JsonProperty("tool_parameters")
 	@JsonPropertyDescription("工具参数")
 	private ToolParameters toolParameters;
+
+	// #10 并发执行支持：依赖的前置步骤号列表；为空表示无依赖，可与其它无依赖步骤并发执行
+	@JsonProperty("depends_on")
+	@JsonPropertyDescription("依赖的前置步骤号列表；为空表示无依赖，可与其它无依赖步骤并发执行")
+	private List<Integer> dependsOn;
 
 	@Data
 	@NoArgsConstructor

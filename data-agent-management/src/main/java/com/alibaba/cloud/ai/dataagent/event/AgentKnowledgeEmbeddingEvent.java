@@ -23,8 +23,7 @@ import java.time.Clock;
 /**
  * 智能体知识向量化嵌入事件。
  * <p>
- * 当智能体知识创建或更新后发布此事件，由事件监听器异步执行向量化（Embedding）处理，
- * 将文本内容写入向量库。
+ * 当智能体知识创建或更新后发布此事件，由事件监听器异步执行向量化（Embedding）处理， 将文本内容写入向量库。
  */
 @Getter
 public class AgentKnowledgeEmbeddingEvent extends ApplicationEvent {

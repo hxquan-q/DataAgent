@@ -25,8 +25,8 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.OTHERS;
 /**
  * 达梦（Dameng）JDBC 连接池实现。
  * <p>
- * 基于 Druid 连接池，使用达梦 JDBC 驱动（dm.jdbc.driver.DmDriver），支持连接测试（ping）和错误码映射。
- * 达梦驱动不兼容 Druid 的 wall 过滤器，仅启用 stat 过滤器。
+ * 基于 Druid 连接池，使用达梦 JDBC 驱动（dm.jdbc.driver.DmDriver），支持连接测试（ping）和错误码映射。 达梦驱动不兼容 Druid 的
+ * wall 过滤器，仅启用 stat 过滤器。
  * </p>
  */
 @Service("damengJdbcConnectionPool")

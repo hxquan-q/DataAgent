@@ -27,8 +27,7 @@ import java.time.LocalDateTime;
 /**
  * 智能体知识对象转换器。
  * <p>
- * 负责在持久化实体（AgentKnowledge）、数据传输对象（CreateKnowledgeDTO）
- * 和视图对象（AgentKnowledgeVO）之间进行双向转换。
+ * 负责在持久化实体（AgentKnowledge）、数据传输对象（CreateKnowledgeDTO） 和视图对象（AgentKnowledgeVO）之间进行双向转换。
  */
 @Component
 public class AgentKnowledgeConverter {

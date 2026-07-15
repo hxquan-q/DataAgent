@@ -24,8 +24,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * OpenAPI / Swagger 文档配置。
  * <p>
- * 定义 API 文档元信息并按包路径分组，启动后访问
- * {@code http://localhost:8065/swagger-ui.html} 查看接口文档。
+ * 定义 API 文档元信息并按包路径分组，启动后访问 {@code http://localhost:8065/swagger-ui.html} 查看接口文档。
  * </p>
  */
 @Configuration

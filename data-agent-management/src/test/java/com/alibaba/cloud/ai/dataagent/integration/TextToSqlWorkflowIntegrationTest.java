@@ -72,6 +72,9 @@ class TextToSqlWorkflowIntegrationTest {
 	@Mock
 	private Accessor accessor;
 
+	@Mock
+	private com.alibaba.cloud.ai.dataagent.service.chart.ChartRenderService chartRenderService;
+
 	private SqlGenerateNode sqlGenerateNode;
 
 	private SqlExecuteNode sqlExecuteNode;
@@ -79,7 +82,8 @@ class TextToSqlWorkflowIntegrationTest {
 	@BeforeEach
 	void setUp() {
 		sqlGenerateNode = new SqlGenerateNode(nl2SqlService, properties);
-		sqlExecuteNode = new SqlExecuteNode(databaseUtil, nl2SqlService, llmService, properties, jsonParseUtil);
+		sqlExecuteNode = new SqlExecuteNode(databaseUtil, nl2SqlService, llmService, properties, jsonParseUtil,
+				chartRenderService);
 
 		when(properties.getMaxSqlRetryCount()).thenReturn(10);
 		when(properties.isEnableSqlResultChart()).thenReturn(false);

@@ -27,6 +27,7 @@ import java.util.Map;
 
 import com.alibaba.cloud.ai.dataagent.common.TestFixtures;
 import com.alibaba.cloud.ai.dataagent.dto.prompt.QueryEnhanceOutputDTO;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.service.llm.LlmService;
 import com.alibaba.cloud.ai.dataagent.service.prompt.UserPromptService;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
@@ -51,11 +52,17 @@ class ReportGeneratorNodeTest {
 	@Mock
 	private UserPromptService promptConfigService;
 
+	@Mock
+	private PromptHelper promptHelper;
+
 	private ReportGeneratorNode reportGeneratorNode;
 
 	@BeforeEach
 	void setUp() {
-		reportGeneratorNode = new ReportGeneratorNode(llmService, promptConfigService);
+		reportGeneratorNode = new ReportGeneratorNode(llmService, promptConfigService, promptHelper);
+		// 技能注入按透传处理（返回原 prompt），保证既有用例不受接线影响
+		when(promptHelper.injectSkills(anyString(), any(), anyString()))
+			.thenAnswer(invocation -> invocation.getArgument(2));
 	}
 
 	private OverAllState createTestState() {

@@ -25,7 +25,8 @@ import java.util.Set;
 /**
  * MCP Server 工具类。
  * <p>
- * 用于在 Spring 容器中按类型筛选 Bean，并排除标注了 {@link McpServerTool} 的 Bean。 便于在工作流节点中只获取非 MCP Server 工具，避免对外暴露的 MCP 工具被节点误用。
+ * 用于在 Spring 容器中按类型筛选 Bean，并排除标注了 {@link McpServerTool} 的 Bean。 便于在工作流节点中只获取非 MCP Server
+ * 工具，避免对外暴露的 MCP 工具被节点误用。
  * </p>
  */
 public final class McpServerToolUtil {

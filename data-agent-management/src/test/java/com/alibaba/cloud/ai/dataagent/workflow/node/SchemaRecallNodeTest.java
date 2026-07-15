@@ -28,6 +28,7 @@ import java.util.Map;
 import com.alibaba.cloud.ai.dataagent.common.TestFixtures;
 import com.alibaba.cloud.ai.dataagent.dto.prompt.QueryEnhanceOutputDTO;
 import com.alibaba.cloud.ai.dataagent.mapper.AgentDatasourceMapper;
+import com.alibaba.cloud.ai.dataagent.mapper.LogicalRelationMapper;
 import com.alibaba.cloud.ai.dataagent.service.schema.SchemaService;
 import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.state.strategy.ReplaceStrategy;
@@ -50,11 +51,14 @@ class SchemaRecallNodeTest {
 	@Mock
 	private AgentDatasourceMapper agentDatasourceMapper;
 
+	@Mock
+	private LogicalRelationMapper logicalRelationMapper;
+
 	private SchemaRecallNode schemaRecallNode;
 
 	@BeforeEach
 	void setUp() {
-		schemaRecallNode = new SchemaRecallNode(schemaService, agentDatasourceMapper);
+		schemaRecallNode = new SchemaRecallNode(schemaService, agentDatasourceMapper, logicalRelationMapper);
 	}
 
 	private OverAllState createTestState() {

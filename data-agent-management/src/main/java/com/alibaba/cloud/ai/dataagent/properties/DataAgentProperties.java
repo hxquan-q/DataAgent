@@ -100,6 +100,22 @@ public class DataAgentProperties {
 	private Long enrichSqlResultTimeout = 3000L;
 
 	/**
+	 * 是否启用 g2-ssr 服务端图表渲染（#6 图文并茂），默认启用；服务不可用时 fail-safe 回退纯文本报告
+	 */
+	private boolean enableChartRender = true;
+
+	/**
+	 * 是否启用 SQL 只读护栏（#17），默认启用；用 jsqlparser 拦截 DDL/DML，解析失败 fail-open 放行
+	 */
+	private boolean enableSqlGuard = true;
+
+	/**
+	 * 是否启用独立 SQL 步骤并发执行（#10），默认关闭；开启后无依赖步骤经 dbOperationExecutor 并发执行。
+	 * 并发通道暂不含语义校验与图表渲染，默认关闭即退回含全部特性的串行模式
+	 */
+	private boolean enableConcurrentSteps = false;
+
+	/**
 	 * 报告生成模板配置：Markdown 解析器与图表库的 CDN 地址。
 	 */
 	@Getter
@@ -254,8 +270,8 @@ public class DataAgentProperties {
 	}
 
 	/**
-	 * Embedding 批处理配置：控制每次向量化请求的 token 上限与文本条数，
-	 * 避免超出 Embedding 模型 API 限制（如 DashScope 单批最多 10 条）。
+	 * Embedding 批处理配置：控制每次向量化请求的 token 上限与文本条数， 避免超出 Embedding 模型 API 限制（如 DashScope 单批最多
+	 * 10 条）。
 	 */
 	@Getter
 	@Setter

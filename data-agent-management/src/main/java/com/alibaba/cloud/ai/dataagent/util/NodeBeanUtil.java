@@ -26,7 +26,8 @@ import org.springframework.stereotype.Component;
 /**
  * Node/Edge Bean 管理工具类。
  * <p>
- * 封装从 Spring 容器获取工作流节点（{@link NodeAction}）和边（{@link EdgeAction}）Bean 的逻辑， 并提供同步/异步的获取方式，简化工作流编排中对 Bean 的引用。
+ * 封装从 Spring 容器获取工作流节点（{@link NodeAction}）和边（{@link EdgeAction}）Bean 的逻辑，
+ * 并提供同步/异步的获取方式，简化工作流编排中对 Bean 的引用。
  * </p>
  *
  * @author vlsmb

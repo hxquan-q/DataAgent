@@ -91,8 +91,7 @@ public class HumanFeedbackNode implements NodeAction {
 
 			// 保存用户反馈内容
 			String feedbackContent = feedbackData.getOrDefault("feedback_content", "").toString();
-			updated.put(PLAN_VALIDATION_ERROR,
-					StringUtils.hasLength(feedbackContent) ? feedbackContent : "用户拒绝了计划");
+			updated.put(PLAN_VALIDATION_ERROR, StringUtils.hasLength(feedbackContent) ? feedbackContent : "用户拒绝了计划");
 			// 清空旧的计划输出
 			updated.put(PLANNER_NODE_OUTPUT, "");
 		}

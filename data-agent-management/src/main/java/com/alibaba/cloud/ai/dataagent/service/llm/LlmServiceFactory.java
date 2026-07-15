@@ -27,8 +27,8 @@ import org.springframework.stereotype.Component;
  * LLM 服务工厂，实现 {@link FactoryBean} 根据配置创建对应的 LLM 服务实例。
  *
  * <p>
- * 根据配置中的 {@code llmServiceType} 决定创建 {@link BlockLlmService}（阻塞式）
- * 还是 {@link StreamLlmService}（流式）。
+ * 根据配置中的 {@code llmServiceType} 决定创建 {@link BlockLlmService}（阻塞式） 还是
+ * {@link StreamLlmService}（流式）。
  * </p>
  */
 @Component

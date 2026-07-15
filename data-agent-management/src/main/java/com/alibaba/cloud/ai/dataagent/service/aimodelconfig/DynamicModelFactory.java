@@ -47,8 +47,8 @@ import reactor.netty.transport.ProxyProvider;
  * 动态模型工厂，根据模型配置动态创建 ChatModel 和 EmbeddingModel 实例。
  *
  * <p>
- * 统一使用 OpenAI 兼容的模型类（{@link OpenAiChatModel}、{@link OpenAiEmbeddingModel}），
- * 通过 baseUrl 实现对多家厂商（DeepSeek、通义千问等）的兼容。支持代理配置。
+ * 统一使用 OpenAI 兼容的模型类（{@link OpenAiChatModel}、{@link OpenAiEmbeddingModel}）， 通过 baseUrl
+ * 实现对多家厂商（DeepSeek、通义千问等）的兼容。支持代理配置。
  * </p>
  */
 @Slf4j

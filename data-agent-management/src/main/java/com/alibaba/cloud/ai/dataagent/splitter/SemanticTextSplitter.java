@@ -1,11 +1,11 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -59,8 +59,7 @@ public class SemanticTextSplitter extends TextSplitter {
 	/**
 	 * 将文本按语义进行切分。
 	 * <p>
-	 * 处理流程：提取句子 -> 构建滑动窗口上下文 -> 批量计算 Embedding ->
-	 * 基于"语义相似度突变"和"最大长度限制"双重约束合并句子为块。
+	 * 处理流程：提取句子 -> 构建滑动窗口上下文 -> 批量计算 Embedding -> 基于"语义相似度突变"和"最大长度限制"双重约束合并句子为块。
 	 * @param text 待切分的原始文本
 	 * @return 切分后的文本块列表
 	 */

@@ -29,8 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Agent 管理服务实现类，提供 Agent 实体的增删改查、API Key 生成与管理，
- * 以及删除时关联向量数据和头像文件的级联清理。
+ * Agent 管理服务实现类，提供 Agent 实体的增删改查、API Key 生成与管理， 以及删除时关联向量数据和头像文件的级联清理。
  */
 @Slf4j
 @Service

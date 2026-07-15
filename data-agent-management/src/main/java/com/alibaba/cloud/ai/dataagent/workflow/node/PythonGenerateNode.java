@@ -47,7 +47,8 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
  * Python 代码生成节点，位于 SQL 执行之后、Python 执行之前。
  *
  * <p>
- * 该节点根据 Schema、SQL 查询结果和当前执行步骤的要求，调用大模型生成 Python 代码。 若上一次生成的代码执行失败，会将失败信息和错误内容反馈给大模型以重新生成。
+ * 该节点根据 Schema、SQL 查询结果和当前执行步骤的要求，调用大模型生成 Python 代码。
+ * 若上一次生成的代码执行失败，会将失败信息和错误内容反馈给大模型以重新生成。
  * </p>
  *
  * @author vlsmb

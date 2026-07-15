@@ -41,9 +41,8 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.SUCCESS;
 /**
  * Hive JDBC 连接池实现。
  * <p>
- * 基于 Druid 连接池，使用 HiveServer2 JDBC 驱动（org.apache.hive.jdbc.HiveDriver）。
- * 自定义了 Hive 专用的连接池参数（如 SELECT 1 心跳检测、更长的最大等待时间 60 秒等），
- * 并重写了 ping 方法通过执行 SELECT 1 测试连接可用性。
+ * 基于 Druid 连接池，使用 HiveServer2 JDBC 驱动（org.apache.hive.jdbc.HiveDriver）。 自定义了 Hive
+ * 专用的连接池参数（如 SELECT 1 心跳检测、更长的最大等待时间 60 秒等）， 并重写了 ping 方法通过执行 SELECT 1 测试连接可用性。
  * </p>
  */
 @Slf4j

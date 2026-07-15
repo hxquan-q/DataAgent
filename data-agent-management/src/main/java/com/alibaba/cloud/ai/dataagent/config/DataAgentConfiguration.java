@@ -83,10 +83,10 @@ import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
  * 集中装配 DataAgent 运行所需的全部 Bean：
  * </p>
  * <ul>
- *   <li>HTTP 客户端（RestClient / WebClient 超时配置）</li>
- *   <li>NL2SQL 工作流状态图（{@link StateGraph}），定义全部节点与边</li>
- *   <li>向量存储、文本分块、Embedding 批处理等 AI 组件</li>
- *   <li>MCP 工具、ChatClient 等 LLM 交互组件</li>
+ * <li>HTTP 客户端（RestClient / WebClient 超时配置）</li>
+ * <li>NL2SQL 工作流状态图（{@link StateGraph}），定义全部节点与边</li>
+ * <li>向量存储、文本分块、Embedding 批处理等 AI 组件</li>
+ * <li>MCP 工具、ChatClient 等 LLM 交互组件</li>
  * </ul>
  *
  * @author vlsmb
@@ -106,7 +106,7 @@ public class DataAgentConfiguration implements DisposableBean {
 	/**
 	 * 自定义 RestClient 超时配置。
 	 * @param connectTimeout 连接超时（秒），默认 600
-	 * @param readTimeout    读取超时（秒），默认 600
+	 * @param readTimeout 读取超时（秒），默认 600
 	 * @return RestClientCustomizer
 	 */
 	@Bean
@@ -137,11 +137,10 @@ public class DataAgentConfiguration implements DisposableBean {
 	/**
 	 * 构建 NL2SQL 工作流状态图。
 	 * <p>
-	 * 定义 DataAgent 从用户输入到生成最终报告的完整流程，
-	 * 包含意图识别、Schema 召回、SQL 生成/执行、Python 分析、报告生成等节点，
+	 * 定义 DataAgent 从用户输入到生成最终报告的完整流程， 包含意图识别、Schema 召回、SQL 生成/执行、Python 分析、报告生成等节点，
 	 * 以及节点间的条件路由（Dispatcher）。
 	 * </p>
-	 * @param nodeBeanUtil           节点工具类（将节点实例转为 Graph 节点）
+	 * @param nodeBeanUtil 节点工具类（将节点实例转为 Graph 节点）
 	 * @param codeExecutorProperties Python 执行器配置（用于重试控制）
 	 * @return 工作流状态图
 	 * @throws GraphStateException 图构建异常

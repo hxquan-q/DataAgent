@@ -33,8 +33,8 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.STREAM_EVENT_ERRO
 /**
  * 工作流流式搜索控制器。
  * <p>
- * 核心接口：以 SSE（Server-Sent Events）方式流式返回 Agent 工作流每一步的执行结果，
- * 包括意图识别、Schema 召回、SQL 生成/执行、Python 分析、报告生成等节点输出。
+ * 核心接口：以 SSE（Server-Sent Events）方式流式返回 Agent 工作流每一步的执行结果， 包括意图识别、Schema 召回、SQL
+ * 生成/执行、Python 分析、报告生成等节点输出。
  * </p>
  *
  * @author zhangshenghang
@@ -52,17 +52,16 @@ public class GraphController {
 	/**
 	 * 流式搜索接口（核心入口）。
 	 * <p>
-	 * 客户端通过 SSE 长连接实时接收工作流各节点的输出，
-	 * 支持 humanFeedback 人工反馈和 nl2sqlOnly 仅生成 SQL 模式。
+	 * 客户端通过 SSE 长连接实时接收工作流各节点的输出， 支持 humanFeedback 人工反馈和 nl2sqlOnly 仅生成 SQL 模式。
 	 * </p>
-	 * @param agentId             Agent ID
-	 * @param threadId            会话线程 ID（用于多轮对话上下文关联）
-	 * @param query               用户查询
-	 * @param humanFeedback       是否处于人工反馈阶段
+	 * @param agentId Agent ID
+	 * @param threadId 会话线程 ID（用于多轮对话上下文关联）
+	 * @param query 用户查询
+	 * @param humanFeedback 是否处于人工反馈阶段
 	 * @param humanFeedbackContent 人工反馈内容
-	 * @param rejectedPlan        是否拒绝当前计划（触发重新规划）
-	 * @param nl2sqlOnly          是否仅生成 SQL（跳过 Python 分析与报告）
-	 * @param response            HTTP 响应对象（用于设置 SSE 头）
+	 * @param rejectedPlan 是否拒绝当前计划（触发重新规划）
+	 * @param nl2sqlOnly 是否仅生成 SQL（跳过 Python 分析与报告）
+	 * @param response HTTP 响应对象（用于设置 SSE 头）
 	 * @return SSE 事件流
 	 */
 	@GetMapping(value = "/stream/search", produces = MediaType.TEXT_EVENT_STREAM_VALUE)

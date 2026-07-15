@@ -16,6 +16,7 @@
 package com.alibaba.cloud.ai.dataagent.workflow.node;
 
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.PLAN_CURRENT_STEP;
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.RESULT_SANITY_RETRY;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.SQL_EXECUTE_NODE_OUTPUT;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.SQL_GENERATE_COUNT;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.SQL_GENERATE_OUTPUT;
@@ -35,6 +36,7 @@ import com.alibaba.cloud.ai.dataagent.enums.TextType;
 import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
 import com.alibaba.cloud.ai.dataagent.service.llm.LlmService;
+import com.alibaba.cloud.ai.dataagent.service.chart.ChartRenderService;
 import com.alibaba.cloud.ai.dataagent.service.nl2sql.Nl2SqlService;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
 import com.alibaba.cloud.ai.dataagent.util.DatabaseUtil;
@@ -43,6 +45,7 @@ import com.alibaba.cloud.ai.dataagent.util.JsonParseUtil;
 import com.alibaba.cloud.ai.dataagent.util.JsonUtil;
 import com.alibaba.cloud.ai.dataagent.util.MarkdownParserUtil;
 import com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil;
+import com.alibaba.cloud.ai.dataagent.util.SqlGuard;
 import com.alibaba.cloud.ai.dataagent.util.StateUtil;
 import com.alibaba.cloud.ai.graph.GraphResponse;
 import com.alibaba.cloud.ai.graph.OverAllState;
@@ -87,6 +90,8 @@ public class SqlExecuteNode implements NodeAction {
 	private final DataAgentProperties properties;
 
 	private final JsonParseUtil jsonParseUtil;
+
+	private final ChartRenderService chartRenderService;
 
 	private static final int SAMPLE_DATA_NUMBER = 20;
 
@@ -158,12 +163,27 @@ public class SqlExecuteNode implements NodeAction {
 			ResultBO resultBO = ResultBO.builder().build();
 
 			try {
+				// #17 只读护栏：拦截 DDL/DML，命中则回 SQL 生成重试（fail-open：解析失败放行）
+				if (properties.isEnableSqlGuard()) {
+					SqlGuard.GuardResult guardResult = SqlGuard.check(sqlQuery);
+					if (!guardResult.allowed()) {
+						log.warn("SQL 只读护栏拦截：{}", guardResult.reason());
+						result.put(SQL_REGENERATE_REASON, SqlRetryDto.sqlExecute(guardResult.reason()));
+						emitter.next(ChatResponseUtil.createResponse("SQL 安全校验未通过：" + guardResult.reason()));
+						return;
+					}
+				}
 				// 执行 SQL 查询并立即获取结果
 				ResultSetBO resultSetBO = dbAccessor.executeSqlAndReturnObject(dbConfig, dbQueryParameter);
 				// 调用大模型获取图表配置信息并填充到 ResultSetBO 中
 				DisplayStyleBO displayStyleBO = enrichResultSetWithChartConfig(state, resultSetBO);
 				resultBO.setResultSet(resultSetBO);
 				resultBO.setDisplayStyle(displayStyleBO);
+
+				// #14 结果合理性：判断空结果与是否已自愈过
+				boolean dataEmpty = resultSetBO.getData() == null || resultSetBO.getData().isEmpty();
+				boolean sanityRetried = Boolean.TRUE
+					.equals(StateUtil.getObjectValue(state, RESULT_SANITY_RETRY, Boolean.class, false));
 
 				String strResultSetJson = JsonUtil.getObjectMapper().writeValueAsString(resultSetBO);
 				String strResultJson = JsonUtil.getObjectMapper().writeValueAsString(resultBO);
@@ -180,6 +200,7 @@ public class SqlExecuteNode implements NodeAction {
 						Map.class, new HashMap<>());
 				Map<String, String> updatedResults = PlanProcessUtil.addStepResult(existingResults, currentStep,
 						strResultSetJson);
+				renderChartIntoResults(updatedResults, currentStep, resultSetBO, displayStyleBO);
 
 				log.info("SQL 执行成功，结果行数: {}", resultSetBO.getData() != null ? resultSetBO.getData().size() : 0);
 
@@ -194,6 +215,19 @@ public class SqlExecuteNode implements NodeAction {
 				result.putAll(Map.of(SQL_EXECUTE_NODE_OUTPUT, updatedResults, SQL_REGENERATE_REASON,
 						SqlRetryDto.empty(), SQL_RESULT_LIST_MEMORY, resultSetBO.getData(), PLAN_CURRENT_STEP,
 						currentStep + 1, SQL_GENERATE_COUNT, 0));
+
+				// #14 空结果一次性自愈：回 SQL 生成复核条件，不推进步骤；已自愈过则接受空结果（一次性守卫 RESULT_SANITY_RETRY）
+				if (dataEmpty && !sanityRetried) {
+					log.info("步骤 {} 返回空结果，触发一次合理性自愈重试", currentStep);
+					emitter.next(ChatResponseUtil.createResponse("查询返回空结果，触发一次重新生成以复核条件..."));
+					result.put(SQL_REGENERATE_REASON,
+							SqlRetryDto.sqlExecute("查询返回 0 行结果，可能 WHERE/JOIN 条件过严或字段/表名错误，请复核并重新生成"));
+					result.put(RESULT_SANITY_RETRY, true);
+					result.put(PLAN_CURRENT_STEP, currentStep);
+				}
+				else if (!dataEmpty) {
+					result.put(RESULT_SANITY_RETRY, false);
+				}
 			}
 			catch (Exception e) {
 				String errorMessage = e.getMessage();
@@ -277,6 +311,29 @@ public class SqlExecuteNode implements NodeAction {
 			// 不抛出异常，允许流程继续执行
 		}
 		return null;
+	}
+
+	/**
+	 * 渲染图表并把图片 URL 存入步骤结果（#6 图文并茂）。fail-safe：失败仅记录日志，不阻断 SQL 执行流程。
+	 * @param updatedResults 当前步骤结果集（会被写入 step_N_chart_url）
+	 * @param currentStep 当前步骤号
+	 * @param resultSetBO SQL 结果集
+	 * @param displayStyle 图表展示配置
+	 */
+	private void renderChartIntoResults(Map<String, String> updatedResults, Integer currentStep,
+			ResultSetBO resultSetBO, DisplayStyleBO displayStyle) {
+		if (!properties.isEnableChartRender()) {
+			return;
+		}
+		try {
+			String url = chartRenderService.render(resultSetBO, displayStyle);
+			if (url != null && !url.isBlank()) {
+				updatedResults.put("step_" + currentStep + "_chart_url", url);
+			}
+		}
+		catch (Exception e) {
+			log.warn("步骤 {} 图表渲染失败，跳过：{}", currentStep, e.getMessage());
+		}
 	}
 
 }

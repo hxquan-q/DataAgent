@@ -49,8 +49,8 @@ public class EnhancedTokenCountBatchingStrategy implements BatchingStrategy {
 	/**
 	 * 对文档列表进行分批处理。
 	 * <p>
-	 * 先使用 {@link TokenCountBatchingStrategy} 按 Token 数量分批，
-	 * 再对每个批次按最大文本数量限制进行二次分割，确保同时满足 Token 和文本数量约束。
+	 * 先使用 {@link TokenCountBatchingStrategy} 按 Token 数量分批， 再对每个批次按最大文本数量限制进行二次分割，确保同时满足
+	 * Token 和文本数量约束。
 	 * @param documents 待分批的文档列表
 	 * @return 分批后的文档列表（二维列表）
 	 */

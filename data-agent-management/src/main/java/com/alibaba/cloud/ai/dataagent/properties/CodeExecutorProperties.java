@@ -25,8 +25,8 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.PROJECT_PROPERTIE
 /**
  * Python 代码执行器配置属性，绑定 {@code spring.ai.alibaba.data-agent.code-executor.*} 前缀。
  * <p>
- * 支持 {@code local}（本机直接执行）和 {@code docker}（容器隔离执行）两种模式。
- * 生产环境强烈建议使用 docker，避免 LLM 生成的代码污染宿主机。
+ * 支持 {@code local}（本机直接执行）和 {@code docker}（容器隔离执行）两种模式。 生产环境强烈建议使用 docker，避免 LLM
+ * 生成的代码污染宿主机。
  * </p>
  *
  * @author vlsmb

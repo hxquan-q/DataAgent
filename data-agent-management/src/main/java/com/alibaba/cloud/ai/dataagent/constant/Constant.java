@@ -18,8 +18,7 @@ package com.alibaba.cloud.ai.dataagent.constant;
 /**
  * 系统全局常量定义类。
  * <p>
- * 包含 DataAgent 工作流图（Graph）中各节点名称、状态键（State Key）、
- * 输出键、以及 Python 代码执行、人类复核、流式事件等相关常量。
+ * 包含 DataAgent 工作流图（Graph）中各节点名称、状态键（State Key）、 输出键、以及 Python 代码执行、人类复核、流式事件等相关常量。
  * 这些常量在工作流编排和节点间数据传递中起到关键作用。
  *
  * @author zhangshenghang

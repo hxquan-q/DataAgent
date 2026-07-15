@@ -23,8 +23,7 @@ import lombok.NoArgsConstructor;
 /**
  * 数据库配置业务对象。
  * <p>
- * 封装数据库连接所需的核心配置信息，包括连接 URL、用户名、密码、
- * 数据库 Schema、连接类型和方言类型等。
+ * 封装数据库连接所需的核心配置信息，包括连接 URL、用户名、密码、 数据库 Schema、连接类型和方言类型等。
  */
 @Data
 @Builder

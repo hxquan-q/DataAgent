@@ -25,10 +25,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * MCP Server 工具注册配置。
  * <p>
- * 通过 {@code @McpServerTool} 自定义注解延迟注册 MCP 工具，解决循环依赖问题：
- * ChatClient 依赖 ChatModel，而 ChatModel 初始化时立即扫描 Tool，
- * 但 NL2SQL 等工具功能又依赖 ChatClient，形成循环。
- * 使用自定义注解将工具注册推迟到合适时机。
+ * 通过 {@code @McpServerTool} 自定义注解延迟注册 MCP 工具，解决循环依赖问题： ChatClient 依赖 ChatModel，而
+ * ChatModel 初始化时立即扫描 Tool， 但 NL2SQL 等工具功能又依赖 ChatClient，形成循环。 使用自定义注解将工具注册推迟到合适时机。
  * </p>
  */
 // TODO 2025/12/08 合并包后移动到DataAgentConfiguration 中
@@ -38,8 +36,7 @@ public class McpServerConfig {
 	/**
 	 * 注册 MCP Server 工具回调提供者。
 	 * <p>
-	 * 将 {@link McpServerService} 中的 @Tool 方法注册为 Spring AI 工具回调，
-	 * 供 ChatClient / MCP 协议调用。
+	 * 将 {@link McpServerService} 中的 @Tool 方法注册为 Spring AI 工具回调， 供 ChatClient / MCP 协议调用。
 	 * </p>
 	 * @param mcpServerService MCP 工具服务
 	 * @return 工具回调提供者

@@ -21,12 +21,10 @@ import com.alibaba.cloud.ai.dataagent.entity.Datasource;
 import org.springframework.util.StringUtils;
 
 /**
- * 数据源类型处理器接口，为不同类型的数据库（MySQL、PostgreSQL、Oracle 等）提供
- * 连接 URL 构建、连接配置转换、Schema 提取等差异化处理能力。
+ * 数据源类型处理器接口，为不同类型的数据库（MySQL、PostgreSQL、Oracle 等）提供 连接 URL 构建、连接配置转换、Schema 提取等差异化处理能力。
  *
  * <p>
- * 每种数据库类型实现该接口，通过 {@link #typeName()} 标识自身类型，
- * 并可覆写默认方法以适配特定数据库的连接方式。
+ * 每种数据库类型实现该接口，通过 {@link #typeName()} 标识自身类型， 并可覆写默认方法以适配特定数据库的连接方式。
  * </p>
  */
 public interface DatasourceTypeHandler {

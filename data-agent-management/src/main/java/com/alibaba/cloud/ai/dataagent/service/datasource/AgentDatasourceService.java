@@ -19,8 +19,7 @@ import com.alibaba.cloud.ai.dataagent.entity.AgentDatasource;
 import java.util.List;
 
 /**
- * Agent 数据源关联服务接口，管理 Agent 与数据源的绑定关系，包括关联的增删改查、
- * 数据源启用/禁用切换以及数据表选择的更新。
+ * Agent 数据源关联服务接口，管理 Agent 与数据源的绑定关系，包括关联的增删改查、 数据源启用/禁用切换以及数据表选择的更新。
  */
 public interface AgentDatasourceService {
 

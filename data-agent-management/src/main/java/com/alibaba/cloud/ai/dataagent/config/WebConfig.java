@@ -28,8 +28,7 @@ import java.time.Duration;
 /**
  * Web 配置类（WebFlux 版本）。
  * <p>
- * 主要负责将本地文件存储目录映射为静态资源访问路径，
- * 使上传的文件可通过 {@code urlPrefix} 对外访问。
+ * 主要负责将本地文件存储目录映射为静态资源访问路径， 使上传的文件可通过 {@code urlPrefix} 对外访问。
  * </p>
  */
 @Configuration

@@ -33,8 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 /**
- * Agent 数据源关联服务实现类，管理 Agent 与数据源的绑定关系，
- * 包括 Schema 初始化、关联查询、数据源启用/禁用切换和数据表选择更新。
+ * Agent 数据源关联服务实现类，管理 Agent 与数据源的绑定关系， 包括 Schema 初始化、关联查询、数据源启用/禁用切换和数据表选择更新。
  */
 @Slf4j
 @Service

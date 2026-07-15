@@ -28,8 +28,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 /**
  * 会话事件 SSE 推送控制器。
  * <p>
- * 以 Server-Sent Events 方式实时推送会话更新事件（如新会话创建、会话删除等），
- * 供前端实时刷新会话列表。
+ * 以 Server-Sent Events 方式实时推送会话更新事件（如新会话创建、会话删除等）， 供前端实时刷新会话列表。
  * </p>
  */
 @Slf4j
@@ -43,7 +42,7 @@ public class SessionEventController {
 
 	/**
 	 * 订阅指定 Agent 的会话更新事件流。
-	 * @param agentId  Agent ID
+	 * @param agentId Agent ID
 	 * @param response HTTP 响应（用于设置 SSE 头）
 	 * @return SSE 事件流
 	 */

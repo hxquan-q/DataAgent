@@ -24,8 +24,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 /**
  * 全局异常处理切面。
  * <p>
- * 基于 Spring 的 {@link RestControllerAdvice} 统一捕获所有 Controller 层抛出的未处理异常，
- * 返回标准化的错误响应。
+ * 基于 Spring 的 {@link RestControllerAdvice} 统一捕获所有 Controller 层抛出的未处理异常， 返回标准化的错误响应。
  */
 @Slf4j
 @RestControllerAdvice

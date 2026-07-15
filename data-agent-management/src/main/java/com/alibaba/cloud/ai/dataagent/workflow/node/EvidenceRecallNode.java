@@ -49,8 +49,7 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
  * 证据召回节点，位于意图识别之后、查询增强之前。
  *
  * <p>
- * 该节点从向量数据库中召回与用户问题相关的业务术语和智能体知识（FAQ/QA/文档等）， 作为后续 SQL 生成和结果分析的上下文证据。
- * 主要流程：
+ * 该节点从向量数据库中召回与用户问题相关的业务术语和智能体知识（FAQ/QA/文档等）， 作为后续 SQL 生成和结果分析的上下文证据。 主要流程：
  * <ol>
  * <li>调用大模型对用户问题进行查询重写（消除多轮上下文歧义）</li>
  * <li>基于重写后的查询在向量库中检索业务术语文档与智能体知识文档</li>
@@ -243,8 +242,7 @@ public class EvidenceRecallNode implements NodeAction {
 		String agentPrompt = PromptHelper.buildAgentKnowledgePrompt(agentKnowledgeContent);
 
 		// 输出证据构建日志
-		log.info("构建证据内容: 业务知识长度 {}, 智能体知识长度 {}", businessKnowledgeContent.length(),
-				agentKnowledgeContent.length());
+		log.info("构建证据内容: 业务知识长度 {}, 智能体知识长度 {}", businessKnowledgeContent.length(), agentKnowledgeContent.length());
 
 		// 拼接业务知识和智能体知识作为最终证据
 		return businessKnowledgeContent.isEmpty() && agentKnowledgeContent.isEmpty() ? "无"

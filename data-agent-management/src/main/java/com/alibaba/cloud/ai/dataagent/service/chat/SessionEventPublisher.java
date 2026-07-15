@@ -29,8 +29,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 会话更新事件发布器，管理向前端推送会话更新的 SSE 流。
- * 一个 Agent 对应一个共享的 Sink，多个连接共享同一个 Sink。
+ * 会话更新事件发布器，管理向前端推送会话更新的 SSE 流。 一个 Agent 对应一个共享的 Sink，多个连接共享同一个 Sink。
  */
 @Slf4j
 @Service

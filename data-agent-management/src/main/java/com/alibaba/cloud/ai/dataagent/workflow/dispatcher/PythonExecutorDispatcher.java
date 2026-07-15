@@ -52,7 +52,8 @@ public class PythonExecutorDispatcher implements EdgeAction {
 	/**
 	 * 根据 Python 执行结果决定下一个节点。
 	 * @param state 工作流全局状态，包含 Python 执行结果和重试次数
-	 * @return 下一个节点名称：{@value PYTHON_ANALYZE_NODE}、{@value PYTHON_GENERATE_NODE} 或 {@code END}
+	 * @return 下一个节点名称：{@value PYTHON_ANALYZE_NODE}、{@value PYTHON_GENERATE_NODE} 或
+	 * {@code END}
 	 * @throws Exception 读取状态时可能抛出的异常
 	 */
 	@Override

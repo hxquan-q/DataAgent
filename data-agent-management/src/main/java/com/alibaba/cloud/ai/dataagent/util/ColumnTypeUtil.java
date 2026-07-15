@@ -27,7 +27,7 @@ public class ColumnTypeUtil {
 	 * 将数据库列类型映射为语义化的前端类型。
 	 * <ul>
 	 * <li>数值类型（decimal/int/bigint/bool/bit/boolean/double）统一归为 "number"；</li>
-	 * <li>字符串类型（varchar*/char*）统一归为 "text"；</li>
+	 * <li>字符串类型（varchar*、char*）统一归为 "text"；</li>
 	 * <li>其它类型原样返回。</li>
 	 * </ul>
 	 * @param s 原始列类型名称，大小写不敏感

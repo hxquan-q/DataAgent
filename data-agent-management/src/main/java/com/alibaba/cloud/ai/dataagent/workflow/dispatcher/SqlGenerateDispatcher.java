@@ -52,7 +52,8 @@ public class SqlGenerateDispatcher implements EdgeAction {
 	/**
 	 * 根据 SQL 生成结果决定下一个节点。
 	 * @param state 工作流全局状态，包含 SQL 生成输出
-	 * @return 下一个节点名称：{@value SEMANTIC_CONSISTENCY_NODE}、{@value SQL_GENERATE_NODE} 或 {@code END}
+	 * @return 下一个节点名称：{@value SEMANTIC_CONSISTENCY_NODE}、{@value SQL_GENERATE_NODE} 或
+	 * {@code END}
 	 */
 	@Override
 	public String apply(OverAllState state) {

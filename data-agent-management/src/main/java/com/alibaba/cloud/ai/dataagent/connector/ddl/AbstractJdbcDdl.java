@@ -29,8 +29,7 @@ import java.util.List;
 /**
  * JDBC DDL 执行器抽象类。
  * <p>
- * 定义了数据库元数据查询（数据库、schema、表、列、外键）和表数据操作（扫描、采样）的抽象方法。
- * 各数据库类型需要实现这些方法以提供特定方言的 SQL 查询逻辑。
+ * 定义了数据库元数据查询（数据库、schema、表、列、外键）和表数据操作（扫描、采样）的抽象方法。 各数据库类型需要实现这些方法以提供特定方言的 SQL 查询逻辑。
  * </p>
  */
 public abstract class AbstractJdbcDdl implements Ddl {

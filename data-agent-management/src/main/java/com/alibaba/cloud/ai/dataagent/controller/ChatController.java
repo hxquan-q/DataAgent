@@ -38,8 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 会话管理控制器，提供会话的创建、查询、删除、置顶、重命名，
- * 以及消息保存、HTML 报告下载等功能。
+ * 会话管理控制器，提供会话的创建、查询、删除、置顶、重命名， 以及消息保存、HTML 报告下载等功能。
  */
 @Slf4j
 @RestController

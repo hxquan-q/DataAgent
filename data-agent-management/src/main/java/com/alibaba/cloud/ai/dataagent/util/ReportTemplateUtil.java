@@ -21,10 +21,12 @@ import org.springframework.stereotype.Component;
 /**
  * 报告模板工具类。
  * <p>
- * 用于动态组装可视化分析报告的 HTML 页面：基于内置的 Header（含 Marked.js、ECharts 等 CDN 引入与样式） 和 Footer（Markdown 渲染逻辑、ECharts 图表渲染逻辑）模板，结合配置项动态替换 CDN 地址。
+ * 用于动态组装可视化分析报告的 HTML 页面：基于内置的 Header（含 Marked.js、ECharts 等 CDN 引入与样式） 和 Footer（Markdown
+ * 渲染逻辑、ECharts 图表渲染逻辑）模板，结合配置项动态替换 CDN 地址。
  * </p>
  * <p>
- * 同时提供一个干净的 ECharts JSON 示例（{@link #cleanJsonExample}），通过变量引用方式注入到 Prompt 中， 避免直接在 Prompt 中拼接 JSON 导致的花括号转义问题。
+ * 同时提供一个干净的 ECharts JSON 示例（{@link #cleanJsonExample}），通过变量引用方式注入到 Prompt 中， 避免直接在 Prompt
+ * 中拼接 JSON 导致的花括号转义问题。
  * </p>
  */
 @Component
@@ -255,8 +257,9 @@ public class ReportTemplateUtil {
 	/**
 	 * 获取动态组装后的报告 Header。
 	 * <p>
-	 * 将模板中的 {@code {{MARKED_URL}}} 与 {@code {{ECHARTS_URL}}} 占位符替换为配置项中的 CDN 地址。
-	 * 由于 CSS 中常出现百分号（如 {@code width: 100%;}），与 {@code String.format} 占位符冲突， 因此使用 {@code .replace} 而非 {@code String.format}。
+	 * 将模板中的 {@code {{MARKED_URL}}} 与 {@code {{ECHARTS_URL}}} 占位符替换为配置项中的 CDN 地址。 由于 CSS
+	 * 中常出现百分号（如 {@code width: 100%;}），与 {@code String.format} 占位符冲突， 因此使用
+	 * {@code .replace} 而非 {@code String.format}。
 	 * </p>
 	 * @return 替换 CDN 地址后的 Header HTML 字符串
 	 */

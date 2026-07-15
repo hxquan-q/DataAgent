@@ -40,8 +40,8 @@ import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
 /**
  * Hive JDBC DDL 执行器实现。
  * <p>
- * 通过 SHOW DATABASES、SHOW TABLES、DESCRIBE 等 HiveQL 命令查询 Hive 数据仓库的元数据信息。
- * Hive 不支持主键、外键和非空约束，相关查询返回默认值或空列表。
+ * 通过 SHOW DATABASES、SHOW TABLES、DESCRIBE 等 HiveQL 命令查询 Hive 数据仓库的元数据信息。 Hive
+ * 不支持主键、外键和非空约束，相关查询返回默认值或空列表。
  * </p>
  */
 @Service

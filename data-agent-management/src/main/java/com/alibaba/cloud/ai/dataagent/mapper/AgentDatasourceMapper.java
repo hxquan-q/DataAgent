@@ -35,7 +35,9 @@ public interface AgentDatasourceMapper {
 
 	/**
 	 * 根据智能体 ID 查询其关联的数据源列表（联表查询，携带数据源明细字段）。
-	 * <p>SQL：左联 {@code datasource} 表，返回每个关联记录及其对应的数据源连接信息。</p>
+	 * <p>
+	 * SQL：左联 {@code datasource} 表，返回每个关联记录及其对应的数据源连接信息。
+	 * </p>
 	 * @param agentId 智能体 ID
 	 * @return 关联数据源列表，按创建时间倒序
 	 */
@@ -73,7 +75,9 @@ public interface AgentDatasourceMapper {
 
 	/**
 	 * 禁用某智能体下的全部数据源关联。
-	 * <p>SQL：将 {@code is_active} 置为 0。</p>
+	 * <p>
+	 * SQL：将 {@code is_active} 置为 0。
+	 * </p>
 	 * @param agentId 智能体 ID
 	 * @return 受影响行数
 	 */

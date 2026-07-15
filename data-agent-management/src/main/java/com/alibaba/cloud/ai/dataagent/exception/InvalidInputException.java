@@ -20,8 +20,7 @@ import lombok.Getter;
 /**
  * 无效输入异常。
  * <p>
- * 表示客户端传入的参数不合法或不符合业务规则，对应 HTTP 400 状态码。
- * 可携带额外的上下文数据（{@link #data}）供调用方进行更细致的错误处理。
+ * 表示客户端传入的参数不合法或不符合业务规则，对应 HTTP 400 状态码。 可携带额外的上下文数据（{@link #data}）供调用方进行更细致的错误处理。
  */
 public class InvalidInputException extends RuntimeException {
 

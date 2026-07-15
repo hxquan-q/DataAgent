@@ -40,8 +40,7 @@ import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
 /**
  * H2 JDBC DDL 执行器实现。
  * <p>
- * 通过 INFORMATION_SCHEMA 系统视图查询 H2 内嵌数据库的元数据信息，
- * 支持数据库、schema、表、列、外键查询以及表数据扫描和列值采样。
+ * 通过 INFORMATION_SCHEMA 系统视图查询 H2 内嵌数据库的元数据信息， 支持数据库、schema、表、列、外键查询以及表数据扫描和列值采样。
  * </p>
  */
 @Service

@@ -42,7 +42,9 @@ public interface AgentDatasourceTablesMapper {
 
 	/**
 	 * 删除当前列表中不存在的表（即清理过期表）。
-	 * <p>SQL：删除不在传入 {@code tables} 集合中的记录；当集合为空时清空该关联下的全部表。</p>
+	 * <p>
+	 * SQL：删除不在传入 {@code tables} 集合中的记录；当集合为空时清空该关联下的全部表。
+	 * </p>
 	 * @param agentDatasourceId 智能体数据源关联记录 ID
 	 * @param tables 保留的表名集合
 	 * @return 受影响行数
@@ -63,7 +65,9 @@ public interface AgentDatasourceTablesMapper {
 
 	/**
 	 * 批量插入用户选择的表（已存在的记录会被忽略）。
-	 * <p>SQL：使用 {@code INSERT IGNORE} 避免唯一键冲突。</p>
+	 * <p>
+	 * SQL：使用 {@code INSERT IGNORE} 避免唯一键冲突。
+	 * </p>
 	 * @param agentDatasourceId 智能体数据源关联记录 ID
 	 * @param tables 待插入的表名集合
 	 * @return 受影响行数
@@ -76,7 +80,9 @@ public interface AgentDatasourceTablesMapper {
 
 	/**
 	 * 更新用户的选择（先清理过期表，再插入新表）。
-	 * <p>{@code tables} 不能为空，否则抛出 {@link IllegalArgumentException}。</p>
+	 * <p>
+	 * {@code tables} 不能为空，否则抛出 {@link IllegalArgumentException}。
+	 * </p>
 	 * @param agentDatasourceId 智能体数据源关联记录 ID
 	 * @param tables 用户最终选择的表名集合
 	 * @return 删除与插入的受影响行数之和

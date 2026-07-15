@@ -32,8 +32,7 @@ import java.nio.file.Paths;
  * SimpleVectorStore 初始化与持久化服务。
  *
  * <p>
- * 在应用启动时从本地文件加载向量数据，在应用关闭时将向量数据序列化到本地文件。
- * 仅适用于 {@link SimpleVectorStore}（内存向量存储）。
+ * 在应用启动时从本地文件加载向量数据，在应用关闭时将向量数据序列化到本地文件。 仅适用于 {@link SimpleVectorStore}（内存向量存储）。
  * </p>
  *
  * @author David Yu

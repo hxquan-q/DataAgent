@@ -35,8 +35,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Agent 知识资源管理器，负责将知识内容（QA/FAQ/文档）向量化存储到向量库，
- * 以及从向量库和文件存储中清理知识关联的向量数据和文件资源。
+ * Agent 知识资源管理器，负责将知识内容（QA/FAQ/文档）向量化存储到向量库， 以及从向量库和文件存储中清理知识关联的向量数据和文件资源。
  */
 @Slf4j
 @Component

@@ -34,7 +34,8 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.TRACE_THREAD_ID;
 /**
  * 响应式流（Reactor Flux）工具类。
  * <p>
- * 提供节点动作（{@link NodeAction}）的流式响应构造、Flux 级联拼接、以及 Langfuse token 用量累计等能力， 是工作流节点输出 GraphResponse 流的统一入口。
+ * 提供节点动作（{@link NodeAction}）的流式响应构造、Flux 级联拼接、以及 Langfuse token 用量累计等能力， 是工作流节点输出
+ * GraphResponse 流的统一入口。
  * </p>
  *
  * @author vlsmb

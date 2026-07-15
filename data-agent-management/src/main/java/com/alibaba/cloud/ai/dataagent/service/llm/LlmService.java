@@ -20,8 +20,8 @@ import org.springframework.ai.chat.model.ChatResponse;
 import reactor.core.publisher.Flux;
 
 /**
- * LLM 调用服务接口，提供与大语言模型交互的能力，支持系统提示词、用户提示词等不同调用方式，
- * 返回 Reactor Flux 流式的 {@link ChatResponse}。
+ * LLM 调用服务接口，提供与大语言模型交互的能力，支持系统提示词、用户提示词等不同调用方式， 返回 Reactor Flux 流式的
+ * {@link ChatResponse}。
  */
 public interface LlmService {
 

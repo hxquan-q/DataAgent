@@ -26,8 +26,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 /**
  * 文件存储相关配置属性，绑定 {@code spring.ai.alibaba.data-agent.file.*} 前缀。
  * <p>
- * 支持 {@code local}（本地磁盘）和 {@code oss}（阿里云 OSS）两种存储方式。
- * 通过 {@code type} 字段切换，OSS 相关配置见 {@link OssStorageProperties}。
+ * 支持 {@code local}（本地磁盘）和 {@code oss}（阿里云 OSS）两种存储方式。 通过 {@code type} 字段切换，OSS 相关配置见
+ * {@link OssStorageProperties}。
  * </p>
  */
 @Getter

@@ -24,8 +24,8 @@ import java.util.Objects;
 /**
  * 数据库查询参数类，封装数据库访问所需的各类查询条件。
  * <p>
- * 包含阿里云 UID、工作空间 ID、区域、密钥 ARN、数据库实例 ID、数据库名、schema、表名、
- * 表名匹配模式、列名、SQL 语句等参数，采用链式 setter 设计。
+ * 包含阿里云 UID、工作空间 ID、区域、密钥 ARN、数据库实例 ID、数据库名、schema、表名、 表名匹配模式、列名、SQL 语句等参数，采用链式 setter
+ * 设计。
  * </p>
  */
 public class DbQueryParameter {
