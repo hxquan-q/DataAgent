@@ -110,8 +110,13 @@ public class SqlExecuteNode implements NodeAction {
 		// 获取当前执行步骤号
 		Integer currentStep = PlanProcessUtil.getCurrentStepNumber(state);
 
-		// 获取并裁剪 SQL 语句
-		String sqlQuery = StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT);
+		// 获取并裁剪 SQL 语句。
+		// 优先取 SQL_GENERATE_OUTPUT（NL2SQL 图）；缺失或为空时回退 CONTROLLED_SQL（v0.2 语义层图，
+		// BuildSQLNode 受控拼装产物）。两图复用本节点，按可用 SQL 键透明适配。
+		String sqlQuery = StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT, "");
+		if (sqlQuery == null || sqlQuery.isBlank()) {
+			sqlQuery = StateUtil.getStringValue(state, BuildSQLNode.CONTROLLED_SQL, "");
+		}
 		sqlQuery = nl2SqlService.sqlTrim(sqlQuery);
 
 		log.info("执行 SQL 查询: {}", sqlQuery);
