@@ -55,6 +55,7 @@ header:
     - '**/.eslintrc.js'
     - '**/.prettierignore'
     - '**/.dockerignore'
+    - 'g2-ssr'
     - 'licenses'
     - '**/*.md'
     - '**/*.json'
