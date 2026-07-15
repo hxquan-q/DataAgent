@@ -188,7 +188,127 @@
 						</v-btn>
 					</div>
 				</template>
-			</v-data-table>
+				</v-data-table>
+		</v-card>
+
+		<!-- 口径版本对比：选两个版本并排 diff，直观查看口径差异（杜绝金额歧义） -->
+		<v-card variant="flat" border class="rounded-lg pa-5">
+			<div class="d-flex align-center mb-3">
+				<v-icon icon="mdi-compare-horizontal" color="blue-darken-2" class="mr-2" size="22" />
+				<span class="text-subtitle-1 font-weight-bold">口径版本对比</span>
+				<v-chip size="x-small" variant="tonal" color="blue-lighten-3" class="ml-3">
+					Diff
+				</v-chip>
+			</div>
+			<p class="text-body-2 text-medium-emphasis mb-4">
+				选择两个口径版本，并排查看其时间字段、过滤条件、描述差异，快速定位口径分歧。
+			</p>
+			<div class="d-flex flex-wrap ga-3 align-center mb-4">
+				<v-select
+					v-model="diffLeftId"
+					:items="versionList"
+					item-title="verCode"
+					item-value="id"
+					placeholder="版本 A"
+					variant="outlined"
+					density="compact"
+					hide-details
+					:disabled="versionList.length === 0"
+					style="max-width: 220px"
+				/>
+				<v-icon icon="mdi-arrow-right" color="medium-emphasis" />
+				<v-select
+					v-model="diffRightId"
+					:items="versionList"
+					item-title="verCode"
+					item-value="id"
+					placeholder="版本 B"
+					variant="outlined"
+					density="compact"
+					hide-details
+					:disabled="versionList.length === 0"
+					style="max-width: 220px"
+				/>
+			</div>
+
+			<v-sheet
+				v-if="diffLeft && diffRight"
+				border
+				rounded="lg"
+				class="overflow-hidden"
+			>
+				<div class="d-flex">
+					<div class="flex-grow-1 pa-4 diff-col diff-col--left">
+						<div class="d-flex align-center mb-3">
+							<v-chip size="small" color="blue-lighten-4" variant="flat">
+								{{ diffLeft.verCode }}
+							</v-chip>
+							<v-chip
+								v-if="diffLeft.isDefault === 1"
+								size="x-small"
+								color="green-lighten-4"
+								variant="flat"
+								class="ml-2"
+							>
+								默认
+							</v-chip>
+						</div>
+						<DiffRow label="时间字段" :value="diffLeft.timeField" />
+						<DiffRow label="过滤条件" :value="diffLeft.filterCondition" mono />
+						<DiffRow label="描述" :value="diffLeft.description" />
+					</div>
+					<v-divider vertical />
+					<div class="flex-grow-1 pa-4 diff-col diff-col--right">
+						<div class="d-flex align-center mb-3">
+							<v-chip size="small" color="blue-lighten-4" variant="flat">
+								{{ diffRight.verCode }}
+							</v-chip>
+							<v-chip
+								v-if="diffRight.isDefault === 1"
+								size="x-small"
+								color="green-lighten-4"
+								variant="flat"
+								class="ml-2"
+							>
+								默认
+							</v-chip>
+						</div>
+						<DiffRow
+							label="时间字段"
+							:value="diffRight.timeField"
+							:changed="diffLeft.timeField !== diffRight.timeField"
+						/>
+						<DiffRow
+							label="过滤条件"
+							:value="diffRight.filterCondition"
+							mono
+							:changed="diffLeft.filterCondition !== diffRight.filterCondition"
+						/>
+						<DiffRow
+							label="描述"
+							:value="diffRight.description"
+							:changed="diffLeft.description !== diffRight.description"
+						/>
+					</div>
+				</div>
+				<v-alert
+					v-if="isIdentical"
+					variant="tonal"
+					type="success"
+					density="compact"
+					class="ma-3"
+				>
+					两版本口径一致，无差异。
+				</v-alert>
+			</v-sheet>
+			<v-alert
+				v-else-if="versionList.length < 2"
+				variant="tonal"
+				type="info"
+				density="compact"
+			>
+				该指标至少需要 2 个口径版本才能进行对比。
+			</v-alert>
 		</v-card>
 
 		<v-dialog v-model="dialogVisible" max-width="820" persistent>
@@ -347,6 +467,10 @@ const selectedMetricId = ref<number | null>(null);
 
 const currentEditId = ref<number | null>(null);
 
+// ——— 口径版本对比（Diff）状态 ———
+const diffLeftId = ref<number | null>(null);
+const diffRightId = ref<number | null>(null);
+
 // 切换默认/状态中的版本 id 集合（避免污染 MetricVersion 类型）
 const switchingIds = ref<Set<number>>(new Set());
 const statusSwitchingIds = ref<Set<number>>(new Set());
@@ -395,6 +519,22 @@ const headers = [
 	{ title: '操作', key: 'actions', width: '140px', sortable: false },
 ];
 
+// ——— 口径版本对比 computed ———
+const diffLeft = computed(
+	() => versionList.value.find((v) => v.id === diffLeftId.value) ?? null,
+);
+const diffRight = computed(
+	() => versionList.value.find((v) => v.id === diffRightId.value) ?? null,
+);
+const isIdentical = computed(() => {
+	if (!diffLeft.value || !diffRight.value) return false;
+	return (
+		diffLeft.value.timeField === diffRight.value.timeField &&
+		diffLeft.value.filterCondition === diffRight.value.filterCondition &&
+		diffLeft.value.description === diffRight.value.description
+	);
+});
+
 function formatDateTime(dateTime?: string) {
 	if (!dateTime) return '-';
 	try {
@@ -414,6 +554,9 @@ function formatDateTime(dateTime?: string) {
 
 async function onMetricChange(metricId: number | null) {
 	selectedMetricId.value = metricId;
+	// 切换指标时重置对比选择（避免跨指标残留）
+	diffLeftId.value = null;
+	diffRightId.value = null;
 	if (metricId != null) {
 		await loadVersions();
 	} else {

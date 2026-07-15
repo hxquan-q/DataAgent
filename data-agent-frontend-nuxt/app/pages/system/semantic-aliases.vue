@@ -219,6 +219,107 @@
 			</v-data-table>
 		</v-card>
 
+		<!-- 别名测试器：输入业务黑话 → 实时显示命中的别名映射（调试/校验用） -->
+		<v-card variant="flat" border class="rounded-lg pa-5">
+			<div class="d-flex align-center mb-3">
+				<v-icon icon="mdi-flask-outline" color="blue-darken-2" class="mr-2" size="22" />
+				<span class="text-subtitle-1 font-weight-bold">别名测试器</span>
+				<v-chip size="x-small" variant="tonal" color="blue-lighten-3" class="ml-3">
+					Playground
+				</v-chip>
+			</div>
+			<p class="text-body-2 text-medium-emphasis mb-4">
+				输入一句业务说法，实时查看它命中哪条别名映射（按优先级取最佳匹配）。用于校验别名配置是否覆盖了真实业务黑话。
+			</p>
+			<div class="d-flex flex-wrap ga-3 align-center mb-1">
+				<v-text-field
+					v-model="testerText"
+					placeholder="例如：上个月的 GMV"
+					prepend-inner-icon="mdi-magnify"
+					variant="outlined"
+					density="compact"
+					clearable
+					hide-details
+					:disabled="!selectedAgentId || testerLoading"
+					class="tester-input"
+					style="min-width: 280px; flex: 1"
+					@keyup.enter="runTester"
+				/>
+				<v-btn
+					color="blue-darken-3"
+					prepend-icon="mdi-play"
+					class="text-none"
+					elevation="0"
+					:loading="testerLoading"
+					:disabled="!selectedAgentId || !testerText?.trim()"
+					@click="runTester"
+				>
+					解析
+				</v-btn>
+			</div>
+
+			<!-- 解析结果 -->
+			<v-alert
+				v-if="testerTried && !testerResult"
+				variant="tonal"
+				type="info"
+				density="compact"
+				class="mt-3"
+			>
+				未命中任何别名。考虑将该业务说法新增为别名，或检查匹配类型/优先级配置。
+			</v-alert>
+			<div v-else-if="testerResult" class="mt-3">
+				<v-sheet border rounded="lg" class="pa-4 bg-blue-lighten-5">
+					<div class="d-flex flex-wrap ga-4 align-center">
+						<div class="d-flex flex-column">
+							<span class="text-caption text-medium-emphasis">命中别名</span>
+							<span class="text-body-1 font-weight-bold">
+								{{ testerResult.aliasText }}
+							</span>
+						</div>
+						<v-divider vertical class="mx-2" />
+						<div class="d-flex flex-column">
+							<span class="text-caption text-medium-emphasis">目标类型</span>
+							<v-chip
+								:color="getTargetTypeColor(testerResult.targetType)"
+								variant="flat"
+								size="small"
+								class="font-weight-medium"
+							>
+								{{ getTargetTypeLabel(testerResult.targetType) }}
+							</v-chip>
+						</div>
+						<div class="d-flex flex-column">
+							<span class="text-caption text-medium-emphasis">映射 Code</span>
+							<span class="text-body-1 font-weight-medium font-mono">
+								{{ testerResult.targetCode }}
+							</span>
+						</div>
+						<div class="d-flex flex-column">
+							<span class="text-caption text-medium-emphasis">匹配方式</span>
+							<v-chip
+								:color="
+									testerResult.matchType === 'EXACT'
+										? 'green-lighten-4'
+										: 'amber-lighten-4'
+								"
+								variant="flat"
+								size="small"
+							>
+								{{ testerResult.matchType }}
+							</v-chip>
+						</div>
+						<div class="d-flex flex-column">
+							<span class="text-caption text-medium-emphasis">优先级</span>
+							<span class="text-body-1 font-weight-medium">
+								{{ testerResult.priority }}
+							</span>
+						</div>
+					</div>
+				</v-sheet>
+			</div>
+		</v-card>
+
 		<v-dialog v-model="dialogVisible" max-width="820" persistent>
 			<v-card rounded="lg">
 				<v-card-title class="d-flex align-center pa-6 pb-4">
@@ -384,6 +485,13 @@ const currentEditId = ref<number | null>(null);
 // 切换状态中的别名 id 集合
 const switchingIds = ref<Set<number>>(new Set());
 
+// ——— 别名测试器（Playground）状态 ———
+const testerText = ref('');
+const testerLoading = ref(false);
+const testerResult = ref<SemanticAlias | null>(null);
+// testerTried: 是否已尝试解析（区分“未尝试”与“尝试后无命中”）
+const testerTried = ref(false);
+
 // ——— useCrudPage ———
 const {
 	loading,
@@ -494,10 +602,34 @@ function clearSearch() {
 
 async function onAgentChange(agentId: number | null) {
 	selectedAgentId.value = agentId;
+	// 切换智能体时重置测试器状态
+	testerResult.value = null;
+	testerTried.value = false;
+	testerText.value = '';
 	if (agentId != null) {
 		await loadAliases();
 	} else {
 		aliasList.value = [];
+	}
+}
+
+// 别名测试器：调用后端 resolve（按优先级取最佳匹配），实时展示命中结果
+async function runTester() {
+	if (selectedAgentId.value == null || !testerText.value?.trim()) return;
+	testerLoading.value = true;
+	testerTried.value = true;
+	try {
+		const result = await semanticAliasService.resolve(
+			selectedAgentId.value,
+			testerText.value.trim(),
+		);
+		testerResult.value = result;
+	} catch {
+		testerResult.value = null;
+		testerResolved.value = false;
+		$tip('解析失败，请重试', { color: 'error', icon: 'mdi-alert-circle' });
+	} finally {
+		testerLoading.value = false;
 	}
 }
 
