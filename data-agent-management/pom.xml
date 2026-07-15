@@ -405,6 +405,10 @@
                         <exclude>**/excel/**/*.class</exclude>
                         <exclude>**/*.xlsx</exclude>
                         <exclude>**/*.xls</exclude>
+                        <!-- jsqlparser 的 JavaCC 生成类（如 CCJSqlParserTokenManager）含超大方法，
+                             触发 JaCoCo ASM MethodTooLargeException 导致插桩崩溃；排除其插桩。
+                             该库为第三方依赖，无需本项目统计覆盖率。 -->
+                        <exclude>net/sf/jsqlparser/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
