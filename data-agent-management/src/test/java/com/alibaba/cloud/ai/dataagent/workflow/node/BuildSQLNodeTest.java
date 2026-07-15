@@ -21,6 +21,9 @@ import static com.alibaba.cloud.ai.dataagent.workflow.node.BuildSQLNode.NEEDS_CL
 import static com.alibaba.cloud.ai.dataagent.workflow.node.BuildSQLNode.SQL_PARAMS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -31,6 +34,7 @@ import com.alibaba.cloud.ai.dataagent.dto.semantic.SemanticObject;
 import com.alibaba.cloud.ai.dataagent.dto.semantic.SemanticObject.MetricRef;
 import com.alibaba.cloud.ai.dataagent.service.semantic.BuildSQLEngine;
 import com.alibaba.cloud.ai.dataagent.service.semantic.BuildSQLEngine.BuildResult;
+import com.alibaba.cloud.ai.dataagent.service.semantic.EvidenceTraceService;
 import com.alibaba.cloud.ai.dataagent.service.semantic.SemanticValidator;
 import com.alibaba.cloud.ai.dataagent.service.semantic.SemanticValidator.ValidationResult;
 import com.alibaba.cloud.ai.dataagent.service.semantic.SemanticVerificationService;
@@ -45,7 +49,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
 
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.AGENT_ID;
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.DATASOURCE_ID;
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.INPUT_KEY;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.QUERY_ENHANCE_NODE_OUTPUT;
+import static com.alibaba.cloud.ai.dataagent.constant.Constant.TRACE_THREAD_ID;
 
 /**
  * {@link BuildSQLNode} 受控拼装节点接线测试（v0.2 语义层，η₂ 确定性构建 + η₅ 监督）。
@@ -69,11 +77,14 @@ class BuildSQLNodeTest {
 	@Mock
 	private SemanticVerificationService verificationService;
 
+	@Mock
+	private EvidenceTraceService evidenceTraceService;
+
 	private BuildSQLNode buildSQLNode;
 
 	@BeforeEach
 	void setUp() {
-		buildSQLNode = new BuildSQLNode(validator, buildSQLEngine, verificationService);
+		buildSQLNode = new BuildSQLNode(validator, buildSQLEngine, verificationService, evidenceTraceService);
 	}
 
 	@Test
@@ -159,16 +170,75 @@ class BuildSQLNodeTest {
 		assertThat(result.get(NEEDS_CLARIFICATION)).isEqualTo(true);
 	}
 
+	@Test
+	void apply_success_tracesEvidenceChain() throws Exception {
+		// given：成功拼装 → 应记录证据链（status=SUCCESS）
+		OverAllState state = stateWith(validSemanticObject(), "查询上月订单金额");
+		when(validator.validate(any(SemanticObject.class))).thenReturn(ValidationResult.ok());
+		when(verificationService.verify(any(SemanticObject.class), any(String.class)))
+			.thenReturn(VerificationResult.ok());
+		when(buildSQLEngine.build(any(SemanticObject.class)))
+			.thenReturn(new BuildResult("SELECT SUM(total_amount) FROM orders LIMIT ?", List.of(1000)));
+
+		buildSQLNode.apply(state);
+
+		// then：证据链被记录，status=SUCCESS
+		verify(evidenceTraceService).trace(eq("thread-1"), eq(1), eq(10), eq("查询上月订单金额"), any(SemanticObject.class),
+				eq("SELECT SUM(total_amount) FROM orders LIMIT ?"), isNull(), isNull(), eq("SUCCESS"), eq("thread-1"));
+	}
+
+	@Test
+	void apply_clarification_tracesEvidenceChainWithClarifyStatus() throws Exception {
+		// given：需反问 → 应记录证据链（status=CLARIFY）
+		OverAllState state = stateWith(validSemanticObject(), "查询订单");
+		when(validator.validate(any(SemanticObject.class))).thenReturn(ValidationResult.clarification("未选择任何指标"));
+
+		buildSQLNode.apply(state);
+
+		verify(evidenceTraceService).trace(eq("thread-1"), eq(1), eq(10), eq("查询订单"), any(SemanticObject.class),
+				isNull(), isNull(), isNull(), eq("CLARIFY"), eq("thread-1"));
+	}
+
+	@Test
+	void apply_traceFailure_doesNotBlockMainFlow() throws Exception {
+		// given：证据链记录抛异常 → fail-open，主链路不阻断，仍产出受控 SQL
+		OverAllState state = stateWith(validSemanticObject(), "查询订单金额");
+		when(validator.validate(any(SemanticObject.class))).thenReturn(ValidationResult.ok());
+		when(verificationService.verify(any(SemanticObject.class), any(String.class)))
+			.thenReturn(VerificationResult.ok());
+		when(buildSQLEngine.build(any(SemanticObject.class)))
+			.thenReturn(new BuildResult("SELECT SUM(total_amount) FROM orders LIMIT ?", List.of(1000)));
+		// 证据链记录抛异常
+		org.mockito.Mockito.doThrow(new RuntimeException("DB down"))
+			.when(evidenceTraceService)
+			.trace(org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.any(),
+					org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyString(),
+					org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+					org.mockito.ArgumentMatchers.isNull(), org.mockito.ArgumentMatchers.isNull(),
+					org.mockito.ArgumentMatchers.anyString(), org.mockito.ArgumentMatchers.anyString());
+
+		Map<String, Object> result = buildSQLNode.apply(state);
+
+		// then：异常被吞，仍产出受控 SQL（fail-open 不阻断）
+		assertThat(result).containsKey(CONTROLLED_SQL);
+	}
+
 	/**
-	 * 构造带语义对象 + canonical 查询的 OverAllState（注册 BuildSQLNode 读取的两个键）。
+	 * 构造带语义对象 + canonical 查询的 OverAllState（注册 BuildSQLNode 读取的全部键）。
 	 */
 	private OverAllState stateWith(SemanticObject so, String canonicalQuery) {
 		OverAllState state = new OverAllState();
 		state.registerKeyAndStrategy(SemanticParseNode.SEMANTIC_OBJECT, new ReplaceStrategy());
 		state.registerKeyAndStrategy(QUERY_ENHANCE_NODE_OUTPUT, new ReplaceStrategy());
+		// 证据链 trace 读取的键
+		state.registerKeyAndStrategy(INPUT_KEY, new ReplaceStrategy());
+		state.registerKeyAndStrategy(AGENT_ID, new ReplaceStrategy());
+		state.registerKeyAndStrategy(DATASOURCE_ID, new ReplaceStrategy());
+		state.registerKeyAndStrategy(TRACE_THREAD_ID, new ReplaceStrategy());
 		QueryEnhanceOutputDTO enhanceDTO = new QueryEnhanceOutputDTO();
 		enhanceDTO.setCanonicalQuery(canonicalQuery);
-		state.updateState(Map.of(SemanticParseNode.SEMANTIC_OBJECT, so, QUERY_ENHANCE_NODE_OUTPUT, enhanceDTO));
+		state.updateState(Map.of(SemanticParseNode.SEMANTIC_OBJECT, so, QUERY_ENHANCE_NODE_OUTPUT, enhanceDTO,
+				INPUT_KEY, canonicalQuery, AGENT_ID, "1", DATASOURCE_ID, "10", TRACE_THREAD_ID, "thread-1"));
 		return state;
 	}
 
