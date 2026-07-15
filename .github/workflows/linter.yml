@@ -20,11 +20,13 @@ on:
       - main
       - dev
       - 'v0.1/**'
+      - 'v0.1-*'
   pull_request:
     branches:
       - main
       - dev
       - 'v0.1/**'
+      - 'v0.1-*'
 permissions:
   contents: read
 jobs:

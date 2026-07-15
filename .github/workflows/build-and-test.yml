@@ -20,6 +20,7 @@ on:
       - main
       - dev
       - 'v0.1/**'
+      - 'v0.1-*'
     paths-ignore:
       - '**.md'
   pull_request:
@@ -27,6 +28,7 @@ on:
       - main
       - dev
       - 'v0.1/**'
+      - 'v0.1-*'
     paths-ignore:
       - '**.md'
 env:
