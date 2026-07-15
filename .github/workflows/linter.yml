@@ -18,14 +18,17 @@ on:
   push:
     branches:
       - main
+      - dev
+      - 'v0.1/**'
   pull_request:
     branches:
       - main
+      - dev
+      - 'v0.1/**'
 permissions:
   contents: read
 jobs:
   linter:
-    if: (github.repository == 'spring-ai-alibaba/DataAgent')
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
