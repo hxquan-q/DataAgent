@@ -632,7 +632,7 @@ watch(
 .md-body :deep(.code-copy-button) {
 	background: transparent;
 	border: 1px solid #d1d5da;
-	padding: 3px 10px;
+	padding: 2px 8px;
 	border-radius: 4px;
 	font-size: 10px;
 	cursor: pointer;

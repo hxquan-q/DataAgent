@@ -336,6 +336,7 @@ function downloadCsv() {
 .result-warn {
 	color: #b45309;
 	font-weight: 600;
+	font-size: 11px;
 }
 .result-actions {
 	display: flex;
