@@ -1,0 +1,16 @@
+<!--
+  IDEA Run Configuration：混合开发（Docker MySQL + 本地后端）
+  导入：IDEA → Run → Edit Configurations → 自动识别 .run/ 目录（或 File → Open）
+  JRebel：安装插件后对此配置勾选 JRebel，或用 JRebel 菜单启动。
+-->
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DataAgent-local" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="local" />
+    <module name="spring-ai-alibaba-data-agent-management" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.alibaba.cloud.ai.dataagent.DataAgentApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
