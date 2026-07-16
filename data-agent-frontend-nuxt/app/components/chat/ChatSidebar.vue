@@ -396,7 +396,7 @@ async function confirmDelete() {
 	display: none;
 	flex-shrink: 0;
 	align-items: center;
-	gap: 12px;
+	gap: 6px;
 	margin-left: 6px;
 }
 .session-item:hover .session-item-actions,
