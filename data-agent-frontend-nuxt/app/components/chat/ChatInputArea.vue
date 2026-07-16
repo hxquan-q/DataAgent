@@ -326,7 +326,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
-	padding: 7px 14px;
+	padding: 6px 12px;
 	font-size: 13px;
 	color: #334155;
 	cursor: pointer;

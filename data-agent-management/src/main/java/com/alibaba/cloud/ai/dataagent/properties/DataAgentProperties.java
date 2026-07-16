@@ -244,7 +244,7 @@ public class DataAgentProperties {
 			/**
 			 * 最大分块大小 默认值：1000
 			 */
-			private int maxChunkSize = 1000;
+			private int maxChunkSize = 800;
 
 			/**
 			 * 语义相似度阈值 默认值：0.5（0-1之间，越低越容易分块）
@@ -263,7 +263,7 @@ public class DataAgentProperties {
 			/**
 			 * 段落重叠字符数 默认值：200（保留前一个分块的最后200个字符，而非段落数量）
 			 */
-			private int paragraphOverlapChars = 200;
+			private int paragraphOverlapChars = 160;
 
 		}
 
