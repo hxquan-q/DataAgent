@@ -348,7 +348,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 }
 .item-tag {
 	flex-shrink: 0;
-	font-size: 11px;
+	font-size: 10.5px;
 	color: #94a3b8;
 	background: #f1f5f9;
 	border-radius: 4px;

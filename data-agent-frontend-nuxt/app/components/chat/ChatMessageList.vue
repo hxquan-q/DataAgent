@@ -482,7 +482,7 @@ watch(
 	gap: 10px;
 }
 .thinking-label {
-	font-size: 13px;
+	font-size: 12.5px;
 	font-weight: 500;
 	color: var(--da-muted, #64748b);
 	letter-spacing: -0.01em;
