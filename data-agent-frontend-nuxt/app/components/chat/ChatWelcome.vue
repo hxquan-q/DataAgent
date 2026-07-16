@@ -135,7 +135,7 @@ watch(
 	align-items: center;
 	justify-content: center;
 	flex: 1;
-	padding: 40px 24px;
+	padding: 36px 20px;
 	text-align: center;
 	max-width: 600px;
 	margin: 0 auto;

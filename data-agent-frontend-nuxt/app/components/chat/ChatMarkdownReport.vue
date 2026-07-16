@@ -296,7 +296,7 @@ async function downloadHtml() {
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .report-body {
-	padding: 12px;
+	padding: 10px;
 }
 .html-iframe {
 	display: block;
