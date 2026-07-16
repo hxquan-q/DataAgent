@@ -143,6 +143,18 @@ public class PromptHelper {
 		return shortenExampleValueTo(query, MAX_QUERY_CHARS);
 	}
 
+	private static final int MAX_ERROR_CHARS = 1_500;
+	private static final int MAX_ERROR_SQL_CHARS = 2_500;
+
+	static String boundErrorText(String text) {
+		return shortenExampleValueTo(text == null ? "" : text, MAX_ERROR_CHARS);
+	}
+
+	static String boundErrorSql(String sql) {
+		return shortenExampleValueTo(sql == null ? "" : sql, MAX_ERROR_SQL_CHARS);
+	}
+
+
 
 
 
@@ -327,8 +339,8 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		params.put("question", boundQuery(sqlGenerationDTO.getQuery()));
 		params.put("schema_info", schemaInfo);
 		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
-		params.put("error_sql", sqlGenerationDTO.getSql());
-		params.put("error_message", sqlGenerationDTO.getExceptionMessage());
+		params.put("error_sql", boundErrorSql(sqlGenerationDTO.getSql()));
+		params.put("error_message", boundErrorText(sqlGenerationDTO.getExceptionMessage()));
 		params.put("execution_description", sqlGenerationDTO.getExecutionDescription());
 
 		return PromptConstant.getSqlErrorFixerPromptTemplate().render(params);

@@ -56,6 +56,7 @@
 						class="action-btn"
 						:title="copied ? '已复制' : '复制 CSV'"
 						:aria-label="copied ? '已复制' : '复制 CSV'"
+						title="复制 CSV"
 						@click="copyCsv"
 					>
 						<v-icon size="14">{{ copied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
@@ -66,6 +67,7 @@
 						class="action-btn"
 						title="下载 CSV"
 						aria-label="下载 CSV"
+						title="下载 CSV"
 						@click="downloadCsv"
 					>
 						<v-icon size="14">mdi-download</v-icon>
