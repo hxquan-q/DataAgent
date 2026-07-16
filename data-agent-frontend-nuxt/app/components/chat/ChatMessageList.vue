@@ -528,7 +528,7 @@ watch(
 .md-body :deep(h2),
 .md-body :deep(h3) {
 	font-weight: 700;
-	margin: 12px 0 5px;
+	margin: 10px 0 4px;
 	line-height: 1.4;
 }
 .md-body :deep(p) {
