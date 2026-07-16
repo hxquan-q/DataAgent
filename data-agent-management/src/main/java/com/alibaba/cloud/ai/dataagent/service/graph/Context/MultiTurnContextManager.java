@@ -66,7 +66,8 @@ public class MultiTurnContextManager {
 		if (StringUtils.isAnyBlank(threadId, userQuestion)) {
 			return;
 		}
-		pendingTurns.put(threadId, new PendingTurn(userQuestion.trim()));
+		// R41: 用户问题入库前有界
+		pendingTurns.put(threadId, new PendingTurn(PromptHelper.boundQuery(userQuestion.trim())));
 	}
 
 	/**
@@ -140,7 +141,7 @@ public class MultiTurnContextManager {
 		}
 		if (lastTurn != null) {
 			// 复用上一轮的用户问题，重新开启待处理轮次
-			pendingTurns.put(threadId, new PendingTurn(lastTurn.userQuestion()));
+			pendingTurns.put(threadId, new PendingTurn(PromptHelper.boundQuery(lastTurn.userQuestion())));
 		}
 	}
 

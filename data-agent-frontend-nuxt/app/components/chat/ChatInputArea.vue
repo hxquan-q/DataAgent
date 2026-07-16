@@ -407,7 +407,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .extra-options {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 4px;
 	flex-wrap: wrap;
 }
 .option-chip {
