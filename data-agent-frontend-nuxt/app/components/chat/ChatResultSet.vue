@@ -282,6 +282,7 @@ function downloadCsv() {
 	}
 }
 .result-error {
+	font-size: 12.5px;
 	display: flex;
 	align-items: center;
 	background: #fef2f2;
