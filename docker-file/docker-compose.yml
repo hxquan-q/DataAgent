@@ -119,7 +119,10 @@ services:
       retries: 3
 
 volumes:
+  # 固定卷名 + external：recreate 复用已有卷，避免 compose 前缀空卷
   data-agent-mysql-inner-data:
+    name: data-agent-mysql-inner-data
+    external: true
 
 networks:
   app-network:

@@ -364,4 +364,24 @@ class PromptHelperTest {
 		assertTrue(PromptHelper.shortenExampleValue("z".repeat(50)).endsWith("…"));
 	}
 
+	@Test
+	void buildMixMacSqlTablePrompt_manyColumns_isCapped() {
+		TableDTO table = new TableDTO();
+		table.setName("wide");
+		table.setDescription("wide");
+		java.util.List<ColumnDTO> cols = new java.util.ArrayList<>();
+		for (int i = 0; i < 50; i++) {
+			ColumnDTO c = new ColumnDTO();
+			c.setName("c" + i);
+			c.setType("int");
+			c.setDescription("c" + i);
+			cols.add(c);
+		}
+		table.setColumn(cols);
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+		assertTrue(result.contains("more columns omitted"));
+		assertFalse(result.contains("(c49"));
+		assertTrue(result.contains("(c0"));
+	}
+
 }

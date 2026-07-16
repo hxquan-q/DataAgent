@@ -87,7 +87,7 @@ public class DataAgentProperties {
 	/**
 	 * 每张表的最大预估列数（用于 Schema 召回时的截断控制）
 	 */
-	private int maxColumnsPerTable = 50;
+	private int maxColumnsPerTable = 40;
 
 	/**
 	 * 是否启用SQL执行结果图表判断，默认启用

@@ -348,12 +348,12 @@ async function confirmDelete() {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 8px 10px;
+	padding: 6px 10px;
 	border-radius: 8px;
 	cursor: pointer;
 	transition: background 0.12s;
 	margin-bottom: 2px;
-	min-height: 44px;
+	min-height: 40px;
 }
 .session-item:hover {
 	background: var(--da-primary-soft, #eff6ff);

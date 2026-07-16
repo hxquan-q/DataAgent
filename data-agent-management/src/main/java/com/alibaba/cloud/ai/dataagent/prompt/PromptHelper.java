@@ -87,6 +87,9 @@ public class PromptHelper {
 	/** Schema 列样本：最多注入条数（R3 token 控制）。 */
 	private static final int MAX_COLUMN_EXAMPLES = 2;
 
+	/** Schema 提示词：单表最多列数。 */
+	private static final int MAX_COLUMNS_PER_TABLE_PROMPT = 40;
+
 	/** Schema 列样本：单条最大字符。 */
 	private static final int MAX_EXAMPLE_CHARS = 40;
 
@@ -129,7 +132,10 @@ public class PromptHelper {
 		}
 		sb.append("[\n");
 		List<String> columnLines = new ArrayList<>();
-		for (ColumnDTO columnDTO : tableDTO.getColumn()) {
+		List<ColumnDTO> columns = tableDTO.getColumn() == null ? List.of() : tableDTO.getColumn();
+		int colLimit = Math.min(columns.size(), MAX_COLUMNS_PER_TABLE_PROMPT);
+		for (int ci = 0; ci < colLimit; ci++) {
+			ColumnDTO columnDTO = columns.get(ci);
 			StringBuilder line = new StringBuilder();
 			line.append("(")
 				.append(columnDTO.getName())
@@ -158,6 +164,9 @@ public class PromptHelper {
 
 			line.append(")");
 			columnLines.add(line.toString());
+		}
+		if (columns.size() > colLimit) {
+			columnLines.add("(... " + (columns.size() - colLimit) + " more columns omitted)");
 		}
 		sb.append(StringUtils.join(columnLines, ",\n"));
 		sb.append("\n]");
