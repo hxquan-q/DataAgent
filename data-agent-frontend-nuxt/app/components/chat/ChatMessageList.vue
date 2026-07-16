@@ -607,7 +607,7 @@ watch(
 
 /* ── Code block with header ─────────────────────────────────────────────────── */
 .md-body :deep(.code-block-wrapper) {
-	margin: 10px 0;
+	margin: 8px 0;
 	border: 1px solid #e1e4e8;
 	border-radius: 6px;
 	overflow: auto;

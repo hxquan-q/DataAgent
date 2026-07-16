@@ -462,6 +462,7 @@ function downloadCsv() {
 	color: #cbd5e1;
 }
 .cell-num {
+	font-size: 12px;
 	text-align: right;
 	font-variant-numeric: tabular-nums;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
