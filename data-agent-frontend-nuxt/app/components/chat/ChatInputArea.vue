@@ -488,7 +488,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 
 /* ── Human feedback ──────────────────────────────────────────────────────────── */
 .human-feedback-panel {
-	margin-top: 10px;
+	margin-top: 8px;
 	background: #fffbeb;
 	border: 1px solid #fde68a;
 	border-radius: 10px;
