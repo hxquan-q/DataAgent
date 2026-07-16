@@ -254,7 +254,7 @@ function downloadCsv() {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	padding: 6px 8px;
+	padding: 5px 6px;
 	font-size: 11px;
 	font-weight: 600;
 	color: #1e40af;

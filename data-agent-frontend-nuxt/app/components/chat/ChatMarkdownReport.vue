@@ -559,6 +559,6 @@ async function downloadHtml() {
 	height: 28px !important;
 }
 .report-header {
-	min-height: 32px;
+	min-height: 30px;
 }
 </style>
