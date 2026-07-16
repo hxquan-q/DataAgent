@@ -261,7 +261,7 @@ function downloadCsv() {
 	background: #eff6ff;
 	border: 1px solid #bfdbfe;
 	border-bottom: none;
-	border-radius: 8px 8px 0 0;
+	border-radius: 6px 6px 0 0;
 }
 .result-pending-dot {
 	width: 7px;
@@ -306,7 +306,7 @@ function downloadCsv() {
 	gap: 4px;
 }
 .result-empty--soft {
-	border-radius: 0 0 8px 8px;
+	border-radius: 0 0 6px 6px;
 	border-top: none;
 }
 .result-header {
