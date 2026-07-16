@@ -70,3 +70,11 @@ AGENTS.md
 .claude/
 docs/
 
+
+# local-only (dev machine)
+.m2-local/
+.ccg/
+.serena/
+.zcode/
+data-agent-frontend-nuxt/dist/
+data/

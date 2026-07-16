@@ -1,0 +1,31 @@
+# 构建依赖与产物——容器内重新构建，避免本地污染（node_modules 导致 pnpm deps check 失败）
+**/node_modules
+**/target
+**/dist
+**/build
+**/.output
+**/.nuxt
+**/.cache
+
+# 版本控制
+.git
+.gitignore
+
+# IDE / 工具
+.idea
+.vscode
+.cursor
+.ccg
+.serena
+.zcode
+.agent
+
+# 本地 Maven 仓库与日志
+.m2-local
+*.log
+logs/
+
+# 数据与文档（非运行时必需）
+data
+img
+docs

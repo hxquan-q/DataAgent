@@ -1,0 +1,17 @@
+# 开发阶段加速用：宿主预构建 jar 直接拷入镜像，跳过容器内 9min 的 mvn install。
+# 用法：先在宿主 `mvn package -pl data-agent-management -DskipTests`，再 `docker build -f Dockerfile-jar .`
+# 生产/CI 仍用 ../docker-file/Dockerfile-backend（容器内自包含构建）。
+FROM eclipse-temurin:17-jdk-jammy
+
+RUN apt-get update && apt-get install -y --no-install-recommends python3 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+RUN mkdir -p /app/config
+
+COPY target/spring-ai-alibaba-data-agent-management-1.0.0-SNAPSHOT.jar /app/app.jar
+
+EXPOSE 8065
+
+ENTRYPOINT ["java", "-jar", "app.jar", "--spring.config.location=classpath:application.yml,optional:file:/app/config/application.yml"]

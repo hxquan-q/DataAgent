@@ -13,13 +13,18 @@
 #limitations under the License.
 
 services:
-  # MySQL数据库
+  # MySQL数据库（元库 nl2sql_db）
+  # 混合开发：宿主 IDEA 连库时需要 3306 映射。当前运行中的容器若无端口，用
+  #   bash scripts/dev-hybrid.sh up  （socat 转发，不 recreate、不丢数据）
+  # 若 recreate 本服务：务必先确认 volumes 已启用，否则数据丢失。
   mysql:
     image: mysql:8.0
     container_name: data-agent-mysql-inner
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: nl2sql_db
+    ports:
+      - "3306:3306"
 #    volumes:
 #      - nl2sql-mysql-inner-data:/var/lib/mysql
     networks:
