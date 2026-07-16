@@ -216,4 +216,17 @@ public class JsonParseUtil {
 		return text.trim();
 	}
 
+
+	/** R20: 限制 JSON 修复提示词体积。 */
+	private static String truncateForPrompt(String s, int max) {
+		if (s == null) {
+			return "";
+		}
+		if (max <= 0 || s.length() <= max) {
+			return s;
+		}
+		return s.substring(0, max) + "…";
+	}
+
+
 }
