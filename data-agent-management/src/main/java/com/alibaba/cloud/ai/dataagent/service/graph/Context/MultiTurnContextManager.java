@@ -44,6 +44,10 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class MultiTurnContextManager {
 
+	/** R40: 单轮计划流式拼接上限。 */
+	private static final int MAX_PLAN_BUILDER_CHARS = 6_000;
+
+
 	private final DataAgentProperties properties;
 
 	// todo：考虑持久化存储
@@ -75,8 +79,14 @@ public class MultiTurnContextManager {
 			return;
 		}
 		PendingTurn pending = pendingTurns.get(threadId);
-		if (pending != null) {
-			pending.planBuilder.append(chunk);
+		if (pending != null && pending.planBuilder.length() < MAX_PLAN_BUILDER_CHARS) {
+			int room = MAX_PLAN_BUILDER_CHARS - pending.planBuilder.length();
+			if (chunk.length() > room) {
+				pending.planBuilder.append(chunk, 0, room);
+			}
+			else {
+				pending.planBuilder.append(chunk);
+			}
 		}
 	}
 
