@@ -36,6 +36,7 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil.getCurrentExecutionStepInstruction;
 import static com.alibaba.cloud.ai.dataagent.prompt.PromptHelper.buildMixMacSqlDbPrompt;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 
 /**
  * 语义一致性校验节点，位于 SQL 生成之后、SQL 执行之前。
@@ -80,13 +81,14 @@ public class SemanticConsistencyNode implements NodeAction {
 		String userQuery = StateUtil.getCanonicalQuery(state);
 
 		// 构建语义一致性校验参数对象
+		// R36: 语义一致性入参有界（PromptHelper 出口 + 节点双保险）
 		SemanticConsistencyDTO semanticConsistencyDTO = SemanticConsistencyDTO.builder()
 			.dialect(dialect)
-			.sql(sql)
-			.executionDescription(getCurrentExecutionStepInstruction(state))
-			.schemaInfo(buildMixMacSqlDbPrompt(schemaDTO, true))
-			.userQuery(userQuery)
-			.evidence(evidence)
+			.sql(PromptHelper.boundErrorSql(sql))
+			.executionDescription(PromptHelper.boundQuery(getCurrentExecutionStepInstruction(state)))
+			.schemaInfo(PromptHelper.boundKnowledge(buildMixMacSqlDbPrompt(schemaDTO, true)))
+			.userQuery(PromptHelper.boundQuery(userQuery))
+			.evidence(PromptHelper.boundEvidence(evidence))
 			.build();
 		log.info("开始语义一致性校验 - SQL: {}", sql);
 		// 调用 NL2SQL 服务执行语义一致性校验
