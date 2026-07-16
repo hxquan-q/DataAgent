@@ -430,7 +430,7 @@ watch(
 	padding: 12px 14px;
 	border-radius: 6px 18px 18px 18px !important;
 	font-size: 14px;
-	line-height: 1.7;
+	line-height: 1.6;
 	max-width: min(78%, 720px);
 	word-break: break-word;
 	color: var(--da-ink, #0f172a);
