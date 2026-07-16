@@ -151,7 +151,7 @@
 				</div>
 				<textarea
 					v-model="store.feedbackContent"
-					class="feedback-textarea"
+					class="feedback-textarea" maxlength="1200"
 					rows="2"
 					placeholder="输入您的反馈意见（留空表示接受计划）"
 				/>

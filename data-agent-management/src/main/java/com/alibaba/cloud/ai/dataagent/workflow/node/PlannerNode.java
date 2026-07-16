@@ -124,8 +124,8 @@ public class PlannerNode implements NodeAction {
 
 		// 构建模板参数并渲染提示词
 		BeanOutputConverter<Plan> beanOutputConverter = new BeanOutputConverter<>(Plan.class);
-		Map<String, Object> params = Map.of("user_question", userPrompt, "schema", schemaStr, "evidence", evidence,
-				"semantic_model", semanticModel, "plan_validation_error", formatValidationError(validationError),
+		Map<String, Object> params = Map.of("user_question", userPrompt, "schema", schemaStr, "evidence", PromptHelper.boundEvidence(evidence),
+				"semantic_model", PromptHelper.boundKnowledge(semanticModel), "plan_validation_error", formatValidationError(validationError),
 				"format", beanOutputConverter.getFormat());
 		// 生成计划提示词
 		String plannerPrompt = PromptConstant.getPlannerPromptTemplate().render(params);

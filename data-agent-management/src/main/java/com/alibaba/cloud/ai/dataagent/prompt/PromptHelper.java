@@ -118,7 +118,7 @@ public class PromptHelper {
 	/** Evidence 注入上限，避免召回文档灌爆 SQL/规划提示词。 */
 	private static final int MAX_EVIDENCE_CHARS = 3_000;
 
-	static String boundEvidence(String evidence) {
+	public static String boundEvidence(String evidence) {
 		if (StringUtils.isBlank(evidence)) {
 			return "无";
 		}
@@ -127,7 +127,7 @@ public class PromptHelper {
 
 	private static final int MAX_MULTI_TURN_CHARS = 2_500;
 
-	static String boundMultiTurn(String multiTurn) {
+	public static String boundMultiTurn(String multiTurn) {
 		if (multiTurn == null || multiTurn.isBlank()) {
 			return "(无)";
 		}
@@ -136,7 +136,7 @@ public class PromptHelper {
 
 	private static final int MAX_QUERY_CHARS = 1_000;
 
-	static String boundQuery(String query) {
+	public static String boundQuery(String query) {
 		if (query == null || query.isBlank()) {
 			return "";
 		}
@@ -146,17 +146,17 @@ public class PromptHelper {
 	private static final int MAX_ERROR_CHARS = 1_500;
 	private static final int MAX_ERROR_SQL_CHARS = 2_500;
 
-	static String boundErrorText(String text) {
+	public static String boundErrorText(String text) {
 		return shortenExampleValueTo(text == null ? "" : text, MAX_ERROR_CHARS);
 	}
 
-	static String boundErrorSql(String sql) {
+	public static String boundErrorSql(String sql) {
 		return shortenExampleValueTo(sql == null ? "" : sql, MAX_ERROR_SQL_CHARS);
 	}
 
 	private static final int MAX_KNOWLEDGE_CHARS = 4_000;
 
-	static String boundKnowledge(String text) {
+	public static String boundKnowledge(String text) {
 		if (StringUtils.isBlank(text)) {
 			return "无";
 		}
