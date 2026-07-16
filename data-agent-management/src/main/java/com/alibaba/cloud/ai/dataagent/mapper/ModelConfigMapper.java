@@ -16,6 +16,7 @@
 package com.alibaba.cloud.ai.dataagent.mapper;
 
 import com.alibaba.cloud.ai.dataagent.entity.ModelConfig;
+import com.alibaba.cloud.ai.dataagent.util.EncryptedStringTypeHandler;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -25,6 +26,10 @@ import java.util.List;
  * <p>
  * 管理大语言模型/嵌入模型的供应商、接入地址、凭证、参数、代理及启用状态， 支持条件查询、按类型激活、互斥停用与软删除。
  * </p>
+ * <p>
+ * {@code api_key} / {@code proxy_password} 两列经 {@link EncryptedStringTypeHandler} 透明加解密：
+ * 落库为 {@code enc:v1:} 密文，实体字段始终持有明文。其余列依赖默认 PARTIAL 自动映射。
+ * </p>
  */
 @Mapper
 public interface ModelConfigMapper {
@@ -33,6 +38,9 @@ public interface ModelConfigMapper {
 	 * 查询全部未删除的模型配置，按创建时间倒序返回。
 	 * @return 模型配置列表
 	 */
+	@Results(id = "modelConfigResults", value = {
+			@Result(column = "api_key", property = "apiKey", typeHandler = EncryptedStringTypeHandler.class),
+			@Result(column = "proxy_password", property = "proxyPassword", typeHandler = EncryptedStringTypeHandler.class) })
 	@Select("""
 			SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			       model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -46,6 +54,7 @@ public interface ModelConfigMapper {
 	 * @param id 模型配置 ID
 	 * @return 模型配置；不存在返回 {@code null}
 	 */
+	@ResultMap("modelConfigResults")
 	@Select("""
 			SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			       model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -59,6 +68,7 @@ public interface ModelConfigMapper {
 	 * @param modelType 模型类型
 	 * @return 启用的模型配置；不存在返回 {@code null}
 	 */
+	@ResultMap("modelConfigResults")
 	@Select("""
 			SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			       model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
@@ -84,6 +94,7 @@ public interface ModelConfigMapper {
 	 * @param modelType 模型类型（可为 {@code null}）
 	 * @return 匹配的模型配置列表
 	 */
+	@ResultMap("modelConfigResults")
 	@Select("""
 			<script>
 			   SELECT id, provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
@@ -118,7 +129,7 @@ public interface ModelConfigMapper {
 			@Param("modelType") String modelType);
 
 	/**
-	 * 新增模型配置，并将自增主键回填到入参对象的 {@code id} 字段。
+	 * 新增模型配置，并将自增主键回填到入参对象的 {@code id} 字段。api_key / proxy_password 落库前加密。
 	 * @param modelConfig 模型配置实体
 	 * @return 受影响行数
 	 */
@@ -126,15 +137,17 @@ public interface ModelConfigMapper {
 			INSERT INTO model_config (provider, base_url, api_key, model_name, temperature, is_active, max_tokens,
 			                         model_type, completions_path, embeddings_path, created_time, updated_time, is_deleted,
 			                         proxy_enabled, proxy_host, proxy_port, proxy_username, proxy_password)
-			VALUES (#{provider}, #{baseUrl}, #{apiKey}, #{modelName}, #{temperature}, #{isActive}, #{maxTokens},
+			VALUES (#{provider}, #{baseUrl}, #{apiKey, typeHandler=com.alibaba.cloud.ai.dataagent.util.EncryptedStringTypeHandler},
+			        #{modelName}, #{temperature}, #{isActive}, #{maxTokens},
 			        #{modelType}, #{completionsPath}, #{embeddingsPath}, NOW(), NOW(), 0,
-			        #{proxyEnabled}, #{proxyHost}, #{proxyPort}, #{proxyUsername}, #{proxyPassword})
+			        #{proxyEnabled}, #{proxyHost}, #{proxyPort}, #{proxyUsername},
+			        #{proxyPassword, typeHandler=com.alibaba.cloud.ai.dataagent.util.EncryptedStringTypeHandler})
 			""")
 	@Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
 	int insert(ModelConfig modelConfig);
 
 	/**
-	 * 根据主键动态更新模型配置（仅更新非空字段），并刷新 {@code updated_time}。
+	 * 根据主键动态更新模型配置（仅更新非空字段），并刷新 {@code updated_time}。api_key / proxy_password 更新前加密。
 	 * @param modelConfig 模型配置实体（需携带 {@code id}）
 	 * @return 受影响行数
 	 */
@@ -144,7 +157,7 @@ public interface ModelConfigMapper {
 			          <trim prefix="SET" suffixOverrides=",">
 			            <if test='provider != null'>provider = #{provider},</if>
 			            <if test='baseUrl != null'>base_url = #{baseUrl},</if>
-			            <if test='apiKey != null'>api_key = #{apiKey},</if>
+			            <if test='apiKey != null'>api_key = #{apiKey, typeHandler=com.alibaba.cloud.ai.dataagent.util.EncryptedStringTypeHandler},</if>
 			            <if test='modelName != null'>model_name = #{modelName},</if>
 			            <if test='temperature != null'>temperature = #{temperature},</if>
 			            <if test='isActive != null'>is_active = #{isActive},</if>
@@ -157,7 +170,7 @@ public interface ModelConfigMapper {
 			            <if test='proxyHost != null'>proxy_host = #{proxyHost},</if>
 			            <if test='proxyPort != null'>proxy_port = #{proxyPort},</if>
 			            <if test='proxyUsername != null'>proxy_username = #{proxyUsername},</if>
-			            <if test='proxyPassword != null'>proxy_password = #{proxyPassword},</if>
+			            <if test='proxyPassword != null'>proxy_password = #{proxyPassword, typeHandler=com.alibaba.cloud.ai.dataagent.util.EncryptedStringTypeHandler},</if>
 			            updated_time = NOW()
 			          </trim>
 			          WHERE id = #{id}
