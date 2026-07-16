@@ -77,7 +77,7 @@ public class DataAgentProperties {
 	/**
 	 * 多轮对话中最多保留的历史轮数
 	 */
-	private int maxturnhistory = 5;
+	private int maxturnhistory = 4;
 
 	/**
 	 * 单次规划（Plan）最大长度限制

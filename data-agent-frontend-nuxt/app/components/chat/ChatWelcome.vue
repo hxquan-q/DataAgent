@@ -206,8 +206,8 @@ watch(
 	background: var(--da-surface, #fff);
 	color: var(--da-ink, #0f172a);
 	border-radius: 999px;
-	padding: 10px 16px;
-	min-height: 40px;
+	padding: 8px 14px;
+	min-height: 36px;
 	font-size: 13px;
 	font-weight: 500;
 	line-height: 1.35;
