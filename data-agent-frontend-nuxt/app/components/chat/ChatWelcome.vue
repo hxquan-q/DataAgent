@@ -177,7 +177,7 @@ watch(
 
 .welcome-line {
 	max-width: 220px;
-	margin: 0 auto 18px;
+	margin: 0 auto 14px;
 	background: var(--da-line, #d9d9d9);
 }
 

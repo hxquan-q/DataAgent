@@ -537,7 +537,7 @@ watch(
 .md-body :deep(ul),
 .md-body :deep(ol) {
 	padding-left: 20px;
-	margin-bottom: 7px;
+	margin-bottom: 5px;
 }
 .md-body :deep(li) {
 	margin-bottom: 2px;
