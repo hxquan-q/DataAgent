@@ -45,27 +45,38 @@
 					</div>
 				</div>
 
-				<!-- Model selector -->
+				<!-- Model selector (R149: empty-model guidance) -->
 				<div class="ds-chip-wrap" @click.stop>
 					<div
 						class="status-chip status-chip--model"
-						:class="{ disabled: store.isStreaming || store.chatModels.length === 0 }"
+						:class="{ disabled: store.isStreaming, warn: store.chatModels.length === 0 }"
 						@click="toggleModelMenu"
 					>
-						<v-icon size="13" color="#3b82f6">mdi-lightning-bolt</v-icon>
-						<span>{{ store.activeModelConfig?.modelName || '选择AI模型' }}</span>
+						<v-icon size="13" :color="store.chatModels.length ? '#3b82f6' : '#f59e0b'">mdi-lightning-bolt</v-icon>
+						<span>{{
+							store.activeModelConfig?.modelName
+								|| (store.chatModels.length ? '选择AI模型' : '未配置模型')
+						}}</span>
 						<v-icon size="13" color="#94a3b8">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</div>
 					<div v-if="showModelMenu" class="chip-dropdown">
-						<div
-							v-for="m in store.chatModels"
-							:key="m.id"
-							class="chip-dropdown-item"
-							:class="{ active: store.activeModelConfig?.id === m.id }"
-							@click="selectModel(m)"
-						>
-							<span class="item-name">{{ m.modelName }}</span>
-							<span class="item-tag">{{ m.provider }}</span>
+						<template v-if="store.chatModels.length">
+							<div
+								v-for="m in store.chatModels"
+								:key="m.id"
+								class="chip-dropdown-item"
+								:class="{ active: store.activeModelConfig?.id === m.id }"
+								@click="selectModel(m)"
+							>
+								<span class="item-name">{{ m.modelName }}</span>
+								<span class="item-tag">{{ m.provider }}</span>
+							</div>
+						</template>
+						<div v-else class="chip-dropdown-empty">
+							<p class="chip-dropdown-empty__text">尚未配置 CHAT 模型，无法生成回答。</p>
+							<button type="button" class="chip-dropdown-empty__cta" @click="goModelConfig">
+								去配置模型
+							</button>
 						</div>
 					</div>
 				</div>
@@ -184,9 +195,15 @@ function toggleDsMenu() {
 }
 
 function toggleModelMenu() {
-	if (store.isStreaming || store.chatModels.length === 0) return;
+	if (store.isStreaming) return;
+	// R149: 无模型时仍打开菜单，展示配置引导
 	showModelMenu.value = !showModelMenu.value;
 	if (showModelMenu.value) showDsMenu.value = false;
+}
+
+function goModelConfig() {
+	showModelMenu.value = false;
+	navigateTo('/system/model-config');
 }
 
 async function selectDs(ds: typeof store.allDatasources[0]) {
@@ -217,6 +234,11 @@ async function handleSend() {
 	if (!query) return;
 	if (!store.currentSession) return;
 	if (store.isStreaming) return;
+	if (!store.chatModels.length || !store.activeModelConfig) {
+		// R149: 无可用模型时阻断发送，引导配置
+		showModelMenu.value = true;
+		return;
+	}
 
 	inputText.value = '';
 	nextTick(() => {

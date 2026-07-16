@@ -24,6 +24,8 @@ spring:
         max-sql-retry-count: 3
         enable-sql-result-chart: false
         enrich-sql-result-timeout: 2000
+        # R149: 无依赖 SQL 波次并发（取舍：跳过逐步语义校验换墙钟）
+        enable-concurrent-steps: true
 
 # embed 开发默认密钥（生产必须改）
 # spring.ai.alibaba.data-agent.embed.token-hmac-key 继承 application.yml
