@@ -177,7 +177,7 @@ public class DataAgentProperties {
 			/**
 			 * 最小分块字符数 默认值：400
 			 */
-			private int minChunkSizeChars = 400;
+			private int minChunkSizeChars = 320;
 
 			/**
 			 * 嵌入最小分块长度 默认值：10
