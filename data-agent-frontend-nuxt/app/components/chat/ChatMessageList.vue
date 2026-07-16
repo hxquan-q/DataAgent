@@ -626,7 +626,7 @@ watch(
 	color: #6a737d;
 	font-weight: 600;
 	font-family: 'Monaco', 'Menlo', monospace;
-	font-size: 10px;
+	font-size: 9.5px;
 	text-transform: uppercase;
 }
 .md-body :deep(.code-copy-button) {
