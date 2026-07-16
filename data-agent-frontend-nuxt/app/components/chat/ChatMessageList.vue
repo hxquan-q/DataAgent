@@ -577,7 +577,7 @@ watch(
 .md-body :deep(th) {
 	display: table-cell;
 	background: #f1f5f9;
-	padding: 7px 12px;
+	padding: 6px 10px;
 	border: 1px solid #e2e8f0;
 	font-weight: 600;
 	font-size: 13px;
@@ -585,7 +585,7 @@ watch(
 }
 .md-body :deep(td) {
 	display: table-cell;
-	padding: 7px 12px;
+	padding: 6px 10px;
 	border: 1px solid #e2e8f0;
 	font-size: 13px;
 }

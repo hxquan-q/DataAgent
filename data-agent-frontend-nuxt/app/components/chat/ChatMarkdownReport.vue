@@ -296,7 +296,7 @@ async function downloadHtml() {
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .report-body {
-	padding: 16px;
+	padding: 12px;
 }
 .html-iframe {
 	display: block;
@@ -366,7 +366,7 @@ async function downloadHtml() {
 .markdown-body :deep(th) {
 	display: table-cell;
 	background: #f1f5f9;
-	padding: 8px 12px;
+	padding: 6px 10px;
 	border: 1px solid #e2e8f0;
 	font-weight: 600;
 	font-size: 13px;
@@ -374,7 +374,7 @@ async function downloadHtml() {
 }
 .markdown-body :deep(td) {
 	display: table-cell;
-	padding: 8px 12px;
+	padding: 6px 10px;
 	border: 1px solid #e8edf2;
 	font-size: 13px;
 }
