@@ -41,6 +41,9 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 @Component
 public class HumanFeedbackNode implements NodeAction {
 
+	private static final int MAX_FEEDBACK_CHARS = 1_200;
+
+
 	/**
 	 * 处理人工反馈逻辑。
 	 * <p>
