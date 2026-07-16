@@ -183,7 +183,7 @@ watch(
 
 .welcome-desc {
 	margin: 0;
-	font-size: 14.5px;
+	font-size: 14px;
 	font-weight: 400;
 	color: var(--da-muted, #64748b);
 	max-width: 440px;
