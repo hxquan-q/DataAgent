@@ -546,7 +546,7 @@ watch(
 }
 
 .step-label {
-	font-size: 13px;
+	font-size: 12.5px;
 	font-weight: 600;
 	color: #1e293b;
 }
@@ -592,7 +592,7 @@ watch(
 /* ── Step content ────────────────────────────────────────────────────────────── */
 .step-content {
 	margin-top: 6px;
-	font-size: 13px;
+	font-size: 12.5px;
 	line-height: 1.65;
 	color: #1e293b;
 	min-width: 0;

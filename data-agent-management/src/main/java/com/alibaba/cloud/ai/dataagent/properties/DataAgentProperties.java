@@ -317,7 +317,7 @@ public class DataAgentProperties {
 		/**
 		 * 表级相似度下限；设置较低以避免漏召回表
 		 */
-		private double tableSimilarityThreshold = 0.2;
+		private double tableSimilarityThreshold = 0.25;
 
 		/**
 		 * 全局默认相似度阈值（用于 BusinessTerm、AgentKnowledge 等），过滤分数低于此值的文档
