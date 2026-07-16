@@ -295,7 +295,7 @@ public class DataAgentProperties {
 		/**
 		 * 每批次最大文本数量 适用于DashScope等有文本数量限制的API DashScope限制为10
 		 */
-		private int maxTextCount = 10;
+		private int maxTextCount = 8;
 
 	}
 

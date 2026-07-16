@@ -322,9 +322,7 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-shell {
-	padding: 32px;
-}
+
 
 .avatar-preview {
 	border: 2px solid #e5e7eb;
