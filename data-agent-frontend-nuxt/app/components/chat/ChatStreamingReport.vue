@@ -194,13 +194,13 @@ onBeforeUnmount(() => {
 	color: #0f172a;
 }
 .markdown-body :deep(h1) {
-	font-size: 20px;
+	font-size: 18px;
 }
 .markdown-body :deep(h2) {
-	font-size: 17px;
+	font-size: 16px;
 }
 .markdown-body :deep(h3) {
-	font-size: 15px;
+	font-size: 14.5px;
 }
 .markdown-body :deep(p) {
 	margin-bottom: 10px;
