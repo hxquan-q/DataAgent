@@ -417,7 +417,7 @@ watch(
 	color: white !important;
 	padding: 10px 14px;
 	border-radius: 18px 18px 6px 18px !important;
-	font-size: 14px;
+	font-size: 13.5px;
 	line-height: 1.55;
 	max-width: min(62%, 560px);
 	word-break: break-word;
@@ -429,7 +429,7 @@ watch(
 .ai-card {
 	padding: 12px 14px;
 	border-radius: 6px 18px 18px 18px !important;
-	font-size: 14px;
+	font-size: 13.5px;
 	line-height: 1.6;
 	max-width: min(78%, 720px);
 	word-break: break-word;
