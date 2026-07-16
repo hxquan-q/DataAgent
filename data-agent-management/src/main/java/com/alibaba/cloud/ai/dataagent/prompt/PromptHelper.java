@@ -75,7 +75,7 @@ public class PromptHelper {
 	public static String buildMixSelectorPrompt(String evidence, String question, SchemaDTO schemaDTO) {
 		String schemaInfo = buildMixMacSqlDbPrompt(schemaDTO, true);
 		Map<String, Object> params = new HashMap<>();
-		params.put("schema_info", schemaInfo);
+		params.put("schema_info", boundKnowledge(schemaInfo));
 		params.put("question", boundQuery(question));
 		if (StringUtils.isBlank(evidence))
 			params.put("evidence", "无");
@@ -153,6 +153,16 @@ public class PromptHelper {
 	static String boundErrorSql(String sql) {
 		return shortenExampleValueTo(sql == null ? "" : sql, MAX_ERROR_SQL_CHARS);
 	}
+
+	private static final int MAX_KNOWLEDGE_CHARS = 4_000;
+
+	static String boundKnowledge(String text) {
+		if (StringUtils.isBlank(text)) {
+			return "无";
+		}
+		return shortenExampleValueTo(text, MAX_KNOWLEDGE_CHARS);
+	}
+
 
 
 
@@ -289,20 +299,20 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		Map<String, Object> params = new HashMap<>();
 		params.put("dialect", sqlGenerationDTO.getDialect());
 		params.put("question", boundQuery(sqlGenerationDTO.getQuery()));
-		params.put("schema_info", schemaInfo);
+		params.put("schema_info", boundKnowledge(schemaInfo));
 		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
-		params.put("execution_description", sqlGenerationDTO.getExecutionDescription());
+		params.put("execution_description", boundQuery(sqlGenerationDTO.getExecutionDescription()));
 		return PromptConstant.getNewSqlGeneratorPromptTemplate().render(params);
 	}
 
 	public static String buildSemanticConsistenPrompt(SemanticConsistencyDTO semanticConsistencyDTO) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("dialect", semanticConsistencyDTO.getDialect());
-		params.put("execution_description", semanticConsistencyDTO.getExecutionDescription());
-		params.put("user_query", semanticConsistencyDTO.getUserQuery());
+		params.put("execution_description", boundQuery(semanticConsistencyDTO.getExecutionDescription()));
+		params.put("user_query", boundQuery(semanticConsistencyDTO.getUserQuery()));
 		params.put("evidence", boundEvidence(semanticConsistencyDTO.getEvidence()));
-		params.put("schema_info", semanticConsistencyDTO.getSchemaInfo());
-		params.put("sql", semanticConsistencyDTO.getSql());
+		params.put("schema_info", boundKnowledge(semanticConsistencyDTO.getSchemaInfo()));
+		params.put("sql", boundErrorSql(semanticConsistencyDTO.getSql()));
 		return PromptConstant.getSemanticConsistencyPromptTemplate().render(params);
 	}
 
@@ -337,11 +347,11 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		Map<String, Object> params = new HashMap<>();
 		params.put("dialect", sqlGenerationDTO.getDialect());
 		params.put("question", boundQuery(sqlGenerationDTO.getQuery()));
-		params.put("schema_info", schemaInfo);
+		params.put("schema_info", boundKnowledge(schemaInfo));
 		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
 		params.put("error_sql", boundErrorSql(sqlGenerationDTO.getSql()));
 		params.put("error_message", boundErrorText(sqlGenerationDTO.getExceptionMessage()));
-		params.put("execution_description", sqlGenerationDTO.getExecutionDescription());
+		params.put("execution_description", boundQuery(sqlGenerationDTO.getExecutionDescription()));
 
 		return PromptConstant.getSqlErrorFixerPromptTemplate().render(params);
 	}
@@ -349,7 +359,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	public static String buildBusinessKnowledgePrompt(String businessTerms) {
 		Map<String, Object> params = new HashMap<>();
 		if (StringUtils.isNotBlank(businessTerms))
-			params.put("businessKnowledge", businessTerms);
+			params.put("businessKnowledge", boundKnowledge(businessTerms));
 		else
 			params.put("businessKnowledge", "无");
 		return PromptConstant.getBusinessKnowledgePromptTemplate().render(params);
@@ -359,7 +369,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	public static String buildAgentKnowledgePrompt(String agentKnowledge) {
 		Map<String, Object> params = new HashMap<>();
 		if (StringUtils.isNotBlank(agentKnowledge))
-			params.put("agentKnowledge", agentKnowledge);
+			params.put("agentKnowledge", boundKnowledge(agentKnowledge));
 		else
 			params.put("agentKnowledge", "无");
 		return PromptConstant.getAgentKnowledgePromptTemplate().render(params);
@@ -369,7 +379,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		Map<String, Object> params = new HashMap<>();
 		String semanticModel = CollectionUtils.isEmpty(semanticModels) ? ""
 				: semanticModels.stream().map(SemanticModel::getPromptInfo).collect(Collectors.joining(";\n"));
-		params.put("semanticModel", semanticModel);
+		params.put("semanticModel", boundKnowledge(semanticModel));
 		return PromptConstant.getSemanticModelPromptTemplate().render(params);
 	}
 
