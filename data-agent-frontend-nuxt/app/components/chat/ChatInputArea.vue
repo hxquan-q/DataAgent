@@ -312,7 +312,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	z-index: 999;
 	background: white;
 	border: 1px solid #e2e8f0;
-	border-radius: 10px;
+	border-radius: 8px;
 	box-shadow: 0 4px 16px rgba(0,0,0,0.10);
 	min-width: 180px;
 	max-width: 300px;

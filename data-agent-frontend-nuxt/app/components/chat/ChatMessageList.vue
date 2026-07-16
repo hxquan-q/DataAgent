@@ -555,7 +555,7 @@ watch(
 	border-left: 3px solid #3b82f6;
 	padding-left: 12px;
 	color: #64748b;
-	margin: 6px 0;
+	margin: 4px 0;
 }
 .md-body :deep(table) {
 	width: 100%;
