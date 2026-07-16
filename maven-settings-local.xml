@@ -1,27 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  IDEA / 命令行共用：本地仓库指向项目内 .m2-local（可写）。
-  原因：本机 ~/.m2 属 root，ubuntu 用户无写权限 → IDEA Maven 导入/下载依赖失败。
+  本机/IDEA 加速用 Maven settings。
 
-  IDEA：Settings → Build → Build Tools → Maven → User settings file
-        勾选 Override，选本文件路径。
-  CLI： mvn -s maven-settings-local.xml ...
+  为什么 IDEA「没进度、特别慢」：
+  1) management/pom.xml 声明了 3 个仓库：spring-milestones + aliyun-releases + central
+     → 每个 artifact 的 maven-metadata 会串行/并行打多个源；repo.spring.io 经常超时，
+       界面几乎无进度条，像卡死。
+  2) 若未指定本文件，IDEA 默认用 ~/.m2；本机曾有权限/空缓存问题，会整树重下。
+  3) 依赖树巨大（Spring AI + Boot + 阿里云 SDK + docker-java…），首次索引本就慢。
+
+  IDEA 必做：
+    Settings → Build Tools → Maven
+    - User settings file: 勾选 Override → 选本文件
+    - Local repository: 可留空（由本文件 localRepository 决定）
+    - JDK for importer: 17
+    然后 Maven 工具窗 → Reload
+  缓存已齐后可勾：Work offline（离线），秒级完成。
 -->
 <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
-  <!-- 使用绝对路径，避免 IDEA 工作目录不同导致找不到仓库 -->
+
   <localRepository>/home/ubuntu/spingagent/DataAgent/.m2-local/repository</localRepository>
 
+  <!-- 所有仓库请求镜像到阿里云 public（含 central / spring 等），避免直连 spring.io 超时 -->
   <mirrors>
-    <!-- 可选：网络慢时取消注释用阿里云 -->
-    <!--
     <mirror>
-      <id>aliyun-central</id>
-      <mirrorOf>central</mirrorOf>
-      <name>Aliyun Maven</name>
-      <url>https://maven.aliyun.com/repository/central</url>
+      <id>aliyun-public</id>
+      <mirrorOf>*</mirrorOf>
+      <name>Aliyun Public (central + others)</name>
+      <url>https://maven.aliyun.com/repository/public</url>
     </mirror>
-    -->
   </mirrors>
+
+  <!-- 缩短连不上的仓库超时（秒）；默认往往 10–30s×N 次重试 -->
+  <profiles>
+    <profile>
+      <id>fast-resolver</id>
+      <properties>
+        <!-- 部分插件/扩展会读这些；核心仍靠 mirror 少打慢源 -->
+        <aether.connector.connectTimeout>5000</aether.connector.connectTimeout>
+        <aether.connector.requestTimeout>15000</aether.connector.requestTimeout>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>fast-resolver</activeProfile>
+  </activeProfiles>
 </settings>

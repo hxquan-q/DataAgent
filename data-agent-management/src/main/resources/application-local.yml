@@ -17,6 +17,13 @@ spring:
   sql:
     init:
       mode: never
+  ai:
+    alibaba:
+      data-agent:
+        # 本地性能：降 SQL 重试；关 SQL 结果后置图表 LLM（报告仍可出 echarts）
+        max-sql-retry-count: 3
+        enable-sql-result-chart: false
+        enrich-sql-result-timeout: 2000
 
 # embed 开发默认密钥（生产必须改）
 # spring.ai.alibaba.data-agent.embed.token-hmac-key 继承 application.yml

@@ -15,7 +15,13 @@
  */
 
 import { nextTick, onBeforeUnmount } from 'vue';
-import * as echarts from 'echarts';
+
+/**
+ * Lazy-load echarts only when a chart node appears.
+ * Sync `import * as echarts` forced ~2.8MB into embed init in Vite dev — that was the cold start tax.
+ */
+
+type EChartsNS = typeof import('echarts');
 
 const EXTENDED_COLORS = [
 	'#5584FF',
@@ -43,12 +49,30 @@ const EXTENDED_COLORS = [
 	'#009db2',
 ];
 
-function renderEChartsInContainer(container: HTMLElement) {
+let echartsMod: EChartsNS | null = null;
+let echartsLoading: Promise<EChartsNS> | null = null;
+
+function loadEcharts(): Promise<EChartsNS> {
+	if (echartsMod) return Promise.resolve(echartsMod);
+	if (!echartsLoading) {
+		echartsLoading = import('echarts').then((m) => {
+			echartsMod = m;
+			return m;
+		});
+	}
+	return echartsLoading;
+}
+
+async function renderEChartsInContainer(container: HTMLElement) {
 	const elements = container.querySelectorAll<HTMLElement>('.md-echarts');
+	if (!elements.length) return;
+
+	const echarts = await loadEcharts();
+
 	elements.forEach((el) => {
 		try {
 			const rawConfig = el.getAttribute('data-echarts-config');
-			if (!rawConfig) return; // already rendered (attribute removed after init)
+			if (!rawConfig) return;
 
 			const code = rawConfig
 				.replace(/&quot;/g, '"')
@@ -58,15 +82,11 @@ function renderEChartsInContainer(container: HTMLElement) {
 
 			if (!code || code.trim() === '') return;
 
-			const options = new Function(`return (${code})`)() as Record<
-				string,
-				unknown
-			>;
+			const options = new Function(`return (${code})`)() as Record<string, unknown>;
 			if (!options.color) {
 				options.color = EXTENDED_COLORS;
 			}
 
-			// Mark as initialized before touching DOM
 			el.removeAttribute('data-echarts-config');
 			el.textContent = '';
 
@@ -84,16 +104,15 @@ function renderEChartsInContainer(container: HTMLElement) {
 }
 
 function disposeEChartsInContainer(container: HTMLElement | null) {
-	if (!container) return;
+	if (!container || !echartsMod) return;
 	const elements = container.querySelectorAll<HTMLElement>('.md-echarts');
 	elements.forEach((el) => {
-		const chart = echarts.getInstanceByDom(el);
+		const chart = echartsMod!.getInstanceByDom(el);
 		if (chart) chart.dispose();
 	});
 }
 
 export function useEchartsRenderer() {
-	// Each composable instance has its own timer — no cross-instance interference
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 	const chartContainers: HTMLElement[] = [];
 
@@ -101,11 +120,12 @@ export function useEchartsRenderer() {
 		if (!container) return;
 		if (!chartContainers.includes(container)) chartContainers.push(container);
 
-		// Cancel any pending debounce for this instance only
 		if (debounceTimer) clearTimeout(debounceTimer);
 		debounceTimer = setTimeout(() => {
 			debounceTimer = null;
-			nextTick(() => renderEChartsInContainer(container));
+			nextTick(() => {
+				void renderEChartsInContainer(container);
+			});
 		}, 200);
 	}
 

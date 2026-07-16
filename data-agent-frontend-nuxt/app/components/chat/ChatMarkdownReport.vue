@@ -67,6 +67,7 @@
 				/>
 			</div>
 		</div>
+		<div class="report-hairline" aria-hidden="true" />
 
 		<!-- Body -->
 		<div ref="reportBodyRef" class="report-body">
@@ -477,8 +478,17 @@ async function downloadHtml() {
 	font-size: 13px;
 }
 :deep(.md-echarts-skeleton-icon) {
-	font-size: 22px;
-	animation: spinPulse 1.6s ease-in-out infinite;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #cbd5e1;
+	border-top-color: #3b82f6;
+	border-radius: 50%;
+	animation: skeletonSpin 0.8s linear infinite;
+}
+@keyframes skeletonSpin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 :deep(.md-echarts-skeleton-text) {
 	font-weight: 500;
@@ -502,5 +512,27 @@ async function downloadHtml() {
 		opacity: 0.5;
 		transform: scale(0.9);
 	}
+}
+
+/* Arceage-inspired header accent */
+.markdown-report {
+	background: #fff;
+}
+.report-header {
+	background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+}
+.report-hairline {
+	height: 1px;
+	width: 100%;
+	background: linear-gradient(90deg, #bfdbfe 0%, #e2e8f0 55%, transparent 100%);
+	transform-origin: left center;
+	animation: da-scale-x 0.65s var(--da-ease-out, ease) both;
+}
+.report-title span {
+	letter-spacing: -0.01em;
+	font-weight: 600;
+}
+.report-body {
+	/* keep existing; soft top pad via hairline separation */
 }
 </style>

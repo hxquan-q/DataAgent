@@ -16,27 +16,33 @@
 
 <template>
 	<div class="welcome-wrap">
-		<!-- Agent Avatar -->
-		<div class="agent-avatar-wrap">
+		<div class="agent-avatar-wrap da-reveal">
 			<v-avatar
 				:image="store.currentAgentAvatar || undefined"
-				:color="store.currentAgentAvatar ? undefined : 'grey-lighten-3'"
-				size="80"
-				rounded="xl"
+				:color="store.currentAgentAvatar ? undefined : 'primary'"
+				size="72"
+				rounded="circle"
 				class="agent-avatar"
 			>
-				<span v-if="!store.currentAgentAvatar" class="agent-avatar-emoji">🤖</span>
+				<v-icon v-if="!store.currentAgentAvatar" size="32" color="white">
+					mdi-robot-outline
+				</v-icon>
 			</v-avatar>
 		</div>
 
-		<!-- Agent Name -->
-		<h2 class="welcome-title">
-			您好，我是 <span class="agent-name">{{ store.currentAgentName || '数据助手' }}</span>
+		<p class="welcome-kicker da-reveal da-reveal-delay-1">Data Agent</p>
+		<h2 class="welcome-title da-reveal da-reveal-delay-1">
+			您好，我是
+			<span class="agent-name">{{ store.currentAgentName || '数据助手' }}</span>
 		</h2>
 
-		<!-- Agent Description -->
-		<p class="welcome-desc">
-			{{ store.currentAgentDescription || '我可以为您分析数据库中的表结构、生成 SQL 或可视化图表。' }}
+		<div class="welcome-line da-hairline da-reveal-delay-2" aria-hidden="true" />
+
+		<p class="welcome-desc da-reveal da-reveal-delay-2">
+			{{
+				store.currentAgentDescription ||
+				'分析表结构、生成 SQL、输出可视化报告——把问题丢给我即可。'
+			}}
 		</p>
 	</div>
 </template>
@@ -53,39 +59,58 @@ const store = useChatStore();
 	align-items: center;
 	justify-content: center;
 	flex: 1;
-	padding: 40px 24px;
+	padding: 48px 28px;
 	text-align: center;
+	max-width: 560px;
+	margin: 0 auto;
 }
 
 .agent-avatar-wrap {
-	margin-bottom: 24px;
+	margin-bottom: 20px;
 }
 
 .agent-avatar {
-	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+	box-shadow:
+		0 1px 2px rgba(15, 23, 42, 0.06),
+		0 12px 28px rgba(30, 64, 175, 0.14);
 }
 
-.agent-avatar-emoji {
-	font-size: 36px;
-	line-height: 1;
+.welcome-kicker {
+	margin: 0 0 8px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--da-muted, #64748b);
 }
 
 .welcome-title {
-	font-size: 26px;
-	font-weight: 700;
-	color: #0f172a;
-	margin-bottom: 12px;
-	letter-spacing: -0.3px;
+	font-size: clamp(22px, 3.2vw, 28px);
+	font-weight: 600;
+	color: var(--da-ink, #0f172a);
+	margin: 0 0 18px;
+	letter-spacing: -0.02em;
+	line-height: 1.25;
 }
 
 .agent-name {
-	color: #1e293b;
+	color: var(--da-primary, #1e40af);
+	font-weight: 700;
+}
+
+.welcome-line {
+	max-width: 220px;
+	margin: 0 auto 18px;
+	background: var(--da-line, #d9d9d9);
 }
 
 .welcome-desc {
+	margin: 0;
 	font-size: 14.5px;
-	color: #64748b;
-	max-width: 480px;
+	font-weight: 400;
+	color: var(--da-muted, #64748b);
+	max-width: 440px;
 	line-height: 1.7;
+	letter-spacing: -0.01em;
 }
 </style>

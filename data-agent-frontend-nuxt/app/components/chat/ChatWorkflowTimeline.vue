@@ -15,15 +15,35 @@
  */
 
 <template>
-	<div ref="timelineRef" class="workflow-timeline">
-		<!-- Title + global toggle -->
+	<div
+		ref="timelineRef"
+		class="workflow-timeline"
+		:class="{ 'is-completed': completed }"
+	>
+		<!-- Title + global toggle (WeKnora-style: process secondary to answer) -->
 		<div class="timeline-title-bar">
-			<v-card-title class="timeline-title pa-0">
-				<v-icon size="18" color="blue" class="mr-1"
-					>mdi-rocket-launch-outline</v-icon
-				>
-				任务开始
-			</v-card-title>
+			<div class="timeline-title-group">
+				<v-card-title class="timeline-title pa-0">
+					<v-icon
+						size="18"
+						:color="completed ? 'success' : 'blue'"
+						class="mr-1"
+					>
+						{{
+							completed
+								? 'mdi-check-decagram-outline'
+								: 'mdi-rocket-launch-outline'
+						}}
+					</v-icon>
+					{{ completed ? '分析过程' : '任务进行中' }}
+				</v-card-title>
+				<span v-if="timelineSteps.length" class="timeline-summary">
+					{{ doneCount }}/{{ timelineSteps.length }} 步
+					<span v-if="activeLabel" class="timeline-active-hint"
+						>· {{ activeLabel }}</span
+					>
+				</span>
+			</div>
 			<v-btn
 				variant="outlined"
 				size="x-small"
@@ -36,7 +56,7 @@
 				"
 				@click="toggleAll"
 			>
-				{{ allExpanded ? '折叠全部' : '展开全部' }}
+				{{ allExpanded ? '折叠过程' : '展开过程' }}
 			</v-btn>
 		</div>
 
@@ -47,6 +67,9 @@
 				:dot-color="dotColor(step.status)"
 				:icon="dotIcon(step.status)"
 				size="small"
+				:class="{
+					'step-muted': completed && step.status === 'done' && !step.isReport,
+				}"
 			>
 				<!-- Step header: clickable to toggle -->
 				<div class="step-header" @click="toggleStep(step.nodeName)">
@@ -78,6 +101,7 @@
 							"
 							:data="safeParseJson(step.block[0].text)"
 							:page-size="10"
+							:pending-report="!completed && !step.isReport"
 						/>
 						<!-- Report node: show brief status, not full content -->
 						<div v-else-if="step.isReport" class="text-body report-brief">
@@ -133,6 +157,15 @@ const allExpanded = computed(() => {
 	return steps.some((s) => s.expanded);
 });
 
+const doneCount = computed(
+	() => timelineSteps.value.filter((s) => s.status === 'done').length,
+);
+
+const activeLabel = computed(() => {
+	const active = timelineSteps.value.find((s) => s.status === 'active');
+	return active?.label ?? '';
+});
+
 function toggleAll() {
 	const shouldExpand = !allExpanded.value;
 	for (const step of timelineSteps.value) {
@@ -141,16 +174,17 @@ function toggleAll() {
 }
 
 function toggleStep(nodeName: string) {
-	const defaultExpanded = getDefaultExpanded(nodeName);
+	const step = timelineSteps.value.find((s) => s.nodeName === nodeName);
+	const defaultExpanded = getDefaultExpanded(nodeName, step?.status);
 	expandedSteps.value[nodeName] = !(
 		expandedSteps.value[nodeName] ?? defaultExpanded
 	);
 }
 
-function getDefaultExpanded(nodeName: string): boolean {
-	if (!props.completed) return true;
-	if (nodeName === 'ReportGeneratorNode') return true;
-	return false;
+function getDefaultExpanded(_nodeName: string, status?: string): boolean {
+	// 完成后全收起；执行中只展开当前 active 步（过程有界）
+	if (props.completed) return false;
+	return status === 'active';
 }
 
 interface NodeDef {
@@ -284,7 +318,7 @@ const timelineSteps = computed<TimelineStep[]>(() => {
 			...def,
 			status,
 			block,
-			expanded: expandedSteps.value[nodeName] ?? getDefaultExpanded(nodeName),
+			expanded: expandedSteps.value[nodeName] ?? getDefaultExpanded(nodeName, status),
 			isReport,
 		};
 	});
@@ -333,9 +367,14 @@ const SANITIZE_OPTIONS = {
 	RETURN_TRUSTED_TYPE: false as const,
 };
 
+function truncateProcess(text: string, limit = 1600): string {
+	if (!text || text.length <= limit) return text;
+	return text.slice(0, limit) + '\n…(过程输出已截断)';
+}
+
 function renderCode(block: GraphNodeResponse[]): string {
 	const lang = (block[0]?.textType || 'text').toLowerCase();
-	const code = block.map((n) => n.text).join('');
+	const code = truncateProcess(block.map((n) => n.text).join(''));
 	try {
 		const h = hljs.highlight(code, { language: lang });
 		return DOMPurify.sanitize(
@@ -370,7 +409,7 @@ function tryExtractJson(
 }
 
 function renderTextWithJsonDetection(block: GraphNodeResponse[]): string {
-	const fullText = block.map((n) => n.text).join('');
+	const fullText = truncateProcess(block.map((n) => n.text).join(''));
 
 	const extracted = tryExtractJson(fullText);
 	if (extracted) {
@@ -406,6 +445,18 @@ function renderTextWithJsonDetection(block: GraphNodeResponse[]): string {
 }
 
 watch(
+	() => props.completed,
+	(done) => {
+		if (!done) return;
+		const next: Record<string, boolean> = {};
+		for (const s of timelineSteps.value) {
+			next[s.nodeName] = false;
+		}
+		expandedSteps.value = next;
+	},
+);
+
+watch(
 	() => props.nodeBlocks,
 	() => {
 		nextTick(() => renderECharts(timelineRef.value));
@@ -419,28 +470,63 @@ watch(
 	width: 100%;
 }
 
+.workflow-timeline.is-completed {
+	opacity: 0.96;
+}
+
 /* ── Title bar ───────────────────────────────────────────────────────────────── */
 .timeline-title-bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
+	gap: 8px;
 	margin-bottom: 8px;
-	padding: 0 2px;
+	padding: 6px 8px;
+	background: #f8fafc;
+	border: 1px solid #e8edf2;
+	border-radius: 8px;
+}
+
+.timeline-title-group {
+	display: flex;
+	align-items: baseline;
+	flex-wrap: wrap;
+	gap: 8px;
+	min-width: 0;
 }
 
 .timeline-title {
-	font-size: 15px !important;
+	font-size: 14px !important;
 	font-weight: 700;
-	color: #2563eb;
+	color: #1e40af;
 	display: flex;
 	align-items: center;
 	line-height: 1;
+}
+
+.workflow-timeline.is-completed .timeline-title {
+	color: #166534;
+}
+
+.timeline-summary {
+	font-size: 12px;
+	color: #64748b;
+	font-weight: 500;
+}
+
+.timeline-active-hint {
+	color: #2563eb;
 }
 
 .toggle-all-btn {
 	font-size: 11px !important;
 	text-transform: none !important;
 	letter-spacing: 0 !important;
+	flex-shrink: 0;
+}
+
+:deep(.step-muted .v-timeline-item__body) {
+	opacity: 0.88;
 }
 
 /* ── Step header ─────────────────────────────────────────────────────────────── */
@@ -671,5 +757,14 @@ watch(
 :deep(.md-echarts) {
 	margin: 8px 0;
 	border-radius: 6px;
+}
+
+/* 过程详情有界，防止长 SQL/JSON 撑满屏 */
+.step-content {
+	max-height: 220px;
+	overflow: auto;
+}
+.workflow-timeline.is-completed {
+	opacity: 0.95;
 }
 </style>

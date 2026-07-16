@@ -56,6 +56,9 @@ import reactor.netty.transport.ProxyProvider;
 @RequiredArgsConstructor
 public class DynamicModelFactory {
 
+	/** 无代理时默认响应超时（与 webclient.response.timeout 默认 600s 同量级，避免裸 builder 无超时）。 */
+	private static final java.time.Duration DEFAULT_RESPONSE_TIMEOUT = java.time.Duration.ofSeconds(600);
+
 	/**
 	 * 根据配置创建 ChatModel，统一使用 OpenAiChatModel 通过 baseUrl 实现多厂商兼容。
 	 * @param config 模型配置 DTO
@@ -153,8 +156,10 @@ public class DynamicModelFactory {
 	}
 
 	private WebClient.Builder getProxiedWebClientBuilder(ModelConfigDTO config) {
+		// 始终自建带 responseTimeout 的 Netty 客户端（不依赖注入 Builder，避免 JRebel 热更字段为 null）
 		if (config.getProxyEnabled() == null || !config.getProxyEnabled()) {
-			return WebClient.builder();
+			HttpClient nettyClient = HttpClient.create().responseTimeout(DEFAULT_RESPONSE_TIMEOUT);
+			return WebClient.builder().clientConnector(new ReactorClientHttpConnector(nettyClient));
 		}
 
 		log.info("【Proxy-Init】Model [{}] is using ASYNC (Netty) proxy -> {}:{}", config.getModelName(),

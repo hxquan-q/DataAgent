@@ -97,6 +97,22 @@ public class EvidenceRecallNode implements NodeAction {
 		log.debug("智能体 ID: {}", agentId);
 
 		String multiTurn = StateUtil.getStringValue(state, MULTI_TURN_CONTEXT, "(无)");
+		Sinks.Many<String> evidenceDisplaySink = Sinks.many().multicast().onBackpressureBuffer();
+		final Map<String, Object> resultMap = new HashMap<>();
+
+		// 单轮无上下文：跳过 LLM 查询重写，直接用原问向量召回（省 1 次完整 LLM，η₂/η₄）
+		if (isSingleTurnContext(multiTurn)) {
+			log.info("单轮查询，跳过证据查询重写 LLM，直接召回: {}", question);
+			Flux<GraphResponse<StreamingOutput>> skipFlux = FluxUtil.createStreamingGeneratorWithMessages(
+					this.getClass(), state, "单轮查询，跳过重写，直接召回证据...", "证据召回完成！", ignored -> {
+						resultMap.putAll(recallEvidencesByQuery(question, agentId, evidenceDisplaySink));
+						return resultMap;
+					}, Flux.empty());
+			Flux<GraphResponse<StreamingOutput>> evidenceFlux = FluxUtil.createStreamingGenerator(this.getClass(),
+					state, evidenceDisplaySink.asFlux().map(ChatResponseUtil::createPureResponse), Flux.empty(),
+					Flux.empty(), result -> resultMap);
+			return Map.of(EVIDENCE, skipFlux.concatWith(evidenceFlux));
+		}
 
 		// 构建查询重写提示词
 		// 不扩展为多个子查询，因为此时大模型无法理解不同公司的个性化业务知识（如 PV、KMV 等专业名词），扩展反而会引入噪音
@@ -105,9 +121,7 @@ public class EvidenceRecallNode implements NodeAction {
 
 		// 调用大模型进行查询重写
 		Flux<ChatResponse> responseFlux = llmService.callUser(prompt);
-		Sinks.Many<String> evidenceDisplaySink = Sinks.many().multicast().onBackpressureBuffer();
 
-		final Map<String, Object> resultMap = new HashMap<>();
 		// 第一段流：查询重写过程
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGenerator(this.getClass(), state,
 				responseFlux,
@@ -127,6 +141,46 @@ public class EvidenceRecallNode implements NodeAction {
 				result -> resultMap);
 		return Map.of(EVIDENCE, generator.concatWith(evidenceFlux));
 	}
+
+	/** 多轮上下文为空或占位时视为单轮。 */
+	public static boolean isSingleTurnContext(String multiTurn) {
+		if (multiTurn == null) {
+			return true;
+		}
+		String t = multiTurn.trim();
+		return t.isEmpty() || "(无)".equals(t) || "无".equals(t) || "null".equalsIgnoreCase(t);
+	}
+
+	/**
+	 * 跳过 LLM 重写时的直接召回（与 getEvidences 后半段一致）。
+	 */
+	private Map<String, Object> recallEvidencesByQuery(String query, String agentId, Sinks.Many<String> sink) {
+		try {
+			if (query == null || query.isBlank()) {
+				sink.tryEmitNext("查询为空，跳过证据召回\n");
+				return Map.of(EVIDENCE, "无");
+			}
+			outputRewrittenQuery(query, sink);
+			DocumentRetrievalResult retrievalResult = retrieveDocuments(agentId, query);
+			if (retrievalResult.allDocuments().isEmpty()) {
+				sink.tryEmitNext("未找到证据！\n");
+				return Map.of(EVIDENCE, "无");
+			}
+			String evidence = buildFormattedEvidenceContent(retrievalResult.businessTermDocuments(),
+					retrievalResult.agentKnowledgeDocuments(), agentId, query);
+			outputEvidenceContent(retrievalResult.allDocuments(), sink);
+			return Map.of(EVIDENCE, evidence);
+		}
+		catch (Exception e) {
+			log.error("直接召回证据失败", e);
+			sink.tryEmitError(e);
+			return Map.of(EVIDENCE, "");
+		}
+		finally {
+			sink.tryEmitComplete();
+		}
+	}
+
 
 	/**
 	 * 根据大模型重写后的查询，从向量库中召回证据文档。

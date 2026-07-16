@@ -358,8 +358,17 @@ onBeforeUnmount(() => {
 	font-size: 13px;
 }
 :deep(.md-echarts-skeleton-icon) {
-	font-size: 22px;
-	animation: spinPulse 1.6s ease-in-out infinite;
+	width: 16px;
+	height: 16px;
+	border: 2px solid #cbd5e1;
+	border-top-color: #3b82f6;
+	border-radius: 50%;
+	animation: skeletonSpin 0.8s linear infinite;
+}
+@keyframes skeletonSpin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 :deep(.md-echarts-skeleton-text) {
 	font-weight: 500;

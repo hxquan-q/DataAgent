@@ -23,7 +23,7 @@
 		<template v-else>
 			<div class="messages-inner">
 				<template v-for="message in filteredMessages" :key="message.id">
-					<div class="message-wrapper">
+					<div class="message-wrapper da-msg-enter">
 						<!-- ── User message ─────────────────────────────────── -->
 						<div v-if="message.role === 'user'" class="row user-row">
 							<v-card class="user-card" elevation="1">
@@ -125,7 +125,7 @@
 							message.messageType === 'timeline' &&
 							extractReportContent(message.content)
 						"
-						class="message-wrapper"
+						class="message-wrapper da-msg-enter"
 					>
 						<div class="row ai-row">
 							<v-avatar
@@ -348,14 +348,23 @@ watch(
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
+	background:
+		radial-gradient(1200px 400px at 50% -80px, rgba(59, 130, 246, 0.06), transparent 60%),
+		#fff;
 }
 
 .messages-inner {
-	padding: 24px 32px;
+	padding: 28px 32px 32px;
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
+	gap: 22px;
 	width: 100%;
+	max-width: 960px;
+	margin: 0 auto;
+}
+
+.message-wrapper {
+	/* enter animation via .da-msg-enter */
 }
 
 /* ── Row (shared by user + AI) ───────────────────────────────────────────────── */
@@ -381,42 +390,63 @@ watch(
 
 /* ── User card ───────────────────────────────────────────────────────────────── */
 .user-card {
-	background: #3b82f6 !important;
+	background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
 	color: white !important;
-	padding: 10px 16px;
-	border-radius: 16px 16px 4px 16px !important;
+	padding: 11px 16px;
+	border-radius: 18px 18px 6px 18px !important;
 	font-size: 14px;
 	line-height: 1.65;
-	max-width: 60%;
+	max-width: min(62%, 560px);
 	word-break: break-word;
+	box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18) !important;
+	letter-spacing: -0.01em;
 }
 
 /* ── AI card ─────────────────────────────────────────────────────────────────── */
 .ai-card {
-	padding: 12px 16px;
-	border-radius: 4px 16px 16px 16px !important;
+	padding: 14px 16px;
+	border-radius: 6px 18px 18px 18px !important;
 	font-size: 14px;
 	line-height: 1.7;
-	max-width: 75%;
+	max-width: min(78%, 720px);
 	word-break: break-word;
-	color: #1e293b;
+	color: var(--da-ink, #0f172a);
 	background: #fff !important;
+	border: 1px solid var(--da-line-soft, #e8edf2) !important;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+	letter-spacing: -0.01em;
+	transition: box-shadow 0.2s var(--da-ease-out, ease), border-color 0.2s ease;
 }
 
-/* Report card: full width like markdown content */
+.ai-card:hover {
+	border-color: #dbe4ee !important;
+	box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+}
+
+/* Report card: answer primary — stronger frame */
 .report-card {
 	max-width: 100% !important;
 	padding: 0 !important;
 	flex: 1;
 	min-width: 0;
+	border: 1px solid #bfdbfe !important;
+	box-shadow:
+		0 1px 2px rgba(30, 64, 175, 0.05),
+		0 10px 28px rgba(30, 64, 175, 0.08) !important;
+	overflow: hidden;
+	border-radius: 14px !important;
 }
 
-/* Timeline card: full width, let timeline handle its own padding */
+/* Timeline card: process secondary (WeKnora hierarchy) */
 .timeline-card {
-	padding: 12px 14px;
+	padding: 10px 12px;
 	max-width: 100% !important;
 	flex: 1;
 	min-width: 0;
+	background: var(--da-surface-soft, #f8fafc) !important;
+	border: 1px dashed #dbe3ec !important;
+	box-shadow: none !important;
+	border-radius: 12px !important;
 }
 
 /* ── Thinking dots ───────────────────────────────────────────────────────────── */

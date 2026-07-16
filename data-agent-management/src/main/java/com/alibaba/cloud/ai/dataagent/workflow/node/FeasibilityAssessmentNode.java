@@ -77,6 +77,24 @@ public class FeasibilityAssessmentNode implements NodeAction {
 
 		String multiTurn = StateUtil.getStringValue(state, MULTI_TURN_CONTEXT, "(无)");
 
+		// 单轮 + Schema 已召回：快路径判定为数据分析，跳过大 prompt LLM（该节点常撞网关慢 TTFT）
+		boolean schemaOk = recalledSchema != null && recalledSchema.getTable() != null
+				&& !recalledSchema.getTable().isEmpty();
+		if (EvidenceRecallNode.isSingleTurnContext(multiTurn) && schemaOk
+				&& canonicalQuery != null && !canonicalQuery.isBlank()) {
+			String fast = """
+					【需求类型】：《数据分析》
+					【语种类型】：《中文》
+					【需求内容】：%s
+					【快路径】：单轮且 Schema 已召回，跳过可行性 LLM
+					""".formatted(canonicalQuery);
+			log.info("可行性评估快路径：{}", canonicalQuery);
+			Flux<GraphResponse<StreamingOutput>> skip = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
+					state, "Schema 已就绪，跳过可行性评估 LLM", "可行性评估完成！",
+					ignored -> Map.of(FEASIBILITY_ASSESSMENT_NODE_OUTPUT, fast), Flux.empty());
+			return Map.of(FEASIBILITY_ASSESSMENT_NODE_OUTPUT, skip);
+		}
+
 		// 构建可行性评估提示词
 		String prompt = PromptHelper.buildFeasibilityAssessmentPrompt(canonicalQuery, recalledSchema, evidence,
 				multiTurn);

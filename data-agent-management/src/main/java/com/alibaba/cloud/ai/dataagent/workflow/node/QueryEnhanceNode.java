@@ -30,9 +30,11 @@ import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
+import static com.alibaba.cloud.ai.dataagent.workflow.node.EvidenceRecallNode.isSingleTurnContext;
 
 /**
  * 查询增强节点，位于证据召回节点之后、Schema 召回节点之前。
@@ -72,6 +74,18 @@ public class QueryEnhanceNode implements NodeAction {
 
 		String evidence = StateUtil.getStringValue(state, EVIDENCE);
 		String multiTurn = StateUtil.getStringValue(state, MULTI_TURN_CONTEXT, "(无)");
+
+		// 单轮：跳过增强 LLM，canonical=原问（省 1 次 LLM）
+		if (isSingleTurnContext(multiTurn)) {
+			log.info("单轮查询，跳过问题增强 LLM: {}", userInput);
+			QueryEnhanceOutputDTO dto = new QueryEnhanceOutputDTO();
+			dto.setCanonicalQuery(userInput);
+			dto.setExpandedQueries(List.of(userInput));
+			Flux<GraphResponse<StreamingOutput>> skip = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
+					state, "单轮查询，跳过问题增强", "问题增强完成！", ignored -> Map.of(QUERY_ENHANCE_NODE_OUTPUT, dto),
+					Flux.empty());
+			return Map.of(QUERY_ENHANCE_NODE_OUTPUT, skip);
+		}
 
 		// 构建查询增强提示词
 		String prompt = PromptHelper.buildQueryEnhancePrompt(multiTurn, userInput, evidence);

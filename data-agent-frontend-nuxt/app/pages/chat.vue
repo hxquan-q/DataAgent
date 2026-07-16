@@ -84,7 +84,7 @@ onUnmounted(() => {
 	display: flex;
 	height: calc(100vh - 64px);
 	overflow: hidden;
-	background: #f1f5f9;
+	background: #eef2f7;
 }
 
 .chat-body {
@@ -94,5 +94,7 @@ onUnmounted(() => {
 	overflow: hidden;
 	min-width: 0;
 	background: #fff;
+	border-left: 1px solid var(--da-line-soft, #e8edf2);
+	box-shadow: -8px 0 24px rgba(15, 23, 42, 0.03);
 }
 </style>

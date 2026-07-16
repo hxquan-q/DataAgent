@@ -136,7 +136,17 @@
     iframe.src = baseUrl + '/embed/' + encodeURIComponent(agentId);
     iframe.style.cssText = 'width:100%;height:100%;border:none';
     iframe.setAttribute('allow', 'clipboard-write');
+    // 预取会话令牌：与 iframe 冷启动并行，避免 ready 后再串行 exchange
+    loadToken(false).catch(function () {});
+    var loadingEl = document.createElement('div');
+    loadingEl.textContent = '加载中…';
+    loadingEl.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:14px/1.4 system-ui,sans-serif;color:#64748b;background:#fff;z-index:1';
+    panel.style.position = panel.style.position || 'fixed';
+    panel.appendChild(loadingEl);
     panel.appendChild(iframe);
+    iframe.addEventListener('load', function () {
+      if (loadingEl && loadingEl.parentNode) loadingEl.parentNode.removeChild(loadingEl);
+    });
 
     var open = false;
     function setOpen(v) {
@@ -155,7 +165,10 @@
         loadToken(false).then(function (t) {
           postToEmbed({ type: 'token', token: t });
           if (pendingContext) postToEmbed({ type: 'context', context: pendingContext });
-          if (pendingQuery) postToEmbed({ type: 'query', query: pendingQuery });
+          if (pendingQuery) {
+            postToEmbed({ type: 'query', query: pendingQuery });
+            pendingQuery = null; // 只投递一次，防 ready 重入双问
+          }
           emit('ready', {});
         }).catch(function () {});
       }
