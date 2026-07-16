@@ -366,7 +366,7 @@ async function downloadHtml() {
 .markdown-body :deep(th) {
 	display: table-cell;
 	background: #f1f5f9;
-	padding: 6px 10px;
+	padding: 5px 8px;
 	border: 1px solid #e2e8f0;
 	font-weight: 600;
 	font-size: 13px;
