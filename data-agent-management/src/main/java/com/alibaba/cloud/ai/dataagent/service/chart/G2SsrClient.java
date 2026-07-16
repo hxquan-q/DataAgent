@@ -41,7 +41,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class G2SsrClient {
 
 	/** 默认 15s 超时，与 g2-ssr 服务端一致 */
-	private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(15);
+	private static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(12);
 
 	private final String baseUrl;
 
