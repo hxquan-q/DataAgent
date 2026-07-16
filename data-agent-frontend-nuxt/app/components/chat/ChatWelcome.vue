@@ -153,7 +153,7 @@ watch(
 }
 
 .welcome-kicker {
-	margin: 0 0 8px;
+	margin: 0 0 6px;
 	font-size: 12px;
 	font-weight: 600;
 	letter-spacing: 0.12em;
@@ -165,7 +165,7 @@ watch(
 	font-size: clamp(22px, 3.2vw, 28px);
 	font-weight: 600;
 	color: var(--da-ink, #0f172a);
-	margin: 0 0 18px;
+	margin: 0 0 14px;
 	letter-spacing: -0.02em;
 	line-height: 1.25;
 }
