@@ -113,24 +113,41 @@ public class PromptHelper {
 		if (columns == null || columns.isEmpty()) {
 			return List.of();
 		}
-		if (primaryKeys == null || primaryKeys.isEmpty()) {
-			return columns;
-		}
-		java.util.Set<String> pks = new java.util.LinkedHashSet<>(primaryKeys);
-		List<ColumnDTO> head = new ArrayList<>();
-		List<ColumnDTO> tail = new ArrayList<>();
+		java.util.Set<String> pks = primaryKeys == null ? java.util.Set.of()
+				: new java.util.LinkedHashSet<>(primaryKeys);
+		List<ColumnDTO> pkCols = new ArrayList<>();
+		List<ColumnDTO> idLikeCols = new ArrayList<>();
+		List<ColumnDTO> rest = new ArrayList<>();
 		for (ColumnDTO col : columns) {
-			if (col != null && col.getName() != null && pks.contains(col.getName())) {
-				head.add(col);
+			if (col == null || col.getName() == null) {
+				rest.add(col);
+				continue;
+			}
+			String name = col.getName();
+			if (pks.contains(name)) {
+				pkCols.add(col);
+			}
+			else if (isLikelyForeignKeyColumn(name)) {
+				idLikeCols.add(col);
 			}
 			else {
-				tail.add(col);
+				rest.add(col);
 			}
 		}
-		List<ColumnDTO> ordered = new ArrayList<>(head.size() + tail.size());
-		ordered.addAll(head);
-		ordered.addAll(tail);
+		List<ColumnDTO> ordered = new ArrayList<>(columns.size());
+		ordered.addAll(pkCols);
+		ordered.addAll(idLikeCols);
+		ordered.addAll(rest);
 		return ordered;
+	}
+
+	/** 启发式：*_id / id_* / 纯 id 视作关联列，截断时次优先于普通列。 */
+	static boolean isLikelyForeignKeyColumn(String name) {
+		if (name == null || name.isBlank()) {
+			return false;
+		}
+		String n = name.toLowerCase(java.util.Locale.ROOT);
+		return "id".equals(n) || n.endsWith("_id") || n.startsWith("id_");
 	}
 
 public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withColumnType) {

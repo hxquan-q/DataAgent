@@ -16,6 +16,18 @@
 
 <template>
 	<div ref="listRef" class="message-list custom-scrollbar">
+		<!-- R6: compact context strip when chatting -->
+		<div
+			v-if="store.currentAgentName && !showWelcome"
+			class="chat-status-strip"
+			role="status"
+		>
+			<span class="chat-status-strip__agent">{{ store.currentAgentName }}</span>
+			<span v-if="store.activeChatModel || store.activeModelConfig?.modelName" class="chat-status-strip__model">
+				{{ store.activeModelConfig?.modelName || store.activeChatModel }}
+			</span>
+			<span v-if="store.isStreaming" class="chat-status-strip__live">分析中</span>
+		</div>
 		<!-- Empty: no session, or session with no messages yet -->
 		<ChatWelcome v-if="showWelcome" />
 
@@ -693,5 +705,37 @@ watch(
 	background: #fef2f2;
 	border: 1px solid #fca5a5;
 	color: #991b1b;
+}
+
+.chat-status-strip {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	padding: 8px 32px 0;
+	max-width: 960px;
+	width: 100%;
+	margin: 0 auto;
+	box-sizing: border-box;
+	font-size: 11.5px;
+	color: var(--da-muted, #64748b);
+}
+.chat-status-strip__agent {
+	font-weight: 600;
+	color: var(--da-ink, #0f172a);
+}
+.chat-status-strip__model {
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: var(--da-primary-soft, #eff6ff);
+	color: var(--da-primary, #1e40af);
+	font-weight: 500;
+}
+.chat-status-strip__live {
+	padding: 2px 8px;
+	border-radius: 999px;
+	background: #ecfdf5;
+	color: #047857;
+	font-weight: 600;
 }
 </style>

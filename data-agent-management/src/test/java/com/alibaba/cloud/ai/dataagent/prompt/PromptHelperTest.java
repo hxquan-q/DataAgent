@@ -426,4 +426,19 @@ class PromptHelperTest {
 		assertEquals(3, ordered.size());
 	}
 
+	@Test
+	void prioritizePrimaryKeyColumns_idLikeAfterPk() {
+		ColumnDTO a = new ColumnDTO();
+		a.setName("amount");
+		ColumnDTO fk = new ColumnDTO();
+		fk.setName("user_id");
+		ColumnDTO pk = new ColumnDTO();
+		pk.setName("id");
+		java.util.List<ColumnDTO> ordered = PromptHelper.prioritizePrimaryKeyColumns(
+				Arrays.asList(a, fk, pk), Arrays.asList("id"));
+		assertEquals("id", ordered.get(0).getName());
+		assertEquals("user_id", ordered.get(1).getName());
+		assertEquals("amount", ordered.get(2).getName());
+	}
+
 }
