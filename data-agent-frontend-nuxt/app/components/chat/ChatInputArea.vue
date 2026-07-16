@@ -251,8 +251,12 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .input-area {
 	flex-shrink: 0;
 	background: white;
-	border-top: 1px solid #e8edf2;
+	border-top: 1px solid var(--da-line-soft, #e8edf2);
 	padding: 12px 32px 16px;
+	max-width: 960px;
+	width: 100%;
+	margin: 0 auto;
+	box-sizing: border-box;
 }
 
 /* ── Status bar ──────────────────────────────────────────────────────────────── */

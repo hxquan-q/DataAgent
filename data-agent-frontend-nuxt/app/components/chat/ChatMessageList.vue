@@ -16,8 +16,8 @@
 
 <template>
 	<div ref="listRef" class="message-list custom-scrollbar">
-		<!-- Welcome state when no session -->
-		<ChatWelcome v-if="!store.currentSession" />
+		<!-- Empty: no session, or session with no messages yet -->
+		<ChatWelcome v-if="showWelcome" />
 
 		<!-- Messages -->
 		<template v-else>
@@ -182,11 +182,14 @@
 					<v-avatar color="blue-darken-3" size="34" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
-					<v-card class="ai-card" elevation="1">
-						<div class="thinking-dots">
-							<span class="dot" />
-							<span class="dot dot--2" />
-							<span class="dot dot--3" />
+					<v-card class="ai-card thinking-card" elevation="1">
+						<div class="thinking-row" role="status" aria-live="polite">
+							<div class="thinking-dots" aria-hidden="true">
+								<span class="dot" />
+								<span class="dot dot--2" />
+								<span class="dot dot--3" />
+							</div>
+							<span class="thinking-label">正在分析…</span>
 						</div>
 					</v-card>
 				</div>
@@ -218,6 +221,14 @@ const TIMELINE_ABSORBED_TYPES = new Set([
 const store = useChatStore();
 const listRef = ref<HTMLElement | null>(null);
 const { renderECharts } = useEchartsRenderer();
+
+// Welcome when idle empty (session may already exist after loadSessions)
+const showWelcome = computed(
+	() =>
+		!store.isStreaming &&
+		!store.isReportStreaming &&
+		(!store.currentSession || store.currentMessages.length === 0),
+);
 
 const filteredMessages = computed<ChatMessage[]>(() => {
 	const msgs = store.currentMessages;
@@ -449,12 +460,26 @@ watch(
 	border-radius: 12px !important;
 }
 
-/* ── Thinking dots ───────────────────────────────────────────────────────────── */
+/* ── Thinking feedback (WeKnora-like status) ─────────────────────────────────── */
+.thinking-card {
+	padding: 12px 16px !important;
+}
+.thinking-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.thinking-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--da-muted, #64748b);
+	letter-spacing: -0.01em;
+}
 .thinking-dots {
 	display: flex;
 	align-items: center;
 	gap: 5px;
-	padding: 4px 2px;
+	padding: 2px 0;
 }
 .dot {
 	width: 7px;
@@ -477,6 +502,12 @@ watch(
 	}
 	30% {
 		transform: translateY(-5px);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.dot {
+		animation: none;
+		opacity: 0.7;
 	}
 }
 

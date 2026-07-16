@@ -44,12 +44,88 @@
 				'分析表结构、生成 SQL、输出可视化报告——把问题丢给我即可。'
 			}}
 		</p>
+
+		<div
+			v-if="chips.length"
+			class="preset-row da-reveal da-reveal-delay-3"
+			role="list"
+			aria-label="推荐问题"
+		>
+			<button
+				v-for="(q, i) in chips"
+				:key="i"
+				type="button"
+				class="preset-chip"
+				role="listitem"
+				:disabled="store.isStreaming || sending"
+				@click="ask(q)"
+			>
+				{{ q }}
+			</button>
+		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
 import { useChatStore } from '~/stores/chat';
+import presetQuestionService from '~/services/presetQuestion/index';
+
 const store = useChatStore();
+const sending = ref(false);
+const presets = ref<string[]>([]);
+
+const FALLBACK = [
+	'最近有哪些关键指标异常？',
+	'按维度汇总核心业务数据',
+	'对比本月与上月变化趋势',
+];
+
+const chips = computed(() =>
+	presets.value.length ? presets.value.slice(0, 6) : FALLBACK,
+);
+
+async function loadPresets(agentId?: number) {
+	if (!agentId) {
+		presets.value = [];
+		return;
+	}
+	try {
+		const list = await presetQuestionService.list(agentId);
+		presets.value = list
+			.filter((q) => q.isActive !== false && q.question?.trim())
+			.sort((a, b) => (a.sortOrder ?? 0) - (b.sortOrder ?? 0))
+			.map((q) => q.question.trim());
+	} catch {
+		presets.value = [];
+	}
+}
+
+async function ask(question: string) {
+	const q = question.trim();
+	if (!q || store.isStreaming || sending.value) return;
+	const agentId = store.currentAgentId;
+	if (!agentId) return;
+
+	sending.value = true;
+	try {
+		if (!store.currentSession) {
+			await store.createNewSession(agentId);
+		}
+		await store.sendMessage(q);
+	} catch (e) {
+		console.error('预设问题发送失败', e);
+	} finally {
+		sending.value = false;
+	}
+}
+
+watch(
+	() => store.currentAgentId,
+	(id) => {
+		void loadPresets(id);
+	},
+	{ immediate: true },
+);
 </script>
 
 <style scoped>
@@ -61,8 +137,9 @@ const store = useChatStore();
 	flex: 1;
 	padding: 48px 28px;
 	text-align: center;
-	max-width: 560px;
+	max-width: 640px;
 	margin: 0 auto;
+	width: 100%;
 }
 
 .agent-avatar-wrap {
@@ -112,5 +189,57 @@ const store = useChatStore();
 	max-width: 440px;
 	line-height: 1.7;
 	letter-spacing: -0.01em;
+}
+
+.preset-row {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin-top: 28px;
+	max-width: 560px;
+}
+
+.preset-chip {
+	appearance: none;
+	border: 1px solid var(--da-line-soft, #e8edf2);
+	background: var(--da-surface, #fff);
+	color: var(--da-ink, #0f172a);
+	border-radius: 999px;
+	padding: 10px 16px;
+	min-height: 40px;
+	font-size: 13px;
+	font-weight: 500;
+	line-height: 1.35;
+	cursor: pointer;
+	transition:
+		border-color 0.15s ease,
+		background 0.15s ease,
+		box-shadow 0.15s ease;
+	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	text-align: left;
+	max-width: 100%;
+}
+
+.preset-chip:hover:not(:disabled) {
+	border-color: #93c5fd;
+	background: var(--da-primary-soft, #eff6ff);
+	color: var(--da-primary, #1e40af);
+}
+
+.preset-chip:focus-visible {
+	outline: 2px solid var(--da-accent, #3b82f6);
+	outline-offset: 2px;
+}
+
+.preset-chip:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.preset-chip {
+		transition: none;
+	}
 }
 </style>

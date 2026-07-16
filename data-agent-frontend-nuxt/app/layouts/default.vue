@@ -298,8 +298,8 @@
 									color="primary"
 									@click="navigateToPath('/system/security')"
 								/>
-															<v-list-item
-									prepend-icon="mdi-web-box"
+									<v-list-item
+										prepend-icon="mdi-web-box"
 									title="网页嵌入"
 									:active="isActive('/system/embed')"
 									density="compact"
