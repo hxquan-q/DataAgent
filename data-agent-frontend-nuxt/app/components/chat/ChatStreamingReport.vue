@@ -114,7 +114,7 @@ onBeforeUnmount(() => {
 .report-header {
 	display: flex;
 	align-items: center;
-	padding: 6px 10px;
+	padding: 4px 8px;
 	background: #f8fafc;
 	border-bottom: 1px solid #e8edf2;
 	font-size: 13px;

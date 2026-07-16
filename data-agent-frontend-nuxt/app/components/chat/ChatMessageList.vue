@@ -599,7 +599,7 @@ watch(
 .md-body :deep(hr) {
 	border: none;
 	border-top: 1px solid #e2e8f0;
-	margin: 12px 0;
+	margin: 8px 0;
 }
 .md-body :deep(strong) {
 	font-weight: 700;
