@@ -307,7 +307,7 @@ async function confirmDelete() {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 10px 8px 10px 16px;
+	padding: 8px 8px 8px 14px;
 	border-bottom: 1px solid var(--da-line-soft, #e8edf2);
 	min-height: 48px;
 	flex-shrink: 0;
@@ -341,7 +341,7 @@ async function confirmDelete() {
 	color: #94a3b8;
 	letter-spacing: 0.5px;
 	text-transform: uppercase;
-	padding: 8px 8px 6px;
+	padding: 6px 8px 4px;
 }
 
 .session-item {

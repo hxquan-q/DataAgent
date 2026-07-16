@@ -225,7 +225,7 @@ public class GraphServiceImpl implements GraphService {
 	 * @param graphRequest 图执行请求体
 	 */
 	private void handleNewProcess(GraphRequest graphRequest) {
-		String query = graphRequest.getQuery();
+		String query = PromptHelper.boundQuery(graphRequest.getQuery());
 		String agentId = graphRequest.getAgentId();
 		String threadId = graphRequest.getThreadId();
 		// 仅当非纯 NL2SQL 模式时才允许人工审核
