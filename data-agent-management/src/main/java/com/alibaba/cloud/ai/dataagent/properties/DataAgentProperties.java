@@ -332,7 +332,7 @@ public class DataAgentProperties {
 		/**
 		 * 一次删除操作中，最多删除的文档数量
 		 */
-		private int batchDelTopkLimit = 5000;
+		private int batchDelTopkLimit = 3000;
 
 		/**
 		 * 是否启用混合搜索（向量 + 关键词）

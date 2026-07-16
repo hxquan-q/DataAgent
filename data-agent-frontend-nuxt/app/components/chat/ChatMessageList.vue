@@ -717,7 +717,7 @@ watch(
 	width: 100%;
 	margin: 0 auto;
 	box-sizing: border-box;
-	font-size: 11.5px;
+	font-size: 11px;
 	color: var(--da-muted, #64748b);
 }
 .chat-status-strip__agent {
