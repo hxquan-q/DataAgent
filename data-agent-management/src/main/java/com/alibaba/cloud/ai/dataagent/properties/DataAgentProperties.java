@@ -322,7 +322,7 @@ public class DataAgentProperties {
 		/**
 		 * 全局默认相似度阈值（用于 BusinessTerm、AgentKnowledge 等），过滤分数低于此值的文档
 		 */
-		private double defaultSimilarityThreshold = 0.4;
+		private double defaultSimilarityThreshold = 0.45;
 
 		/**
 		 * 查询时返回的最大文档数量
