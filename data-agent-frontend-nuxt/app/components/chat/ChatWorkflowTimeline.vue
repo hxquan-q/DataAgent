@@ -496,7 +496,7 @@ watch(
 }
 
 .timeline-title {
-	font-size: 13px !important;
+	font-size: 12.5px !important;
 	font-weight: 700;
 	color: #1e40af;
 	display: flex;
