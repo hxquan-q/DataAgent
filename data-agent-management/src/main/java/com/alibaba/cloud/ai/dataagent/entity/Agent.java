@@ -80,6 +80,17 @@ public class Agent {
 	@Builder.Default
 	private String workflowMode = "nl2sql";
 
+	/** 是否启用网页嵌入 embed（0-关闭，1-开启）。开启后该 Agent 可被外部网站经 widget SDK 嵌入。 */
+	@Builder.Default
+	private Integer embedEnabled = 0;
+
+	/**
+	 * 网页嵌入配置（JSON 字符串）。结构见 {@code EmbedConfig}：allowedOrigins / welcomeMessage /
+	 * primaryColor / widgetPosition / showSuggestedQuestions / rateLimitPerMinute / rateLimitPerDay 等。
+	 * 为空时按 {@code EmbedConfig.defaults()} 兜底。落库为明文 JSON（非敏感）。
+	 */
+	private String embedConfig;
+
 	/** 创建时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime createTime;

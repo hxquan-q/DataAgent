@@ -91,6 +91,14 @@ spring:
           code-pool-executor: local
           # Python 执行最大重试次数
           python-max-tries-count: 5
+        # 网页嵌入 embed 配置
+        embed:
+          # 会话令牌 HMAC 密钥（生产必须修改）
+          token-hmac-key: dataagent-embed-dev-hmac-key-change-in-prod
+          # 会话令牌有效期（秒）
+          session-ttl-seconds: 1800
+          # 每 Agent 每分钟请求上限
+          rate-limit-per-minute: 30
         # 文件存储
         file:
           # local=本地磁盘；oss=阿里云 OSS

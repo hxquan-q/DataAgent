@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS agent (
     admin_id BIGINT COMMENT '管理员ID',
     tags TEXT COMMENT '标签，逗号分隔',
     workflow_mode VARCHAR(20) DEFAULT 'nl2sql' COMMENT '工作流模式：nl2sql-自由生成SQL，semantic-语义层受控拼装(NL2Semantic2SQL)',
+    embed_enabled TINYINT DEFAULT 0 COMMENT '是否启用网页嵌入：0-禁用，1-启用',
+    embed_config TEXT COMMENT '网页嵌入配置JSON：allowedOrigins/welcomeMessage/primaryColor等',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id),
