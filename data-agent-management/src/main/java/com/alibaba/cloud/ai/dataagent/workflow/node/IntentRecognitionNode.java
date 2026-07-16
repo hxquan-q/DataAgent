@@ -79,7 +79,7 @@ public class IntentRecognitionNode implements NodeAction {
 		String multiTurn = StateUtil.getStringValue(state, MULTI_TURN_CONTEXT, "(无)");
 
 		// 构建意图识别提示词
-		String prompt = PromptHelper.buildIntentRecognitionPrompt(multiTurn, userInput);
+		String prompt = PromptHelper.buildIntentRecognitionPrompt(PromptHelper.boundMultiTurn(multiTurn), PromptHelper.boundQuery(userInput));
 		log.debug("构建的意图识别提示词如下 \n {} \n", prompt);
 
 		// 调用大模型进行意图识别
