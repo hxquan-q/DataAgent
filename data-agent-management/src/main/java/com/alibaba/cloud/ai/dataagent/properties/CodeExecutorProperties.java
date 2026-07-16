@@ -112,7 +112,7 @@ public class CodeExecutorProperties {
 	/**
 	 * Python 代码执行超时时间
 	 */
-	String codeTimeout = "60s";
+	String codeTimeout = "45s";
 
 	/**
 	 * 容器最大运行时长
