@@ -435,7 +435,7 @@ async function downloadHtml() {
 }
 .markdown-body :deep(pre.hljs) {
 	margin: 0;
-	padding: 10px;
+	padding: 8px;
 	overflow-x: auto;
 	overflow-y: hidden;
 	background: #f6f8fa;
