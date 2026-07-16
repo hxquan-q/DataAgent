@@ -332,7 +332,7 @@ async function confirmDelete() {
 .session-list {
 	flex: 1;
 	overflow-y: auto;
-	padding: 0 8px;
+	padding: 0 6px;
 }
 
 .session-group-label {

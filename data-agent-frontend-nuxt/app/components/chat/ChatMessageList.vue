@@ -494,8 +494,8 @@ watch(
 	padding: 2px 0;
 }
 .dot {
-	width: 7px;
-	height: 7px;
+	width: 6px;
+	height: 6px;
 	background: #94a3b8;
 	border-radius: 50%;
 	animation: dotBounce 1.2s infinite;
