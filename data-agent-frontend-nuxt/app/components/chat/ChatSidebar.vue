@@ -353,7 +353,7 @@ async function confirmDelete() {
 	cursor: pointer;
 	transition: background 0.12s;
 	margin-bottom: 2px;
-	min-height: 38px;
+	min-height: 36px;
 }
 .session-item:hover {
 	background: var(--da-primary-soft, #eff6ff);
