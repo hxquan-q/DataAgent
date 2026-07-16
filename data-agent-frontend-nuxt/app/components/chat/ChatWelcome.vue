@@ -195,8 +195,8 @@ watch(
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 10px;
-	margin-top: 28px;
+	gap: 8px;
+	margin-top: 22px;
 	max-width: 560px;
 }
 

@@ -223,7 +223,7 @@ public class ReportGeneratorNode implements NodeAction {
 			sb.append("### 步骤 ").append(i + 1).append(": 步骤编号 ").append(step.getStep()).append("\n");
 			sb.append("**工具**: ").append(step.getToolToUse()).append("\n");
 			if (step.getToolParameters() != null) {
-				sb.append("**参数描述**: ").append(step.getToolParameters().getInstruction()).append("\n");
+				sb.append("**参数描述**: ").append(limitPromptSection(step.getToolParameters().getInstruction(), MAX_INSTRUCTION_CHARS)).append("\n");
 			}
 			sb.append("\n");
 		}
@@ -262,10 +262,10 @@ public class ReportGeneratorNode implements NodeAction {
 				sb.append("**步骤编号**: ").append(step.getStep()).append("\n");
 				sb.append("**使用工具**: ").append(step.getToolToUse()).append("\n");
 				if (step.getToolParameters() != null) {
-					sb.append("**参数描述**: ").append(step.getToolParameters().getInstruction()).append("\n");
+					sb.append("**参数描述**: ").append(limitPromptSection(step.getToolParameters().getInstruction(), MAX_INSTRUCTION_CHARS)).append("\n");
 					if (step.getToolParameters().getSqlQuery() != null) {
 						sb.append("**执行SQL**: \n```sql\n")
-							.append(step.getToolParameters().getSqlQuery())
+							.append(limitPromptSection(step.getToolParameters().getSqlQuery(), MAX_SQL_CHARS))
 							.append("\n```\n");
 					}
 				}
@@ -311,6 +311,12 @@ public class ReportGeneratorNode implements NodeAction {
 	 * @param maxChars 最大字符数
 	 * @return 截断后文本
 	 */
+	/** 报告提示词：步骤指令上限。 */
+	private static final int MAX_INSTRUCTION_CHARS = 500;
+
+	/** 报告提示词：单条 SQL 上限。 */
+	private static final int MAX_SQL_CHARS = 2_000;
+
 	static String limitPromptSection(String text, int maxChars) {
 		if (text == null) {
 			return "";
