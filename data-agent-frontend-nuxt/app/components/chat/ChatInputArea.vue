@@ -522,7 +522,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .feedback-btn {
 	display: inline-flex;
 	align-items: center;
-	padding: 6px 16px;
+	padding: 5px 12px;
 	border-radius: 6px;
 	font-size: 12.5px;
 	font-weight: 600;
