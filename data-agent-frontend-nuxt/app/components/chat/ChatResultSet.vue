@@ -314,7 +314,7 @@ function downloadCsv() {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
 	padding: 4px 6px;
 	background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 	border: 1px solid #e2e8f0;
