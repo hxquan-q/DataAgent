@@ -415,7 +415,7 @@ watch(
 .user-card {
 	background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
 	color: white !important;
-	padding: 10px 14px;
+	padding: 9px 12px;
 	border-radius: 18px 18px 6px 18px !important;
 	font-size: 13.5px;
 	line-height: 1.55;
@@ -427,7 +427,7 @@ watch(
 
 /* ── AI card ─────────────────────────────────────────────────────────────────── */
 .ai-card {
-	padding: 12px 14px;
+	padding: 10px 12px;
 	border-radius: 6px 18px 18px 18px !important;
 	font-size: 13.5px;
 	line-height: 1.6;
