@@ -427,7 +427,7 @@ watch(
 
 /* ── AI card ─────────────────────────────────────────────────────────────────── */
 .ai-card {
-	padding: 14px 16px;
+	padding: 12px 14px;
 	border-radius: 6px 18px 18px 18px !important;
 	font-size: 14px;
 	line-height: 1.7;

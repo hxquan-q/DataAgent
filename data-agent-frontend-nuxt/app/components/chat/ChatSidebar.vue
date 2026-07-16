@@ -431,7 +431,7 @@ async function confirmDelete() {
 	text-align: center;
 	font-size: 12px;
 	color: #94a3b8;
-	padding: 20px 0;
+	padding: 14px 0;
 }
 
 /* ── Bottom new session ──────────────────────────────────────────────────────── */
@@ -444,7 +444,7 @@ async function confirmDelete() {
 .new-session-btn {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
-	font-size: 14px !important;
+	font-size: 13px !important;
 	border-style: dashed !important;
 	border-radius: 10px !important;
 }
