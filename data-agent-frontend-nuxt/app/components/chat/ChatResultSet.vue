@@ -332,6 +332,8 @@ function downloadCsv() {
 }
 .result-meta {
 	color: #94a3b8;
+	font-size: 11.5px;
+	line-height: 1.3;
 }
 .result-warn {
 	color: #b45309;

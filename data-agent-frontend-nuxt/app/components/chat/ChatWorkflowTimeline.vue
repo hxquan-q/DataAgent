@@ -480,8 +480,8 @@ watch(
 	align-items: center;
 	justify-content: space-between;
 	gap: 6px;
-	margin-bottom: 8px;
-	padding: 6px 8px;
+	margin-bottom: 6px;
+	padding: 4px 6px;
 	background: #f8fafc;
 	border: 1px solid #e8edf2;
 	border-radius: 8px;
