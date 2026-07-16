@@ -76,7 +76,7 @@ public class PromptHelper {
 		String schemaInfo = buildMixMacSqlDbPrompt(schemaDTO, true);
 		Map<String, Object> params = new HashMap<>();
 		params.put("schema_info", schemaInfo);
-		params.put("question", question);
+		params.put("question", boundQuery(question));
 		if (StringUtils.isBlank(evidence))
 			params.put("evidence", "无");
 		else
@@ -133,6 +133,16 @@ public class PromptHelper {
 		}
 		return shortenExampleValueTo(multiTurn, MAX_MULTI_TURN_CHARS);
 	}
+
+	private static final int MAX_QUERY_CHARS = 1_000;
+
+	static String boundQuery(String query) {
+		if (query == null || query.isBlank()) {
+			return "";
+		}
+		return shortenExampleValueTo(query, MAX_QUERY_CHARS);
+	}
+
 
 
 
@@ -266,7 +276,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		String schemaInfo = buildMixMacSqlDbPrompt(sqlGenerationDTO.getSchemaDTO(), true);
 		Map<String, Object> params = new HashMap<>();
 		params.put("dialect", sqlGenerationDTO.getDialect());
-		params.put("question", sqlGenerationDTO.getQuery());
+		params.put("question", boundQuery(sqlGenerationDTO.getQuery()));
 		params.put("schema_info", schemaInfo);
 		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
 		params.put("execution_description", sqlGenerationDTO.getExecutionDescription());
@@ -314,7 +324,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 
 		Map<String, Object> params = new HashMap<>();
 		params.put("dialect", sqlGenerationDTO.getDialect());
-		params.put("question", sqlGenerationDTO.getQuery());
+		params.put("question", boundQuery(sqlGenerationDTO.getQuery()));
 		params.put("schema_info", schemaInfo);
 		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
 		params.put("error_sql", sqlGenerationDTO.getSql());
@@ -399,7 +409,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	public static String buildIntentRecognitionPrompt(String multiTurn, String latestQuery) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("multi_turn", boundMultiTurn(multiTurn));
-		params.put("latest_query", latestQuery);
+		params.put("latest_query", boundQuery(latestQuery));
 		BeanOutputConverter<IntentRecognitionOutputDTO> beanOutputConverter = new BeanOutputConverter<>(
 				IntentRecognitionOutputDTO.class);
 		params.put("format", beanOutputConverter.getFormat());
@@ -415,7 +425,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	public static String buildQueryEnhancePrompt(String multiTurn, String latestQuery, String evidence) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("multi_turn", boundMultiTurn(multiTurn));
-		params.put("latest_query", latestQuery);
+		params.put("latest_query", boundQuery(latestQuery));
 		if (StringUtils.isEmpty(evidence))
 			params.put("evidence", "无");
 		else
@@ -462,7 +472,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	public static String buildEvidenceQueryRewritePrompt(String multiTurn, String latestQuery) {
 		Map<String, Object> params = new HashMap<>();
 		params.put("multi_turn", boundMultiTurn(multiTurn));
-		params.put("latest_query", latestQuery);
+		params.put("latest_query", boundQuery(latestQuery));
 		BeanOutputConverter<EvidenceQueryRewriteDTO> beanOutputConverter = new BeanOutputConverter<>(
 				EvidenceQueryRewriteDTO.class);
 		params.put("format", beanOutputConverter.getFormat());
