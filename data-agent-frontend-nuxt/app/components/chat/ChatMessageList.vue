@@ -691,7 +691,7 @@ watch(
 	align-items: center;
 	padding: 10px 14px;
 	border-radius: 8px;
-	font-size: 13.5px;
+	font-size: 13px;
 	font-weight: 500;
 	line-height: 1.5;
 	max-width: 75%;

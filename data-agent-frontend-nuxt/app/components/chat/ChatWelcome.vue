@@ -208,7 +208,7 @@ watch(
 	border-radius: 999px;
 	padding: 8px 14px;
 	min-height: 36px;
-	font-size: 13px;
+	font-size: 12.5px;
 	font-weight: 500;
 	line-height: 1.35;
 	cursor: pointer;
