@@ -82,7 +82,7 @@ public class DataAgentProperties {
 	/**
 	 * 单次规划（Plan）最大长度限制
 	 */
-	private int maxplanlength = 2000;
+	private int maxplanlength = 1800;
 
 	/**
 	 * 每张表的最大预估列数（用于 Schema 召回时的截断控制）

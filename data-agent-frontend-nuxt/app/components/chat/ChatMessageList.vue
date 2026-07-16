@@ -474,7 +474,7 @@ watch(
 
 /* ── Thinking feedback (WeKnora-like status) ─────────────────────────────────── */
 .thinking-card {
-	padding: 12px 16px !important;
+	padding: 10px 14px !important;
 }
 .thinking-row {
 	display: flex;

@@ -395,7 +395,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 6px 4px 0;
+	padding: 4px 4px 0;
 }
 .action-bar-left {
 	display: flex;
