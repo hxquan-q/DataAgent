@@ -316,7 +316,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	box-shadow: 0 4px 16px rgba(0,0,0,0.10);
 	min-width: 180px;
 	max-width: 300px;
-	max-height: 280px;
+	max-height: 220px;
 	overflow-y: auto;
 	padding: 4px 0;
 }

@@ -270,8 +270,8 @@ async function confirmDelete() {
 /* ── Wrapper: drives the width transition ────────────────────────────────────── */
 .sidebar-wrapper {
 	position: relative;
-	width: 260px;
-	min-width: 260px;
+	width: 248px;
+	min-width: 248px;
 	transition:
 		width 0.25s ease,
 		min-width 0.25s ease;
@@ -287,7 +287,7 @@ async function confirmDelete() {
 
 /* ── Expanded panel ──────────────────────────────────────────────────────────── */
 .chat-sidebar {
-	width: 260px;
+	width: 248px;
 	background: var(--da-surface-soft, #f8fafc);
 	border-right: 1px solid #e8edf2;
 	display: flex;
