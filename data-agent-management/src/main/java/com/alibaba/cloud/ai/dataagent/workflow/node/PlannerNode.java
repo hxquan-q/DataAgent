@@ -167,8 +167,18 @@ public class PlannerNode implements NodeAction {
 	 * @param validationError 校验错误
 	 * @return 格式化后的错误信息字符串
 	 */
+	private static final int MAX_VALIDATION_ERROR_CHARS = 1_200;
+
 	private String formatValidationError(String validationError) {
-		return validationError != null ? String.format("**用户反馈（关键）**: %s\n\n**必须融合此反馈。**", validationError) : "";
+		if (validationError == null) {
+			return "";
+		}
+		// R23: 用户拒绝/校验反馈有界，避免长反馈撑爆 planner 重试 prompt
+		String err = validationError.trim();
+		if (err.length() > MAX_VALIDATION_ERROR_CHARS) {
+			err = err.substring(0, MAX_VALIDATION_ERROR_CHARS) + "…";
+		}
+		return String.format("**用户反馈（重要）**: %s\n\n**必须融合此反馈。**", err);
 	}
 
 }
