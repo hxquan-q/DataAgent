@@ -25,8 +25,9 @@ services:
       MYSQL_DATABASE: nl2sql_db
     ports:
       - "3306:3306"
-#    volumes:
-#      - nl2sql-mysql-inner-data:/var/lib/mysql
+    # 命名卷：recreate/restart 后保留 nl2sql_db。切勿 docker compose down -v。
+    volumes:
+      - data-agent-mysql-inner-data:/var/lib/mysql
     networks:
       - app-network
     restart: unless-stopped

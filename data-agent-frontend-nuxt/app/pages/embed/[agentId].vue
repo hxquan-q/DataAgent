@@ -302,8 +302,10 @@ function onHostMessage(ev: MessageEvent) {
 	} else if (d.type === 'context') {
 		hostContext.value = d.context || {};
 	} else if (d.type === 'query') {
-		input.value = d.query;
-		send();
+		const q = String(d.query || '').trim();
+		if (!q || streaming.value) return;
+		input.value = q;
+		void send(q);
 	}
 }
 
@@ -599,8 +601,13 @@ onBeforeUnmount(() => {
 				<!-- Live stream -->
 				<div v-if="streaming" class="msg-row">
 					<div class="msg-bot">
-						<div v-if="!liveSteps.length && !displayedText" class="thinking-row">
-							<span class="thinking-row__pulse" />
+						<div
+							v-if="!liveSteps.length && !displayedText"
+							class="thinking-row"
+							role="status"
+							aria-live="polite"
+						>
+							<span class="thinking-row__pulse" aria-hidden="true" />
 							<span>正在理解问题并规划查询…</span>
 						</div>
 						<div v-if="liveSteps.length" class="pipeline">
