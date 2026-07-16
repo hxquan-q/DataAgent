@@ -109,12 +109,12 @@ const cssVars = computed(() => ({
 }
 
 .base-drawer__header {
-	height: 56px;
+	height: 52px;
 	border-bottom: 1px solid #e2e8f0;
 	background-color: #ffffff;
 	display: flex;
 	align-items: center;
-	padding: 0 16px;
+	padding: 0 14px;
 	flex-shrink: 0;
 }
 
