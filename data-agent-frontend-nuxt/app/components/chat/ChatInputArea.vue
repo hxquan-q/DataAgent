@@ -135,7 +135,7 @@
 					发送
 					<v-icon size="16" class="ml-1">mdi-arrow-right</v-icon>
 				</v-btn>
-				<v-btn v-else class="stop-btn" @click="handleStop">
+				<v-btn v-else class="stop-btn" aria-label="停止生成" @click="handleStop">
 					<v-icon size="16" color="white">mdi-stop</v-icon>
 					停止
 				</v-btn>

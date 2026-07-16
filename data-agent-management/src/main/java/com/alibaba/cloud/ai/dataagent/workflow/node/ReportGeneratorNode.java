@@ -208,10 +208,13 @@ public class ReportGeneratorNode implements NodeAction {
 	private String buildUserRequirementsAndPlan(String userInput, Plan plan) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("## 用户原始需求\n");
-		sb.append(userInput).append("\n\n");
+		sb.append(limitPromptSection(userInput, 800)).append("\n\n");
 
 		sb.append("## 执行计划概述\n");
-		sb.append("**思考过程**: ").append(plan.getThoughtProcess()).append("\n\n");
+		// R9: 思考过程有界，避免 planner 长链式思考灌入报告 prompt
+		sb.append("**思考过程**: ")
+			.append(limitPromptSection(plan.getThoughtProcess(), MAX_THOUGHT_CHARS))
+			.append("\n\n");
 
 		sb.append("## 详细执行步骤\n");
 		List<ExecutionStep> executionPlan = plan.getExecutionPlan();
@@ -295,6 +298,9 @@ public class ReportGeneratorNode implements NodeAction {
 
 	/** 报告提示词：总结建议上限。 */
 	private static final int MAX_SUMMARY_CHARS = 1_500;
+
+	/** 报告提示词：计划思考过程上限。 */
+	private static final int MAX_THOUGHT_CHARS = 1_200;
 
 	/** 单步 Python 分析文本上限。 */
 	private static final int MAX_PYTHON_ANALYSIS_CHARS = 2_000;
