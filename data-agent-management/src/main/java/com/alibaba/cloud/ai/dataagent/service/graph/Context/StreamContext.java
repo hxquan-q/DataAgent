@@ -47,8 +47,20 @@ public class StreamContext {
 	 */
 	private final StringBuilder outputCollector = new StringBuilder();
 
+	/** R45: Langfuse 采集上限，避免超大流式输出占内存。 */
+	private static final int MAX_COLLECTED_OUTPUT_CHARS = 50_000;
+
 	public void appendOutput(String chunk) {
-		outputCollector.append(chunk);
+		if (chunk == null || outputCollector.length() >= MAX_COLLECTED_OUTPUT_CHARS) {
+			return;
+		}
+		int room = MAX_COLLECTED_OUTPUT_CHARS - outputCollector.length();
+		if (chunk.length() > room) {
+			outputCollector.append(chunk, 0, room);
+		}
+		else {
+			outputCollector.append(chunk);
+		}
 	}
 
 	public String getCollectedOutput() {

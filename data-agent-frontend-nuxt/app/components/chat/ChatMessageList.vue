@@ -415,7 +415,7 @@ watch(
 .user-card {
 	background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
 	color: white !important;
-	padding: 11px 16px;
+	padding: 10px 14px;
 	border-radius: 18px 18px 6px 18px !important;
 	font-size: 14px;
 	line-height: 1.65;
