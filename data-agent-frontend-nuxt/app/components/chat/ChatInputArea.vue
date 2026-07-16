@@ -341,6 +341,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font-weight: 500;
 }
 .item-name {
+	font-size: 12.5px;
 	flex: 1;
 	overflow: hidden;
 	text-overflow: ellipsis;
