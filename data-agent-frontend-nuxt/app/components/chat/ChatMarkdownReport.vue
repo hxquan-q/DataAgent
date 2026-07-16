@@ -541,4 +541,16 @@ async function downloadHtml() {
 		animation: none !important;
 	}
 }
+
+/* R8 tokens */
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
+.markdown-body :deep(h3) {
+	color: var(--da-ink, #0f172a);
+}
+.markdown-body :deep(p),
+.markdown-body :deep(li) {
+	color: #334155;
+	letter-spacing: -0.01em;
+}
 </style>

@@ -457,4 +457,19 @@ class PromptHelperTest {
 		assertTrue(result.contains("…"));
 	}
 
+	@Test
+	void buildMixMacSqlDbPrompt_manyForeignKeys_isCapped() {
+		SchemaDTO schema = new SchemaDTO();
+		schema.setName("db");
+		schema.setTable(Arrays.asList());
+		java.util.List<String> fks = new java.util.ArrayList<>();
+		for (int i = 0; i < 40; i++) {
+			fks.add("t" + i + ".a = t" + i + ".b");
+		}
+		schema.setForeignKeys(fks);
+		String result = PromptHelper.buildMixMacSqlDbPrompt(schema, true);
+		assertTrue(result.contains("more foreign keys omitted"));
+		assertFalse(result.contains("t39.a"));
+	}
+
 }

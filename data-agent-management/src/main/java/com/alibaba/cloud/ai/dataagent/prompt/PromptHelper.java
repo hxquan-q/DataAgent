@@ -90,6 +90,9 @@ public class PromptHelper {
 	/** Schema 提示词：单表最多列数。 */
 	private static final int MAX_COLUMNS_PER_TABLE_PROMPT = 40;
 
+	/** Schema 提示词：最多外键行数。 */
+	private static final int MAX_FOREIGN_KEYS_PROMPT = 30;
+
 	/** Schema 列样本：单条最大字符。 */
 	private static final int MAX_EXAMPLE_CHARS = 40;
 
@@ -164,7 +167,14 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 			sb.append(buildMixMacSqlTablePrompt(tableDTO, withColumnType)).append("\n");
 		}
 		if (CollectionUtils.isNotEmpty(schemaDTO.getForeignKeys())) {
-			sb.append("【Foreign keys】\n").append(StringUtils.join(schemaDTO.getForeignKeys(), "\n"));
+			// R8: FK 列表有界，避免超多逻辑外键撑爆 schema 提示词
+			List<String> fks = schemaDTO.getForeignKeys();
+			int fkLimit = Math.min(fks.size(), MAX_FOREIGN_KEYS_PROMPT);
+			sb.append("【Foreign keys】\n")
+				.append(StringUtils.join(fks.subList(0, fkLimit), "\n"));
+			if (fks.size() > fkLimit) {
+				sb.append("\n(... ").append(fks.size() - fkLimit).append(" more foreign keys omitted)");
+			}
 		}
 		return sb.toString();
 	}
