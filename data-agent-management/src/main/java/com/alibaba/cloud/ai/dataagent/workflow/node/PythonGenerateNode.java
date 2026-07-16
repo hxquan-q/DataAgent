@@ -60,7 +60,7 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 public class PythonGenerateNode implements NodeAction {
 
 	/** 范例数据采样数量，用于限制提示词中包含的数据量 */
-	private static final int SAMPLE_DATA_NUMBER = 5;
+	private static final int SAMPLE_DATA_NUMBER = 4;
 
 	private final ObjectMapper objectMapper;
 
