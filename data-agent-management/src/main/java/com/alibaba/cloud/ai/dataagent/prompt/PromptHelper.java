@@ -125,6 +125,16 @@ public class PromptHelper {
 		return shortenExampleValueTo(evidence, MAX_EVIDENCE_CHARS);
 	}
 
+	private static final int MAX_MULTI_TURN_CHARS = 2_500;
+
+	static String boundMultiTurn(String multiTurn) {
+		if (multiTurn == null || multiTurn.isBlank()) {
+			return "(无)";
+		}
+		return shortenExampleValueTo(multiTurn, MAX_MULTI_TURN_CHARS);
+	}
+
+
 
 	
 	/**
@@ -388,7 +398,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	 */
 	public static String buildIntentRecognitionPrompt(String multiTurn, String latestQuery) {
 		Map<String, Object> params = new HashMap<>();
-		params.put("multi_turn", multiTurn != null ? multiTurn : "(无)");
+		params.put("multi_turn", boundMultiTurn(multiTurn));
 		params.put("latest_query", latestQuery);
 		BeanOutputConverter<IntentRecognitionOutputDTO> beanOutputConverter = new BeanOutputConverter<>(
 				IntentRecognitionOutputDTO.class);
@@ -404,7 +414,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	 */
 	public static String buildQueryEnhancePrompt(String multiTurn, String latestQuery, String evidence) {
 		Map<String, Object> params = new HashMap<>();
-		params.put("multi_turn", multiTurn != null ? multiTurn : "(无)");
+		params.put("multi_turn", boundMultiTurn(multiTurn));
 		params.put("latest_query", latestQuery);
 		if (StringUtils.isEmpty(evidence))
 			params.put("evidence", "无");
@@ -439,7 +449,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		params.put("canonical_query", canonicalQuery != null ? canonicalQuery : "");
 		params.put("recalled_schema", schemaInfo);
 		params.put("evidence", boundEvidence(evidence));
-		params.put("multi_turn", multiTurn != null ? multiTurn : "(无)");
+		params.put("multi_turn", boundMultiTurn(multiTurn));
 		return PromptConstant.getFeasibilityAssessmentPromptTemplate().render(params);
 	}
 
@@ -451,7 +461,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 	 */
 	public static String buildEvidenceQueryRewritePrompt(String multiTurn, String latestQuery) {
 		Map<String, Object> params = new HashMap<>();
-		params.put("multi_turn", multiTurn != null ? multiTurn : "(无)");
+		params.put("multi_turn", boundMultiTurn(multiTurn));
 		params.put("latest_query", latestQuery);
 		BeanOutputConverter<EvidenceQueryRewriteDTO> beanOutputConverter = new BeanOutputConverter<>(
 				EvidenceQueryRewriteDTO.class);

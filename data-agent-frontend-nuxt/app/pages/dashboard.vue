@@ -15,14 +15,57 @@
  */
 
 <template>
-  <section class="page-shell">
+  <section class="page-shell dashboard-placeholder">
+    <p class="dashboard-kicker">Data Agent</p>
     <h1>数据看板</h1>
-    <p>这里将呈现业务可视化看板。</p>
+    <p class="dashboard-desc">
+      业务可视化看板位。当前请从「数据问答」发起分析，报告与图表会直接出现在对话结果中。
+    </p>
+    <div class="dashboard-actions">
+      <NuxtLink to="/chat" class="dashboard-link">前往数据问答</NuxtLink>
+    </div>
   </section>
 </template>
 
 <style scoped>
-.page-shell {
-  padding: 32px;
+.dashboard-placeholder {
+  max-width: 720px;
+}
+.dashboard-kicker {
+  margin: 0 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--da-muted, #64748b);
+}
+.dashboard-placeholder h1 {
+  margin: 0 0 12px;
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--da-ink, #0f172a);
+}
+.dashboard-desc {
+  margin: 0 0 20px;
+  font-size: 14.5px;
+  line-height: 1.7;
+  color: var(--da-muted, #64748b);
+}
+.dashboard-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--da-primary, #1e40af);
+  color: #fff;
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.dashboard-link:focus-visible {
+  outline: 2px solid var(--da-accent, #3b82f6);
+  outline-offset: 2px;
 }
 </style>
