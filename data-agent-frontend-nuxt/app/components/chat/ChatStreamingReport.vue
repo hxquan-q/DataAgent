@@ -190,7 +190,7 @@ onBeforeUnmount(() => {
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
 	font-weight: 700;
-	margin: 14px 0 6px;
+	margin: 10px 0 4px;
 	color: #0f172a;
 }
 .markdown-body :deep(h1) {
