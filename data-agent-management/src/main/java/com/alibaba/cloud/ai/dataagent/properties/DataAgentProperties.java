@@ -187,7 +187,7 @@ public class DataAgentProperties {
 			/**
 			 * 最大分块数量 默认值：5000
 			 */
-			private int maxNumChunks = 5000;
+			private int maxNumChunks = 3000;
 
 			/**
 			 * 是否保留分隔符 默认值：true

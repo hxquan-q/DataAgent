@@ -553,4 +553,12 @@ async function downloadHtml() {
 	color: #334155;
 	letter-spacing: -0.01em;
 }
+
+.report-actions :deep(.v-btn) {
+	min-width: 28px !important;
+	height: 28px !important;
+}
+.report-header {
+	min-height: 36px;
+}
 </style>
