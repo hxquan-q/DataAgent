@@ -380,7 +380,7 @@ watch(
 	padding: 16px 24px 24px;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: 14px;
 	width: 100%;
 	max-width: 960px;
 	margin: 0 auto;
