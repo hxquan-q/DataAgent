@@ -479,7 +479,7 @@ watch(
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 8px;
+	gap: 6px;
 	margin-bottom: 8px;
 	padding: 6px 8px;
 	background: #f8fafc;
@@ -491,12 +491,12 @@ watch(
 	display: flex;
 	align-items: baseline;
 	flex-wrap: wrap;
-	gap: 8px;
+	gap: 6px;
 	min-width: 0;
 }
 
 .timeline-title {
-	font-size: 14px !important;
+	font-size: 13px !important;
 	font-weight: 700;
 	color: #1e40af;
 	display: flex;
@@ -542,7 +542,7 @@ watch(
 .step-header-left {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
 }
 
 .step-label {

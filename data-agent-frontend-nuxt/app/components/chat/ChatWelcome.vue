@@ -20,7 +20,7 @@
 			<v-avatar
 				:image="store.currentAgentAvatar || undefined"
 				:color="store.currentAgentAvatar ? undefined : 'primary'"
-				size="72"
+				size="64"
 				rounded="circle"
 				class="agent-avatar"
 			>
