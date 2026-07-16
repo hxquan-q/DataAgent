@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.dataagent.workflow.node;
 
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
+
 import com.alibaba.cloud.ai.dataagent.dto.prompt.QueryEnhanceOutputDTO;
 import com.alibaba.cloud.ai.dataagent.entity.LogicalRelation;
 import com.alibaba.cloud.ai.dataagent.mapper.AgentDatasourceMapper;
@@ -87,7 +89,7 @@ public class SchemaRecallNode implements NodeAction {
 		// 获取查询增强节点的输出
 		QueryEnhanceOutputDTO queryEnhanceOutputDTO = StateUtil.getObjectValue(state, QUERY_ENHANCE_NODE_OUTPUT,
 				QueryEnhanceOutputDTO.class);
-		String input = queryEnhanceOutputDTO.getCanonicalQuery();
+		String input = PromptHelper.boundQuery(queryEnhanceOutputDTO.getCanonicalQuery());
 		String agentId = StateUtil.getStringValue(state, AGENT_ID);
 
 		// 查询智能体的激活数据源

@@ -15,7 +15,7 @@
  */
 
 <template>
-	<header class="d-flex align-center justify-space-between mb-8 knowledge-header">
+	<header class="d-flex align-center justify-space-between mb-5 knowledge-header">
 		<div>
 			<h1 class="text-h4 font-weight-bold mb-1 knowledge-header__title">{{ title }}</h1>
 			<p class="text-body-2 text-medium-emphasis">{{ subtitle }}</p>
@@ -35,6 +35,10 @@ defineProps<{
 
 <style scoped>
 .knowledge-header__title {
-	color: #1565c0;
+	color: var(--da-primary, #1e40af);
+	letter-spacing: -0.02em;
+}
+.knowledge-header p {
+	color: var(--da-muted, #64748b);
 }
 </style>
