@@ -312,7 +312,7 @@ public class DataAgentProperties {
 		/**
 		 * 表级召回返回的最大表数量（Top-K）
 		 */
-		private int tableTopkLimit = 10;
+		private int tableTopkLimit = 8;
 
 		/**
 		 * 表级相似度下限；设置较低以避免漏召回表
@@ -327,7 +327,7 @@ public class DataAgentProperties {
 		/**
 		 * 查询时返回的最大文档数量
 		 */
-		private int defaultTopkLimit = 8;
+		private int defaultTopkLimit = 6;
 
 		/**
 		 * 一次删除操作中，最多删除的文档数量

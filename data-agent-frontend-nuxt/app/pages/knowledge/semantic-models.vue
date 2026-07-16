@@ -52,7 +52,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="searchKeyword"
@@ -193,7 +193,7 @@
 
 		<v-dialog v-model="dialogVisible" max-width="760" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
 						color="blue-darken-2"
@@ -213,7 +213,7 @@
 				</v-card-title>
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<v-row>
 							<v-col cols="12" md="6">
@@ -345,7 +345,7 @@
 
 		<v-dialog v-model="batchImportDialogVisible" max-width="760">
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-upload"
 						color="blue-darken-2"
@@ -362,7 +362,7 @@
 					/>
 				</v-card-title>
 				<v-divider />
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-file-input
 						v-model="importFile"
 						label="上传 Excel 文件"

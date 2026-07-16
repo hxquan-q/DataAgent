@@ -54,7 +54,7 @@
 		</KnowledgePageHeader>
 
 		<!-- 搜索栏 -->
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<v-text-field
 				v-model="searchKeyword"
 				placeholder="请输入关键词搜索业务名词、描述或同义词..."
@@ -268,7 +268,7 @@
 		<!-- 添加/编辑 Dialog -->
 		<v-dialog v-model="dialogVisible" max-width="640" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
 						color="blue-darken-2"
@@ -289,7 +289,7 @@
 
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<div class="mb-5">
 							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
