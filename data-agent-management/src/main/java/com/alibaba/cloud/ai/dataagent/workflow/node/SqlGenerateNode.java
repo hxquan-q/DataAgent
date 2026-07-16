@@ -69,6 +69,9 @@ import static com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil.getCurrentExec
 @AllArgsConstructor
 public class SqlGenerateNode implements NodeAction {
 
+	private static final int MAX_HEAL_ERROR_ENTRIES = 5;
+
+
 	private final Nl2SqlService nl2SqlService;
 
 	private final DataAgentProperties properties;
@@ -120,7 +123,15 @@ public class SqlGenerateNode implements NodeAction {
 		String errorForPrompt;
 		if (isRetry) {
 			updatedHealErrors = new ArrayList<>(healErrors);
-			updatedHealErrors.add(retryDto.reason());
+			// R49: 仅保留最近若干条自愈错误，防止列表膨胀
+			String reason = retryDto.reason() == null ? "" : retryDto.reason();
+			if (reason.length() > 400) {
+				reason = reason.substring(0, 400) + "…";
+			}
+			updatedHealErrors.add(reason);
+			while (updatedHealErrors.size() > MAX_HEAL_ERROR_ENTRIES) {
+				updatedHealErrors.remove(0);
+			}
 			errorForPrompt = buildHealErrorMessage(updatedHealErrors);
 		}
 		else {
