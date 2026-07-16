@@ -156,7 +156,7 @@ onBeforeUnmount(() => {
 }
 
 .report-body {
-	padding: 10px;
+	padding: 8px;
 	position: relative;
 }
 
