@@ -122,7 +122,7 @@ public class PythonGenerateNode implements NodeAction {
 					codeExecutorProperties.getCodeTimeout(), "database_schema",
 					// R14: 使用与 SQL 节点一致的紧凑 schema 文本，避免全量 JSON 撑爆 python 生成 prompt
 					PromptHelper.buildMixMacSqlDbPrompt(schemaDTO, true), "sample_input",
-					objectMapper.writeValueAsString(sqlResults.stream().limit(SAMPLE_DATA_NUMBER).toList()),
+					limitJson(objectMapper.writeValueAsString(sqlResults.stream().limit(SAMPLE_DATA_NUMBER).toList()), MAX_SAMPLE_JSON_CHARS),
 					"plan_description",
 					limitJson(objectMapper.writeValueAsString(toolParameters), MAX_PLAN_JSON_CHARS)));
 
@@ -148,6 +148,8 @@ public class PythonGenerateNode implements NodeAction {
 
 
 	private static final int MAX_PLAN_JSON_CHARS = 2_000;
+
+	private static final int MAX_SAMPLE_JSON_CHARS = 3_000;
 
 	static String limitJson(String json, int maxChars) {
 		if (json == null) {
