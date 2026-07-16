@@ -63,7 +63,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-select
 					v-model="selectedAgentId"
@@ -240,7 +240,7 @@
 
 		<v-dialog v-model="dialogVisible" max-width="760" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
 						color="blue-darken-2"

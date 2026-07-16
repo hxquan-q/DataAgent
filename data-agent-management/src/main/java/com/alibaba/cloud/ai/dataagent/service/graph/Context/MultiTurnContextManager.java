@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.dataagent.service.graph.Context;
 
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
+
 import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -142,9 +144,11 @@ public class MultiTurnContextManager {
 		if (deque == null || deque.isEmpty()) {
 			return "(无)";
 		}
-		return deque.stream()
+		// R39: 构建时即有界，避免历史无限增长灌入所有节点
+		String raw = deque.stream()
 			.map(turn -> "用户: " + turn.userQuestion() + "\nAI计划: " + turn.plan())
 			.collect(Collectors.joining("\n"));
+		return PromptHelper.boundMultiTurn(raw);
 	}
 
 	/**
