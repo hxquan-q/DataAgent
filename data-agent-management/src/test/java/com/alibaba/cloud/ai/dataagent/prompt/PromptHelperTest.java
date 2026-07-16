@@ -472,4 +472,18 @@ class PromptHelperTest {
 		assertFalse(result.contains("t39.a"));
 	}
 
+	@Test
+	void boundEvidence_blankBecomesWu() {
+		assertEquals("无", PromptHelper.boundEvidence(null));
+		assertEquals("无", PromptHelper.boundEvidence("  "));
+	}
+
+	@Test
+	void boundQuery_truncatesLongQuery() {
+		String q = "q".repeat(1200);
+		String out = PromptHelper.boundQuery(q);
+		assertTrue(out.length() <= 1001);
+		assertTrue(out.endsWith("…"));
+	}
+
 }
