@@ -153,7 +153,7 @@ public class JsonParseUtil {
 	private String callLlmToFix(String json, String errorMessage) {
 		try {
 			String prompt = PromptConstant.getJsonFixPromptTemplate()
-				.render(Map.of("json_string", json, "error_message", errorMessage));
+				.render(Map.of("json_string", truncateForPrompt(json, 4_000), "error_message", truncateForPrompt(errorMessage, 1_000)));
 
 			Flux<ChatResponse> responseFlux = llmService.callUser(prompt);
 			String fixedJson = llmService.toStringFlux(responseFlux)
