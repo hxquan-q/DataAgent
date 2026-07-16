@@ -535,4 +535,10 @@ async function downloadHtml() {
 .report-body {
 	/* keep existing; soft top pad via hairline separation */
 }
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation: none !important;
+	}
+}
 </style>

@@ -393,4 +393,24 @@ onBeforeUnmount(() => {
 		transform: scale(0.9);
 	}
 }
+
+/* design tokens + reduced motion (R2) */
+.report-header {
+	background: var(--da-surface-soft, #f8fafc);
+	border-bottom-color: var(--da-line-soft, #e8edf2);
+	color: var(--da-ink, #0f172a);
+}
+.typing-dot {
+	background: var(--da-accent, #3b82f6);
+}
+.markdown-body.streaming :deep(> :last-child::after) {
+	background: var(--da-accent, #3b82f6);
+}
+@media (prefers-reduced-motion: reduce) {
+	.typing-dot,
+	.markdown-body.streaming :deep(> :last-child::after) {
+		animation: none !important;
+		opacity: 0.85;
+	}
+}
 </style>
