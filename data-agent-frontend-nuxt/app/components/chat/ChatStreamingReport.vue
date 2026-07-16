@@ -125,7 +125,7 @@ onBeforeUnmount(() => {
 .typing-indicator {
 	display: inline-flex;
 	align-items: center;
-	gap: 3px;
+	gap: 2px;
 	margin-left: 6px;
 }
 

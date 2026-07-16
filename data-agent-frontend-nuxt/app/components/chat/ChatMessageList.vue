@@ -540,7 +540,7 @@ watch(
 	margin-bottom: 7px;
 }
 .md-body :deep(li) {
-	margin-bottom: 3px;
+	margin-bottom: 2px;
 }
 .md-body :deep(code:not(pre code)) {
 	background: #f6f8fa;
