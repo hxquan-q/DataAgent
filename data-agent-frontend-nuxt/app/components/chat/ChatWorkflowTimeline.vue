@@ -481,7 +481,7 @@ watch(
 	justify-content: space-between;
 	gap: 6px;
 	margin-bottom: 6px;
-	padding: 4px 6px;
+	padding: 3px 5px;
 	background: #f8fafc;
 	border: 1px solid #e8edf2;
 	border-radius: 8px;
