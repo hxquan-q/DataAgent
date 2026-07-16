@@ -140,7 +140,7 @@ public class DataAgentProperties {
 		/**
 		 * 默认分块大小，基于token数量 默认值：1000
 		 */
-		private int chunkSize = 1000;
+		private int chunkSize = 800;
 
 		/**
 		 * TokenTextSplitter 策略配置
@@ -206,7 +206,7 @@ public class DataAgentProperties {
 			/**
 			 * 重叠区域字符数 默认值：200
 			 */
-			private int chunkOverlap = 200;
+			private int chunkOverlap = 160;
 
 			/**
 			 * 分隔符列表（如果为 null，该类内部有默认的分隔符列表）
