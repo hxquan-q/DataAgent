@@ -280,6 +280,33 @@
 									color="primary"
 									@click="navigateToPath('/system/query-log')"
 								/>
+								<v-list-item
+									prepend-icon="mdi-chart-bar"
+									title="评测游乐场"
+									:active="isActive('/system/eval-playground')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/eval-playground')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-shield-lock"
+									title="安全状态"
+									:active="isActive('/system/security')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/security')"
+								/>
+															<v-list-item
+									prepend-icon="mdi-web-box"
+									title="网页嵌入"
+									:active="isActive('/system/embed')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/embed')"
+								/>
 							</v-list-group>
 
 							<div class="mt-6 pt-4 border-t border-white/5">
@@ -385,6 +412,9 @@ const routeTitleMap: Record<string, string> = {
 	'/system/metric-versions': '口径版本配置',
 	'/system/semantic-aliases': '语义别名配置',
 	'/system/query-log': '查询证据链',
+	'/system/eval-playground': '评测游乐场',
+	'/system/security': '安全状态',
+	'/system/embed': '网页嵌入',
 	'/system/settings': '通用设置',
 	'/agent/new': '新建智能体',
 };

@@ -45,12 +45,26 @@ export default defineNuxtConfig({
 	},
 	//全局关闭ssr
 	ssr: false,
+	// 混合开发：公网 IP / 域名访问（经 3301 nginx 或直连 3000）
+	// allowedHosts 避免 Vite 拦截 Host 头；HMR 走当前访问的 host
+	vite: {
+		server: {
+			host: '0.0.0.0',
+			// 允许公网 IP / 任意 Host（开发环境）
+			allowedHosts: true,
+			hmr: {
+				// 经 3301 反代时由客户端自动用当前页面 host；直连 3000 也可用
+				clientPort: undefined,
+			},
+		},
+	},
 	// /路由重定向到/create-agent
 	routeRules: {
 		'/': { redirect: '/agent/new' },
-		// 代理所有 /api/** 的请求到 Java 后端
-		'/api/**': { proxy: 'http://localhost:8065/api/**' },
-		'/nl2sql/**': { proxy: 'http://localhost:8065/nl2sql/**' },
+		// 代理所有 /api/** 的请求到 Java 后端（Nuxt 服务端转发，浏览器仍同源）
+		// 公网访问 3000/3301 时，/api 仍转到本机 IDEA 8065
+		'/api/**': { proxy: 'http://127.0.0.1:8065/api/**' },
+		'/nl2sql/**': { proxy: 'http://127.0.0.1:8065/nl2sql/**' },
 	},
 	//全局动画配置
 	app: {
