@@ -436,7 +436,7 @@ async function confirmDelete() {
 
 /* ── Bottom new session ──────────────────────────────────────────────────────── */
 .sidebar-bottom {
-	padding: 10px 12px 12px;
+	padding: 8px 10px 10px;
 	border-top: 1px solid var(--da-line-soft, #e8edf2);
 	flex-shrink: 0;
 }
