@@ -73,6 +73,26 @@
 			</v-btn-toggle>
 		</div>
 
+
+		<!-- R150: readiness banner -->
+		<v-alert
+			v-if="!loading && readiness && !readiness.chatModelReady"
+			type="warning"
+			variant="tonal"
+			class="mb-4"
+			border="start"
+			density="comfortable"
+		>
+			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
+				<span class="text-body-2">
+					当前无激活的对话模型：数据问答无法生成回答。请在下方添加并激活 CHAT 模型。
+				</span>
+				<v-btn size="small" color="warning" variant="flat" class="text-none" @click="openCreateDialog('CHAT')">
+					添加对话模型
+				</v-btn>
+			</div>
+		</v-alert>
+
 		<v-row justify="center">
 			<v-col cols="12" xl="10">
 				<!-- Hint Alert (Commented out) -->
@@ -213,30 +233,39 @@
 							</v-card>
 						</div>
 
-						<!-- Empty State (Inside TransitionGroup) -->
+						<!-- Empty State (R150: actionable copy) -->
 						<div
 							v-if="filteredModels.length === 0"
 							:key="activeTab + 'empty'"
-							class="text-center py-16 border-dashed rounded-xl bg-white"
+							class="text-center py-12 border-dashed rounded-xl bg-white model-empty"
 						>
 							<v-icon
-								icon="mdi-robot-vacuum-variant-off"
-								size="64"
-								color="grey-lighten-2"
-								class="mb-4"
+								icon="mdi-robot-outline"
+								size="56"
+								color="grey-lighten-1"
+								class="mb-3"
 							></v-icon>
-							<h3 class="text-h6 font-weight-medium text-grey-darken-1">
-								暂无配置
+							<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">
+								{{ activeTab === 'CHAT' ? '尚未配置对话模型' : '尚未配置嵌入模型' }}
 							</h3>
-							<p class="text-body-2 text-grey mb-6">
-								您还没有在该分类下添加任何供应商
+							<p class="text-body-2 text-medium-emphasis mb-2 model-empty__desc">
+								{{
+									activeTab === 'CHAT'
+										? '数据问答依赖激活的 CHAT 模型。请添加供应商（OpenAI 兼容 / DashScope 等），填写 Base URL、API Key 与模型名，并点击「激活」。'
+										: '向量检索依赖激活的 EMBEDDING 模型。未配置时将使用占位向量，召回质量会下降。'
+								}}
+							</p>
+							<p class="text-caption text-medium-emphasis mb-5">
+								配置后请返回「数据问答」发送问题验证。
 							</p>
 							<v-btn
-								color="black"
+								color="primary"
 								variant="flat"
+								class="text-none"
 								@click="openCreateDialog(activeTab)"
-								>立即添加</v-btn
 							>
+								{{ activeTab === 'CHAT' ? '添加对话模型' : '添加嵌入模型' }}
+							</v-btn>
 						</div>
 					</TransitionGroup>
 				</div>
@@ -399,6 +428,7 @@ const providerBaseUrlMap: Record<string, string> = {
 	custom: '',
 };
 
+const readiness = ref<{ chatModelReady?: boolean; embeddingModelReady?: boolean; ready?: boolean } | null>(null);
 const loading = ref(false);
 const configs = ref<ModelConfig[]>([]);
 const activeTab = ref<ModelType>('CHAT');
@@ -473,6 +503,11 @@ const fetchConfigs = async () => {
 	loading.value = true;
 	try {
 		const response = await modelConfigService.list();
+		try {
+			readiness.value = await modelConfigService.checkReady();
+		} catch {
+			readiness.value = null;
+		}
 		console.log(response);
 		configs.value = response || [];
 	} catch {
