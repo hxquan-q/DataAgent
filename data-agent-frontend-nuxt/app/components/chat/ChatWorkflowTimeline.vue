@@ -767,4 +767,11 @@ watch(
 .workflow-timeline.is-completed {
 	opacity: 0.95;
 }
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		transition: none !important;
+		animation: none !important;
+	}
+}
 </style>

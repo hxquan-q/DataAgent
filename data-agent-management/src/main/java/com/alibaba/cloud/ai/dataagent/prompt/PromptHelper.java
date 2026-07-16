@@ -80,7 +80,7 @@ public class PromptHelper {
 		if (StringUtils.isBlank(evidence))
 			params.put("evidence", "无");
 		else
-			params.put("evidence", evidence);
+			params.put("evidence", boundEvidence(evidence));
 		return PromptConstant.getMixSelectorPromptTemplate().render(params);
 	}
 
@@ -114,6 +114,17 @@ public class PromptHelper {
 		}
 		return v.substring(0, maxChars) + "…";
 	}
+
+	/** Evidence 注入上限，避免召回文档灌爆 SQL/规划提示词。 */
+	private static final int MAX_EVIDENCE_CHARS = 3_000;
+
+	static String boundEvidence(String evidence) {
+		if (StringUtils.isBlank(evidence)) {
+			return "无";
+		}
+		return shortenExampleValueTo(evidence, MAX_EVIDENCE_CHARS);
+	}
+
 
 	
 	/**
@@ -247,7 +258,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		params.put("dialect", sqlGenerationDTO.getDialect());
 		params.put("question", sqlGenerationDTO.getQuery());
 		params.put("schema_info", schemaInfo);
-		params.put("evidence", sqlGenerationDTO.getEvidence());
+		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
 		params.put("execution_description", sqlGenerationDTO.getExecutionDescription());
 		return PromptConstant.getNewSqlGeneratorPromptTemplate().render(params);
 	}
@@ -257,7 +268,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		params.put("dialect", semanticConsistencyDTO.getDialect());
 		params.put("execution_description", semanticConsistencyDTO.getExecutionDescription());
 		params.put("user_query", semanticConsistencyDTO.getUserQuery());
-		params.put("evidence", semanticConsistencyDTO.getEvidence());
+		params.put("evidence", boundEvidence(semanticConsistencyDTO.getEvidence()));
 		params.put("schema_info", semanticConsistencyDTO.getSchemaInfo());
 		params.put("sql", semanticConsistencyDTO.getSql());
 		return PromptConstant.getSemanticConsistencyPromptTemplate().render(params);
@@ -295,7 +306,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		params.put("dialect", sqlGenerationDTO.getDialect());
 		params.put("question", sqlGenerationDTO.getQuery());
 		params.put("schema_info", schemaInfo);
-		params.put("evidence", sqlGenerationDTO.getEvidence());
+		params.put("evidence", boundEvidence(sqlGenerationDTO.getEvidence()));
 		params.put("error_sql", sqlGenerationDTO.getSql());
 		params.put("error_message", sqlGenerationDTO.getExceptionMessage());
 		params.put("execution_description", sqlGenerationDTO.getExecutionDescription());
@@ -398,7 +409,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		if (StringUtils.isEmpty(evidence))
 			params.put("evidence", "无");
 		else
-			params.put("evidence", evidence);
+			params.put("evidence", boundEvidence(evidence));
 		params.put("current_time_info", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 		BeanOutputConverter<QueryEnhanceOutputDTO> beanOutputConverter = new BeanOutputConverter<>(
 				QueryEnhanceOutputDTO.class);
@@ -427,7 +438,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		String schemaInfo = buildMixMacSqlDbPrompt(recalledSchema, true);
 		params.put("canonical_query", canonicalQuery != null ? canonicalQuery : "");
 		params.put("recalled_schema", schemaInfo);
-		params.put("evidence", evidence != null ? evidence : "");
+		params.put("evidence", boundEvidence(evidence));
 		params.put("multi_turn", multiTurn != null ? multiTurn : "(无)");
 		return PromptConstant.getFeasibilityAssessmentPromptTemplate().render(params);
 	}
