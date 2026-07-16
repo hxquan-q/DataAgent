@@ -334,4 +334,34 @@ class PromptHelperTest {
 		assertNotNull(result);
 	}
 
+	@Test
+	void buildMixMacSqlTablePrompt_longExampleValue_isShortened() {
+		TableDTO table = new TableDTO();
+		table.setName("users");
+		table.setDescription("User table");
+
+		ColumnDTO col = new ColumnDTO();
+		col.setName("bio");
+		col.setType("text");
+		col.setDescription("Bio");
+		String longVal = "x".repeat(80);
+		col.setData(Arrays.asList(longVal, "short", "another-long-" + "y".repeat(50)));
+		table.setColumn(Arrays.asList(col));
+
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+
+		assertTrue(result.contains("Examples:"));
+		assertFalse(result.contains(longVal));
+		assertTrue(result.contains("…"));
+		int idx = result.indexOf("Examples: [");
+		String ex = result.substring(idx, result.indexOf(']', idx) + 1);
+		assertEquals(1, ex.chars().filter(ch -> ch == ',').count());
+	}
+
+	@Test
+	void shortenExampleValue_passthroughAndTrim() {
+		assertEquals("ab", PromptHelper.shortenExampleValue("  ab  "));
+		assertTrue(PromptHelper.shortenExampleValue("z".repeat(50)).endsWith("…"));
+	}
+
 }

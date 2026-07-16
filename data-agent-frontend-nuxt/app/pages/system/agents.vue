@@ -15,9 +15,9 @@
  */
 
 <template>
-	<v-container fluid class="page-shell pa-8 agents-container">
+	<v-container fluid class="page-shell pa-6 agents-container">
 		<!-- Header Section -->
-		<header class="d-flex align-center justify-space-between mb-8">
+		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
 				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">智能体管理</h1>
 				<p class="text-body-2 text-medium-emphasis">

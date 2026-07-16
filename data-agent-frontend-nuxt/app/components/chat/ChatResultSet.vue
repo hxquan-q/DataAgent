@@ -311,7 +311,7 @@ function downloadCsv() {
 	justify-content: space-between;
 	align-items: center;
 	gap: 8px;
-	padding: 8px 12px;
+	padding: 6px 10px;
 	background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
 	border: 1px solid #e2e8f0;
 	border-bottom: none;
@@ -421,7 +421,7 @@ function downloadCsv() {
 	top: 0;
 	z-index: 1;
 	background: #f8fafc;
-	padding: 9px 12px;
+	padding: 7px 10px;
 	border-bottom: 2px solid #e2e8f0;
 	font-weight: 600;
 	color: #334155;
@@ -430,7 +430,7 @@ function downloadCsv() {
 	white-space: nowrap;
 }
 .result-table td {
-	padding: 8px 12px;
+	padding: 6px 10px;
 	border-bottom: 1px solid #f1f5f9;
 	color: #1e293b;
 	font-size: 12.5px;

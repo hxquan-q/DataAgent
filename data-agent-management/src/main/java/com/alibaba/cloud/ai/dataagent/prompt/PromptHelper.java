@@ -84,6 +84,24 @@ public class PromptHelper {
 		return PromptConstant.getMixSelectorPromptTemplate().render(params);
 	}
 
+	/** Schema 列样本：最多注入条数（R3 token 控制）。 */
+	private static final int MAX_COLUMN_EXAMPLES = 2;
+
+	/** Schema 列样本：单条最大字符。 */
+	private static final int MAX_EXAMPLE_CHARS = 40;
+
+	/** 截断过长样本值，避免 free-text 列污染 schema 提示词。 */
+	static String shortenExampleValue(String value) {
+		if (value == null) {
+			return "";
+		}
+		String v = value.trim();
+		if (v.length() <= MAX_EXAMPLE_CHARS) {
+			return v;
+		}
+		return v.substring(0, MAX_EXAMPLE_CHARS) + "…";
+	}
+
 	public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withColumnType) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("【DB_ID】 ").append(schemaDTO.getName() == null ? "" : schemaDTO.getName()).append("\n");
@@ -124,15 +142,18 @@ public class PromptHelper {
 					&& tableDTO.getPrimaryKeys().contains(columnDTO.getName())) {
 				line.append(", Primary Key");
 			}
+			// R3: 样本值有界 — 最多 2 个、单值 ≤40 字符，避免 schema 提示词被长样本撑爆
 			List<String> enumData = Optional.ofNullable(columnDTO.getData())
 				.orElse(new ArrayList<>())
 				.stream()
 				.filter(d -> !StringUtils.isEmpty(d))
+				.map(PromptHelper::shortenExampleValue)
+				.distinct()
+				.limit(MAX_COLUMN_EXAMPLES)
 				.collect(Collectors.toList());
 			if (CollectionUtils.isNotEmpty(enumData) && !"id".equals(columnDTO.getName())) {
 				line.append(", Examples: [");
-				List<String> data = new ArrayList<>(enumData.subList(0, Math.min(3, enumData.size())));
-				line.append(StringUtils.join(data, ",")).append("]");
+				line.append(StringUtils.join(enumData, ",")).append("]");
 			}
 
 			line.append(")");
