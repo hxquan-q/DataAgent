@@ -124,7 +124,7 @@ public class PlannerNode implements NodeAction {
 
 		// 构建模板参数并渲染提示词
 		BeanOutputConverter<Plan> beanOutputConverter = new BeanOutputConverter<>(Plan.class);
-		Map<String, Object> params = Map.of("user_question", userPrompt, "schema", schemaStr, "evidence", PromptHelper.boundEvidence(evidence),
+		Map<String, Object> params = Map.of("user_question", userPrompt, "schema", PromptHelper.boundKnowledge(schemaStr), "evidence", PromptHelper.boundEvidence(evidence),
 				"semantic_model", PromptHelper.boundKnowledge(semanticModel), "plan_validation_error", formatValidationError(validationError),
 				"format", beanOutputConverter.getFormat());
 		// 生成计划提示词
@@ -151,17 +151,24 @@ public class PlannerNode implements NodeAction {
 	 * @return 构建完成的用户提示字符串
 	 */
 	private String buildUserPrompt(String input, String validationError, OverAllState state) {
+		String q = PromptHelper.boundQuery(input);
 		if (validationError == null) {
-			return input;
+			return q;
 		}
 
-		// 附加用户反馈、原始问题和被拒绝的旧计划
+		// 附加用户反馈、原始问题和被拒绝的旧计划（R27 有界）
 		String previousPlan = StateUtil.getStringValue(state, PLANNER_NODE_OUTPUT, "");
+		previousPlan = PromptHelper.boundKnowledge(previousPlan);
+		String err = validationError.trim();
+		if (err.length() > MAX_VALIDATION_ERROR_CHARS) {
+			err = err.substring(0, MAX_VALIDATION_ERROR_CHARS) + "…";
+		}
 		return String.format(
-				"重要提示：用户拒绝了之前的计划，反馈内容：\"%s\"\n\n" + "原始问题：%s\n\n" + "被拒绝的旧计划：\n%s\n\n" + "关键要求：请根据用户反馈（\"%s\"）生成新的计划",
-				validationError, input, previousPlan, validationError);
+				"重要提示：用户拒绝了之前的计划，反馈内容：\"%s\"\n\n" + "原始问题：%s\n\n" + "被拒绝的旧计划：\n%s\n\n" + "重要要求：请根据用户反馈（\"%s\"）生成新的计划",
+				err, q, previousPlan, err);
 	}
 
+	
 	/**
 	 * 格式化校验错误信息，用于强调用户反馈的重要性。
 	 * @param validationError 校验错误
