@@ -130,8 +130,8 @@ onBeforeUnmount(() => {
 }
 
 .typing-dot {
-	width: 4px;
-	height: 4px;
+	width: 3px;
+	height: 3px;
 	background: #3b82f6;
 	border-radius: 50%;
 	animation: typingBounce 1.2s infinite;
