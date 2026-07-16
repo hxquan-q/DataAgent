@@ -424,7 +424,7 @@ function downloadCsv() {
 	top: 0;
 	z-index: 1;
 	background: #f8fafc;
-	padding: 7px 10px;
+	padding: 5px 8px;
 	border-bottom: 2px solid #e2e8f0;
 	font-weight: 600;
 	color: #334155;
@@ -433,7 +433,7 @@ function downloadCsv() {
 	white-space: nowrap;
 }
 .result-table td {
-	padding: 6px 10px;
+	padding: 5px 8px;
 	border-bottom: 1px solid #f1f5f9;
 	color: #1e293b;
 	font-size: 12px;
