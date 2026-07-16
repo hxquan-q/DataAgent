@@ -314,10 +314,10 @@ async function downloadHtml() {
 	color: #0f172a;
 }
 .markdown-body :deep(h1) {
-	font-size: 20px;
+	font-size: 16.5px;
 }
 .markdown-body :deep(h2) {
-	font-size: 17px;
+	font-size: 15.5px;
 }
 .markdown-body :deep(h3) {
 	font-size: 15px;
