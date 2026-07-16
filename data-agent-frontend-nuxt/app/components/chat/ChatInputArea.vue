@@ -353,7 +353,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	color: #94a3b8;
 	background: #f1f5f9;
 	border-radius: 4px;
-	padding: 1px 5px;
+	padding: 1px 4px;
 }
 
 /* ── Textarea ────────────────────────────────────────────────────────────────── */

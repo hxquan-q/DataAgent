@@ -676,14 +676,14 @@ watch(
 .md-body :deep(th) {
 	display: table-cell;
 	background: #f1f5f9;
-	padding: 4px 8px;
+	padding: 3px 6px;
 	border: 1px solid #e2e8f0;
 	font-weight: 600;
 	font-size: 12px;
 }
 .md-body :deep(td) {
 	display: table-cell;
-	padding: 4px 8px;
+	padding: 3px 6px;
 	border: 1px solid #e2e8f0;
 	font-size: 12px;
 }
