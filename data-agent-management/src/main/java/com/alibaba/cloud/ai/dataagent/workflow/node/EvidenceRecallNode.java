@@ -116,7 +116,7 @@ public class EvidenceRecallNode implements NodeAction {
 
 		// 构建查询重写提示词
 		// 不扩展为多个子查询，因为此时大模型无法理解不同公司的个性化业务知识（如 PV、KMV 等专业名词），扩展反而会引入噪音
-		String prompt = PromptHelper.buildEvidenceQueryRewritePrompt(multiTurn, question);
+		String prompt = PromptHelper.buildEvidenceQueryRewritePrompt(PromptHelper.boundMultiTurn(multiTurn), PromptHelper.boundQuery(question));
 		log.debug("构建的证据查询重写提示词如下 \n {} \n", prompt);
 
 		// 调用大模型进行查询重写

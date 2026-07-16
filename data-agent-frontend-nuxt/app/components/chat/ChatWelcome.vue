@@ -135,7 +135,7 @@ watch(
 	align-items: center;
 	justify-content: center;
 	flex: 1;
-	padding: 48px 28px;
+	padding: 40px 24px;
 	text-align: center;
 	max-width: 640px;
 	margin: 0 auto;
@@ -143,7 +143,7 @@ watch(
 }
 
 .agent-avatar-wrap {
-	margin-bottom: 20px;
+	margin-bottom: 16px;
 }
 
 .agent-avatar {
