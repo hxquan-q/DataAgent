@@ -181,6 +181,11 @@ public class ReportGeneratorNode implements NodeAction {
 		// 构建分析步骤和数据结果描述
 		String analysisStepsAndData = buildAnalysisStepsAndData(plan, executionResults);
 
+		// V3: 有界注入 — 防止超长结果集/分析文本拖垮报告生成 token 与墙钟
+		userRequirementsAndPlan = limitPromptSection(userRequirementsAndPlan, MAX_PLAN_CHARS);
+		analysisStepsAndData = limitPromptSection(analysisStepsAndData, MAX_ANALYSIS_CHARS);
+		summaryAndRecommendations = limitPromptSection(summaryAndRecommendations, MAX_SUMMARY_CHARS);
+
 		// 获取优化配置（优先按智能体加载）
 		List<UserPromptConfig> optimizationConfigs = promptConfigService.getOptimizationConfigs("report-generator",
 				agentId);
@@ -271,12 +276,50 @@ public class ReportGeneratorNode implements NodeAction {
 					}
 				}
 				if (analysisResult != null && !analysisResult.trim().isEmpty()) {
-					sb.append("**Python 分析结果**: ").append(analysisResult).append("\n\n");
+					sb.append("**Python 分析结果**: ")
+						.append(limitPromptSection(analysisResult, MAX_PYTHON_ANALYSIS_CHARS))
+						.append("\n\n");
 				}
 			}
 		}
 
 		return sb.toString();
 	}
+
+
+	/** 报告提示词：分析步骤与数据上限（字符）。 */
+	private static final int MAX_ANALYSIS_CHARS = 12_000;
+
+	/** 报告提示词：计划描述上限。 */
+	private static final int MAX_PLAN_CHARS = 4_000;
+
+	/** 报告提示词：总结建议上限。 */
+	private static final int MAX_SUMMARY_CHARS = 1_500;
+
+	/** 单步 Python 分析文本上限。 */
+	private static final int MAX_PYTHON_ANALYSIS_CHARS = 2_000;
+
+	/**
+	 * 截断过长提示词片段，保留头尾以便模型仍可见结构与结论。
+	 * @param text 原文
+	 * @param maxChars 最大字符数
+	 * @return 截断后文本
+	 */
+	static String limitPromptSection(String text, int maxChars) {
+		if (text == null) {
+			return "";
+		}
+		if (maxChars <= 0 || text.length() <= maxChars) {
+			return text;
+		}
+		int head = Math.max(1, (int) (maxChars * 0.7));
+		int tail = Math.max(1, maxChars - head - 32);
+		if (head + tail >= text.length()) {
+			return text.substring(0, maxChars);
+		}
+		return text.substring(0, head) + "\n\n…(已截断 " + (text.length() - head - tail) + " 字符)…\n\n"
+				+ text.substring(text.length() - tail);
+	}
+
 
 }

@@ -238,11 +238,19 @@ public class PromptHelper {
 	 * @param params 模板参数
 	 * @return 优化部分的内容
 	 */
+	/** 无用户自定义配置时的全局默认优化（V4 质量兜底）。 */
+	private static final String DEFAULT_REPORT_OPTIMIZATION = """
+		- 结论先行：直接回答用户问题，含关键数字与单位
+		- 信息密度优先：默认 80–250 字；禁止「背景/过程回顾/后续行动」等注水段
+		- 不得杜撰数据；无数据时一句话说明即可
+		- 图表仅在有助于理解时使用，且必须是 echarts 纯 JSON 代码块
+		""".strip();
+
 	private static String buildOptimizationSection(List<UserPromptConfig> optimizationConfigs,
 			Map<String, Object> params) {
 
 		if (optimizationConfigs == null || optimizationConfigs.isEmpty()) {
-			return "";
+			return "## 优化要求\n" + DEFAULT_REPORT_OPTIMIZATION;
 		}
 
 		StringBuilder result = new StringBuilder();
@@ -255,7 +263,12 @@ public class PromptHelper {
 			}
 		}
 
-		return result.toString().trim();
+		String body = result.toString().trim();
+		// 配置存在但全空时仍兜底
+		if ("## 优化要求".equals(body)) {
+			return body + "\n" + DEFAULT_REPORT_OPTIMIZATION;
+		}
+		return body;
 	}
 
 	/**

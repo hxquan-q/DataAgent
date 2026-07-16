@@ -230,4 +230,20 @@ class ReportGeneratorNodeTest {
 		assertTrue(result.containsKey(RESULT));
 	}
 
+	@Test
+	void limitPromptSection_truncatesLongTextPreservingHeadAndTail() {
+		String longText = "H".repeat(100) + "MID" + "T".repeat(100);
+		String out = ReportGeneratorNode.limitPromptSection(longText, 80);
+		assertTrue(out.length() <= 80 + 40); // marker overhead
+		assertTrue(out.contains("已截断"));
+		assertTrue(out.startsWith("H"));
+		assertTrue(out.endsWith("T"));
+	}
+
+	@Test
+	void limitPromptSection_nullAndShortPassthrough() {
+		assertEquals("", ReportGeneratorNode.limitPromptSection(null, 10));
+		assertEquals("abc", ReportGeneratorNode.limitPromptSection("abc", 10));
+	}
+
 }
