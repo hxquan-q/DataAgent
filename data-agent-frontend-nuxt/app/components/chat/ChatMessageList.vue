@@ -618,7 +618,7 @@ watch(
 	justify-content: space-between;
 	align-items: center;
 	background: #f6f8fa;
-	padding: 4px 8px;
+	padding: 3px 6px;
 	border-bottom: 1px solid #e1e4e8;
 	font-size: 11px;
 }
