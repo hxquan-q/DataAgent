@@ -310,6 +310,7 @@ function downloadCsv() {
 	border-top: none;
 }
 .result-header {
+	min-height: 32px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
