@@ -261,7 +261,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 
 /* ── Status bar ──────────────────────────────────────────────────────────────── */
 .status-bar {
-	margin-bottom: 8px;
+	margin-bottom: 6px;
 }
 .status-chips {
 	display: flex;
