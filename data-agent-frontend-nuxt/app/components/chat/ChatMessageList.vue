@@ -394,7 +394,7 @@ watch(
 .row {
 	display: flex;
 	align-items: flex-start;
-	gap: 10px;
+	gap: 8px;
 }
 
 .user-row {

@@ -359,7 +359,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .textarea-wrap {
 	background: #f8fafc;
 	border: 1.5px solid #e2e8f0;
-	border-radius: 14px;
+	border-radius: 12px;
 	overflow: hidden;
 	transition: border-color 0.15s;
 }
