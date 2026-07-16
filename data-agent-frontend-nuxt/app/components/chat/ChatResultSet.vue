@@ -297,7 +297,7 @@ function downloadCsv() {
 	justify-content: center;
 	text-align: center;
 	color: #94a3b8;
-	padding: 16px 14px;
+	padding: 14px 12px;
 	font-size: 13px;
 	background: #f8fafc;
 	border: 1px dashed #e2e8f0;
