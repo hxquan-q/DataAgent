@@ -34,7 +34,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-select
 					v-model="filterAgentId"
@@ -216,7 +216,7 @@
 		<!-- 详情弹窗 -->
 		<v-dialog v-model="detailDialog" max-width="920" scrollable>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-shield-link-variant-outline"
 						color="blue-darken-2"
@@ -234,7 +234,7 @@
 				</v-card-title>
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<template v-if="detailLoading">
 						<div class="d-flex justify-center align-center py-12">
 							<v-progress-circular indeterminate color="blue-darken-2" />

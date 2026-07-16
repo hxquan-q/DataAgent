@@ -43,7 +43,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="searchKeyword"
@@ -217,7 +217,7 @@
 
 		<v-dialog v-model="dialogVisible" max-width="820" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
 						color="blue-darken-2"
@@ -237,7 +237,7 @@
 				</v-card-title>
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<v-row>
 							<v-col cols="12" md="6">
@@ -504,7 +504,7 @@
 		<!-- 测试拼装 Dialog：展示指标如何拼装为受控 SQL -->
 		<v-dialog v-model="assembleDialogVisible" max-width="780" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-flask"
 						color="teal-darken-2"
@@ -522,7 +522,7 @@
 				</v-card-title>
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-alert
 						variant="tonal"
 						color="blue-lighten-4"
