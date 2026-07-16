@@ -127,6 +127,6 @@ public class CodeExecutorProperties {
 	/**
 	 * Python 执行失败后的最大重试次数
 	 */
-	Integer pythonMaxTriesCount = 5;
+	Integer pythonMaxTriesCount = 4;
 
 }
