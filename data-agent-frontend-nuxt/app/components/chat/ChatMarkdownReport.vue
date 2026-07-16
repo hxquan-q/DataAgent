@@ -260,7 +260,7 @@ async function downloadHtml() {
 	background: #f8fafc;
 	border-bottom: 1px solid #e8edf2;
 	flex-wrap: wrap;
-	gap: 6px;
+	gap: 4px;
 }
 .report-title {
 	display: flex;

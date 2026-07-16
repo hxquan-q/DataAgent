@@ -239,7 +239,7 @@ public class DataAgentProperties {
 			/**
 			 * 最小分块大小 默认值：200
 			 */
-			private int minChunkSize = 200;
+			private int minChunkSize = 160;
 
 			/**
 			 * 最大分块大小 默认值：1000
@@ -249,7 +249,7 @@ public class DataAgentProperties {
 			/**
 			 * 语义相似度阈值 默认值：0.5（0-1之间，越低越容易分块）
 			 */
-			private double similarityThreshold = 0.5;
+			private double similarityThreshold = 0.55;
 
 		}
 
