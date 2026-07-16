@@ -15,7 +15,7 @@
 -->
 <!-- 安全状态：凭据加密（AES-256-GCM）启停状态 + 覆盖范围 + 启用指引。把 R12 加密能力暴露成运维可见性。 -->
 <template>
-	<div class="pa-4 pa-md-6">
+	<div class="page-shell pa-4 pa-md-6">
 		<KnowledgePageHeader title="安全状态" description="凭据静态加密（AES-256-GCM）状态与覆盖范围">
 			<template #actions>
 				<v-btn variant="text" size="small" prepend-icon="mdi-refresh" :loading="loading" @click="load">

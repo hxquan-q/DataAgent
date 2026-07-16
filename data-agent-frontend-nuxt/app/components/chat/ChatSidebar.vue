@@ -288,7 +288,7 @@ async function confirmDelete() {
 /* ── Expanded panel ──────────────────────────────────────────────────────────── */
 .chat-sidebar {
 	width: 260px;
-	background: #f8fafc;
+	background: var(--da-surface-soft, #f8fafc);
 	border-right: 1px solid #e8edf2;
 	display: flex;
 	flex-direction: column;
@@ -308,7 +308,7 @@ async function confirmDelete() {
 	align-items: center;
 	justify-content: space-between;
 	padding: 10px 8px 10px 16px;
-	border-bottom: 1px solid #e8edf2;
+	border-bottom: 1px solid var(--da-line-soft, #e8edf2);
 	min-height: 48px;
 	flex-shrink: 0;
 }
@@ -356,10 +356,10 @@ async function confirmDelete() {
 	min-height: 44px;
 }
 .session-item:hover {
-	background: #e8f0fe;
+	background: var(--da-primary-soft, #eff6ff);
 }
 .session-item.active {
-	background: #e8f0fe;
+	background: var(--da-primary-soft, #eff6ff);
 }
 
 .session-item-info {
@@ -372,7 +372,7 @@ async function confirmDelete() {
 
 .session-item-title {
 	font-size: 13px;
-	color: #1e293b;
+	color: var(--da-ink, #0f172a);
 	line-height: 1.35;
 	white-space: nowrap;
 	overflow: hidden;
@@ -381,13 +381,13 @@ async function confirmDelete() {
 
 .session-item-time {
 	font-size: 11px;
-	color: #94a3b8;
+	color: var(--da-muted, #64748b);
 	font-style: italic;
 	line-height: 1.2;
 }
 
 .session-item.active .session-item-title {
-	color: #1d4ed8;
+	color: var(--da-primary, #1e40af);
 	font-weight: 500;
 }
 
@@ -437,7 +437,7 @@ async function confirmDelete() {
 /* ── Bottom new session ──────────────────────────────────────────────────────── */
 .sidebar-bottom {
 	padding: 12px 16px 16px;
-	border-top: 1px solid #e8edf2;
+	border-top: 1px solid var(--da-line-soft, #e8edf2);
 	flex-shrink: 0;
 }
 
@@ -471,5 +471,10 @@ async function confirmDelete() {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 	background: #94a3b8;
+}
+@media (prefers-reduced-motion: reduce) {
+	.sidebar-wrapper {
+		transition: none;
+	}
 }
 </style>

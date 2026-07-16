@@ -33,7 +33,22 @@
 /* ── 公共页面样式 ──────────────────────────────────────────────────────────── */
 
 .page-shell {
-	padding: 32px;
+	padding: 28px 32px 40px;
+	max-width: 1280px;
+	margin: 0 auto;
+	color: var(--da-ink, #0f172a);
+	box-sizing: border-box;
+}
+
+.page-shell h1,
+.page-shell .text-h4 {
+	letter-spacing: -0.02em;
+	color: var(--da-ink, #0f172a);
+}
+
+.page-shell .text-medium-emphasis,
+.page-shell .text-caption {
+	color: var(--da-muted, #64748b);
 }
 
 .search-field .v-field__outline {

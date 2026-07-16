@@ -15,7 +15,7 @@
  */
 
 <template>
-	<v-container fluid class="pa-8 agents-container">
+	<v-container fluid class="page-shell pa-8 agents-container">
 		<!-- Header Section -->
 		<header class="d-flex align-center justify-space-between mb-8">
 			<div>
