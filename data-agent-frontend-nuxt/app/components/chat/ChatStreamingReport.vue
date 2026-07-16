@@ -126,7 +126,7 @@ onBeforeUnmount(() => {
 	display: inline-flex;
 	align-items: center;
 	gap: 3px;
-	margin-left: 8px;
+	margin-left: 6px;
 }
 
 .typing-dot {

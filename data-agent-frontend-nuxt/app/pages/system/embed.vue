@@ -214,7 +214,7 @@ watch(selectedAgentId, () => {
 	<v-container fluid class="page-shell pa-5">
 		<div class="d-flex align-center mb-3">
 			<v-icon icon="mdi-web-box" color="primary" class="mr-2" />
-			<h2 class="text-h6 font-weight-bold mb-0">网页嵌入（Embed）</h2>
+			<h2 class="text-subtitle-1 font-weight-bold mb-0">网页嵌入（Embed）</h2>
 			<v-chip v-if="embedded" size="small" color="success" class="ml-3">已启用</v-chip>
 		</div>
 
