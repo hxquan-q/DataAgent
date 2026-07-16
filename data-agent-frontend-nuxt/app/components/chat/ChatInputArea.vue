@@ -325,7 +325,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 8px;
+	gap: 6px;
 	padding: 5px 10px;
 	font-size: 12.5px;
 	color: #334155;

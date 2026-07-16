@@ -479,7 +479,7 @@ watch(
 .thinking-row {
 	display: flex;
 	align-items: center;
-	gap: 10px;
+	gap: 8px;
 }
 .thinking-label {
 	font-size: 12.5px;
