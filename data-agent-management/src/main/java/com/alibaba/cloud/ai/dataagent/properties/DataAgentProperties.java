@@ -97,7 +97,7 @@ public class DataAgentProperties {
 	/**
 	 * 执行SQL结果图表化超时时间，默认3000ms
 	 */
-	private Long enrichSqlResultTimeout = 3000L;
+	private Long enrichSqlResultTimeout = 2000L;
 
 	/**
 	 * 是否启用 g2-ssr 服务端图表渲染（#6 图文并茂），默认启用；服务不可用时 fail-safe 回退纯文本报告
