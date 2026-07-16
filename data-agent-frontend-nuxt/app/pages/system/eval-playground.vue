@@ -22,7 +22,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" class="mt-4" border>
+		<v-card variant="flat" class="mt-3" border>
 			<v-tabs v-model="tab" color="primary" density="compact">
 				<v-tab value="generation">
 					<v-icon start>mdi-file-document-check</v-icon>

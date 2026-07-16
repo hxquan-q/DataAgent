@@ -26,7 +26,7 @@
 
 		<v-alert v-if="error" type="error" variant="tonal" class="mt-4" :text="error" />
 
-		<v-row class="mt-2">
+		<v-row class="mt-1">
 			<v-col cols="12" md="6">
 				<v-card variant="flat" border class="pa-4 h-100">
 					<div class="d-flex align-center mb-3">
