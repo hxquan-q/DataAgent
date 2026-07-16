@@ -380,7 +380,7 @@ async function confirmDelete() {
 }
 
 .session-item-time {
-	font-size: 11px;
+	font-size: 10.5px;
 	color: var(--da-muted, #64748b);
 	font-style: italic;
 	line-height: 1.2;

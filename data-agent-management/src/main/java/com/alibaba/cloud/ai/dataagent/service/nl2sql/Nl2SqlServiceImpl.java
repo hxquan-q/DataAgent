@@ -85,8 +85,9 @@ public class Nl2SqlServiceImpl implements Nl2SqlService {
 	private Flux<ChatResponse> fineSelect(SchemaDTO schemaDTO, String sqlGenerateSchemaMissingAdvice,
 			Consumer<Set<String>> resultConsumer) {
 		log.debug("Fine selecting tables based on advice: {}", sqlGenerateSchemaMissingAdvice);
-		String schemaInfo = buildMixMacSqlDbPrompt(schemaDTO, true);
-		String prompt = " 建议：" + sqlGenerateSchemaMissingAdvice
+		String advice = PromptHelper.boundQuery(sqlGenerateSchemaMissingAdvice);
+		String schemaInfo = PromptHelper.boundKnowledge(buildMixMacSqlDbPrompt(schemaDTO, true));
+		String prompt = " 建议：" + advice
 				+ " \n 请按照建议进行返回相关表的名称，只返回建议中提到的表名，返回格式为：[\"a\",\"b\",\"c\"] \n " + schemaInfo;
 		log.debug("Built table selection with advice prompt as follows \n {} \n", prompt);
 		StringBuilder sb = new StringBuilder();
