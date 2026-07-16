@@ -17,7 +17,7 @@
 <template>
 	<v-container fluid class="page-shell pa-6 model-config-container">
 		<!-- Header Section -->
-		<header class="d-flex align-center justify-space-between mb-8">
+		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
 				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">模型服务</h1>
 				<p class="text-body-2 text-medium-emphasis">
@@ -48,7 +48,7 @@
 		</header>
 
 		<!-- Tab Navigation (Segmented Toggle) -->
-		<div class="d-flex justify-center mb-8">
+		<div class="d-flex justify-center mb-5">
 			<v-btn-toggle
 				v-model="activeTab"
 				mandatory

@@ -96,8 +96,8 @@ public class FeasibilityAssessmentNode implements NodeAction {
 		}
 
 		// 构建可行性评估提示词
-		String prompt = PromptHelper.buildFeasibilityAssessmentPrompt(canonicalQuery, recalledSchema, evidence,
-				multiTurn);
+		String prompt = PromptHelper.buildFeasibilityAssessmentPrompt(PromptHelper.boundQuery(canonicalQuery), recalledSchema, PromptHelper.boundEvidence(evidence),
+				PromptHelper.boundMultiTurn(multiTurn));
 		log.debug("构建的可行性评估提示词如下 \n {} \n", prompt);
 
 		// 调用大模型进行可行性评估
