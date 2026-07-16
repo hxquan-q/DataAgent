@@ -167,8 +167,8 @@ onBeforeUnmount(() => {
 .markdown-body.streaming :deep(> :last-child::after) {
 	content: '';
 	display: inline-block;
-	width: 6px;
-	height: 6px;
+	width: 5px;
+	height: 5px;
 	border-radius: 50%;
 	background: #3b82f6;
 	margin-left: 3px;
