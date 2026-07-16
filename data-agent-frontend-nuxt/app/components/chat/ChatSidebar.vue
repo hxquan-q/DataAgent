@@ -336,7 +336,7 @@ async function confirmDelete() {
 }
 
 .session-group-label {
-	font-size: 11px;
+	font-size: 10.5px;
 	font-weight: 600;
 	color: #94a3b8;
 	letter-spacing: 0.5px;
