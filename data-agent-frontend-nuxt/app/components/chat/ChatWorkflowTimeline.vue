@@ -626,7 +626,7 @@ watch(
 	background: #f8fafc;
 	border: 1px solid #e2e8f0;
 	border-radius: 8px;
-	padding: 8px 10px;
+	padding: 6px 8px;
 	font-size: 12.5px;
 	overflow-x: auto;
 	white-space: pre;
