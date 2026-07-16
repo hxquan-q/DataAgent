@@ -545,7 +545,7 @@ watch(
 .md-body :deep(code:not(pre code)) {
 	background: #f6f8fa;
 	border: 1px solid #e1e4e8;
-	padding: 2px 6px;
+	padding: 1px 4px;
 	border-radius: 3px;
 	font-size: 12.5px;
 	font-family: 'Monaco', 'Menlo', 'Fira Code', monospace;

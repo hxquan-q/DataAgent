@@ -348,7 +348,7 @@ async function confirmDelete() {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 6px 10px;
+	padding: 5px 8px;
 	border-radius: 6px;
 	cursor: pointer;
 	transition: background 0.12s;
