@@ -121,7 +121,7 @@
 					</v-btn>
 				</v-toolbar>
 				<v-card-text
-					style="height: calc(100vh - 64px); overflow-y: auto; padding: 24px"
+					style="height: calc(100vh - 64px); overflow-y: auto; padding: 18px"
 				>
 					<div
 						v-if="store.reportFormat === 'markdown'"
@@ -179,7 +179,7 @@ function loadHtmlToIframe(
 	if (!iframe) return;
 	if (!markdownContent) {
 		iframe.srcdoc =
-			'<html><body style="padding:20px;color:#666;">暂无报告内容</body></html>';
+			'<html><body style="padding:16px;color:#666;">暂无报告内容</body></html>';
 		return;
 	}
 	const html = buildReportHtml(markdownContent);

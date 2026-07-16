@@ -435,7 +435,7 @@ function downloadCsv() {
 	padding: 6px 10px;
 	border-bottom: 1px solid #f1f5f9;
 	color: #1e293b;
-	font-size: 12.5px;
+	font-size: 12px;
 	max-width: 320px;
 	overflow: hidden;
 	text-overflow: ellipsis;

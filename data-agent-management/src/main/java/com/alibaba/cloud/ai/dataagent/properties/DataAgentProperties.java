@@ -285,7 +285,7 @@ public class DataAgentProperties {
 		/**
 		 * 每批次最大令牌数 值越小，每批次文档越少，但更安全 值越大，处理效率越高，但可能超出API限制 建议值：2000-8000，根据实际API限制调整
 		 */
-		private int maxTokenCount = 8000;
+		private int maxTokenCount = 6000;
 
 		/**
 		 * 预留百分比 用于预留缓冲空间，避免超出限制 建议值：0.1-0.2（10%-20%）
