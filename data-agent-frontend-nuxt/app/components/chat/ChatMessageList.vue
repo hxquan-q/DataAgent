@@ -689,7 +689,7 @@ watch(
 .status-banner {
 	display: flex;
 	align-items: center;
-	padding: 10px 14px;
+	padding: 6px 10px;
 	border-radius: 6px;
 	font-size: 13px;
 	font-weight: 500;

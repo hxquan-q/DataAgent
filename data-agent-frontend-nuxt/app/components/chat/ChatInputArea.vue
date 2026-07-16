@@ -493,7 +493,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	background: #fffbeb;
 	border: 1px solid #fde68a;
 	border-radius: 8px;
-	padding: 10px 12px;
+	padding: 8px 10px;
 }
 .feedback-header {
 	display: flex;
