@@ -626,7 +626,7 @@ watch(
 	background: #f8fafc;
 	border: 1px solid #e2e8f0;
 	border-radius: 8px;
-	padding: 10px 12px;
+	padding: 8px 10px;
 	font-size: 12.5px;
 	overflow-x: auto;
 	white-space: pre;
@@ -761,7 +761,7 @@ watch(
 
 /* 过程详情有界，防止长 SQL/JSON 撑满屏 */
 .step-content {
-	max-height: 220px;
+	max-height: 180px;
 	overflow: auto;
 }
 .workflow-timeline.is-completed {
