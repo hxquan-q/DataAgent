@@ -377,7 +377,7 @@ watch(
 }
 
 .messages-inner {
-	padding: 16px 24px 24px;
+	padding: 14px 20px 20px;
 	display: flex;
 	flex-direction: column;
 	gap: 14px;

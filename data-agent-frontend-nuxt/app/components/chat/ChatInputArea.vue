@@ -252,7 +252,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	flex-shrink: 0;
 	background: white;
 	border-top: 1px solid var(--da-line-soft, #e8edf2);
-	padding: 8px 20px 12px;
+	padding: 6px 16px 10px;
 	max-width: 960px;
 	width: 100%;
 	margin: 0 auto;
