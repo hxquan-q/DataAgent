@@ -439,7 +439,7 @@ async function downloadHtml() {
 	overflow-x: auto;
 	overflow-y: hidden;
 	background: #f6f8fa;
-	font-size: 12px;
+	font-size: 11.5px;
 	line-height: 1.4;
 	white-space: pre;
 }
