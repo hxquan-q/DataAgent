@@ -37,6 +37,7 @@ import com.alibaba.cloud.ai.dataagent.enums.TextType;
 import com.alibaba.cloud.ai.dataagent.service.datasource.AgentDatasourceService;
 import com.alibaba.cloud.ai.dataagent.service.datasource.DatasourceService;
 import com.alibaba.cloud.ai.dataagent.service.nl2sql.Nl2SqlService;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.service.schema.SchemaService;
 import com.alibaba.cloud.ai.dataagent.service.semantic.SemanticModelService;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
@@ -220,6 +221,10 @@ public class TableRelationNode implements NodeAction {
 			OverAllState state, DbConfigBO agentDbConfig, Consumer<SchemaDTO> dtoConsumer) {
 		// 获取 Schema 缺失信息的补充建议
 		String schemaAdvice = StateUtil.getStringValue(state, SQL_GENERATE_SCHEMA_MISSING_ADVICE, null);
+		// R31: 建议文本有界（nl2sql 侧亦 bound，双保险）
+		if (schemaAdvice != null) {
+			schemaAdvice = PromptHelper.boundQuery(schemaAdvice);
+		}
 
 		Flux<ChatResponse> schemaFlux;
 		if (schemaAdvice != null) {

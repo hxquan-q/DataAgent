@@ -278,7 +278,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	display: inline-flex;
 	align-items: center;
 	gap: 5px;
-	padding: 4px 10px;
+	padding: 3px 9px;
 	background: #f1f5f9;
 	border: 1px solid #e2e8f0;
 	border-radius: 20px;
