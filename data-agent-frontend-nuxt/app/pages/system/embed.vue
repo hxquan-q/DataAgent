@@ -211,8 +211,8 @@ watch(selectedAgentId, () => {
 </script>
 
 <template>
-	<v-container fluid class="page-shell pa-6">
-		<div class="d-flex align-center mb-4">
+	<v-container fluid class="page-shell pa-5">
+		<div class="d-flex align-center mb-3">
 			<v-icon icon="mdi-web-box" color="primary" class="mr-2" />
 			<h2 class="text-h6 font-weight-bold mb-0">网页嵌入（Embed）</h2>
 			<v-chip v-if="embedded" size="small" color="success" class="ml-3">已启用</v-chip>
@@ -220,7 +220,7 @@ watch(selectedAgentId, () => {
 
 		<v-row>
 			<v-col cols="12" md="4">
-				<v-card variant="outlined" class="mb-4">
+				<v-card variant="outlined" class="mb-3">
 					<v-card-title class="text-subtitle-1">选择智能体</v-card-title>
 					<v-card-text>
 						<v-select
@@ -262,7 +262,7 @@ watch(selectedAgentId, () => {
 			</v-col>
 
 			<v-col cols="12" md="8">
-				<v-card variant="outlined" class="mb-4">
+				<v-card variant="outlined" class="mb-3">
 					<v-card-title class="text-subtitle-1">嵌入配置</v-card-title>
 					<v-card-text>
 						<v-textarea
@@ -301,7 +301,7 @@ watch(selectedAgentId, () => {
 					</v-card-text>
 				</v-card>
 
-				<v-card variant="outlined" title="嵌入代码" class="mb-4">
+				<v-card variant="outlined" title="嵌入代码" class="mb-3">
 					<v-card-text>
 						<v-alert v-if="!apiKeyPlain" type="info" density="compact" class="mb-2 text-caption">
 							需先生成发布令牌以生成嵌入代码（生产环境建议改用 tokenEndpoint 安全模式）。

@@ -15,6 +15,8 @@
  */
 package com.alibaba.cloud.ai.dataagent.service.graph;
 
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
+
 import com.alibaba.cloud.ai.dataagent.entity.Agent;
 import com.alibaba.cloud.ai.dataagent.mapper.AgentMapper;
 import com.alibaba.cloud.ai.dataagent.service.langfuse.LangfuseService;
@@ -261,7 +263,7 @@ public class GraphServiceImpl implements GraphService {
 	private void handleHumanFeedback(GraphRequest graphRequest) {
 		String agentId = graphRequest.getAgentId();
 		String threadId = graphRequest.getThreadId();
-		String feedbackContent = graphRequest.getHumanFeedbackContent();
+		String feedbackContent = PromptHelper.boundQuery(graphRequest.getHumanFeedbackContent());
 		if (!StringUtils.hasText(threadId) || !StringUtils.hasText(agentId) || !StringUtils.hasText(feedbackContent)) {
 			throw new IllegalArgumentException("Invalid arguments");
 		}
