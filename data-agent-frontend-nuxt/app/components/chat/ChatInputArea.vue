@@ -380,7 +380,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	line-height: 1.6;
 	color: #1e293b;
 	font-family: inherit;
-	min-height: 64px;
+	min-height: 56px;
 	max-height: 240px;
 }
 .chat-textarea::placeholder {
