@@ -710,9 +710,9 @@ watch(
 .chat-status-strip {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: 6px;
 	flex-wrap: wrap;
-	padding: 8px 32px 0;
+	padding: 6px 28px 0;
 	max-width: 960px;
 	width: 100%;
 	margin: 0 auto;

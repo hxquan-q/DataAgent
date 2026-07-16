@@ -88,7 +88,7 @@ public class QueryEnhanceNode implements NodeAction {
 		}
 
 		// 构建查询增强提示词
-		String prompt = PromptHelper.buildQueryEnhancePrompt(multiTurn, userInput, evidence);
+		String prompt = PromptHelper.buildQueryEnhancePrompt(PromptHelper.boundMultiTurn(multiTurn), PromptHelper.boundQuery(userInput), PromptHelper.boundEvidence(evidence));
 		log.debug("构建的查询增强提示词如下 \n {} \n", prompt);
 
 		// 调用大模型进行查询增强
