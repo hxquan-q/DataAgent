@@ -256,7 +256,7 @@ async function downloadHtml() {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 10px 14px;
+	padding: 8px 12px;
 	background: #f8fafc;
 	border-bottom: 1px solid #e8edf2;
 	flex-wrap: wrap;
