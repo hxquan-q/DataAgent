@@ -479,4 +479,10 @@ function downloadCsv() {
 		animation: none;
 	}
 }
+
+.result-header :deep(.v-btn) {
+	min-width: 28px !important;
+	width: 28px !important;
+	height: 28px !important;
+}
 </style>
