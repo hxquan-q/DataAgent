@@ -57,12 +57,12 @@ public class DataAgentProperties {
 	/**
 	 * SQL 执行失败重试次数
 	 */
-	private int maxSqlRetryCount = 10;
+	private int maxSqlRetryCount = 8;
 
 	/**
 	 * SQL 优化最多次数
 	 */
-	private int maxSqlOptimizeCount = 10;
+	private int maxSqlOptimizeCount = 8;
 
 	/**
 	 * SQL 优化分数阈值（达到该分数即认为 SQL 质量合格）
