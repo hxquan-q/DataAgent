@@ -45,7 +45,7 @@
 							</v-card>
 							<v-avatar
 								color="grey-darken-2"
-								size="34"
+								size="32"
 								rounded="lg"
 								class="avatar"
 							>
@@ -57,7 +57,7 @@
 						<div v-else class="row ai-row">
 							<v-avatar
 								color="blue-darken-3"
-								size="34"
+								size="32"
 								rounded="lg"
 								class="avatar"
 							>
@@ -142,7 +142,7 @@
 						<div class="row ai-row">
 							<v-avatar
 								color="blue-darken-3"
-								size="34"
+								size="32"
 								rounded="lg"
 								class="avatar"
 								style="visibility: hidden"
@@ -161,7 +161,7 @@
 					v-if="store.isStreaming && store.nodeBlocks.length > 0"
 					class="row ai-row"
 				>
-					<v-avatar color="blue-darken-3" size="34" rounded="lg" class="avatar">
+					<v-avatar color="blue-darken-3" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
 					<v-card class="ai-card timeline-card" elevation="1">
@@ -176,7 +176,7 @@
 				>
 					<v-avatar
 						color="blue-darken-3"
-						size="34"
+						size="32"
 						rounded="lg"
 						class="avatar"
 						style="visibility: hidden"
@@ -191,7 +191,7 @@
 					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
 					class="row ai-row"
 				>
-					<v-avatar color="blue-darken-3" size="34" rounded="lg" class="avatar">
+					<v-avatar color="blue-darken-3" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
 					<v-card class="ai-card thinking-card" elevation="1">

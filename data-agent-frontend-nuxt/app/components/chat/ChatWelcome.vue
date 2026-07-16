@@ -137,7 +137,7 @@ watch(
 	flex: 1;
 	padding: 40px 24px;
 	text-align: center;
-	max-width: 640px;
+	max-width: 600px;
 	margin: 0 auto;
 	width: 100%;
 }
