@@ -24,6 +24,7 @@ import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import com.alibaba.cloud.ai.dataagent.dto.planner.ExecutionStep;
 import com.alibaba.cloud.ai.dataagent.prompt.PromptConstant;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.service.llm.LlmService;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
 import com.alibaba.cloud.ai.dataagent.util.FluxUtil;
@@ -119,9 +120,11 @@ public class PythonGenerateNode implements NodeAction {
 		String systemPrompt = PromptConstant.getPythonGeneratorPromptTemplate()
 			.render(Map.of("python_memory", codeExecutorProperties.getLimitMemory().toString(), "python_timeout",
 					codeExecutorProperties.getCodeTimeout(), "database_schema",
-					objectMapper.writeValueAsString(schemaDTO), "sample_input",
+					// R14: 使用与 SQL 节点一致的紧凑 schema 文本，避免全量 JSON 撑爆 python 生成 prompt
+					PromptHelper.buildMixMacSqlDbPrompt(schemaDTO, true), "sample_input",
 					objectMapper.writeValueAsString(sqlResults.stream().limit(SAMPLE_DATA_NUMBER).toList()),
-					"plan_description", objectMapper.writeValueAsString(toolParameters)));
+					"plan_description",
+					limitJson(objectMapper.writeValueAsString(toolParameters), MAX_PLAN_JSON_CHARS)));
 
 		// 调用大模型生成 Python 代码
 		Flux<ChatResponse> pythonGenerateFlux = llmService.call(systemPrompt, userPrompt);
@@ -142,5 +145,19 @@ public class PythonGenerateNode implements NodeAction {
 
 		return Map.of(PYTHON_GENERATE_NODE_OUTPUT, generator);
 	}
+
+
+	private static final int MAX_PLAN_JSON_CHARS = 2_000;
+
+	static String limitJson(String json, int maxChars) {
+		if (json == null) {
+			return "";
+		}
+		if (maxChars <= 0 || json.length() <= maxChars) {
+			return json;
+		}
+		return json.substring(0, maxChars) + "…";
+	}
+
 
 }

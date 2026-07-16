@@ -211,7 +211,7 @@ watch(selectedAgentId, () => {
 </script>
 
 <template>
-	<v-container fluid class="pa-6">
+	<v-container fluid class="page-shell pa-6">
 		<div class="d-flex align-center mb-4">
 			<v-icon icon="mdi-web-box" color="primary" class="mr-2" />
 			<h2 class="text-h6 font-weight-bold mb-0">网页嵌入（Embed）</h2>
