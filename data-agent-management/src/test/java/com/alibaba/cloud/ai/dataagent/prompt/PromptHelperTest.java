@@ -384,4 +384,46 @@ class PromptHelperTest {
 		assertTrue(result.contains("(c0"));
 	}
 
+	@Test
+	void buildMixMacSqlTablePrompt_wideTable_keepsPrimaryKeyWhenCapped() {
+		TableDTO table = new TableDTO();
+		table.setName("wide");
+		table.setDescription("wide");
+		table.setPrimaryKeys(Arrays.asList("id_pk"));
+		java.util.List<ColumnDTO> cols = new java.util.ArrayList<>();
+		for (int i = 0; i < 45; i++) {
+			ColumnDTO c = new ColumnDTO();
+			c.setName("c" + i);
+			c.setType("int");
+			c.setDescription("c" + i);
+			cols.add(c);
+		}
+		// PK last in source order — must still appear after prioritization
+		ColumnDTO pk = new ColumnDTO();
+		pk.setName("id_pk");
+		pk.setType("bigint");
+		pk.setDescription("Primary key");
+		cols.add(pk);
+		table.setColumn(cols);
+
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+		assertTrue(result.contains("id_pk"));
+		assertTrue(result.contains("Primary Key"));
+		assertTrue(result.contains("more columns omitted"));
+	}
+
+	@Test
+	void prioritizePrimaryKeyColumns_movesPkToFront() {
+		ColumnDTO a = new ColumnDTO();
+		a.setName("a");
+		ColumnDTO b = new ColumnDTO();
+		b.setName("b");
+		ColumnDTO pk = new ColumnDTO();
+		pk.setName("id");
+		java.util.List<ColumnDTO> ordered = PromptHelper.prioritizePrimaryKeyColumns(
+				Arrays.asList(a, b, pk), Arrays.asList("id"));
+		assertEquals("id", ordered.get(0).getName());
+		assertEquals(3, ordered.size());
+	}
+
 }

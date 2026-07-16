@@ -105,7 +105,35 @@ public class PromptHelper {
 		return v.substring(0, MAX_EXAMPLE_CHARS) + "…";
 	}
 
-	public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withColumnType) {
+	
+	/**
+	 * 宽表截断前重排：主键列置前，其余保持原序（稳定）。
+	 */
+	static List<ColumnDTO> prioritizePrimaryKeyColumns(List<ColumnDTO> columns, List<String> primaryKeys) {
+		if (columns == null || columns.isEmpty()) {
+			return List.of();
+		}
+		if (primaryKeys == null || primaryKeys.isEmpty()) {
+			return columns;
+		}
+		java.util.Set<String> pks = new java.util.LinkedHashSet<>(primaryKeys);
+		List<ColumnDTO> head = new ArrayList<>();
+		List<ColumnDTO> tail = new ArrayList<>();
+		for (ColumnDTO col : columns) {
+			if (col != null && col.getName() != null && pks.contains(col.getName())) {
+				head.add(col);
+			}
+			else {
+				tail.add(col);
+			}
+		}
+		List<ColumnDTO> ordered = new ArrayList<>(head.size() + tail.size());
+		ordered.addAll(head);
+		ordered.addAll(tail);
+		return ordered;
+	}
+
+public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withColumnType) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("【DB_ID】 ").append(schemaDTO.getName() == null ? "" : schemaDTO.getName()).append("\n");
 		for (TableDTO tableDTO : schemaDTO.getTable()) {
@@ -133,9 +161,11 @@ public class PromptHelper {
 		sb.append("[\n");
 		List<String> columnLines = new ArrayList<>();
 		List<ColumnDTO> columns = tableDTO.getColumn() == null ? List.of() : tableDTO.getColumn();
-		int colLimit = Math.min(columns.size(), MAX_COLUMNS_PER_TABLE_PROMPT);
+		// R5: 宽表截断时优先保留主键列，再保留其余列顺序
+		List<ColumnDTO> ordered = prioritizePrimaryKeyColumns(columns, tableDTO.getPrimaryKeys());
+		int colLimit = Math.min(ordered.size(), MAX_COLUMNS_PER_TABLE_PROMPT);
 		for (int ci = 0; ci < colLimit; ci++) {
-			ColumnDTO columnDTO = columns.get(ci);
+			ColumnDTO columnDTO = ordered.get(ci);
 			StringBuilder line = new StringBuilder();
 			line.append("(")
 				.append(columnDTO.getName())
@@ -165,8 +195,8 @@ public class PromptHelper {
 			line.append(")");
 			columnLines.add(line.toString());
 		}
-		if (columns.size() > colLimit) {
-			columnLines.add("(... " + (columns.size() - colLimit) + " more columns omitted)");
+		if (ordered.size() > colLimit) {
+			columnLines.add("(... " + (ordered.size() - colLimit) + " more columns omitted)");
 		}
 		sb.append(StringUtils.join(columnLines, ",\n"));
 		sb.append("\n]");
