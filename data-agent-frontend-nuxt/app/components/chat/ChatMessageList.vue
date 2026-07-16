@@ -418,7 +418,7 @@ watch(
 	padding: 10px 14px;
 	border-radius: 18px 18px 6px 18px !important;
 	font-size: 14px;
-	line-height: 1.65;
+	line-height: 1.55;
 	max-width: min(62%, 560px);
 	word-break: break-word;
 	box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18) !important;
@@ -532,7 +532,7 @@ watch(
 	line-height: 1.4;
 }
 .md-body :deep(p) {
-	margin-bottom: 7px;
+	margin-bottom: 6px;
 }
 .md-body :deep(ul),
 .md-body :deep(ol) {
