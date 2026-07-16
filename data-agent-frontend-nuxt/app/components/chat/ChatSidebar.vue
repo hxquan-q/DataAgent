@@ -371,7 +371,7 @@ async function confirmDelete() {
 }
 
 .session-item-title {
-	font-size: 12.5px;
+	font-size: 12px;
 	color: var(--da-ink, #0f172a);
 	line-height: 1.35;
 	white-space: nowrap;
