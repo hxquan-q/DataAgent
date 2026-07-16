@@ -420,7 +420,7 @@ async function confirmDelete() {
 	font-size: 13px;
 	border: 1px solid #3b82f6;
 	border-radius: 4px;
-	padding: 2px 6px;
+	padding: 1px 5px;
 	outline: none;
 	min-width: 0;
 	background: white;
@@ -452,8 +452,8 @@ async function confirmDelete() {
 /* ── Collapsed expand FAB ────────────────────────────────────────────────────── */
 .expand-fab {
 	position: absolute;
-	top: 10px;
-	left: 8px;
+	top: 8px;
+	left: 6px;
 	z-index: 10;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
 }
