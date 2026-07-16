@@ -170,8 +170,12 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 			// R8: FK 列表有界，避免超多逻辑外键撑爆 schema 提示词
 			List<String> fks = schemaDTO.getForeignKeys();
 			int fkLimit = Math.min(fks.size(), MAX_FOREIGN_KEYS_PROMPT);
+			List<String> fkLines = new ArrayList<>(fkLimit);
+			for (int i = 0; i < fkLimit; i++) {
+				fkLines.add(shortenExampleValueTo(fks.get(i), 120));
+			}
 			sb.append("【Foreign keys】\n")
-				.append(StringUtils.join(fks.subList(0, fkLimit), "\n"));
+				.append(StringUtils.join(fkLines, "\n"));
 			if (fks.size() > fkLimit) {
 				sb.append("\n(... ").append(fks.size() - fkLimit).append(" more foreign keys omitted)");
 			}
