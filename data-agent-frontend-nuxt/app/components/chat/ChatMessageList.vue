@@ -690,7 +690,7 @@ watch(
 	display: flex;
 	align-items: center;
 	padding: 10px 14px;
-	border-radius: 8px;
+	border-radius: 6px;
 	font-size: 13px;
 	font-weight: 500;
 	line-height: 1.5;
