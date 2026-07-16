@@ -264,8 +264,8 @@ function downloadCsv() {
 	border-radius: 6px 6px 0 0;
 }
 .result-pending-dot {
-	width: 7px;
-	height: 7px;
+	width: 6px;
+	height: 6px;
 	border-radius: 50%;
 	background: #3b82f6;
 	animation: pendingPulse 1.2s ease-in-out infinite;
