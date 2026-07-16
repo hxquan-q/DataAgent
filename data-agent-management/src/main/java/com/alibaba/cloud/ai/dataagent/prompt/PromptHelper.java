@@ -93,16 +93,23 @@ public class PromptHelper {
 	/** Schema 列样本：单条最大字符。 */
 	private static final int MAX_EXAMPLE_CHARS = 40;
 
+	/** Schema 表/列描述最大字符。 */
+	private static final int MAX_DESC_CHARS = 80;
+
 	/** 截断过长样本值，避免 free-text 列污染 schema 提示词。 */
 	static String shortenExampleValue(String value) {
+		return shortenExampleValueTo(value, MAX_EXAMPLE_CHARS);
+	}
+
+	static String shortenExampleValueTo(String value, int maxChars) {
 		if (value == null) {
 			return "";
 		}
 		String v = value.trim();
-		if (v.length() <= MAX_EXAMPLE_CHARS) {
+		if (maxChars <= 0 || v.length() <= maxChars) {
 			return v;
 		}
-		return v.substring(0, MAX_EXAMPLE_CHARS) + "…";
+		return v.substring(0, maxChars) + "…";
 	}
 
 	
@@ -169,7 +176,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 		// ? "" : ", " + tableDTO.getDescription()).append("\n");
 		sb.append("# Table: ").append(tableDTO.getName());
 		if (!StringUtils.equals(tableDTO.getName(), tableDTO.getDescription())) {
-			sb.append(StringUtils.isBlank(tableDTO.getDescription()) ? "" : ", " + tableDTO.getDescription())
+			sb.append(StringUtils.isBlank(tableDTO.getDescription()) ? "" : ", " + shortenExampleValueTo(tableDTO.getDescription(), MAX_DESC_CHARS))
 				.append("\n");
 		}
 		else {
@@ -189,7 +196,7 @@ public static String buildMixMacSqlDbPrompt(SchemaDTO schemaDTO, Boolean withCol
 				.append(BooleanUtils.isTrue(withColumnType)
 						? ":" + StringUtils.defaultString(columnDTO.getType(), "").toUpperCase(Locale.ROOT) : "");
 			if (!StringUtils.equals(columnDTO.getDescription(), columnDTO.getName())) {
-				line.append(", ").append(StringUtils.defaultString(columnDTO.getDescription(), ""));
+				line.append(", ").append(shortenExampleValueTo(StringUtils.defaultString(columnDTO.getDescription(), ""), MAX_DESC_CHARS));
 			}
 			if (CollectionUtils.isNotEmpty(tableDTO.getPrimaryKeys())
 					&& tableDTO.getPrimaryKeys().contains(columnDTO.getName())) {

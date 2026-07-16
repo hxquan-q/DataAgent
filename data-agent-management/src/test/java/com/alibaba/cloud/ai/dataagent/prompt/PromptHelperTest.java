@@ -441,4 +441,20 @@ class PromptHelperTest {
 		assertEquals("amount", ordered.get(2).getName());
 	}
 
+	@Test
+	void buildMixMacSqlTablePrompt_longDescription_isShortened() {
+		TableDTO table = new TableDTO();
+		table.setName("t");
+		String longDesc = "d".repeat(120);
+		table.setDescription(longDesc);
+		ColumnDTO col = new ColumnDTO();
+		col.setName("c");
+		col.setType("varchar");
+		col.setDescription("e".repeat(120));
+		table.setColumn(Arrays.asList(col));
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+		assertFalse(result.contains(longDesc));
+		assertTrue(result.contains("…"));
+	}
+
 }
