@@ -535,7 +535,7 @@ watch(
 	align-items: center;
 	justify-content: space-between;
 	cursor: pointer;
-	padding: 2px 0;
+	padding: 4px 6px;
 	user-select: none;
 }
 
