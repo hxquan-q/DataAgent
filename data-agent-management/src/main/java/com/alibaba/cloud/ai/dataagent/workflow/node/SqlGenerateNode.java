@@ -24,6 +24,7 @@ import com.alibaba.cloud.ai.dataagent.util.StateUtil;
 import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
 import com.alibaba.cloud.ai.dataagent.dto.datasource.SqlRetryDto;
 import com.alibaba.cloud.ai.dataagent.dto.prompt.SqlGenerationDTO;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.dto.schema.SchemaDTO;
 import com.alibaba.cloud.ai.dataagent.service.nl2sql.Nl2SqlService;
 import com.alibaba.cloud.ai.graph.GraphResponse;
@@ -188,12 +189,12 @@ public class SqlGenerateNode implements NodeAction {
 
 		// 构建 SQL 生成所需的参数对象
 		SqlGenerationDTO sqlGenerationDTO = SqlGenerationDTO.builder()
-			.evidence(evidence)
-			.query(userQuery)
+			.evidence(PromptHelper.boundEvidence(evidence))
+			.query(PromptHelper.boundQuery(userQuery))
 			.schemaDTO(schemaDTO)
-			.sql(originalSql)
-			.exceptionMessage(errorMsg)
-			.executionDescription(executionDescription)
+			.sql(PromptHelper.boundErrorSql(originalSql))
+			.exceptionMessage(PromptHelper.boundErrorText(errorMsg))
+			.executionDescription(PromptHelper.boundQuery(executionDescription))
 			.dialect(dialect)
 			.build();
 
@@ -227,7 +228,8 @@ public class SqlGenerateNode implements NodeAction {
 			sb.append("第 ").append(i + 1).append(" 次尝试错误：").append(errors.get(i)).append("\n");
 		}
 		sb.append("以上为历史失败原因，请避免重复同样的错误。");
-		return sb.toString();
+		// R37: 自愈错误历史有界
+		return PromptHelper.boundErrorText(sb.toString());
 	}
 
 }

@@ -20,6 +20,7 @@ import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import com.alibaba.cloud.ai.dataagent.prompt.PromptConstant;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.service.llm.LlmService;
 import com.alibaba.cloud.ai.dataagent.util.FluxUtil;
 import com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil;
@@ -96,7 +97,7 @@ public class PythonAnalyzeNode implements NodeAction {
 
 		// 构建系统提示词并调用大模型进行分析
 		String systemPrompt = PromptConstant.getPythonAnalyzePromptTemplate()
-			.render(Map.of("python_output", pythonOutput, "user_query", userQuery));
+			.render(Map.of("python_output", PromptHelper.boundKnowledge(pythonOutput), "user_query", PromptHelper.boundQuery(userQuery)));
 
 		Flux<ChatResponse> pythonAnalyzeFlux = llmService.callSystem(systemPrompt);
 
