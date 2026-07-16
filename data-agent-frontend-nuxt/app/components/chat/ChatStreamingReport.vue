@@ -206,7 +206,7 @@ onBeforeUnmount(() => {
 	margin-bottom: 10px;
 	line-height: 1.65;
 	color: #374151;
-	font-size: 14px;
+	font-size: 13.5px;
 }
 .markdown-body :deep(ul),
 .markdown-body :deep(ol) {
