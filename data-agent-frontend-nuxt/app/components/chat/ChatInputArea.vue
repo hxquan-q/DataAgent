@@ -415,7 +415,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	display: inline-flex;
 	align-items: center;
 	gap: 3px;
-	padding: 2px 8px;
+	padding: 2px 7px;
 	background: #f8fafc;
 	border: 1px solid #e2e8f0;
 	border-radius: 14px;

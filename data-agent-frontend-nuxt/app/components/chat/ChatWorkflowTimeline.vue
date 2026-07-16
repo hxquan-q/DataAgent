@@ -761,7 +761,7 @@ watch(
 
 /* 过程详情有界，防止长 SQL/JSON 撑满屏 */
 .step-content {
-	max-height: 120px;
+	max-height: 110px;
 	overflow: auto;
 }
 .workflow-timeline.is-completed {
