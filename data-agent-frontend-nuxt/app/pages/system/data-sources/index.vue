@@ -16,7 +16,7 @@
 
 <template>
 	<section class="page-shell">
-		<header class="d-flex align-center justify-space-between mb-8">
+		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
 				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">数据源配置</h1>
 				<p class="text-body-2 text-medium-emphasis">
@@ -242,6 +242,28 @@
 							/>
 						</td>
 					</tr>
+				</template>
+
+				<!-- R152: empty state -->
+				<template #no-data>
+					<div class="text-center py-12 ds-empty">
+						<v-icon icon="mdi-database-off-outline" size="56" color="grey-lighten-1" class="mb-3" />
+						<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">尚未配置数据源</h3>
+						<p class="text-body-2 text-medium-emphasis mb-2 ds-empty__desc">
+							全局数据源是 NL2SQL 的连接入口。请先添加数据库连接并测试通过，再在智能体中绑定并激活。
+						</p>
+						<p class="text-caption text-medium-emphasis mb-5">
+							聊天页若提示「未绑定数据源」，请先完成此页配置，再到智能体详情关联。
+						</p>
+						<div class="d-flex justify-center ga-3 flex-wrap">
+							<v-btn color="primary" variant="flat" class="text-none" prepend-icon="mdi-plus" @click="openFormDialog('create')">
+								添加数据源
+							</v-btn>
+							<v-btn variant="outlined" class="text-none" prepend-icon="mdi-robot-outline" @click="navigateTo('/system/agents')">
+								管理智能体绑定
+							</v-btn>
+						</div>
+					</div>
 				</template>
 			</v-data-table>
 		</v-card>
