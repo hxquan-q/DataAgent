@@ -434,6 +434,7 @@ const { showConfirm } = useConfirm();
 const router = useRouter();
 
 // ——— 额外状态 ———
+const modelReady = ref<boolean | null>(null);
 const activeFilter = ref<'all' | 'published' | 'draft' | 'offline'>('all');
 const searchKeyword = ref('');
 const tagsDialog = ref(false);
