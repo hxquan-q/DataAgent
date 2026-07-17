@@ -178,7 +178,27 @@
 				<!-- Actions Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.actions="{ item }">
-					<div class="d-flex ga-1">
+					<div class="d-flex ga-1 justify-center flex-wrap">
+						<v-btn
+							icon="mdi-message-text-outline"
+							variant="text"
+							size="small"
+							color="primary"
+							@click="goChat(item)"
+						>
+							<v-icon size="20" />
+							<v-tooltip activator="parent" location="top">数据问答</v-tooltip>
+						</v-btn>
+						<v-btn
+							icon="mdi-database-cog-outline"
+							variant="text"
+							size="small"
+							color="teal-darken-1"
+							@click="goDatasource(item)"
+						>
+							<v-icon size="20" />
+							<v-tooltip activator="parent" location="top">配置数据源</v-tooltip>
+						</v-btn>
 						<v-btn
 							icon="mdi-pencil-outline"
 							variant="text"
@@ -417,7 +437,7 @@ const headers = [
 	{ title: '标签', key: 'tags', width: '220px', sortable: false },
 	{ title: '状态', key: 'status', width: '100px', sortable: false },
 	{ title: '创建时间', key: 'createTime', width: '170px', sortable: false },
-	{ title: '操作', key: 'actions', width: '120px', sortable: false, align: 'center' as const },
+	{ title: '操作', key: 'actions', width: '180px', sortable: false, align: 'center' as const },
 ];
 
 const statusOptions = [
@@ -448,6 +468,16 @@ const filteredAgents = computed(() => {
 });
 
 function goToCreateAgent() { router.push('/agent/new'); }
+
+function goChat(agent: Agent) {
+	if (!agent?.id) return;
+	navigateTo({ path: '/chat', query: { agentId: String(agent.id) } });
+}
+
+function goDatasource(agent: Agent) {
+	if (!agent?.id) return;
+	navigateTo({ path: '/system/data-sources', query: { agentId: String(agent.id) } });
+}
 
 function handleEdit(agent: Agent) {
 	editingId.value = agent.id;
