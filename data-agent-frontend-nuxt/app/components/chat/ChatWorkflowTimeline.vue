@@ -35,7 +35,7 @@
 								: 'mdi-rocket-launch-outline'
 						}}
 					</v-icon>
-					{{ completed ? '分析过程' : '任务进行中' }}
+					{{ completed ? '过程详情（可展开）' : '任务进行中' }}
 				</v-card-title>
 				<span v-if="timelineSteps.length" class="timeline-summary">
 					{{ doneCount }}/{{ timelineSteps.length }} 步
