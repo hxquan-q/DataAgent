@@ -112,9 +112,9 @@ public class AgentStartupInitialization implements ApplicationRunner, Disposable
 							e.getMessage());
 				}
 
-				// 每个 Agent 初始化之间间隔 1 秒，避免资源争抢
+				// 每个 Agent 初始化之间间隔 300ms，避免资源争抢（R174 加速启动）
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(300);
 				}
 				catch (InterruptedException e) {
 					Thread.currentThread().interrupt();
