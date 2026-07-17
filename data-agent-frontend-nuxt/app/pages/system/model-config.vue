@@ -357,7 +357,7 @@
 
 							<v-col cols="6">
 								<span class="custom-label"
-									>温度系数: {{ form.temperature }}</span
+									>温度系数: {{ form.temperature }}（问答建议 0–0.3）</span
 								>
 								<v-slider
 									v-model="form.temperature"
