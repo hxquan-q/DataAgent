@@ -87,6 +87,9 @@ public class ConcurrentSqlStepExecutor {
 		if (steps == null || steps.isEmpty()) {
 			return;
 		}
+		// R193: 波次开始日志，便于对照串行路径耗时
+		log.info("开始并发 SQL 波次：agentId={}，步骤数={}，canonicalQueryLen={}", agentId, steps.size(),
+				canonicalQuery == null ? 0 : canonicalQuery.length());
 		Accessor accessor = databaseUtil.getAgentAccessor(agentId);
 		CompletableFuture<?>[] futures = steps.stream()
 			.map(step -> CompletableFuture.runAsync(
