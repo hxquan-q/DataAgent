@@ -91,4 +91,5 @@ API：`GET /api/model-config/check-ready` 应体现 `chatModelReady=true`。
 - R169–R170 发送禁用 + 阻塞原因  
 - R171–R176 maxTokens/并发日志/无模型错误  
 - R177 流错误中文化  
+- R196–R201 体量日志 / 选表警告 / 初始化禁用 / 流式秒表  
 
