@@ -153,7 +153,7 @@
 				<v-btn
 					v-if="!store.isStreaming"
 					class="send-btn"
-					:disabled="!inputText.trim() || store.showHumanFeedback"
+					:disabled="!canSend"
 					@click="handleSend"
 				>
 					发送
@@ -200,6 +200,16 @@ const inputText = ref('');
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const showDsMenu = ref(false);
 const showModelMenu = ref(false);
+
+const canSend = computed(() => {
+	if (!inputText.value.trim()) return false;
+	if (store.showHumanFeedback) return false;
+	if (store.isStreaming) return false;
+	if (!store.chatModels.length || !store.activeModelConfig) return false;
+	if (!store.allDatasources.length || !store.activeDatasource) return false;
+	return true;
+});
+
 
 function toggleDsMenu() {
 	if (store.isStreaming) return;
