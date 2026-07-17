@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  控制台 + 文件双输出。
+  文件：logs/data-agent-{STARTUP_ID}.log
+  按日滚动：logs/data-agent-yyyy-MM-dd-{STARTUP_ID}.log
+  STARTUP_ID = 进程启动时刻 yyyyMMdd-HHmmss（每次启动唯一编码）
+-->
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+	<!-- 每次 JVM 加载配置时生成，整次运行固定 -->
+	<timestamp key="STARTUP_ID" datePattern="yyyyMMdd-HHmmss"/>
+
+	<springProperty scope="context" name="LOG_HOME" source="logging.file.path" defaultValue="logs"/>
+	<springProperty scope="context" name="APP_NAME" source="spring.application.name" defaultValue="data-agent"/>
+
+	<property name="FILE_LOG_PATTERN"
+			  value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level ${PID:-} --- [%X{traceId:-}] %logger{50} : %msg%n"/>
+	<property name="CONSOLE_LOG_PATTERN"
+			  value="%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${CONSOLE_LOG_PATTERN}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- 当前活跃文件：带启动编码 -->
+		<file>${LOG_HOME}/${APP_NAME}-${STARTUP_ID}.log</file>
+		<append>true</append>
+		<encoder>
+			<pattern>${FILE_LOG_PATTERN}</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+		<!-- 按自然日滚动；归档名同时带日期 + 启动编码 -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_HOME}/${APP_NAME}-%d{yyyy-MM-dd}-${STARTUP_ID}.log</fileNamePattern>
+			<!-- 保留 30 天；按需改 -->
+			<maxHistory>30</maxHistory>
+			<totalSizeCap>5GB</totalSizeCap>
+			<cleanHistoryOnStart>false</cleanHistoryOnStart>
+		</rollingPolicy>
+	</appender>
+
+	<!-- 异步写盘，降低业务线程阻塞 -->
+	<appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<queueSize>1024</queueSize>
+		<discardingThreshold>0</discardingThreshold>
+		<includeCallerData>false</includeCallerData>
+		<appender-ref ref="FILE"/>
+	</appender>
+
+	<root level="INFO">
+		<appender-ref ref="CONSOLE"/>
+		<appender-ref ref="ASYNC_FILE"/>
+	</root>
+</configuration>

@@ -1,7 +1,10 @@
 <!--
-  IDEA Run Configuration：混合开发（Docker MySQL + 本地后端）
-  导入：IDEA → Run → Edit Configurations → 自动识别 .run/ 目录（或 File → Open）
-  JRebel：安装插件后对此配置勾选 JRebel，或用 JRebel 菜单启动。
+  IDEA Run Configuration：混合热部署（数据平面 Docker MySQL + 开发平面 IDEA/JRebel）
+  导入：IDEA 自动识别 .run/ 目录
+  前置：bash scripts/dev-hybrid.sh up
+  要求：Profiles=local（sql.init=never）、JDK 17、端口 8065
+  JRebel：插件启用后对本配置用 JRebel 启动；rebel.xml → target/classes
+  文档：docs/dev/HYBRID_HOTDEPLOY.md
 -->
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DataAgent-local" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">

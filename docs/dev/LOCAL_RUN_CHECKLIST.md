@@ -1,95 +1,86 @@
-# DataAgent 本地可运行 Checklist（IDEA + Docker MySQL）
+# DataAgent 本地可运行 Checklist（IDEA + hybrid）
 
 > 目标：从「能打开页面」到「能完成一次数据问答」。  
-> 适用：`--spring.profiles.active=local`，MySQL 映射 `127.0.0.1:3306`，库 `nl2sql_db`。
+> 推荐：`bash scripts/dev-hybrid.sh up` + IDEA `profiles=local` + Nuxt `:3000`。  
+> 红线：`docs/dev/HYBRID_HOTDEPLOY.md` · `.rule/hybrid-hotdeploy-db-safe.md` · 总览：`CLAUDE.md`
 
 ## 0. 基础设施
 
-- [ ] MySQL 容器/进程可用（compose 中 `data-agent-mysql-inner`）
-- [ ] 宿主可连：`mysql -h127.0.0.1 -P3306 -uroot -proot nl2sql_db`
-- [ ] `spring.sql.init.mode=never`：空库需手动导入 `data-agent-management/src/main/resources/sql/schema.sql` + `data.sql`
-- [ ] **不要**对 MySQL 执行 `docker compose down -v`（会丢元库）
+- [ ] `bash scripts/dev-hybrid.sh up`（停 Docker backend/frontend，起 portfwd + `:3301` 代理）
+- [ ] `bash scripts/dev-hybrid.sh status`：元库 healthy；`:8065` 留给 IDEA
+- [ ] 元库：`127.0.0.1:3306` / `nl2sql_db` / root/root
+- [ ] `spring.sql.init.mode=never`（`application-local.yml`）——空库才手工导入 schema/data
+- [ ] **不要** `docker compose down -v`
+- [ ] 风险操作前：`bash scripts/backup-meta-db.sh`
 
 ## 1. 后端（IDEA / JRebel）
 
-- [ ] Active profile = `local`
-- [ ] 端口 `8065`：`curl -s http://127.0.0.1:8065/api/agent/list`
-- [ ] 修改 `application-local.yml` 后 **Restart**（YAML 一般不热更）
-- [ ] 本地已推荐配置（`application-local.yml`）：
+- [ ] Run：`DataAgent-local` · Active profile = **`local`** · JDK **17** · 端口 **8065**
+- [ ] JRebel：`rebel.xml` → `target/classes`
+- [ ] `curl -s http://127.0.0.1:8065/api/agent/list` → 200
+- [ ] 改 `application-local.yml` 后 **Restart**（YAML 一般不热更）
+- [ ] 本地推荐项（`application-local.yml`）：
   - `max-sql-retry-count: 3`
   - `enable-sql-result-chart: false`
-  - `enrich-sql-result-timeout: 2000`
-  - `enable-concurrent-steps: true`（无依赖 SQL 波次并发；跳过逐步语义校验换墙钟）
-
-### 并发 SQL 说明
-
-启用后，PlanExecutor 在「连续无依赖 SQL 步骤」波次上走 `ConcurrentSqlStepExecutor`。  
-**取舍**：并发路径不做逐步语义一致性与逐步图表（见类注释）。默认生产仍为 `false`。
+  - `enable-concurrent-steps: true`（无依赖 SQL 波次并发；取舍见 `ConcurrentSqlStepExecutor`）
 
 ## 2. 前端
 
-- [ ] `data-agent-frontend-nuxt`：`pnpm dev`（常见 3000 / 代理到 8065）
-- [ ] 侧栏可进：数据问答 / 模型服务 / 数据源配置 / 智能体
+- [ ] `bash scripts/dev-hybrid.sh frontend` 或 `pnpm dev --host 0.0.0.0 --port 3000`
+- [ ] 公网：`http://<host>:3301`（proxy → 3000/8065）
+- [ ] 侧栏可进：数据问答 / 模型 / 数据源 / 智能体
 
 ## 3. 模型（硬依赖）
 
-聊天页无 CHAT 模型时：
+1. `/system/model-config` 添加并**激活** CHAT  
+2. `GET /api/model-config/check-ready` → chat 就绪  
+3. 数据问答 chip 显示模型名  
 
-1. 点模型 chip →「去配置模型」→ `/system/model-config`
-2. **添加对话模型**（Base URL、API Key、模型名；maxTokens 默认 1536，可按需调大）
-3. **激活**至少一个 CHAT
-4. 回到数据问答，确认 chip 显示模型名
+## 4. 数据源（现行范围）
 
-API：`GET /api/model-config/check-ready` 应体现 `chatModelReady=true`。
+| 用途 | 配置 | hybrid 地址 |
+|------|------|-------------|
+| 模拟业务 | DS「模拟业务库-product_db」 | `127.0.0.1:3307` / product_db |
+| 库存台账 | DS「ASD标准库-库存台账」 | `docs/.db.env` 远程 asd_standard |
 
-当前库若 `model_config` 行数为 0，**无法**做真实 LLM E2E。
+- [ ] `POST /api/datasource/1/test` 与 `/4/test` 成功  
+- [ ] 模拟库若空：重灌 `docker-file/config/mysql/product_db.sql`  
+- [ ] 智能体 **#6 库存台账**：绑定 DS4 + 表初始化  
+- [ ] 丢台账配置：`bash scripts/restore-inventory-agent.sh`  
 
-## 4. 数据源（硬依赖）
+详见 `docs/dev/INVENTORY_STOCK_FLOW_AGENT.md`。
 
-路径：
+## 5. 一次冒烟
 
-1. 智能体列表 →「配置数据源」→ `/system/data-sources?agentId=N`
-2. 若全局无连接：先「添加数据源」并测试连接
-3. 操作列「设为当前」→ 右上角「初始化当前智能体数据源」
-4. 聊天页数据源 chip 应显示库名
-
-聊天页守卫：
-
-- 无模型 → 打开模型菜单并阻断发送  
-- 无数据源 → 打开数据源菜单并阻断发送  
-
-## 5. 一次冒烟（有模型后）
-
-1. 智能体列表 → 数据问答  
-2. 确认模型 + 数据源 chip 均非空  
-3. 发送简单问题（如「有哪些表」）  
-4. 观察过程时间线与结果表/报告  
-5. （可选）对比 concurrent 开启前后墙钟  
+1. 智能体列表 → **库存台账智能体**  
+2. 确认模型 + 数据源 chip  
+3. 预设：「库存台账一共有多少条流水？」→ 期望约 **100**  
+4. （可选）「按仓库汇总出入库操作数量」  
 
 ## 6. 常见故障
 
 | 现象 | 处理 |
 |------|------|
-| agent list 空 / 表不存在 | 导入 schema + data.sql |
-| 模型 chip「未配置模型」 | 配置并激活 CHAT |
-| 数据源「未绑定」 | data-sources?agentId= 设为当前 + 初始化 |
-| 改 yml 不生效 | IDEA Restart（非仅 JRebel reload） |
-| 报告仍五段注水 | 确认后端加载了新 `report-generator-plain.txt` / 全局 optimization |
+| agent list 空 / 表不存在 | 导入 schema；或 restore-inventory + backup restore |
+| 8065 起不来 | `dev-hybrid.sh up` 停 Docker backend；勿双开 |
+| 模型 chip「未配置」 | 激活 CHAT |
+| 模拟库连失败 / 无表 | 重灌 product_db.sql；确认 3307 portfwd |
+| 台账连失败 | 查 `docs/.db.env` 与网络；远端只读 |
+| INSERT denied root@x.x.x.x | GRANT root@`%`（见台账文档 §11） |
+| 改 yml 不生效 | IDEA Restart |
+| embed 403 | 配置 allowedOrigins（禁用 `*`） |
 
-## 7. 相关迭代
+## 7. 相关文档
 
-- R149 模型引导 + concurrent  
-- R150 模型配置空态  
-- R151–R153 数据源引导与路由  
-- R154/R156 智能体列表：问答 / 数据源 / 模型  
-- R155 本文档  
-- R157–R160 无 agent 空态 / 切换 / Welcome 清单 / 侧栏链  
-- R161 新建智能体 → 绑定数据源  
-- R162–R163 激活/初始化后进问答  
-- R164 默认 published + 阶段图  
-- R165–R166 状态条就绪胶囊（可点）  
-- R169–R170 发送禁用 + 阻塞原因  
-- R171–R176 maxTokens/并发日志/无模型错误  
-- R177 流错误中文化  
-- R196–R201 体量日志 / 选表警告 / 初始化禁用 / 流式秒表  
+| 路径 | 用途 |
+|------|------|
+| `CLAUDE.md` | 项目总上下文 + 数据平面 |
+| `docs/dev/HYBRID_HOTDEPLOY.md` | 热部署手册 |
+| `docs/dev/INVENTORY_STOCK_FLOW_AGENT.md` | 台账智能体 |
+| `.rule/hybrid-hotdeploy-db-safe.md` | 强制红线 |
 
+## 8. 相关迭代（历史）
+
+- R149–R177：模型/数据源引导、并发、发送守卫等  
+- R196–R201：体量日志 / 选表警告 / 初始化禁用 / 流式秒表  
+- 2026-07-17：hybrid 零写库 + SQL_INIT=never + 台账恢复文档对齐  

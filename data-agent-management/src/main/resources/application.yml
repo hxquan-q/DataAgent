@@ -156,9 +156,14 @@ mybatis:
     log-impl: org.apache.ibatis.logging.slf4j.Slf4jImpl
 
 # -----------------------------------------------------------------------------
-# 日志级别（开发可开 debug，生产建议调为 info）
+# 日志：控制台 + 文件（logback-spring.xml）
+# 活跃文件：logs/data-agent-{启动编码}.log
+# 按日归档：logs/data-agent-yyyy-MM-dd-{启动编码}.log
+# 启动编码 = 进程启动时刻 yyyyMMdd-HHmmss；目录已在 .gitignore（**/logs/*）
 # -----------------------------------------------------------------------------
 logging:
+  file:
+    path: ${LOG_PATH:logs}
   level:
     # 业务服务层
     com.alibaba.cloud.ai.dataagent.service: debug

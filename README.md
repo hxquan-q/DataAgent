@@ -88,6 +88,8 @@ npm install && npm run dev
 
 ## 📚 文档导航
 
+完整索引：[docs/README.md](docs/README.md) · 本地开发：[docs/dev/](docs/dev/README.md) · 硬约束：[.rule/](.rule/README.md)
+
 | 文档 | 此文档包含的内容 |
 | :--- | :--- |
 | [快速开始](docs/QUICK_START.md) | 环境要求、数据库导入、基础配置、系统初体验 |
@@ -95,8 +97,9 @@ npm install && npm run dev
 | [开发者指南](docs/DEVELOPER_GUIDE.md) | 开发环境搭建、详细配置手册、代码规范、扩展开发(向量库/模型) |
 | [高级功能](docs/ADVANCED_FEATURES.md) | API Key 调用、MCP 服务器配置、自定义混合检索策略、Python执行器配置 |
 | [知识配置最佳实践](docs/KNOWLEDGE_USAGE.md) | 语义模型，业务知识，智能体知识的解释和使用 |
-| [工程化系统思维入门](docs/ENGINEERING_SYSTEM_THINKING.md) | 面向新手的系统建模/分析/设计/优化方法论、21 天阅读路线图、二次开发实战清单 |
-| [系统设计：顶层到落地（图解）](docs/SYSTEM_DESIGN_TOP_DOWN.md) | 结合 20+ Mermaid 图：问题定义→分层→StateGraph 控制律→状态空间→反馈回路→前端 SSE |
+| [工程化系统思维入门](docs/dev/ENGINEERING_SYSTEM_THINKING.md) | 面向新手的系统建模/分析/设计/优化方法论、21 天阅读路线图、二次开发实战清单 |
+| [系统设计：顶层到落地（图解）](docs/dev/SYSTEM_DESIGN_TOP_DOWN.md) | 结合 20+ Mermaid 图：问题定义→分层→StateGraph 控制律→状态空间→反馈回路→前端 SSE |
+| [hybrid 热部署 / 本地 checklist](docs/dev/HYBRID_HOTDEPLOY.md) | IDEA+JRebel + 元库零影响；[LOCAL_RUN_CHECKLIST](docs/dev/LOCAL_RUN_CHECKLIST.md) |
 
 ## 🤝 加入社区 & 贡献
 

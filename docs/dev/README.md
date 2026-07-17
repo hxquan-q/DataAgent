@@ -1,22 +1,42 @@
 # 开发文档（dev）
 
-本目录存放二次开发与联调相关文档。
+本目录存放二次开发与联调相关文档。总导航见 [`../README.md`](../README.md)。
+
+## 运行与环境
 
 | 文档 | 说明 |
 | :--- | :--- |
-| [V0.2_PRD.md](./V0.2_PRD.md) | **v0.2 需求规格（现行）**：范式 B = NL2Semantic2SQL 全迁移 + 4 支柱（AST 护栏 / 语义层 / 样例库 / 证据链） |
-| [V0.2_ARCHITECTURE.md](./V0.2_ARCHITECTURE.md) | v0.2 架构落地：语义层四表、受控拼装、安全护栏、召回接线、参考项目抄录（§10） |
-| [V0.2_TASKS.md](./V0.2_TASKS.md) | v0.2 任务分解：M0-M4 工作流任务（WS）拆分 |
-| [ENGINEERING_SYSTEM_THINKING.md](./ENGINEERING_SYSTEM_THINKING.md) | 工程化系统思维入门：用《工程控制论》四步法读懂现有 DataAgent 代码（新手向） |
-| [SYSTEM_DESIGN_TOP_DOWN.md](./SYSTEM_DESIGN_TOP_DOWN.md) | 从顶层目标到代码落地的系统实现讲解 |
-| [NL2SQL_AGENT_CYBERNETICS.md](./NL2SQL_AGENT_CYBERNETICS.md) | 问数 Agent 的控制论分析：竞品对比与构建蓝图（设计/评估向）；`docs/research/FULL_CONTROL_THEORY_SURVEY.md` 是其扩展 |
-| [API_INTEGRATION.md](./API_INTEGRATION.md) | 前后端 API 对接：代理配置、模块映射、接口明细、SSE/上传约定、联调清单 |
-| [INVENTORY_STOCK_FLOW_AGENT.md](./INVENTORY_STOCK_FLOW_AGENT.md) | **库存台账智能体（agentId=6）**：asd_standard 连库搭建、质量优化、指标/语义别名、图表报告实测记录 |
+| [HYBRID_HOTDEPLOY.md](./HYBRID_HOTDEPLOY.md) | **hybrid 热部署**：IDEA+JRebel + Docker 元库；数据平面红线 |
+| [LOCAL_RUN_CHECKLIST.md](./LOCAL_RUN_CHECKLIST.md) | 本地可运行 checklist（模型 / 数据源 / 冒烟） |
+| [RUNNABILITY_PHASE.md](./RUNNABILITY_PHASE.md) | 可运行性阶段记录 |
+| [API_INTEGRATION.md](./API_INTEGRATION.md) | 前后端 API：代理、模块映射、SSE/上传、联调清单 |
 
-> 历史/已取代文档（v0.1 PRD、图谱实施蓝图、会话日志、北极星设计稿、superpowers 计划等）已移至 [`../archive/`](../archive/README.md)，备查不再维护。
+硬约束源：[`.rule/hybrid-hotdeploy-db-safe.md`](../../.rule/hybrid-hotdeploy-db-safe.md)。
 
-运行时完整 OpenAPI 以后端 Swagger 为准：`http://localhost:8065/swagger-ui.html`。
+## v0.2（现行）
 
-## Local run
+| 文档 | 说明 |
+| :--- | :--- |
+| [V0.2_PRD.md](./V0.2_PRD.md) | 需求规格：范式 B = NL2Semantic2SQL + 4 支柱 |
+| [V0.2_ARCHITECTURE.md](./V0.2_ARCHITECTURE.md) | 架构落地：语义层、受控拼装、护栏、召回 |
+| [V0.2_TASKS.md](./V0.2_TASKS.md) | 任务分解 M0–M4 |
+| [V0.2_EMBED_DESIGN.md](./V0.2_EMBED_DESIGN.md) | Embed 嵌入设计（HMAC / origins） |
 
-- [LOCAL_RUN_CHECKLIST.md](./LOCAL_RUN_CHECKLIST.md) — IDEA + Docker MySQL 可运行路径（模型/数据源/重启）
+## 智能体实例
+
+| 文档 | 说明 |
+| :--- | :--- |
+| [INVENTORY_STOCK_FLOW_AGENT.md](./INVENTORY_STOCK_FLOW_AGENT.md) | 库存台账智能体（agentId=6） |
+| [MES_PASS_STATION_AGENT.md](./MES_PASS_STATION_AGENT.md) | 扫码过站智能体（agentId=7） |
+
+## 设计与方法论
+
+| 文档 | 说明 |
+| :--- | :--- |
+| [ENGINEERING_SYSTEM_THINKING.md](./ENGINEERING_SYSTEM_THINKING.md) | 工程化系统思维入门（控制论读代码） |
+| [SYSTEM_DESIGN_TOP_DOWN.md](./SYSTEM_DESIGN_TOP_DOWN.md) | 从顶层目标到代码落地 |
+| [NL2SQL_AGENT_CYBERNETICS.md](./NL2SQL_AGENT_CYBERNETICS.md) | 问数 Agent 控制论分析；扩展见 [`../research/FULL_CONTROL_THEORY_SURVEY.md`](../research/FULL_CONTROL_THEORY_SURVEY.md) |
+
+> 历史/已取代文档（v0.1 PRD、图谱实施蓝图、superpowers 计划等）→ [`../archive/`](../archive/README.md)。
+
+运行时 OpenAPI：`http://localhost:8065/swagger-ui.html`。
