@@ -36,7 +36,7 @@
 聊天页无 CHAT 模型时：
 
 1. 点模型 chip →「去配置模型」→ `/system/model-config`
-2. **添加对话模型**（Base URL、API Key、模型名）
+2. **添加对话模型**（Base URL、API Key、模型名；maxTokens 默认 1536，可按需调大）
 3. **激活**至少一个 CHAT
 4. 回到数据问答，确认 chip 显示模型名
 

@@ -58,6 +58,7 @@
 				<button v-if="!hasDatasource" type="button" class="ready-link" @click="goDatasource">去绑定</button>
 			</li>
 		</ul>
+		<p v-else class="ready-ok da-reveal da-reveal-delay-3" role="status">已就绪，直接提问或点下方推荐问题。</p>
 
 		<div
 			v-if="chips.length"
@@ -334,5 +335,12 @@ watch(
 .ready-link:focus-visible {
 	outline: 2px solid var(--da-accent, #3b82f6);
 	outline-offset: 2px;
+}
+
+.ready-ok {
+	margin: 16px 0 0;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: #047857;
 }
 </style>
