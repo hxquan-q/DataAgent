@@ -18,7 +18,7 @@
 	<section class="page-shell">
 		<KnowledgePageHeader
 			title="新建智能体"
-			subtitle="创建你的专属数据分析智能体，统一接入知识、提示词和语义能力。"
+			subtitle="创建后将引导绑定数据源。建议先在「模型服务」配置并激活 CHAT 模型。"
 		>
 			<template #actions>
 				<v-btn
@@ -305,10 +305,20 @@ async function createAgent() {
 			humanReviewEnabled: agentForm.humanReviewEnabled ? 1 : 0,
 		};
 		const result = await agentService.create(payload);
+		// R161: 先引导绑定数据源，再进问答（避免空模型/空 DS 直接聊天）
 		$tip(
-			`智能体创建成功！状态：${payload.status === 'published' ? '已发布' : '草稿'}`,
+			`智能体创建成功（${payload.status === 'published' ? '已发布' : '草稿'}）。请绑定并激活数据源，然后进入数据问答。`,
+			{ icon: 'mdi-check-circle', color: 'success' },
 		);
-		await router.push({ path: '/chat', query: { agentId: result.id } });
+		const id = result?.id;
+		if (id != null) {
+			await router.push({
+				path: '/system/data-sources',
+				query: { agentId: String(id) },
+			});
+		} else {
+			await router.push('/system/agents');
+		}
 	} catch {
 		$tip('创建失败，请重试', { color: 'error', icon: 'mdi-alert-circle' });
 	} finally {
