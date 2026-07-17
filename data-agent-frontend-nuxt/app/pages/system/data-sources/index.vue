@@ -111,6 +111,15 @@
 					>
 						进入数据问答
 					</v-btn>
+					<v-btn
+						v-if="agentId"
+						size="small"
+						variant="text"
+						class="text-none"
+						@click="navigateTo('/system/agents')"
+					>
+						返回智能体
+					</v-btn>
 				</div>
 			</div>
 		</v-alert>
@@ -722,17 +731,11 @@ async function handleInitDatasource() {
 		}
 		const res = await agentDatasourceService.initSchema(agentId.value);
 		if (res.success) {
-			// R163: 初始化完成后引导进入问答
-			$tip('初始化数据源成功。可以进入数据问答开始提问。', {
+			// R168: 不自动强跳，由横幅「进入数据问答」用户确认（可继续调表）
+			$tip('初始化数据源成功。可点击上方「进入数据问答」开始提问。', {
 				icon: 'mdi-check-circle',
 				color: 'success',
 			});
-			// 短延迟后跳转，避免 tip 被立刻卸载（仍允许用户用横幅按钮）
-			setTimeout(() => {
-				if (agentId.value) {
-					navigateTo({ path: '/chat', query: { agentId: String(agentId.value) } });
-				}
-			}, 600);
 		} else {
 			$tip(res.message || '初始化数据源失败', {
 				color: 'error',
