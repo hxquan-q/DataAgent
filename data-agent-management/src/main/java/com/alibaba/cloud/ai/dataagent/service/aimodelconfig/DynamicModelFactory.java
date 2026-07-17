@@ -123,11 +123,13 @@ public class DynamicModelFactory {
 	}
 
 	private static void checkBasic(ModelConfigDTO config) {
-		Assert.hasText(config.getBaseUrl(), "baseUrl must not be empty");
+		// R176: 校验信息面向运维/前端展示
+		Assert.notNull(config, "模型配置不能为空");
+		Assert.hasText(config.getBaseUrl(), "模型 Base URL 不能为空");
 		if (!"custom".equalsIgnoreCase(config.getProvider())) {
-			Assert.hasText(config.getApiKey(), "apiKey must not be empty");
+			Assert.hasText(config.getApiKey(), "模型 API Key 不能为空");
 		}
-		Assert.hasText(config.getModelName(), "modelName must not be empty");
+		Assert.hasText(config.getModelName(), "模型名称不能为空");
 	}
 
 	private RestClient.Builder getProxiedRestClientBuilder(ModelConfigDTO config) {

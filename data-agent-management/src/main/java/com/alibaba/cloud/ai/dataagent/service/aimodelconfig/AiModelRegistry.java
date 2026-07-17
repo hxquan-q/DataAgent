@@ -76,10 +76,10 @@ public class AiModelRegistry {
 						log.error("Failed to initialize ChatClient: {}", e.getMessage(), e);
 					}
 
-					// 兜底：如果还没初始化成功，抛出运行时异常，提示用户配置
+					// 兜底：如果还没初始化成功，抛出运行时异常，提示用户配置（R176 中文可操作）
 					if (currentChatClient == null) {
 						throw new RuntimeException(
-								"No active CHAT model configured. Please configure it in the dashboard.");
+								"未配置或未激活 CHAT 模型。请到「模型服务」添加对话模型并点击激活（配置后需等待热刷新或重启）。");
 					}
 				}
 			}
@@ -109,7 +109,7 @@ public class AiModelRegistry {
 					// 兜底：为了防止 VectorStore Starter 启动时调用 dimensions() 报错
 					// 我们必须返回一个"哑巴"模型，而不是 null 或 抛异常
 					if (currentEmbeddingModel == null) {
-						log.warn("Using DummyEmbeddingModel for fallback.");
+						log.warn("未配置激活的 EMBEDDING 模型，使用 DummyEmbeddingModel 兜底（向量召回质量会下降）。请到「模型服务」配置嵌入模型。");
 						currentEmbeddingModel = new DummyEmbeddingModel();
 					}
 				}
