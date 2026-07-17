@@ -104,7 +104,7 @@
 				v-model="inputText"
 				class="chat-textarea"
 				:disabled="store.isStreaming || store.showHumanFeedback"
-				placeholder="在这里提问，例如：'分析上月各产品的销售增长情况'..."
+				:placeholder="composerPlaceholder"
 				rows="3"
 				@keydown.enter.exact.prevent="handleSend"
 				@input="autoResize"
@@ -235,6 +235,13 @@ const sendBlockReason = computed(() => {
 	if (!store.chatModels.length || !store.activeModelConfig) return '请先配置并选择 CHAT 模型';
 	if (!store.allDatasources.length || !store.activeDatasource) return '请先绑定并选择数据源';
 	return '';
+});
+
+const composerPlaceholder = computed(() => {
+	if (sendBlockReason.value) {
+		return `${sendBlockReason.value}（配置后即可提问）`;
+	}
+	return "在这里提问，例如：分析上月各产品的销售增长情况...";
 });
 
 function toggleDsMenu() {
