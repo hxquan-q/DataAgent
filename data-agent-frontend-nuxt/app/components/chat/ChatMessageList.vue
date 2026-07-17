@@ -26,6 +26,16 @@
 			<span v-if="store.activeChatModel || store.activeModelConfig?.modelName" class="chat-status-strip__model">
 				{{ store.activeModelConfig?.modelName || store.activeChatModel }}
 			</span>
+			<span
+				class="chat-status-strip__ready"
+				:class="{ ok: stripHasModel }"
+				:title="stripHasModel ? 'CHAT 模型就绪' : '缺少 CHAT 模型'"
+			>模型</span>
+			<span
+				class="chat-status-strip__ready"
+				:class="{ ok: stripHasDs }"
+				:title="stripHasDs ? '数据源就绪' : '缺少数据源'"
+			>数据源</span>
 			<span v-if="store.isStreaming" class="chat-status-strip__live">分析中</span>
 			<button
 				type="button"
@@ -750,5 +760,20 @@ watch(
 	background: #ecfdf5;
 	color: #047857;
 	font-weight: 600;
+}
+
+.chat-status-strip__ready {
+	padding: 2px 8px;
+	border-radius: 999px;
+	font-size: 11px;
+	font-weight: 600;
+	background: #fff7ed;
+	color: #c2410c;
+	border: 1px solid #fed7aa;
+}
+.chat-status-strip__ready.ok {
+	background: #ecfdf5;
+	color: #047857;
+	border-color: #a7f3d0;
 }
 </style>
