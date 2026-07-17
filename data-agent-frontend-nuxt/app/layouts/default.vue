@@ -26,13 +26,11 @@
 									<v-icon icon="mdi-robot" color="white" size="22" />
 								</v-avatar>
 								<div>
-									<div class="text-subtitle-2 font-weight-bold text-white">
-										Spring AI Alibaba
+									<div class="text-subtitle-2 font-weight-bold brand-title">
+										DataAgent
 									</div>
-									<div
-										class="text-caption text-blue-lighten-3 font-weight-bold brand-subtitle"
-									>
-										DATA AGENT
+									<div class="text-caption font-weight-bold brand-subtitle">
+										AI DATA WORKSPACE
 									</div>
 								</div>
 							</div>
@@ -315,7 +313,7 @@
 									density="compact"
 									:active="isActive('/agent/new')"
 									variant="flat"
-									class="rounded-xl mx-2 shadow-lg bg-blue-grey-darken-4 new-agent-item"
+									class="rounded-xl mx-2 new-agent-item"
 									@click="navigateToPath('/agent/new')"
 								>
 									<div class="d-flex align-center justify-center gap-2 w-100">
@@ -335,8 +333,8 @@
 								@click="openChangePassword"
 							>
 								<template #prepend>
-									<v-avatar size="24" color="grey-darken-3">
-										<v-icon icon="mdi-account" size="14" color="white" />
+									<v-avatar size="24" color="primary" variant="tonal">
+										<v-icon icon="mdi-account" size="14" color="primary" />
 									</v-avatar>
 								</template>
 								<v-list-item-title class="text-caption font-weight-bold ms-2">
@@ -656,29 +654,42 @@ watch(
 
 <style scoped>
 .border-white-5 {
-	border-color: var(--da-sidebar-line, rgba(255, 255, 255, 0.05)) !important;
+	border-color: var(--da-sidebar-line, #e4edf5) !important;
 }
 
 .brand-subtitle {
 	font-size: 10px;
 	letter-spacing: 1px;
+	color: var(--da-sidebar-muted, #64748b);
+}
+
+.brand-title {
+	color: var(--da-sidebar-ink, #1a2332);
+}
+
+/* rebuild-ui: light paper sidebar brand */
+:deep(.base-drawer__left .text-white) {
+	color: var(--da-sidebar-ink, #1a2332) !important;
 }
 
 .agent-switcher :deep(.v-field) {
-	background: var(--da-sidebar-field, rgba(30, 41, 59, 0.8));
-	border-radius: var(--da-radius-md, 10px);
+	background: var(--da-sidebar-field, #ffffff);
+	border-radius: var(--da-radius-md, 12px);
+	border: 1px solid var(--da-sidebar-line, #e4edf5);
+	box-shadow: var(--da-shadow-sm);
 }
 
 .agent-switcher :deep(.v-field__input),
 .agent-switcher :deep(.v-field-label),
 .agent-switcher :deep(.v-icon) {
-	color: var(--da-sidebar-ink, #dbeafe);
+	color: var(--da-sidebar-ink, #1a2332);
 }
 
 :deep(.agent-switcher-menu) {
-	background: var(--da-sidebar-bg, #1e293b) !important;
-	border: 1px solid color-mix(in srgb, var(--da-accent, #3b82f6) 30%, transparent) !important;
-	border-radius: 12px !important;
+	background: var(--da-surface, #ffffff) !important;
+	border: 1px solid var(--da-line-soft, #e4edf5) !important;
+	border-radius: var(--da-radius-md, 12px) !important;
+	box-shadow: var(--da-shadow-md) !important;
 	overflow: hidden;
 	z-index: var(--da-z-dropdown, 1000);
 }
@@ -689,13 +700,14 @@ watch(
 }
 
 :deep(.agent-switcher-menu .v-list-item) {
-	border-radius: 8px !important;
+	border-radius: var(--da-radius-sm, 8px) !important;
 	margin-bottom: 2px !important;
 	min-height: 44px !important;
+	color: var(--da-ink, #1a2332) !important;
 }
 
 :deep(.agent-switcher-menu .v-list-item:hover) {
-	background: color-mix(in srgb, var(--da-accent, #3b82f6) 12%, transparent) !important;
+	background: var(--da-sidebar-hover, rgba(47, 132, 214, 0.08)) !important;
 }
 
 .agent-option__text {
@@ -714,13 +726,13 @@ watch(
 }
 
 .agent-option__title--active {
-	color: var(--da-sidebar-accent, #60a5fa);
+	color: var(--da-sidebar-accent, #2f84d6);
 }
 
 .agent-option__subtitle {
 	font-size: 10px;
 	line-height: 1.2;
-	color: var(--da-sidebar-muted, #94a3b8);
+	color: var(--da-sidebar-muted, #64748b);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -729,12 +741,12 @@ watch(
 }
 
 .agent-tags-text {
-	background: var(--da-sidebar-chip-bg, rgba(59, 130, 246, 0.15));
-	color: var(--da-sidebar-chip-ink, #93c5fd);
+	background: var(--da-sidebar-chip-bg, rgba(47, 132, 214, 0.1));
+	color: var(--da-sidebar-chip-ink, #1e5fa8);
 	padding: 1px 6px;
-	border-radius: 4px;
+	border-radius: 6px;
 	font-size: 9px;
-	border: 1px solid var(--da-sidebar-chip-line, rgba(59, 130, 246, 0.2));
+	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
 }
 
 .agent-option--selection .agent-option__title {
@@ -748,6 +760,18 @@ watch(
 .navigation-item {
 	--v-list-item-padding-start: 16px;
 	--v-list-item-min-height: var(--da-table-row-density, 36px);
+	border-radius: var(--da-radius-sm, 8px) !important;
+	color: var(--da-sidebar-ink, #1a2332) !important;
+	margin-inline: 4px;
+}
+
+.navigation-item:hover {
+	background: var(--da-sidebar-hover, rgba(47, 132, 214, 0.08)) !important;
+}
+
+.navigation-item.v-list-item--active {
+	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.14)) !important;
+	color: var(--da-sidebar-accent, #2f84d6) !important;
 }
 
 .navigation-sub-item {
@@ -764,12 +788,19 @@ watch(
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-	background: rgba(255, 255, 255, 0.1);
+	background: color-mix(in srgb, var(--da-muted, #64748b) 35%, transparent);
 	border-radius: 4px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-	background: rgba(255, 255, 255, 0.2);
+	background: color-mix(in srgb, var(--da-muted, #64748b) 55%, transparent);
+}
+
+.new-agent-item {
+	background: var(--da-primary-soft, #e8f3fc) !important;
+	color: var(--da-primary, #2f84d6) !important;
+	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
+	box-shadow: none !important;
 }
 
 :deep(.v-list-group__items .v-list-item) {

@@ -440,17 +440,17 @@ watch(
 	display: flex;
 	flex-direction: column;
 	background:
-		radial-gradient(1200px 400px at 50% -80px, rgba(59, 130, 246, 0.06), transparent 60%),
-		#fff;
+		radial-gradient(1000px 380px at 50% -100px, color-mix(in srgb, var(--da-primary, #2f84d6) 8%, transparent), transparent 62%),
+		var(--da-surface-soft, #f4f8fb);
 }
 
 .messages-inner {
-	padding: 14px 20px 20px;
+	padding: 18px 20px 28px;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 16px;
 	width: 100%;
-	max-width: 960px;
+	max-width: var(--da-chat-max, 960px);
 	margin: 0 auto;
 }
 
@@ -481,37 +481,42 @@ watch(
 
 /* ── User card ───────────────────────────────────────────────────────────────── */
 .user-card {
-	background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%) !important;
+	background: linear-gradient(
+		135deg,
+		var(--da-primary, #2f84d6) 0%,
+		var(--da-accent, #3b9eea) 100%
+	) !important;
 	color: white !important;
-	padding: 9px 12px;
+	padding: 10px 14px;
 	border-radius: 18px 18px 6px 18px !important;
 	font-size: 13.5px;
 	line-height: 1.55;
 	max-width: min(62%, 560px);
 	word-break: break-word;
-	box-shadow: 0 6px 16px rgba(37, 99, 235, 0.18) !important;
+	box-shadow: 0 8px 20px color-mix(in srgb, var(--da-primary, #2f84d6) 24%, transparent) !important;
 	letter-spacing: -0.01em;
 }
 
 /* ── AI card ─────────────────────────────────────────────────────────────────── */
 .ai-card {
-	padding: 10px 12px;
+	padding: 12px 14px;
 	border-radius: 6px 18px 18px 18px !important;
 	font-size: 13.5px;
-	line-height: 1.6;
-	max-width: min(78%, 720px);
+	line-height: 1.65;
+	max-width: min(82%, 760px);
 	word-break: break-word;
-	color: var(--da-ink, #0f172a);
-	background: #fff !important;
-	border: 1px solid var(--da-line-soft, #e8edf2) !important;
-	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04) !important;
+	color: var(--da-ink, #1a2332);
+	background: var(--da-surface, #fff) !important;
+	border: 1px solid var(--da-line-soft, #e4edf5) !important;
+	box-shadow: var(--da-shadow-sm) !important;
 	letter-spacing: -0.01em;
-	transition: box-shadow 0.2s var(--da-ease-out, ease), border-color 0.2s ease;
+	transition: box-shadow var(--da-dur-base, 0.2s) var(--da-ease-out),
+		border-color var(--da-dur-base, 0.2s) var(--da-ease-out);
 }
 
 .ai-card:hover {
-	border-color: #dbe4ee !important;
-	box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05) !important;
+	border-color: color-mix(in srgb, var(--da-primary, #2f84d6) 22%, var(--da-line-soft, #e4edf5)) !important;
+	box-shadow: var(--da-shadow-md) !important;
 }
 
 /* Report card: answer primary — stronger frame */
@@ -520,12 +525,10 @@ watch(
 	padding: 0 !important;
 	flex: 1;
 	min-width: 0;
-	border: 1px solid #bfdbfe !important;
-	box-shadow:
-		0 1px 2px rgba(30, 64, 175, 0.05),
-		0 10px 28px rgba(30, 64, 175, 0.08) !important;
+	border: 1px solid color-mix(in srgb, var(--da-primary, #2f84d6) 28%, transparent) !important;
+	box-shadow: var(--da-shadow-lg) !important;
 	overflow: hidden;
-	border-radius: 14px !important;
+	border-radius: var(--da-radius-md, 14px) !important;
 }
 
 /* Timeline card: process secondary (WeKnora hierarchy) */

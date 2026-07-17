@@ -134,7 +134,7 @@ onUnmounted(() => {
 	display: flex;
 	height: calc(100vh - 52px);
 	overflow: hidden;
-	background: var(--da-surface-soft, #f8fafc);
+	background: var(--da-surface-soft, #f4f8fb);
 }
 
 .chat-body {
@@ -143,8 +143,7 @@ onUnmounted(() => {
 	flex-direction: column;
 	overflow: hidden;
 	min-width: 0;
-	background: var(--da-surface, #fff);
-	border-left: 1px solid var(--da-line-soft, #e8edf2);
-	box-shadow: -4px 0 16px rgba(15, 23, 42, 0.03);
+	background: transparent;
+	border-left: 1px solid var(--da-line-soft, #e4edf5);
 }
 </style>

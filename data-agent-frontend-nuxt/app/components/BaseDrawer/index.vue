@@ -85,13 +85,14 @@ const cssVars = computed(() => ({
 .base-drawer__left {
 	width: var(--drawer-width);
 	height: 100%;
-	background-color: var(--da-sidebar-bg, #1e293b);
-	color: var(--da-sidebar-ink, #e2e8f0);
-	transition: width var(--da-dur-slow, 0.3s) cubic-bezier(0.4, 0, 0.2, 1);
+	background-color: var(--da-sidebar-bg, #f4f8fb);
+	color: var(--da-sidebar-ink, #1a2332);
+	transition: width var(--da-dur-slow, 0.3s) var(--da-ease-out, cubic-bezier(0.16, 1, 0.3, 1));
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	border-right: 1px solid var(--da-sidebar-line, rgba(255, 255, 255, 0.05));
+	border-right: 1px solid var(--da-sidebar-line, #e4edf5);
+	box-shadow: var(--da-shadow-sm);
 	flex-shrink: 0;
 	white-space: nowrap;
 }
@@ -110,11 +111,12 @@ const cssVars = computed(() => ({
 
 .base-drawer__header {
 	height: 52px;
-	border-bottom: 1px solid var(--da-line-soft, #e2e8f0);
-	background-color: var(--da-surface, #ffffff);
+	border-bottom: 1px solid var(--da-line-soft, #e4edf5);
+	background-color: color-mix(in srgb, var(--da-surface, #ffffff) 92%, transparent);
+	backdrop-filter: blur(10px);
 	display: flex;
 	align-items: center;
-	padding: 0 14px;
+	padding: 0 16px;
 	flex-shrink: 0;
 }
 

@@ -322,13 +322,14 @@ async function confirmDelete() {
 /* ── Expanded panel ──────────────────────────────────────────────────────────── */
 .chat-sidebar {
 	width: 240px;
-	background: var(--da-surface-soft, #f8fafc);
-	border-right: 1px solid #e8edf2;
+	background: var(--da-surface, #ffffff);
+	border-right: 1px solid var(--da-line-soft, #e4edf5);
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	overflow: hidden;
-	transition: opacity 0.2s ease;
+	transition: opacity var(--da-dur-base, 0.2s) var(--da-ease-out);
+	box-shadow: var(--da-shadow-sm);
 }
 
 .collapsed .chat-sidebar {
@@ -350,16 +351,16 @@ async function confirmDelete() {
 .sidebar-title {
 	font-size: 13px;
 	font-weight: 600;
-	color: #475569;
+	color: var(--da-muted, #64748b);
 	letter-spacing: 0.3px;
 	white-space: nowrap;
 }
 
 .toggle-btn {
-	color: #94a3b8 !important;
+	color: var(--da-muted, #94a3b8) !important;
 }
 .toggle-btn:hover {
-	color: #3b82f6 !important;
+	color: var(--da-primary, #2f84d6) !important;
 }
 
 /* ── Session list ────────────────────────────────────────────────────────────── */
@@ -382,18 +383,19 @@ async function confirmDelete() {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 4px 8px;
-	border-radius: 6px;
+	padding: 6px 10px;
+	border-radius: var(--da-radius-sm, 8px);
 	cursor: pointer;
-	transition: background 0.12s;
+	transition: background var(--da-dur-fast, 0.12s);
 	margin-bottom: 2px;
-	min-height: 36px;
+	min-height: 40px;
 }
 .session-item:hover {
-	background: var(--da-primary-soft, #eff6ff);
+	background: var(--da-sidebar-hover, rgba(47, 132, 214, 0.08));
 }
 .session-item.active {
-	background: var(--da-primary-soft, #eff6ff);
+	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.14));
+	box-shadow: inset 0 0 0 1px var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
 }
 
 .session-item-info {

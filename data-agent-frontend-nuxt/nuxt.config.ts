@@ -38,28 +38,28 @@ export default defineNuxtConfig({
 	},
 	vuetify: {
 		vuetifyOptions: {
-			// Keep static hex in sync with app/assets/css/tokens.css (W0a bridge).
+			// Keep static hex in sync with app/assets/css/tokens.css (rebuild-ui · DEEIX azure).
 			theme: {
 				defaultTheme: 'light',
 				themes: {
 					light: {
 						dark: false,
 						colors: {
-							primary: '#1E40AF',
-							secondary: '#3B82F6',
-							accent: '#3B82F6',
+							primary: '#2F84D6',
+							secondary: '#3B9EEA',
+							accent: '#3B9EEA',
 							error: '#DC2626',
-							info: '#3B82F6',
-							success: '#10B981',
+							info: '#3B9EEA',
+							success: '#16A34A',
 							warning: '#D97706',
-							background: '#F8FAFC',
+							background: '#F4F8FB',
 							surface: '#FFFFFF',
 						},
 					},
 				},
 			},
 			defaults: {
-				VBtn: { variant: 'outlined' },
+				VBtn: { variant: 'flat', rounded: 'lg' },
 			},
 		},
 	},
