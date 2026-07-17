@@ -221,12 +221,34 @@ export const useChatStore = defineStore('chat', () => {
 			return;
 		}
 		try {
-			// 全局数据源列表切换：确保先建立/启用 agent 关联
-			// 后端 add 接口会自动禁用该 agent 其他数据源并启用当前数据源
+			// 后端 add 会启用当前并禁用其他 agent 数据源
 			await agentDatasourceService.addDatasourceToAgent(
 				String(agentId),
 				nextDatasourceId,
 			);
+			// R204: 切换后尽量刷新为 agent 绑定视图
+			try {
+				const agentDs = await agentDatasourceService.getAgentDatasource(agentId);
+				const mapped = (agentDs || [])
+					.map((ad) => {
+						const raw = ad.datasource || {};
+						return {
+							...raw,
+							id: ad.datasourceId ?? raw.id,
+							isActive: Number(ad.isActive) === 1,
+							selectTables: ad.selectTables,
+						} as Datasource;
+					})
+					.filter((item) => item.id != null);
+				if (mapped.length) {
+					allDatasources.value = mapped;
+					activeDatasource.value =
+						mapped.find((d) => d.isActive) || mapped.find((d) => d.id === nextDatasourceId) || mapped[0] || null;
+					return;
+				}
+			} catch {
+				/* fall through */
+			}
 			allDatasources.value = allDatasources.value.map((item) => ({
 				...item,
 				isActive: item.id === nextDatasourceId,
