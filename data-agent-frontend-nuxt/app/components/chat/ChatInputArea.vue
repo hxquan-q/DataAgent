@@ -165,6 +165,7 @@
 				</v-btn>
 			</div>
 		</div>
+		<p v-if="sendBlockReason" class="send-block-hint" role="status">{{ sendBlockReason }}</p>
 
 		<!-- Human Feedback Panel -->
 		<Transition name="slide-up">
@@ -210,6 +211,13 @@ const canSend = computed(() => {
 	return true;
 });
 
+const sendBlockReason = computed(() => {
+	if (store.isStreaming) return '';
+	if (store.showHumanFeedback) return '请先处理人工确认后再发送';
+	if (!store.chatModels.length || !store.activeModelConfig) return '请先配置并选择 CHAT 模型';
+	if (!store.allDatasources.length || !store.activeDatasource) return '请先绑定并选择数据源';
+	return '';
+});
 
 function toggleDsMenu() {
 	if (store.isStreaming) return;
@@ -610,4 +618,11 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 .slide-up-enter-active, .slide-up-leave-active { transition: all 0.2s ease; }
 .slide-up-enter-from, .slide-up-leave-to { transform: translateY(10px); opacity: 0; }
+
+.send-block-hint {
+	margin: 6px 4px 0;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #c2410c;
+}
 </style>
