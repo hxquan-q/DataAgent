@@ -122,17 +122,24 @@
 								<ChatMarkdownReport :content="message.content" />
 							</v-card>
 
-							<!-- Timeline -->
-							<v-card
-								v-else-if="message.messageType === 'timeline'"
-								class="ai-card timeline-card"
-								elevation="1"
-							>
-								<ChatWorkflowTimeline
-									:node-blocks="safeParseBlocks(message.content)"
-									:completed="true"
-								/>
-							</v-card>
+							<!-- Timeline + answer-first report (R210) -->
+							<template v-else-if="message.messageType === 'timeline'">
+								<v-card
+									v-if="extractReportContent(message.content)"
+									class="ai-card report-card mb-2"
+									elevation="1"
+								>
+									<ChatMarkdownReport
+										:content="extractReportContent(message.content)!"
+									/>
+								</v-card>
+								<v-card class="ai-card timeline-card" elevation="1">
+									<ChatWorkflowTimeline
+										:node-blocks="safeParseBlocks(message.content)"
+										:completed="true"
+									/>
+								</v-card>
+							</template>
 
 							<!-- Warning (user stopped) -->
 							<div
@@ -159,47 +166,24 @@
 						</div>
 					</div>
 
-					<!-- ── Report card below completed timeline ────────── -->
-					<div
-						v-if="
-							message.messageType === 'timeline' &&
-							extractReportContent(message.content)
-						"
-						class="message-wrapper da-msg-enter"
-					>
-						<div class="row ai-row">
-							<v-avatar
-								color="blue-darken-3"
-								size="32"
-								rounded="lg"
-								class="avatar"
-								style="visibility: hidden"
-							/>
-							<v-card class="ai-card report-card" elevation="1">
-								<ChatMarkdownReport
-									:content="extractReportContent(message.content)!"
-								/>
-							</v-card>
-						</div>
-					</div>
 				</template>
 
-				<!-- ── Streaming: Workflow Timeline ──────────────────── -->
+				<!-- ── Streaming: Report first (R210 answer-first) ── -->
 				<div
-					v-if="store.isStreaming && store.nodeBlocks.length > 0"
+					v-if="store.isReportStreaming && store.streamingReportContent"
 					class="row ai-row"
 				>
 					<v-avatar color="blue-darken-3" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
-					<v-card class="ai-card timeline-card" elevation="1">
-						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
+					<v-card class="ai-card report-card" elevation="1">
+						<ChatStreamingReport :content="store.streamingReportContent" />
 					</v-card>
 				</div>
 
-				<!-- ── Streaming: Report card below timeline ─────────── -->
+				<!-- ── Streaming: Workflow Timeline (secondary) ── -->
 				<div
-					v-if="store.isReportStreaming && store.streamingReportContent"
+					v-if="store.isStreaming && store.nodeBlocks.length > 0"
 					class="row ai-row"
 				>
 					<v-avatar
@@ -207,10 +191,16 @@
 						size="32"
 						rounded="lg"
 						class="avatar"
-						style="visibility: hidden"
-					/>
-					<v-card class="ai-card report-card" elevation="1">
-						<ChatStreamingReport :content="store.streamingReportContent" />
+						:style="
+							store.isReportStreaming && store.streamingReportContent
+								? 'visibility: hidden'
+								: undefined
+						"
+					>
+						<v-icon size="18" color="white">mdi-robot</v-icon>
+					</v-avatar>
+					<v-card class="ai-card timeline-card" elevation="1">
+						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
 					</v-card>
 				</div>
 
