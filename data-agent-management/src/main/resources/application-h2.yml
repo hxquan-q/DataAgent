@@ -153,3 +153,9 @@ logging:
     com.alibaba.cloud.ai.dataagent.workflow.node: debug
     com.alibaba.cloud.ai.mapper: debug
     org.springframework.jdbc: debug
+
+spring.ai.alibaba.data-agent.admin:
+  username: admin
+  password: admin123
+  jwt-secret: h2-test-jwt-secret-change-me-32bytes
+  bootstrap-enabled: true

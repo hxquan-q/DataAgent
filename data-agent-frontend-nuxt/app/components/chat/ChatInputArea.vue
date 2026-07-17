@@ -16,38 +16,51 @@
 
 <template>
 	<div class="input-area">
-		<!-- Status / Info bar -->
+		<!-- Status / Info bar (R228: keyboard-accessible selectors) -->
 		<div class="status-bar">
 			<div class="status-chips">
 
 				<!-- Datasource selector (R151: empty-datasource guidance) -->
 				<div class="ds-chip-wrap" @click.stop>
-					<div
+					<button
+						type="button"
 						class="status-chip status-chip--ds"
-						:class="{ disabled: store.isStreaming, warn: store.allDatasources.length === 0 }"
+						:class="{ warn: store.allDatasources.length === 0 }"
+						:disabled="store.isStreaming"
+						:aria-expanded="showDsMenu"
+						aria-haspopup="listbox"
+						:aria-label="dsChipAriaLabel"
 						@click="toggleDsMenu"
 					>
-						<v-icon size="13" :color="store.allDatasources.length ? '#64748b' : '#f59e0b'">mdi-database-outline</v-icon>
+						<v-icon size="13" :color="store.allDatasources.length ? '#64748b' : '#f59e0b'" aria-hidden="true">mdi-database-outline</v-icon>
 						<span>{{
 							store.activeDatasource?.name
 								|| (store.allDatasources.length ? '选择数据库' : '未绑定数据源')
 						}}</span>
-						<v-icon size="13" color="#94a3b8">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-					</div>
-					<div v-if="showDsMenu" class="chip-dropdown">
+						<v-icon size="13" color="#94a3b8" aria-hidden="true">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+					</button>
+					<div
+						v-if="showDsMenu"
+						class="chip-dropdown"
+						role="listbox"
+						aria-label="数据源列表"
+					>
 						<template v-if="store.allDatasources.length">
-							<div
+							<button
 								v-for="ds in store.allDatasources"
 								:key="ds.id"
+								type="button"
 								class="chip-dropdown-item"
+								role="option"
 								:class="{ active: store.activeDatasource?.id === ds.id }"
+								:aria-selected="store.activeDatasource?.id === ds.id"
 								@click="selectDs(ds)"
 							>
 								<span class="item-name">{{ ds.name }}</span>
 								<span class="item-tag">{{ ds.type?.toUpperCase() }}</span>
-							</div>
+							</button>
 						</template>
-						<div v-else class="chip-dropdown-empty">
+						<div v-else class="chip-dropdown-empty" role="presentation">
 							<p class="chip-dropdown-empty__text">
 								当前智能体未绑定可用数据源，NL2SQL 无法查库。请到「数据源配置」关联并激活。
 							</p>
@@ -60,32 +73,45 @@
 
 				<!-- Model selector (R149: empty-model guidance) -->
 				<div class="ds-chip-wrap" @click.stop>
-					<div
+					<button
+						type="button"
 						class="status-chip status-chip--model"
-						:class="{ disabled: store.isStreaming, warn: store.chatModels.length === 0 }"
+						:class="{ warn: store.chatModels.length === 0 }"
+						:disabled="store.isStreaming"
+						:aria-expanded="showModelMenu"
+						aria-haspopup="listbox"
+						:aria-label="modelChipAriaLabel"
 						@click="toggleModelMenu"
 					>
-						<v-icon size="13" :color="store.chatModels.length ? '#3b82f6' : '#f59e0b'">mdi-lightning-bolt</v-icon>
+						<v-icon size="13" :color="store.chatModels.length ? '#3b82f6' : '#f59e0b'" aria-hidden="true">mdi-lightning-bolt</v-icon>
 						<span>{{
 							store.activeModelConfig?.modelName
 								|| (store.chatModels.length ? '选择AI模型' : '未配置模型')
 						}}</span>
-						<v-icon size="13" color="#94a3b8">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
-					</div>
-					<div v-if="showModelMenu" class="chip-dropdown">
+						<v-icon size="13" color="#94a3b8" aria-hidden="true">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+					</button>
+					<div
+						v-if="showModelMenu"
+						class="chip-dropdown"
+						role="listbox"
+						aria-label="模型列表"
+					>
 						<template v-if="store.chatModels.length">
-							<div
+							<button
 								v-for="m in store.chatModels"
 								:key="m.id"
+								type="button"
 								class="chip-dropdown-item"
+								role="option"
 								:class="{ active: store.activeModelConfig?.id === m.id }"
+								:aria-selected="store.activeModelConfig?.id === m.id"
 								@click="selectModel(m)"
 							>
 								<span class="item-name">{{ m.modelName }}</span>
 								<span class="item-tag">{{ m.provider }}</span>
-							</div>
+							</button>
 						</template>
-						<div v-else class="chip-dropdown-empty">
+						<div v-else class="chip-dropdown-empty" role="presentation">
 							<p class="chip-dropdown-empty__text">尚未配置 CHAT 模型，无法生成回答。</p>
 							<button type="button" class="chip-dropdown-empty__cta" @click="goModelConfig">
 								去配置模型
@@ -250,6 +276,21 @@ const composerPlaceholder = computed(() => {
 	return "在这里提问，例如：分析上月各产品的销售增长情况...";
 });
 
+// R228: accessible names for status selectors (keyboard / SR)
+const dsChipAriaLabel = computed(() => {
+	const name =
+		store.activeDatasource?.name ||
+		(store.allDatasources.length ? '选择数据库' : '未绑定数据源');
+	return `数据源：${name}`;
+});
+
+const modelChipAriaLabel = computed(() => {
+	const name =
+		store.activeModelConfig?.modelName ||
+		(store.chatModels.length ? '选择AI模型' : '未配置模型');
+	return `模型：${name}`;
+});
+
 function toggleDsMenu() {
 	if (store.isStreaming) return;
 	showDsMenu.value = !showDsMenu.value;
@@ -350,7 +391,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 <style scoped>
 .input-area {
 	flex-shrink: 0;
-	background: white;
+	background: var(--da-surface, #fff);
 	border-top: 1px solid var(--da-line-soft, #e8edf2);
 	padding: 6px 14px 8px;
 	max-width: 960px;
@@ -366,7 +407,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .status-chips {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: var(--da-space-2, 8px);
 	flex-wrap: wrap;
 }
 
@@ -374,34 +415,44 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	position: relative;
 }
 
+/* R228: native button reset + density tokens */
 .status-chip {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	padding: 2px 8px;
-	background: #f1f5f9;
-	border: 1px solid #e2e8f0;
+	min-height: var(--da-control-height-sm, 32px);
+	padding: 4px 10px;
+	background: var(--da-surface-soft, #f1f5f9);
+	border: 1px solid var(--da-line-soft, #e2e8f0);
 	border-radius: 20px;
+	font: inherit;
 	font-size: 12px;
-	color: #475569;
+	color: var(--da-muted, #475569);
 	cursor: pointer;
 	user-select: none;
 	white-space: nowrap;
-	transition: border-color 0.1s, background 0.1s;
+	transition: border-color var(--da-dur-fast, 0.1s), background var(--da-dur-fast, 0.1s);
 }
-.status-chip:hover:not(.disabled) {
+.status-chip:hover:not(:disabled) {
 	border-color: #94a3b8;
 }
-.status-chip.disabled {
-	opacity: 0.5;
+.status-chip:disabled {
+	opacity: var(--da-disabled-opacity, 0.5);
 	cursor: not-allowed;
 }
-.status-chip--model {
-	background: #eff6ff;
-	border-color: #bfdbfe;
-	color: #1d4ed8;
+.status-chip:focus-visible {
+	outline: 2px solid var(--da-ring, #1e40af);
+	outline-offset: 2px;
 }
-.status-chip--model:hover:not(.disabled) {
+.status-chip.warn {
+	border-color: color-mix(in srgb, var(--da-warning, #d97706) 45%, transparent);
+}
+.status-chip--model {
+	background: var(--da-primary-soft, #eff6ff);
+	border-color: #bfdbfe;
+	color: var(--da-primary, #1d4ed8);
+}
+.status-chip--model:hover:not(:disabled) {
 	border-color: #93c5fd;
 }
 
@@ -409,11 +460,11 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	position: absolute;
 	top: calc(100% + 4px);
 	left: 0;
-	z-index: 999;
-	background: white;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-	box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+	z-index: var(--da-z-dropdown, 999);
+	background: var(--da-surface, #fff);
+	border: 1px solid var(--da-line-soft, #e2e8f0);
+	border-radius: var(--da-radius-md, 8px);
+	box-shadow: var(--da-shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
 	min-width: 180px;
 	max-width: 300px;
 	max-height: 220px;
@@ -426,18 +477,29 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	align-items: center;
 	justify-content: space-between;
 	gap: 6px;
-	padding: 5px 10px;
+	width: 100%;
+	min-height: var(--da-control-height-sm, 32px);
+	padding: 6px 10px;
+	border: none;
+	background: transparent;
+	font: inherit;
 	font-size: 12.5px;
-	color: #334155;
+	text-align: left;
+	color: var(--da-ink, #334155);
 	cursor: pointer;
-	transition: background 0.1s;
+	transition: background var(--da-dur-fast, 0.1s);
 }
 .chip-dropdown-item:hover {
-	background: #f1f5f9;
+	background: var(--da-surface-soft, #f1f5f9);
+}
+.chip-dropdown-item:focus-visible {
+	outline: 2px solid var(--da-ring, #1e40af);
+	outline-offset: -2px;
+	background: var(--da-primary-soft, #eff6ff);
 }
 .chip-dropdown-item.active {
-	background: #eff6ff;
-	color: #2563eb;
+	background: var(--da-primary-soft, #eff6ff);
+	color: var(--da-primary, #2563eb);
 	font-weight: 500;
 }
 .item-name {
@@ -450,9 +512,9 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .item-tag {
 	flex-shrink: 0;
 	font-size: 10.5px;
-	color: #94a3b8;
-	background: #f1f5f9;
-	border-radius: 4px;
+	color: var(--da-muted, #94a3b8);
+	background: var(--da-surface-soft, #f1f5f9);
+	border-radius: var(--da-radius-sm, 4px);
 	padding: 1px 4px;
 }
 
