@@ -88,7 +88,7 @@ public class DynamicModelFactory {
 		OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
 			.model(config.getModelName())
 			.temperature(config.getTemperature() != null ? config.getTemperature() : 0.0)
-			.maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 1536)
+			.maxTokens(resolveMaxTokens(config.getMaxTokens()))
 			.streamUsage(true)
 			.build();
 		// 4. 返回统一的 OpenAiChatModel
@@ -120,6 +120,15 @@ public class DynamicModelFactory {
 		return new OpenAiEmbeddingModel(openAiApi, MetadataMode.EMBED,
 				OpenAiEmbeddingOptions.builder().model(config.getModelName()).build(),
 				RetryUtils.DEFAULT_RETRY_TEMPLATE);
+	}
+
+
+	/** R208: 默认 1536，上限 8192，防止异常配置拖垮延迟。 */
+	static int resolveMaxTokens(Integer maxTokens) {
+		if (maxTokens == null || maxTokens <= 0) {
+			return 1536;
+		}
+		return Math.min(maxTokens, 8192);
 	}
 
 	private static void checkBasic(ModelConfigDTO config) {
