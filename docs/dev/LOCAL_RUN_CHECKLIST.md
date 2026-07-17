@@ -84,3 +84,26 @@
 - R149–R177：模型/数据源引导、并发、发送守卫等  
 - R196–R201：体量日志 / 选表警告 / 初始化禁用 / 流式秒表  
 - 2026-07-17：hybrid 零写库 + SQL_INIT=never + 台账恢复文档对齐  
+
+## 管理端登录（Admin Auth · 2026-07）
+
+1. **已有元库**先建表（sql.init=never，勿 always / down -v）：
+   ```bash
+   # 建议：bash scripts/backup-meta-db.sh
+   mysql -h127.0.0.1 -P3306 -uroot -proot nl2sql_db < scripts/sql/admin_user_v1.sql
+   ```
+2. 本地默认账号（application-local.yml）：`admin` / `admin123`；JWT secret 已给开发默认值。
+3. 登录与受保护 API：
+   ```bash
+   TOKEN=$(curl -s -X POST http://localhost:8065/api/auth/login \
+     -H 'Content-Type: application/json' \
+     -d '{"username":"admin","password":"admin123"}' | jq -r '.data.token')
+   curl -s -H "Authorization: Bearer $TOKEN" http://localhost:8065/api/agent/list | head -c 200
+   # 无 token 应 401：
+   curl -s -o /dev/null -w '%{http_code}\n' http://localhost:8065/api/agent/list
+   ```
+4. 前端冷启动 `/system/agents` → 跳转 `/login`；登录后可进管理页。
+5. embed 公开路径仍不需管理员 JWT；预设问题走 `/api/embed/public/{id}/preset-questions`。
+6. 生产务必设置：`DATA_AGENT_ADMIN_PASSWORD`、`DATA_AGENT_JWT_SECRET`（≥32 字节），profile=`prod` 时缺失会 fail-fast。
+7. 忘密：备份后 `UPDATE admin_user SET password_hash='<BCrypt>' WHERE username='admin';`（可用小工具生成 BCrypt）。
+

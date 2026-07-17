@@ -31,3 +31,10 @@ spring:
 
 # embed 开发默认密钥（生产必须改）
 # spring.ai.alibaba.data-agent.embed.token-hmac-key 继承 application.yml
+
+# 管理端登录 local 默认（仅开发；生产务必用 env 覆盖）
+spring.ai.alibaba.data-agent.admin:
+  username: admin
+  password: admin123
+  jwt-secret: local-dev-jwt-secret-change-me-32b
+  bootstrap-enabled: true

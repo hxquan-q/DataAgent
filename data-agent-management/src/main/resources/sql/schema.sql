@@ -400,3 +400,17 @@ CREATE TABLE IF NOT EXISTS sql_example (
 -- v0.2 语义层：agent 表增 workflow_mode 列（已存在则忽略，依赖 sql.init.continue-on-error=true）
 ALTER TABLE agent ADD COLUMN workflow_mode VARCHAR(20) DEFAULT 'nl2sql'
   COMMENT '工作流模式：nl2sql-自由生成SQL，semantic-语义层受控拼装(NL2Semantic2SQL)';
+
+-- 平台管理员（管理端登录）
+CREATE TABLE IF NOT EXISTS admin_user (
+  id            BIGINT NOT NULL AUTO_INCREMENT,
+  username      VARCHAR(64)  NOT NULL COMMENT '登录名',
+  password_hash VARCHAR(100) NOT NULL COMMENT 'BCrypt 密码哈希',
+  display_name  VARCHAR(64)  NULL COMMENT '显示名',
+  status        TINYINT      NOT NULL DEFAULT 1 COMMENT '1=启用 0=禁用',
+  last_login_at TIMESTAMP    NULL COMMENT '最近登录时间',
+  create_time   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_admin_username (username)
+) ENGINE=InnoDB COMMENT='平台管理员';

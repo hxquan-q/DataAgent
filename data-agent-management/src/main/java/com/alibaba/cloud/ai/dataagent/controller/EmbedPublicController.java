@@ -16,7 +16,9 @@
 package com.alibaba.cloud.ai.dataagent.controller;
 
 import com.alibaba.cloud.ai.dataagent.dto.GraphRequest;
+import com.alibaba.cloud.ai.dataagent.entity.AgentPresetQuestion;
 import com.alibaba.cloud.ai.dataagent.exception.EmbedException;
+import com.alibaba.cloud.ai.dataagent.service.agent.AgentPresetQuestionService;
 import com.alibaba.cloud.ai.dataagent.service.embed.EmbedPublicService;
 import com.alibaba.cloud.ai.dataagent.service.embed.EmbedPublicService.ExchangeResult;
 import com.alibaba.cloud.ai.dataagent.service.graph.GraphService;
@@ -39,6 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Sinks;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -59,10 +62,23 @@ public class EmbedPublicController {
 
 	private final GraphService graphService;
 
+	private final AgentPresetQuestionService presetQuestionService;
+
 	/** 读 embed UI 配置（不含令牌），供 widget 初始化。 */
 	@GetMapping("/{agentId}/config")
 	public EmbedConfig config(@PathVariable Long agentId) {
 		return embedService.getEmbedConfig(agentId);
+	}
+
+	/**
+	 * 公开只读预设问题（embed 启用校验）。避免管理端全局鉴权后
+	 * {@code GET /api/agent/{id}/preset-questions} 对 embed 页 401。
+	 */
+	@GetMapping("/{agentId}/preset-questions")
+	public List<AgentPresetQuestion> presetQuestions(@PathVariable Long agentId) {
+		// 复用 getEmbedConfig 的 embed 启用校验（agent 不存在/未启用会抛 EmbedException）
+		embedService.getEmbedConfig(agentId);
+		return presetQuestionService.findByAgentId(agentId);
 	}
 
 	/** 发布令牌（X-Publish-Token = Agent.apiKey）换短期会话令牌。 */
