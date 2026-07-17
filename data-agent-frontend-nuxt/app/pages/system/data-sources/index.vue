@@ -77,7 +77,8 @@
 					正在为智能体 <strong>#{{ agentId }}</strong> 绑定数据源：在操作列点击「设为当前」激活，再「初始化」同步表结构。
 					<span v-if="activeDatasourceId">
 						当前激活 ID：{{ activeDatasourceId }}
-						<span v-if="activeSelectedTableCount != null">，已选表 {{ activeSelectedTableCount }} 张</span>。
+						<span v-if="activeSelectedTableCount != null">，已选表 {{ activeSelectedTableCount }} 张</span>
+						<span v-if="activeSelectedTableCount === 0" class="text-warning">（未选表将无法初始化）</span>。
 					</span>
 					<span v-else class="text-warning">尚未激活任何数据源。</span>
 				</span>
@@ -378,11 +379,18 @@ const datasourceList = ref<Datasource[]>([]);
 const expandedRows = ref<readonly string[]>([]);
 const tableLists = ref<Record<number, string[]>>({});
 const selectedTables = ref<Record<number, string[]>>({});
+
 const loadingTablesId = ref<number | null>(null);
 const tableFetchError = ref<Record<number, boolean>>({});
 const updatingTablesId = ref<number | null>(null);
 const initStatus = ref(false);
 const activeDatasourceId = ref<number | null>(null);
+
+const activeSelectedTableCount = computed(() => {
+	if (activeDatasourceId.value == null) return null;
+	const tables = selectedTables.value[activeDatasourceId.value];
+	return tables ? tables.length : null;
+});
 
 const agentId = computed(() => {
 	const id = route.params.agentId || route.query.agentId;
