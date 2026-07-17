@@ -167,7 +167,7 @@ public class DynamicModelFactory {
 		log.info("【Proxy-Init】Model [{}] is using ASYNC (Netty) proxy -> {}:{}", config.getModelName(),
 				config.getProxyHost(), config.getProxyPort());
 
-		HttpClient nettyClient = HttpClient.create().responseTimeout(java.time.Duration.ofMinutes(3)).proxy(p -> {
+		HttpClient nettyClient = HttpClient.create().responseTimeout(java.time.Duration.ofSeconds(180)).proxy(p -> {
 			ProxyProvider.Builder proxyBuilder = p.type(ProxyProvider.Proxy.HTTP)
 				.host(config.getProxyHost())
 				.port(config.getProxyPort());

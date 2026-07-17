@@ -47,6 +47,24 @@
 			</div>
 		</header>
 
+		
+		<!-- R181: global chat model readiness -->
+		<v-alert
+			v-if="modelReady === false"
+			type="warning"
+			variant="tonal"
+			border="start"
+			class="mb-4"
+			density="comfortable"
+		>
+			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
+				<span class="text-body-2">尚未激活对话模型，数据问答将无法生成回答。</span>
+				<v-btn size="small" color="warning" variant="flat" class="text-none" @click="goModelConfig">
+					去配置模型
+				</v-btn>
+			</div>
+		</v-alert>
+
 		<!-- Filter and Search Section -->
 		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<div class="d-flex flex-wrap ga-3 align-center">
@@ -407,6 +425,7 @@
 
 <script setup lang="ts">
 import type { Agent } from '~/services/agent/index';
+import modelConfigService from '~/services/modelConfig/index';
 import agentService from '~/services/agent/index';
 import { useCrudPage } from '~/composables/useCrudPage/index';
 
@@ -509,6 +528,15 @@ function goChat(agent: Agent) {
 function goDatasource(agent: Agent) {
 	if (!agent?.id) return;
 	navigateTo({ path: '/system/data-sources', query: { agentId: String(agent.id) } });
+}
+
+async function loadModelReady() {
+	try {
+		const r = await modelConfigService.checkReady();
+		modelReady.value = !!r?.chatModelReady;
+	} catch {
+		modelReady.value = null;
+	}
 }
 
 function goModelConfig() {
@@ -614,7 +642,10 @@ const formatTime = (time?: Date | string) => {
 	return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 };
 
-onMounted(() => { loadAgents(); });
+onMounted(() => {
+	void loadModelReady();
+	loadAgents();
+});
 </script>
 
 <style scoped>
