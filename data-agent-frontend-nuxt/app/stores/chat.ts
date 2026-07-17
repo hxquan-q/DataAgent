@@ -275,7 +275,11 @@ export const useChatStore = defineStore('chat', () => {
 	}
 
 	async function createNewSession(agentId: number) {
-		const newSession = await chatService.createSession(agentId, '新会话');
+		// R205: 默认标题带智能体名，便于侧栏识别
+		const title = currentAgentName.value
+			? `${currentAgentName.value} · 新会话`
+			: '新会话';
+		const newSession = await chatService.createSession(agentId, title);
 		sessions.value.unshift(newSession);
 		await selectSession(newSession);
 		return newSession;
