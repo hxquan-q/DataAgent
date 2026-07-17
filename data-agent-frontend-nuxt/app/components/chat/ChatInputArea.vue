@@ -657,7 +657,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .slide-up-enter-from, .slide-up-leave-to { transform: translateY(10px); opacity: 0; }
 
 .send-block-hint {
-	margin: 6px 4px 0;
+	margin: 6px 4px 4px;
 	font-size: 12px;
 	line-height: 1.4;
 	color: #c2410c;
