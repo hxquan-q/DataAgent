@@ -317,7 +317,11 @@
 						<v-icon icon="mdi-database-off-outline" size="56" color="grey-lighten-1" class="mb-3" />
 						<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">尚未配置数据源</h3>
 						<p class="text-body-2 text-medium-emphasis mb-2 ds-empty__desc">
-							全局数据源是 NL2SQL 的连接入口。请先添加数据库连接并测试通过，再在智能体中绑定并激活。
+							{{
+								agentId
+									? `智能体 #${agentId} 需要可用连接：请先添加数据库并测试通过，再「设为当前」并初始化。`
+									: '全局数据源是 NL2SQL 的连接入口。请先添加数据库连接并测试通过，再在智能体中绑定并激活。'
+							}}
 						</p>
 						<p class="text-caption text-medium-emphasis mb-5">
 							聊天页若提示「未绑定数据源」，请先完成此页配置，再到智能体详情关联。
