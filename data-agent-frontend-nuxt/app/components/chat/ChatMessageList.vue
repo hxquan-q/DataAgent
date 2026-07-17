@@ -239,7 +239,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
+import { ref, computed, watch, nextTick, onUnmounted } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
@@ -274,6 +274,38 @@ function goDatasource() {
 function goSwitchAgent() {
 	navigateTo('/system/agents');
 }
+
+const streamElapsed = ref(0);
+let streamTimer: ReturnType<typeof setInterval> | null = null;
+watch(
+	() => store.isStreaming,
+	(streaming) => {
+		if (streaming) {
+			streamElapsed.value = 0;
+			if (streamTimer) clearInterval(streamTimer);
+			streamTimer = setInterval(() => {
+				streamElapsed.value += 1;
+			}, 1000);
+		} else if (streamTimer) {
+			clearInterval(streamTimer);
+			streamTimer = null;
+		}
+	},
+);
+onUnmounted(() => {
+	if (streamTimer) {
+		clearInterval(streamTimer);
+		streamTimer = null;
+	}
+});
+
+const stripHasModel = computed(
+	() => store.chatModels.length > 0 && !!store.activeModelConfig,
+);
+const stripHasDs = computed(
+	() => store.allDatasources.length > 0 && !!store.activeDatasource,
+);
+
 
 const listRef = ref<HTMLElement | null>(null);
 const { renderECharts } = useEchartsRenderer();
