@@ -57,7 +57,7 @@ import reactor.netty.transport.ProxyProvider;
 public class DynamicModelFactory {
 
 	/** 无代理时默认响应超时（与 webclient.response.timeout 默认 600s 同量级，避免裸 builder 无超时）。 */
-	private static final java.time.Duration DEFAULT_RESPONSE_TIMEOUT = java.time.Duration.ofSeconds(600);
+	private static final java.time.Duration DEFAULT_RESPONSE_TIMEOUT = java.time.Duration.ofSeconds(180);
 
 	/**
 	 * 根据配置创建 ChatModel，统一使用 OpenAiChatModel 通过 baseUrl 实现多厂商兼容。
