@@ -552,7 +552,14 @@ const submitConfig = async (isUpdate: boolean) => {
 		}
 
 		if (result.success) {
-			$tip(isUpdate ? '配置更新成功' : '配置创建成功');
+			const createdChat = !isUpdate && form.modelType === 'CHAT';
+			$tip(
+				isUpdate
+					? '配置更新成功'
+					: createdChat
+						? '配置创建成功。请点击「激活」设为默认对话模型，然后去数据问答。'
+						: '配置创建成功。嵌入模型需激活后用于向量召回。',
+			);
 			closeDialog();
 			fetchConfigs();
 		} else {
@@ -616,8 +623,18 @@ const handleActivate = async (model: ModelConfig) => {
 	try {
 		const result = await modelConfigService.activate(model.id);
 		if (result.success) {
-			$tip('已设置为默认模型');
+			$tip(
+				model.modelType === 'CHAT'
+					? '已激活对话模型。可到智能体列表进入数据问答。'
+					: '已设置为默认嵌入模型。',
+			);
 			fetchConfigs();
+			// 刷新 readiness 横幅
+			try {
+				readiness.value = await modelConfigService.checkReady();
+			} catch {
+				/* ignore */
+			}
 		} else {
 			$tip(result.message || '设置失败', {
 				icon: 'mdi-alert-circle',
