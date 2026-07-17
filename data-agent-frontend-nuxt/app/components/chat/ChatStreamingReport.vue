@@ -20,7 +20,7 @@
 			<v-icon color="primary" size="18" class="mr-2"
 				>mdi-file-document-edit-outline</v-icon
 			>
-			<span>正在生成报告...</span>
+			<span>报告生成中（结论优先）...</span>
 			<span class="typing-indicator">
 				<span class="typing-dot" />
 				<span class="typing-dot typing-dot--2" />

@@ -67,7 +67,7 @@ export const useChatStore = defineStore('chat', () => {
 		humanFeedback: false,
 		nl2sqlOnly: false,
 		showSqlResults: false,
-		pageSize: 20,
+		pageSize: 50,
 	});
 
 	// ── Report state ────────────────────────────────────────────────────────────
