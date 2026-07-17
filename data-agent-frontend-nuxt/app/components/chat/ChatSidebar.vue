@@ -113,7 +113,7 @@
 				</div>
 			</div>
 
-			<!-- Bottom: New Session Button -->
+			<!-- Bottom: New Session + config links (R160) -->
 			<div class="sidebar-bottom">
 				<v-btn
 					block
@@ -125,6 +125,19 @@
 				>
 					新建分析会话
 				</v-btn>
+				<nav class="sidebar-config-links" aria-label="配置快捷入口">
+					<button type="button" class="sidebar-config-link" @click="goModels">
+						模型
+					</button>
+					<span class="sidebar-config-sep" aria-hidden="true">·</span>
+					<button type="button" class="sidebar-config-link" @click="goDatasource">
+						数据源
+					</button>
+					<span class="sidebar-config-sep" aria-hidden="true">·</span>
+					<button type="button" class="sidebar-config-link" @click="goAgents">
+						智能体
+					</button>
+				</nav>
 			</div>
 		</div>
 
@@ -180,6 +193,22 @@ import { useChatStore, type ExtendedChatSession } from '~/stores/chat';
 import type { ChatSession } from '~/services/chat/index';
 
 const store = useChatStore();
+
+function goModels() {
+	navigateTo('/system/model-config');
+}
+function goDatasource() {
+	const id = store.currentAgentId;
+	if (id) {
+		navigateTo({ path: '/system/data-sources', query: { agentId: String(id) } });
+	} else {
+		navigateTo('/system/data-sources');
+	}
+}
+function goAgents() {
+	navigateTo('/system/agents');
+}
+
 const showDeleteConfirm = ref(false);
 let sessionToDelete: ChatSession | null = null;
 
