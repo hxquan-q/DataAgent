@@ -136,7 +136,9 @@
 							<span v-else class="text-caption">{{ getInitials(item.name) }}</span>
 						</v-avatar>
 						<div>
-							<div class="text-subtitle-2 font-weight-bold">{{ item.name }}</div>
+							<button type="button" class="agent-name-link text-subtitle-2 font-weight-bold" @click="goChat(item)">
+								{{ item.name }}
+							</button>
 							<div class="text-caption text-medium-emphasis">{{ item.category || '未分类' }}</div>
 						</div>
 					</div>
@@ -670,5 +672,19 @@ onMounted(() => {
 
 .search-field {
 	border-color: #e2e8f0;
+}
+
+.agent-name-link {
+	appearance: none;
+	border: none;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	cursor: pointer;
+	text-align: left;
+}
+.agent-name-link:hover {
+	color: var(--da-primary, #1e40af);
+	text-decoration: underline;
 }
 </style>

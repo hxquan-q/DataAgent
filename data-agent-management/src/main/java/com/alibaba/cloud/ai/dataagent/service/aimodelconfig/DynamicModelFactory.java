@@ -87,7 +87,7 @@ public class DynamicModelFactory {
 		// 3. 构建运行时选项 (设置默认的模型名称，如 "deepseek-chat" 或 "gpt-4")
 		OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
 			.model(config.getModelName())
-			.temperature(config.getTemperature())
+			.temperature(config.getTemperature() != null ? config.getTemperature() : 0.0)
 			.maxTokens(config.getMaxTokens() != null ? config.getMaxTokens() : 1536)
 			.streamUsage(true)
 			.build();
