@@ -141,7 +141,15 @@ async function ask(question: string) {
 	if (!q || store.isStreaming || sending.value) return;
 	const agentId = store.currentAgentId;
 	if (!agentId) return;
-	if (!readyToChat.value) return;
+	if (!readyToChat.value) {
+		// R184: 点击推荐问题时给出明确路径
+		if (!hasModel.value) {
+			navigateTo('/system/model-config');
+		} else if (!hasDatasource.value) {
+			goDatasource();
+		}
+		return;
+	}
 
 	sending.value = true;
 	try {
