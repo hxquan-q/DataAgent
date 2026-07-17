@@ -118,6 +118,16 @@
 		<div class="action-bar">
 			<div class="action-bar-left">
 				<div class="extra-options">
+					<label class="option-chip" :class="{ active: store.requestOptions.showSqlResults }">
+						<input
+							v-model="store.requestOptions.showSqlResults"
+							type="checkbox"
+							:disabled="store.isStreaming"
+							class="hidden-checkbox"
+						/>
+						<v-icon size="11">mdi-table-eye</v-icon>
+						显示SQL结果
+					</label>
 					<label class="option-chip" :class="{ active: store.requestOptions.humanFeedback }">
 						<input
 							v-model="store.requestOptions.humanFeedback"
@@ -128,26 +138,15 @@
 						<v-icon size="11">mdi-account-check-outline</v-icon>
 						人工反馈
 					</label>
-					<label class="option-chip" :class="{ active: store.requestOptions.nl2sqlOnly }">
+					<label class="option-chip" :class="{ active: store.requestOptions.humanFeedback }">
 						<input
-							v-model="store.requestOptions.nl2sqlOnly"
+							v-model="store.requestOptions.humanFeedback"
 							type="checkbox"
-							:disabled="store.isStreaming"
-							class="hidden-checkbox"
-							@change="onNl2sqlChange"
-						/>
-						<v-icon size="11">mdi-database-search-outline</v-icon>
-						仅NL2SQL
-					</label>
-					<label class="option-chip" :class="{ active: store.requestOptions.showSqlResults }">
-						<input
-							v-model="store.requestOptions.showSqlResults"
-							type="checkbox"
-							:disabled="store.isStreaming"
+							:disabled="store.requestOptions.nl2sqlOnly || store.isStreaming"
 							class="hidden-checkbox"
 						/>
-						<v-icon size="11">mdi-table-eye</v-icon>
-						显示SQL结果
+						<v-icon size="11">mdi-account-check-outline</v-icon>
+						人工反馈
 					</label>
 				</div>
 			</div>

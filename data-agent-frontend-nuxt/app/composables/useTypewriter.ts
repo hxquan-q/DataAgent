@@ -22,7 +22,7 @@ import { ref, onBeforeUnmount } from 'vue';
  * Stream complete should still call flush().
  */
 
-const BASE_CHARS = 12;
+const BASE_CHARS = 20;
 const MAX_CHARS = 64;
 
 export function useTypewriter() {

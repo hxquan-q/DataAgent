@@ -67,7 +67,6 @@
 						class="action-btn"
 						title="下载 CSV"
 						aria-label="下载 CSV"
-						title="下载 CSV"
 						@click="downloadCsv"
 					>
 						<v-icon size="14">mdi-download</v-icon>
