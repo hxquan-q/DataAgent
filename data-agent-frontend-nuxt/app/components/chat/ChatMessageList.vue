@@ -44,7 +44,9 @@
 			>
 				数据源
 			</button>
-			<span v-if="store.isStreaming" class="chat-status-strip__live">分析中</span>
+			<span v-if="store.isStreaming" class="chat-status-strip__live">
+				分析中<span v-if="streamElapsed > 0"> · {{ streamElapsed }}s</span>
+			</span>
 			<button
 				type="button"
 				class="chat-status-strip__switch"
