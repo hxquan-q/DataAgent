@@ -70,9 +70,9 @@
 				v-for="(q, i) in chips"
 				:key="i"
 				type="button"
-				class="preset-chip"
+				:class="['preset-chip', { 'preset-chip--blocked': !readyToChat }]"
 				role="listitem"
-				:disabled="store.isStreaming || sending || !readyToChat"
+				:disabled="store.isStreaming || sending"
 				:title="readyToChat ? q : '请先完成模型与数据源配置'"
 				@click="ask(q)"
 			>
