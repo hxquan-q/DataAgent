@@ -234,21 +234,36 @@
 
 				<!-- No Data Slot -->
 				<template #no-data>
-					<div class="text-center py-16">
-						<v-icon icon="mdi-robot-confused-outline" size="64" color="grey-lighten-2" class="mb-4" />
-						<h3 class="text-h6 font-weight-medium text-grey-darken-1">暂无智能体</h3>
-						<p class="text-body-2 text-grey mb-6">
-							{{ activeFilter === 'all' ? '您还没有创建任何智能体' : '该分类下暂无智能体' }}
+					<div class="text-center py-12">
+						<v-icon icon="mdi-robot-outline" size="56" color="grey-lighten-1" class="mb-3" />
+						<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">暂无智能体</h3>
+						<p class="text-body-2 text-medium-emphasis mb-2" style="max-width: 420px; margin: 0 auto 12px; line-height: 1.6">
+							{{
+								activeFilter === 'all'
+									? '创建智能体后，可绑定数据源并进入数据问答。建议先配置 CHAT 模型，再新建智能体。'
+									: '该分类下暂无智能体，可切换「全部」查看或新建。'
+							}}
 						</p>
-						<v-btn
-							v-if="activeFilter === 'all'"
-							color="black"
-							variant="flat"
-							prepend-icon="mdi-plus"
-							@click="goToCreateAgent"
-						>
-							新建智能体
-						</v-btn>
+						<div class="d-flex justify-center ga-2 flex-wrap">
+							<v-btn
+								v-if="activeFilter === 'all'"
+								color="primary"
+								variant="flat"
+								class="text-none"
+								prepend-icon="mdi-plus"
+								@click="goToCreateAgent"
+							>
+								新建智能体
+							</v-btn>
+							<v-btn
+								variant="outlined"
+								class="text-none"
+								prepend-icon="mdi-lightning-bolt-outline"
+								@click="goModelConfig"
+							>
+								配置模型
+							</v-btn>
+						</div>
 					</div>
 				</template>
 

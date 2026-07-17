@@ -27,6 +27,14 @@
 				{{ store.activeModelConfig?.modelName || store.activeChatModel }}
 			</span>
 			<span v-if="store.isStreaming" class="chat-status-strip__live">分析中</span>
+			<button
+				type="button"
+				class="chat-status-strip__switch"
+				:disabled="store.isStreaming"
+				@click="goSwitchAgent"
+			>
+				切换智能体
+			</button>
 		</div>
 		<!-- Empty: no session, or session with no messages yet -->
 		<ChatWelcome v-if="showWelcome" />
@@ -231,6 +239,11 @@ const TIMELINE_ABSORBED_TYPES = new Set([
 ]);
 
 const store = useChatStore();
+
+function goSwitchAgent() {
+	navigateTo('/system/agents');
+}
+
 const listRef = ref<HTMLElement | null>(null);
 const { renderECharts } = useEchartsRenderer();
 
