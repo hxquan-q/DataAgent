@@ -375,9 +375,12 @@ public class GraphServiceImpl implements GraphService {
 	 * 处理流式完成 线程安全：使用 remove 操作确保只有一个线程能获取到 context
 	 */
 	private void handleStreamComplete(String agentId, String threadId) {
-		log.info("Stream processing completed successfully for threadId: {}", threadId);
+		StreamContext ctx = streamContextMap.remove(threadId);
+		// R226: 可观测 — 完整流输出长度，验证 prompt 有界质量/速度
+		int collectedLen = (ctx != null && ctx.getCollectedOutput() != null) ? ctx.getCollectedOutput().length() : 0;
+		log.info("Stream processing completed for threadId: {}. collectedOutputLen={} (上有界 50k)", threadId, collectedLen);
 		multiTurnContextManager.finishTurn(threadId);
-		StreamContext context = streamContextMap.remove(threadId);
+		StreamContext context = ctx;
 		if (context != null && !context.isCleaned()) {
 			// 结束 Langfuse span（成功）
 			if (context.getSpan() != null) {
