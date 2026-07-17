@@ -177,15 +177,11 @@ export const useChatStore = defineStore('chat', () => {
 					} as Datasource;
 				})
 				.filter((ds) => ds.id != null);
-			if (mapped.length) {
-				allDatasources.value = mapped;
-				activeDatasource.value =
-					mapped.find((d) => d.isActive) || mapped[0] || null;
-			} else {
-				const list = await datasourceService.getAllDatasource('active');
-				allDatasources.value = list;
-				activeDatasource.value = list[0] || null;
-			}
+			// R207: 空绑定 = 未就绪，不再用全局 DS 冒充已绑定
+			allDatasources.value = mapped;
+			activeDatasource.value = mapped.length
+				? mapped.find((d) => d.isActive) || mapped[0] || null
+				: null;
 		} catch {
 			try {
 				const list = await datasourceService.getAllDatasource('active');
