@@ -16,11 +16,43 @@
 
 <template>
 	<div class="chat-page">
-		<ChatSidebar />
-		<div class="chat-body">
-			<ChatMessageList />
-			<ChatInputArea />
-		</div>
+		<template v-if="currentAgentId">
+			<ChatSidebar />
+			<div class="chat-body">
+				<ChatMessageList />
+				<ChatInputArea />
+			</div>
+		</template>
+		<!-- R157: no agent selected -->
+		<section v-else class="chat-no-agent" role="status">
+			<div class="chat-no-agent__card">
+				<div class="chat-no-agent__icon" aria-hidden="true">
+					<svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+						<path
+							d="M12 2a4 4 0 0 1 4 4v1h1a3 3 0 0 1 3 3v7a3 3 0 0 1-3 3h-1v1a4 4 0 0 1-8 0v-1H8a3 3 0 0 1-3-3V10a3 3 0 0 1 3-3h1V6a4 4 0 0 1 4-4Z"
+							stroke="currentColor"
+							stroke-width="1.5"
+						/>
+					</svg>
+				</div>
+				<p class="chat-no-agent__kicker">Data Agent</p>
+				<h1 class="chat-no-agent__title">请先选择智能体</h1>
+				<p class="chat-no-agent__desc">
+					数据问答依赖智能体绑定的数据源与全局模型配置。请从智能体列表进入，或先完成模型 / 数据源准备。
+				</p>
+				<div class="chat-no-agent__actions">
+					<button type="button" class="chat-no-agent__btn chat-no-agent__btn--primary" @click="goAgents">
+						选择智能体
+					</button>
+					<button type="button" class="chat-no-agent__btn" @click="goModels">
+						配置模型
+					</button>
+					<button type="button" class="chat-no-agent__btn" @click="goDatasources">
+						配置数据源
+					</button>
+				</div>
+			</div>
+		</section>
 	</div>
 </template>
 
@@ -57,6 +89,17 @@ async function init(agentId: number) {
 
 	store.connectSessionStream(agentId);
 	await store.loadSessions(agentId);
+}
+
+
+function goAgents() {
+	navigateTo('/system/agents');
+}
+function goModels() {
+	navigateTo('/system/model-config');
+}
+function goDatasources() {
+	navigateTo('/system/data-sources');
 }
 
 onMounted(async () => {
