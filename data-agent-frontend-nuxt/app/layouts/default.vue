@@ -328,15 +328,70 @@
 							</div>
 						</v-list>
 
-						<!-- <div class="pa-2 border-t border-white/5">
-							<v-list-item class="rounded-lg navigation-item logout-item" color="red-lighten-2" @click="logout">
+						<div class="pa-2 border-t border-white/5">
+							<v-list-item
+								class="rounded-lg navigation-item logout-item"
+								color="red-lighten-2"
+								@click="openChangePassword"
+							>
 								<template #prepend>
-									<v-avatar size="24" color="grey-darken-3"><v-icon icon="mdi-account" size="14" color="white" /></v-avatar>
+									<v-avatar size="24" color="grey-darken-3">
+										<v-icon icon="mdi-account" size="14" color="white" />
+									</v-avatar>
 								</template>
-								<v-list-item-title class="text-caption font-weight-bold ms-2">root</v-list-item-title>
-								<template #append><v-icon icon="mdi-logout" size="24" color="red" /></template>
+								<v-list-item-title class="text-caption font-weight-bold ms-2">
+									{{ authDisplayName }}
+								</v-list-item-title>
+								<template #append>
+									<v-btn
+										icon
+										variant="text"
+										size="small"
+										color="red"
+										:title="'退出登录'"
+										@click.stop="onLogout"
+									>
+										<v-icon icon="mdi-logout" size="20" />
+									</v-btn>
+								</template>
 							</v-list-item>
-						</div> -->
+						</div>
+
+						<v-dialog v-model="pwdDialog" max-width="420">
+							<v-card class="pa-4">
+								<div class="text-subtitle-1 font-weight-bold mb-3">修改密码</div>
+								<v-alert
+									v-if="pwdError"
+									type="error"
+									variant="tonal"
+									density="compact"
+									class="mb-2"
+									:text="pwdError"
+								/>
+								<v-text-field
+									v-model="oldPassword"
+									label="原密码"
+									type="password"
+									density="compact"
+									variant="outlined"
+									class="mb-2"
+								/>
+								<v-text-field
+									v-model="newPassword"
+									label="新密码（≥8位）"
+									type="password"
+									density="compact"
+									variant="outlined"
+									class="mb-3"
+								/>
+								<div class="d-flex justify-end ga-2">
+									<v-btn variant="text" @click="pwdDialog = false">取消</v-btn>
+									<v-btn color="primary" :loading="pwdLoading" @click="submitChangePassword">
+										确认
+									</v-btn>
+								</div>
+							</v-card>
+						</v-dialog>
 					</div>
 				</template>
 
@@ -377,13 +432,51 @@
 import BaseDrawer from '../components/BaseDrawer/index.vue';
 import agentService from '~/services/agent/index';
 import modelConfigService from '~/services/modelConfig/index';
+import { useAuthStore } from '~/stores/auth';
 
 const { dialogState, handleGlobalConfirm } = useConfirm();
 const drawer = ref(true);
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
+const authDisplayName = computed(
+	() => authStore.displayName || authStore.username || 'admin',
+);
+const pwdDialog = ref(false);
+const oldPassword = ref('');
+const newPassword = ref('');
+const pwdLoading = ref(false);
+const pwdError = ref('');
 // 默认都展开
 const openedGroups = ref(['knowledge', 'system']);
+
+function openChangePassword() {
+	pwdError.value = '';
+	oldPassword.value = '';
+	newPassword.value = '';
+	pwdDialog.value = true;
+}
+
+async function submitChangePassword() {
+	pwdLoading.value = true;
+	pwdError.value = '';
+	try {
+		await authStore.changePassword(oldPassword.value, newPassword.value);
+		pwdDialog.value = false;
+		await router.push('/login');
+	}
+	catch (e: any) {
+		pwdError.value = e?.response?.data?.message || e?.message || '改密失败';
+	}
+	finally {
+		pwdLoading.value = false;
+	}
+}
+
+async function onLogout() {
+	await authStore.logout();
+	await router.push('/login');
+}
 
 type DrawerAgentOption = {
 	id: number;
@@ -563,7 +656,7 @@ watch(
 
 <style scoped>
 .border-white-5 {
-	border-color: rgba(255, 255, 255, 0.05) !important;
+	border-color: var(--da-sidebar-line, rgba(255, 255, 255, 0.05)) !important;
 }
 
 .brand-subtitle {
@@ -572,21 +665,22 @@ watch(
 }
 
 .agent-switcher :deep(.v-field) {
-	background: rgba(30, 41, 59, 0.8);
-	border-radius: 10px;
+	background: var(--da-sidebar-field, rgba(30, 41, 59, 0.8));
+	border-radius: var(--da-radius-md, 10px);
 }
 
 .agent-switcher :deep(.v-field__input),
 .agent-switcher :deep(.v-field-label),
 .agent-switcher :deep(.v-icon) {
-	color: #dbeafe;
+	color: var(--da-sidebar-ink, #dbeafe);
 }
 
 :deep(.agent-switcher-menu) {
-	background: #1e293b !important;
-	border: 1px solid rgba(59, 130, 246, 0.3) !important;
+	background: var(--da-sidebar-bg, #1e293b) !important;
+	border: 1px solid color-mix(in srgb, var(--da-accent, #3b82f6) 30%, transparent) !important;
 	border-radius: 12px !important;
 	overflow: hidden;
+	z-index: var(--da-z-dropdown, 1000);
 }
 
 :deep(.agent-switcher-menu .v-list) {
@@ -601,7 +695,7 @@ watch(
 }
 
 :deep(.agent-switcher-menu .v-list-item:hover) {
-	background: rgba(59, 130, 246, 0.12) !important;
+	background: color-mix(in srgb, var(--da-accent, #3b82f6) 12%, transparent) !important;
 }
 
 .agent-option__text {
@@ -620,13 +714,13 @@ watch(
 }
 
 .agent-option__title--active {
-	color: #60a5fa;
+	color: var(--da-sidebar-accent, #60a5fa);
 }
 
 .agent-option__subtitle {
 	font-size: 10px;
 	line-height: 1.2;
-	color: #94a3b8;
+	color: var(--da-sidebar-muted, #94a3b8);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -635,12 +729,12 @@ watch(
 }
 
 .agent-tags-text {
-	background: rgba(59, 130, 246, 0.15);
-	color: #93c5fd;
+	background: var(--da-sidebar-chip-bg, rgba(59, 130, 246, 0.15));
+	color: var(--da-sidebar-chip-ink, #93c5fd);
 	padding: 1px 6px;
 	border-radius: 4px;
 	font-size: 9px;
-	border: 1px solid rgba(59, 130, 246, 0.2);
+	border: 1px solid var(--da-sidebar-chip-line, rgba(59, 130, 246, 0.2));
 }
 
 .agent-option--selection .agent-option__title {
@@ -653,12 +747,12 @@ watch(
 
 .navigation-item {
 	--v-list-item-padding-start: 16px;
-	--v-list-item-min-height: 36px;
+	--v-list-item-min-height: var(--da-table-row-density, 36px);
 }
 
 .navigation-sub-item {
 	--v-list-item-padding-start: 28px;
-	--v-list-item-min-height: 36px;
+	--v-list-item-min-height: var(--da-table-row-density, 36px);
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -683,7 +777,7 @@ watch(
 }
 
 :deep(.flex-grow-1.v-list .v-list-item) {
-	min-height: 36px !important;
+	min-height: var(--da-table-row-density, 36px) !important;
 }
 
 :deep(.v-list-item__spacer) {

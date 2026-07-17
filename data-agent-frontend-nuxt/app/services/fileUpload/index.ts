@@ -39,13 +39,15 @@ export const fileUploadApi = {
    * @param {File} file - 头像文件对象
    * @returns {Promise<UploadResponse>} 上传结果
    */
-  uploadAvatar(file: File): Promise<UploadResponse> {
+  async uploadAvatar(file: File): Promise<UploadResponse> {
     const formData = new FormData();
     formData.append('file', file);
 
     const url = '/api/upload/avatar';
+    const { authHeaders } = await import('~/utils/authToken');
     return fetch(url, {
       method: 'POST',
+      headers: authHeaders(),
       body: formData,
     }).then(async response => {
       if (!response.ok) {

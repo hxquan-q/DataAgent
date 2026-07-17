@@ -112,7 +112,11 @@ class GraphService {
       params.append("humanFeedbackContent", request.humanFeedbackContent);
     }
 
-    const url = `${API_BASE_URL}/stream/search?${params.toString()}`;
+    // EventSource 无法设 Authorization，走 query access_token（仅 SSE 路径）
+    const { withAccessToken } = await import('~/utils/authToken');
+    const url = withAccessToken(
+      `${API_BASE_URL}/stream/search?${params.toString()}`,
+    );
 
     const eventSource = new EventSource(url);
 

@@ -82,6 +82,7 @@ const hostContext = ref<Record<string, unknown>>({});
 const sessionId = ref('');
 const messages = ref<Msg[]>([]);
 const input = ref('');
+const pendingHostQuery = ref('');
 const streaming = ref(false);
 const liveBlocks = ref<Block[]>([]);
 const ready = ref(false);
@@ -292,21 +293,51 @@ function scheduleCharts() {
 
 watch([messages, liveAnswerHtml, displayedText], () => scheduleCharts(), { deep: true });
 
-function onHostMessage(ev: MessageEvent) {
+async function onHostMessage(ev: MessageEvent) {
 	if (ev.source !== window.parent) return;
 	const d = ev.data || {};
 	if (d.source !== 'dataagent-host') return;
 	if (d.type === 'token') {
-		token.value = d.token;
-		ready.value = true;
+		await setSessionToken(d.token);
+		const pending = pendingHostQuery.value;
+		pendingHostQuery.value = '';
+		if (pending && !streaming.value) void send(pending);
 	} else if (d.type === 'context') {
 		hostContext.value = d.context || {};
 	} else if (d.type === 'query') {
 		const q = String(d.query || '').trim();
 		if (!q || streaming.value) return;
+		if (!token.value) {
+			pendingHostQuery.value = q;
+			return;
+		}
 		input.value = q;
 		void send(q);
 	}
+}
+
+async function resolveSessionToken(candidate: string): Promise<string> {
+	if (!candidate || candidate.startsWith('das_')) return candidate;
+	// Generated snippets carry the publish token; exchange it before creating a session.
+	try {
+		const res = await fetch(`/api/embed/public/${agentId.value}/exchange`, {
+			method: 'POST',
+			headers: { 'X-Publish-Token': candidate },
+		});
+		if (res.ok) {
+			const data = (await res.json()) as { sessionToken?: string };
+			if (data.sessionToken) return data.sessionToken;
+		}
+	} catch {
+		// Keep legacy opaque session tokens compatible.
+	}
+	return candidate;
+}
+
+async function setSessionToken(candidate: unknown) {
+	ready.value = false;
+	token.value = await resolveSessionToken(String(candidate || '').trim());
+	ready.value = Boolean(token.value);
 }
 
 async function ensureSession() {
@@ -406,14 +437,11 @@ async function send(preset?: string) {
 
 function finishStream(es: EventSource, fromError: boolean) {
 	if (streamFinished) return;
-	// readyState 2=CLOSED：complete 后浏览器常再抛 error，必须吞掉
-	if (fromError && es.readyState !== EventSource.CLOSED && liveBlocks.value.length === 0 && streaming.value) {
-		// 真错误且尚无内容
-	}
+	const hadContent = liveBlocks.value.length > 0;
 	streamFinished = true;
 	streaming.value = false;
 	liveShowSteps.value = false;
-	if (liveBlocks.value.length) {
+	if (hadContent) {
 		const blocks = [...liveBlocks.value];
 		messages.value.push({
 			role: 'assistant',
@@ -429,6 +457,9 @@ function finishStream(es: EventSource, fromError: boolean) {
 		/* ignore */
 	}
 	if (activeES === es) activeES = null;
+	if (fromError && !hadContent) {
+		messages.value.push({ role: 'assistant', content: '⚠️ 流式连接失败，请检查令牌、代理或后端日志后重试。' });
+	}
 	flush();
 	scheduleCharts();
 }
@@ -459,8 +490,7 @@ onMounted(async () => {
 	// demo/host 可把 token 放 query，避免 postMessage 往返
 	const qToken = String(route.query.token || route.query.sessionToken || '');
 	if (qToken) {
-		token.value = qToken;
-		ready.value = true;
+		await setSessionToken(qToken);
 	}
 	window.parent?.postMessage({ source: 'dataagent-embed', type: 'ready' }, '*');
 	window.addEventListener('message', onHostMessage);
@@ -471,7 +501,7 @@ onMounted(async () => {
 			if (res.ok) config.value = await res.json();
 		})
 		.catch(() => {});
-	const presetP = fetch(`/api/agent/${agentId.value}/preset-questions`)
+	const presetP = fetch(`/api/embed/public/${agentId.value}/preset-questions`)
 		.then(async (r) => {
 			if (!r.ok) {
 				suggested.value = FALLBACK_SUGGESTIONS;

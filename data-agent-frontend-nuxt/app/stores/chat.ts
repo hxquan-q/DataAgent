@@ -32,6 +32,7 @@ import modelConfigService, {
 import datasourceService, {
 	type Datasource as BaseDatasource,
 } from '~/services/datasource/index';
+import { withAccessToken } from '~/utils/authToken';
 
 export type Datasource = BaseDatasource & { isActive?: boolean };
 
@@ -115,7 +116,9 @@ export const useChatStore = defineStore('chat', () => {
 		}
 		if (sessionEventSource) sessionEventSource.close();
 
-		const source = new EventSource(`/api/agent/${agentId}/sessions/stream`);
+		const source = new EventSource(
+			withAccessToken(`/api/agent/${agentId}/sessions/stream`),
+		);
 		source.addEventListener('title-updated', (event) => {
 			try {
 				const data = JSON.parse((event as MessageEvent<string>).data) as {
