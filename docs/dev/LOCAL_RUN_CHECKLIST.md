@@ -81,4 +81,9 @@ API：`GET /api/model-config/check-ready` 应体现 `chatModelReady=true`。
 - R149 模型引导 + concurrent  
 - R150 模型配置空态  
 - R151–R153 数据源引导与路由  
-- R154 智能体列表快捷入口  
+- R154/R156 智能体列表：问答 / 数据源 / 模型  
+- R155 本文档  
+- R157–R160 无 agent 空态 / 切换 / Welcome 清单 / 侧栏链  
+- R161 新建智能体 → 绑定数据源  
+- R162–R163 激活/初始化后进问答  
+

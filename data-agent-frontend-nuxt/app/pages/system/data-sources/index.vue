@@ -714,19 +714,31 @@ async function handleInitDatasource() {
 			!activeDatasource.selectTables ||
 			activeDatasource.selectTables.length === 0
 		) {
-			$tip('当前绑定的数据源没有选择相应的数据表！请先选择数据表并更新', {
+			$tip('当前绑定的数据源未选择数据表。请展开数据源行勾选表并「更新表」，再初始化。', {
 				color: 'error',
 				icon: 'mdi-alert-circle',
 			});
 			return;
 		}
 		const res = await agentDatasourceService.initSchema(agentId.value);
-		if (res.success) $tip('初始化数据源成功');
-		else
+		if (res.success) {
+			// R163: 初始化完成后引导进入问答
+			$tip('初始化数据源成功。可以进入数据问答开始提问。', {
+				icon: 'mdi-check-circle',
+				color: 'success',
+			});
+			// 短延迟后跳转，避免 tip 被立刻卸载（仍允许用户用横幅按钮）
+			setTimeout(() => {
+				if (agentId.value) {
+					navigateTo({ path: '/chat', query: { agentId: String(agentId.value) } });
+				}
+			}, 600);
+		} else {
 			$tip(res.message || '初始化数据源失败', {
 				color: 'error',
 				icon: 'mdi-alert-circle',
 			});
+		}
 	} catch (error: unknown) {
 		const errMsg = error instanceof Error ? error.message : '初始化数据源失败';
 		$tip(errMsg, { color: 'error', icon: 'mdi-alert-circle' });
