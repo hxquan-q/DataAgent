@@ -249,6 +249,10 @@ public class GraphServiceImpl implements GraphService {
 
 		String multiTurnContext = multiTurnContextManager.buildContext(threadId);
 		multiTurnContextManager.beginTurn(threadId, query);
+		// R196: 可观测 — 请求体量，便于对比 prompt 有界效果
+		log.info("启动图执行: agentId={}, threadId={}, queryLen={}, multiTurnLen={}, nl2sqlOnly={}, humanReview={}",
+				agentId, threadId, query.length(), multiTurnContext != null ? multiTurnContext.length() : 0, nl2sqlOnly,
+				humanReviewEnabled);
 		Flux<NodeOutput> nodeOutputFlux = resolveGraph(agentId).stream(
 				Map.of(IS_ONLY_NL2SQL, nl2sqlOnly, INPUT_KEY, query, AGENT_ID, agentId, HUMAN_REVIEW_ENABLED,
 						humanReviewEnabled, MULTI_TURN_CONTEXT, multiTurnContext, TRACE_THREAD_ID, threadId),

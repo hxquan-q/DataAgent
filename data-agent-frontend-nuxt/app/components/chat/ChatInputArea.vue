@@ -109,6 +109,9 @@
 				@keydown.enter.exact.prevent="handleSend"
 				@input="autoResize"
 			/>
+			<p v-if="inputText.length > 200" class="input-char-count" aria-live="polite">
+				{{ inputText.length }} 字
+			</p>
 		</div>
 
 		<!-- Bottom action bar -->
@@ -659,5 +662,12 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font-size: 12px;
 	line-height: 1.4;
 	color: #c2410c;
+}
+
+.input-char-count {
+	margin: 4px 8px 0;
+	font-size: 11px;
+	color: #94a3b8;
+	text-align: right;
 }
 </style>
