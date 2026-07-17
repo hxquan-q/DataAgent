@@ -138,7 +138,7 @@ const currentPage = ref(1);
 const copied = ref(false);
 let copyTimer: ReturnType<typeof setTimeout> | null = null;
 
-const pageSz = computed(() => props.pageSize || 20);
+const pageSz = computed(() => props.pageSize || 50);
 const columns = computed(() => props.data?.resultSet?.column || []);
 const allRows = computed(() => props.data?.resultSet?.data || []);
 const totalRows = computed(() => allRows.value.length);
