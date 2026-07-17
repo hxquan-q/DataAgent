@@ -20,27 +20,40 @@
 		<div class="status-bar">
 			<div class="status-chips">
 
-				<!-- Datasource selector -->
+				<!-- Datasource selector (R151: empty-datasource guidance) -->
 				<div class="ds-chip-wrap" @click.stop>
 					<div
 						class="status-chip status-chip--ds"
-						:class="{ disabled: store.isStreaming }"
+						:class="{ disabled: store.isStreaming, warn: store.allDatasources.length === 0 }"
 						@click="toggleDsMenu"
 					>
-						<v-icon size="13" color="#64748b">mdi-database-outline</v-icon>
-						<span>{{ store.activeDatasource?.name || '选择数据库' }}</span>
+						<v-icon size="13" :color="store.allDatasources.length ? '#64748b' : '#f59e0b'">mdi-database-outline</v-icon>
+						<span>{{
+							store.activeDatasource?.name
+								|| (store.allDatasources.length ? '选择数据库' : '未绑定数据源')
+						}}</span>
 						<v-icon size="13" color="#94a3b8">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</div>
 					<div v-if="showDsMenu" class="chip-dropdown">
-						<div
-							v-for="ds in store.allDatasources"
-							:key="ds.id"
-							class="chip-dropdown-item"
-							:class="{ active: store.activeDatasource?.id === ds.id }"
-							@click="selectDs(ds)"
-						>
-							<span class="item-name">{{ ds.name }}</span>
-							<span class="item-tag">{{ ds.type?.toUpperCase() }}</span>
+						<template v-if="store.allDatasources.length">
+							<div
+								v-for="ds in store.allDatasources"
+								:key="ds.id"
+								class="chip-dropdown-item"
+								:class="{ active: store.activeDatasource?.id === ds.id }"
+								@click="selectDs(ds)"
+							>
+								<span class="item-name">{{ ds.name }}</span>
+								<span class="item-tag">{{ ds.type?.toUpperCase() }}</span>
+							</div>
+						</template>
+						<div v-else class="chip-dropdown-empty">
+							<p class="chip-dropdown-empty__text">
+								当前智能体未绑定可用数据源，NL2SQL 无法查库。请到智能体配置中关联数据源并激活。
+							</p>
+							<button type="button" class="chip-dropdown-empty__cta" @click="goAgentDatasource">
+								去绑定数据源
+							</button>
 						</div>
 					</div>
 				</div>
@@ -206,6 +219,16 @@ function goModelConfig() {
 	navigateTo('/system/model-config');
 }
 
+function goAgentDatasource() {
+	showDsMenu.value = false;
+	const id = store.currentAgentId;
+	if (id) {
+		navigateTo(`/agent/${id}`);
+	} else {
+		navigateTo('/system/agents');
+	}
+}
+
 async function selectDs(ds: typeof store.allDatasources[0]) {
 	showDsMenu.value = false;
 	await store.switchDatasource(ds);
@@ -237,6 +260,11 @@ async function handleSend() {
 	if (!store.chatModels.length || !store.activeModelConfig) {
 		// R149: 无可用模型时阻断发送，引导配置
 		showModelMenu.value = true;
+		return;
+	}
+	if (!store.allDatasources.length || !store.activeDatasource) {
+		// R151: 无数据源时阻断发送
+		showDsMenu.value = true;
 		return;
 	}
 
