@@ -232,11 +232,11 @@ public class GraphServiceImpl implements GraphService {
 		boolean nl2sqlOnly = graphRequest.isNl2sqlOnly();
 		boolean humanReviewEnabled = graphRequest.isHumanFeedback() & !(nl2sqlOnly);
 		if (!StringUtils.hasText(threadId) || !StringUtils.hasText(agentId) || !StringUtils.hasText(query)) {
-			throw new IllegalArgumentException("Invalid arguments");
+			throw new IllegalArgumentException("请求参数无效：threadId、agentId、query 均不能为空");
 		}
 		StreamContext context = streamContextMap.get(threadId);
 		if (context == null || context.getSink() == null) {
-			throw new IllegalStateException("StreamContext not found for threadId: " + threadId);
+			throw new IllegalStateException("流式会话不存在或已失效，threadId=" + threadId + "。请刷新页面后重试。");
 		}
 		// 检查是否已经清理，如果已清理则不再启动新的流
 		if (context.isCleaned()) {
@@ -265,11 +265,11 @@ public class GraphServiceImpl implements GraphService {
 		String threadId = graphRequest.getThreadId();
 		String feedbackContent = PromptHelper.boundQuery(graphRequest.getHumanFeedbackContent());
 		if (!StringUtils.hasText(threadId) || !StringUtils.hasText(agentId) || !StringUtils.hasText(feedbackContent)) {
-			throw new IllegalArgumentException("Invalid arguments");
+			throw new IllegalArgumentException("请求参数无效：必要字段不能为空");
 		}
 		StreamContext context = streamContextMap.get(threadId);
 		if (context == null || context.getSink() == null) {
-			throw new IllegalStateException("StreamContext not found for threadId: " + threadId);
+			throw new IllegalStateException("流式会话不存在或已失效，threadId=" + threadId + "。请刷新页面后重试。");
 		}
 		if (context.isCleaned()) {
 			log.warn("StreamContext already cleaned for threadId: {}, skipping stream start", threadId);
@@ -296,7 +296,7 @@ public class GraphServiceImpl implements GraphService {
 			updatedConfig = graph.updateState(baseConfig, stateUpdate);
 		}
 		catch (Exception e) {
-			throw new IllegalStateException("Failed to update graph state for human feedback", e);
+			throw new IllegalStateException("更新人工反馈状态失败，请重试", e);
 		}
 		RunnableConfig resumeConfig = RunnableConfig.builder(updatedConfig)
 			.addMetadata(RunnableConfig.HUMAN_FEEDBACK_METADATA_KEY, feedbackData)

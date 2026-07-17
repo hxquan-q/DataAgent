@@ -281,6 +281,18 @@ export const useChatStore = defineStore('chat', () => {
 	}
 
 	// ── Message send & stream ───────────────────────────────────────────────────
+	function mapStreamErrorMessage(error: Error): string {
+		const raw = (error?.message || '').trim();
+		if (!raw) return '请求失败，请检查网络连接并重试。';
+		if (/CHAT model|未配置或未激活 CHAT|No active CHAT/i.test(raw)) {
+			return '未配置或未激活对话模型，请到「模型服务」添加并激活 CHAT 模型。';
+		}
+		if (/数据源|datasource/i.test(raw)) {
+			return '数据源不可用，请绑定并激活数据源后重试。';
+		}
+		return raw.length > 240 ? raw.slice(0, 240) + '…' : raw;
+	}
+
 	async function sendMessage(query: string) {
 		if (!currentSession.value) return;
 
@@ -479,7 +491,7 @@ export const useChatStore = defineStore('chat', () => {
 				const errorMsg: ChatMessage = {
 					sessionId,
 					role: 'assistant',
-					content: error.message || '请求失败，请检查网络连接并重试。',
+					content: mapStreamErrorMessage(error),
 					messageType: 'error',
 				};
 				await chatService
