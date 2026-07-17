@@ -194,10 +194,14 @@
 				</div>
 				<textarea
 					v-model="store.feedbackContent"
-					class="feedback-textarea" maxlength="1200"
+					class="feedback-textarea"
+					maxlength="1200"
 					rows="2"
 					placeholder="输入您的反馈意见（留空表示接受计划）"
 				/>
+				<p class="feedback-count" aria-live="polite">
+					{{ (store.feedbackContent || '').length }}/1200
+				</p>
 				<div class="feedback-actions">
 					<v-btn class="feedback-btn feedback-btn--accept" @click="store.submitFeedback(false, store.feedbackContent)">
 						<v-icon size="14" class="mr-1">mdi-check</v-icon>接受计划
@@ -596,6 +600,12 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font-weight: 600;
 	color: #92400e;
 	margin-bottom: 8px;
+}
+.feedback-count {
+	margin: 4px 0 0;
+	font-size: 11px;
+	color: #94a3b8;
+	text-align: right;
 }
 .feedback-textarea {
 	width: 100%;
