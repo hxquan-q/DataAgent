@@ -24,7 +24,7 @@
 
 		<!-- Parse miss / no structure -->
 		<div v-else-if="!data || !columns.length" class="result-empty" role="status">
-			<v-icon size="18" color="#94a3b8" class="mb-1">mdi-table-off</v-icon>
+			<v-icon size="18" color="grey" class="mb-1">mdi-table-off</v-icon>
 			<div>{{ parseHint }}</div>
 		</div>
 
@@ -256,9 +256,9 @@ function downloadCsv() {
 	padding: 5px 6px;
 	font-size: 11px;
 	font-weight: 600;
-	color: #1e40af;
-	background: #eff6ff;
-	border: 1px solid #bfdbfe;
+	color: var(--da-primary);
+	background: var(--da-primary-soft);
+	border: 1px solid color-mix(in srgb, var(--da-primary) 35%, transparent);
 	border-bottom: none;
 	border-radius: 6px 6px 0 0;
 }
@@ -266,7 +266,7 @@ function downloadCsv() {
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
-	background: #3b82f6;
+	background: var(--da-accent);
 	animation: pendingPulse 1.2s ease-in-out infinite;
 }
 @keyframes pendingPulse {
@@ -284,8 +284,8 @@ function downloadCsv() {
 	font-size: 12.5px;
 	display: flex;
 	align-items: center;
-	background: #fef2f2;
-	color: #dc2626;
+	background: color-mix(in srgb, var(--da-danger) 8%, white);
+	color: var(--da-danger);
 	padding: 6px 10px;
 	font-size: 13px;
 	border-radius: 6px;
@@ -296,11 +296,11 @@ function downloadCsv() {
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	color: #94a3b8;
+	color: var(--da-muted);
 	padding: 12px 10px;
 	font-size: 12.5px;
-	background: #f8fafc;
-	border: 1px dashed #e2e8f0;
+	background: var(--da-surface-soft);
+	border: 1px dashed var(--da-line-soft);
 	border-radius: 6px;
 	gap: 4px;
 }
@@ -315,8 +315,8 @@ function downloadCsv() {
 	align-items: center;
 	gap: 6px;
 	padding: 4px 6px;
-	background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-	border: 1px solid #e2e8f0;
+	background: linear-gradient(180deg, var(--da-surface-soft) 0%, var(--da-surface-soft) 100%);
+	border: 1px solid var(--da-line-soft);
 	border-bottom: none;
 	border-radius: 8px 8px 0 0;
 }
@@ -325,19 +325,19 @@ function downloadCsv() {
 }
 .result-count {
 	font-size: 12px;
-	color: #64748b;
+	color: var(--da-muted);
 }
 .result-count strong {
-	color: #1e40af;
+	color: var(--da-primary);
 	font-weight: 600;
 }
 .result-meta {
-	color: #94a3b8;
+	color: var(--da-muted);
 	font-size: 11.5px;
 	line-height: 1.3;
 }
 .result-warn {
-	color: #b45309;
+	color: var(--da-warning);
 	font-weight: 600;
 	font-size: 11px;
 }
@@ -356,11 +356,11 @@ function downloadCsv() {
 	gap: 4px;
 	height: 28px;
 	padding: 0 10px;
-	background: #fff;
-	border: 1px solid #cbd5e1;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line);
 	border-radius: 6px;
 	font-size: 11.5px;
-	color: #334155;
+	color: var(--da-ink);
 	cursor: pointer;
 	transition:
 		background 0.15s,
@@ -368,12 +368,12 @@ function downloadCsv() {
 		color 0.15s;
 }
 .action-btn:hover {
-	background: #eff6ff;
-	border-color: #93c5fd;
-	color: #1e40af;
+	background: var(--da-primary-soft);
+	border-color: color-mix(in srgb, var(--da-primary) 45%, transparent);
+	color: var(--da-primary);
 }
 .action-btn:focus-visible {
-	outline: 2px solid #1e40af;
+	outline: 2px solid var(--da-primary);
 	outline-offset: 1px;
 }
 .pagination {
@@ -383,7 +383,7 @@ function downloadCsv() {
 }
 .pagination-info {
 	font-size: 11.5px;
-	color: #64748b;
+	color: var(--da-muted);
 	padding: 0 4px;
 	min-width: 36px;
 	text-align: center;
@@ -395,28 +395,28 @@ function downloadCsv() {
 	width: 28px;
 	height: 28px;
 	background: white;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	border-radius: 6px;
 	cursor: pointer;
 	transition: background 0.15s;
 }
 .page-btn:hover:not(:disabled) {
-	background: #f1f5f9;
+	background: var(--da-surface-soft);
 }
 .page-btn:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
 .page-btn:focus-visible {
-	outline: 2px solid #1e40af;
+	outline: 2px solid var(--da-primary);
 	outline-offset: 1px;
 }
 .table-container {
 	overflow: auto;
 	max-height: 360px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	border-radius: 0 0 8px 8px;
-	background: #fff;
+	background: var(--da-surface);
 }
 .result-table {
 	width: 100%;
@@ -428,19 +428,19 @@ function downloadCsv() {
 	position: sticky;
 	top: 0;
 	z-index: 1;
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 	padding: 4px 6px;
-	border-bottom: 2px solid #e2e8f0;
+	border-bottom: 2px solid var(--da-line-soft);
 	font-weight: 600;
-	color: #334155;
+	color: var(--da-ink);
 	font-size: 12px;
 	text-align: left;
 	white-space: nowrap;
 }
 .result-table td {
 	padding: 4px 6px;
-	border-bottom: 1px solid #f1f5f9;
-	color: #1e293b;
+	border-bottom: 1px solid var(--da-surface-soft);
+	color: var(--da-ink);
 	font-size: 12px;
 	max-width: 320px;
 	overflow: hidden;
@@ -452,16 +452,16 @@ function downloadCsv() {
 	border-bottom: none;
 }
 .result-table tr:hover td {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 }
 .cell-null {
-	color: #94a3b8;
+	color: var(--da-muted);
 	font-style: italic;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 	font-size: 11.5px;
 }
 .cell-empty {
-	color: #cbd5e1;
+	color: var(--da-line);
 }
 .cell-num {
 	font-size: 12px;
@@ -477,7 +477,7 @@ function downloadCsv() {
 	background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
+	background: var(--da-line);
 	border-radius: 4px;
 }
 @media (prefers-reduced-motion: reduce) {

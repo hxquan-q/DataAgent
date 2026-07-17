@@ -343,7 +343,7 @@ async function confirmDelete() {
 	align-items: center;
 	justify-content: space-between;
 	padding: 8px 8px 8px 14px;
-	border-bottom: 1px solid var(--da-line-soft, #e8edf2);
+	border-bottom: 1px solid var(--da-line-soft, var(--da-line-soft));
 	min-height: 48px;
 	flex-shrink: 0;
 }
@@ -351,13 +351,13 @@ async function confirmDelete() {
 .sidebar-title {
 	font-size: 13px;
 	font-weight: 600;
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted, var(--da-muted));
 	letter-spacing: 0.3px;
 	white-space: nowrap;
 }
 
 .toggle-btn {
-	color: var(--da-muted, #94a3b8) !important;
+	color: var(--da-muted, var(--da-muted)) !important;
 }
 .toggle-btn:hover {
 	color: var(--da-primary, #2f84d6) !important;
@@ -373,7 +373,7 @@ async function confirmDelete() {
 .session-group-label {
 	font-size: 10.5px;
 	font-weight: 600;
-	color: #94a3b8;
+	color: var(--da-muted);
 	letter-spacing: 0.5px;
 	text-transform: uppercase;
 	padding: 6px 8px 4px;
@@ -408,7 +408,7 @@ async function confirmDelete() {
 
 .session-item-title {
 	font-size: 12px;
-	color: var(--da-ink, #0f172a);
+	color: var(--da-ink, var(--da-ink));
 	line-height: 1.35;
 	white-space: nowrap;
 	overflow: hidden;
@@ -417,13 +417,13 @@ async function confirmDelete() {
 
 .session-item-time {
 	font-size: 10.5px;
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted, var(--da-muted));
 	font-style: italic;
 	line-height: 1.2;
 }
 
 .session-item.active .session-item-title {
-	color: var(--da-primary, #1e40af);
+	color: var(--da-primary, var(--da-primary));
 	font-weight: 500;
 }
 
@@ -441,20 +441,20 @@ async function confirmDelete() {
 }
 
 .action-btn--edit:hover {
-	color: #3b82f6 !important;
+	color: var(--da-accent) !important;
 }
 .action-btn--star:hover {
-	color: #f59e0b !important;
+	color: var(--da-warning) !important;
 }
 .action-btn--danger:hover {
-	color: #ef4444 !important;
+	color: var(--da-danger) !important;
 }
 
 /* ── Rename input ────────────────────────────────────────────────────────────── */
 .session-rename-input {
 	flex: 1;
 	font-size: 13px;
-	border: 1px solid #3b82f6;
+	border: 1px solid var(--da-accent);
 	border-radius: 4px;
 	padding: 1px 5px;
 	outline: none;
@@ -473,26 +473,26 @@ async function confirmDelete() {
 	margin: 0;
 	font-size: 12.5px;
 	font-weight: 600;
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted, var(--da-muted));
 }
 .empty-sessions__desc {
 	margin: 0;
 	font-size: 11.5px;
 	line-height: 1.45;
-	color: #94a3b8;
+	color: var(--da-muted);
 	max-width: 160px;
 }
 .empty-sessions {
 	text-align: center;
 	font-size: 12px;
-	color: #94a3b8;
+	color: var(--da-muted);
 	padding: 14px 0;
 }
 
 /* ── Bottom new session ──────────────────────────────────────────────────────── */
 .sidebar-bottom {
 	padding: 8px 10px 10px;
-	border-top: 1px solid var(--da-line-soft, #e8edf2);
+	border-top: 1px solid var(--da-line-soft, var(--da-line-soft));
 	flex-shrink: 0;
 }
 
@@ -521,11 +521,11 @@ async function confirmDelete() {
 	background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
+	background: var(--da-line);
 	border-radius: 4px;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-	background: #94a3b8;
+	background: var(--da-muted);
 }
 @media (prefers-reduced-motion: reduce) {
 	.sidebar-wrapper {
@@ -542,7 +542,7 @@ async function confirmDelete() {
 .sidebar-agent {
 	font-size: 11px;
 	font-weight: 600;
-	color: var(--da-primary, #1e40af);
+	color: var(--da-primary, var(--da-primary));
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;

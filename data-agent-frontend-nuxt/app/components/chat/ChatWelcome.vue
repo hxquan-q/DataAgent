@@ -201,7 +201,7 @@ watch(
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted, var(--da-muted));
 }
 
 .welcome-title {
@@ -222,14 +222,14 @@ watch(
 .welcome-line {
 	max-width: 220px;
 	margin: 0 auto 14px;
-	background: var(--da-line, #d9d9d9);
+	background: var(--da-line, var(--da-line));
 }
 
 .welcome-desc {
 	margin: 0;
 	font-size: 14px;
 	font-weight: 400;
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted, var(--da-muted));
 	max-width: 440px;
 	line-height: 1.6;
 	letter-spacing: -0.01em;
@@ -267,7 +267,7 @@ watch(
 
 .preset-chip:hover:not(:disabled) {
 	border-color: color-mix(in srgb, var(--da-primary, #2f84d6) 40%, transparent);
-	background: var(--da-primary-soft, #e8f3fc);
+	background: var(--da-primary-soft, var(--da-primary-soft));
 	color: var(--da-primary, #2f84d6);
 	box-shadow: var(--da-shadow-md);
 }
@@ -304,26 +304,26 @@ watch(
 	gap: 8px;
 	padding: 8px 12px;
 	border-radius: 10px;
-	border: 1px solid var(--da-line-soft, #e8edf2);
+	border: 1px solid var(--da-line-soft, var(--da-line-soft));
 	background: var(--da-surface, #fff);
 	font-size: 13px;
-	color: var(--da-ink, #0f172a);
+	color: var(--da-ink, var(--da-ink));
 	text-align: left;
 }
 .ready-item.ok {
-	border-color: #bbf7d0;
-	background: #f0fdf4;
-	color: #166534;
+	border-color: color-mix(in srgb, var(--da-success) 25%, white);
+	background: color-mix(in srgb, var(--da-success) 8%, white);
+	color: var(--da-success);
 }
 .ready-dot {
 	width: 8px;
 	height: 8px;
 	border-radius: 50%;
-	background: #f59e0b;
+	background: var(--da-warning);
 	flex-shrink: 0;
 }
 .ready-item.ok .ready-dot {
-	background: #22c55e;
+	background: var(--da-success);
 }
 .ready-text {
 	flex: 1;
@@ -333,7 +333,7 @@ watch(
 	appearance: none;
 	border: none;
 	background: transparent;
-	color: var(--da-primary, #1e40af);
+	color: var(--da-primary, var(--da-primary));
 	font-size: 12.5px;
 	font-weight: 600;
 	cursor: pointer;
@@ -341,7 +341,7 @@ watch(
 	white-space: nowrap;
 }
 .ready-link:focus-visible {
-	outline: 2px solid var(--da-accent, #3b82f6);
+	outline: 2px solid var(--da-accent, var(--da-accent));
 	outline-offset: 2px;
 }
 
@@ -349,6 +349,6 @@ watch(
 	margin: 16px 0 0;
 	font-size: 12.5px;
 	font-weight: 600;
-	color: #047857;
+	color: var(--da-success);
 }
 </style>

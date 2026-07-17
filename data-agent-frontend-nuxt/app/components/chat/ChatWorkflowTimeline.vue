@@ -82,7 +82,7 @@
 							>完成</span
 						>
 					</div>
-					<v-icon size="16" color="#94a3b8">
+					<v-icon size="16" color="grey">
 						{{ step.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
 					</v-icon>
 				</div>
@@ -105,7 +105,7 @@
 						/>
 						<!-- Report node: show brief status, not full content -->
 						<div v-else-if="step.isReport" class="text-body report-brief">
-							<v-icon size="14" color="#16a34a" class="mr-1"
+							<v-icon size="14" color="success" class="mr-1"
 								>mdi-file-chart-outline</v-icon
 							>
 							<span v-if="step.status === 'active'"
@@ -482,8 +482,8 @@ watch(
 	gap: 6px;
 	margin-bottom: 6px;
 	padding: 3px 5px;
-	background: #f8fafc;
-	border: 1px solid #e8edf2;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	border-radius: 8px;
 }
 
@@ -498,24 +498,24 @@ watch(
 .timeline-title {
 	font-size: 12.5px !important;
 	font-weight: 700;
-	color: #1e40af;
+	color: var(--da-primary);
 	display: flex;
 	align-items: center;
 	line-height: 1;
 }
 
 .workflow-timeline.is-completed .timeline-title {
-	color: #166534;
+	color: var(--da-success);
 }
 
 .timeline-summary {
 	font-size: 12px;
-	color: #64748b;
+	color: var(--da-muted);
 	font-weight: 500;
 }
 
 .timeline-active-hint {
-	color: #2563eb;
+	color: var(--da-primary);
 }
 
 .toggle-all-btn {
@@ -548,7 +548,7 @@ watch(
 .step-label {
 	font-size: 12.5px;
 	font-weight: 600;
-	color: #1e293b;
+	color: var(--da-ink);
 }
 
 /* ── Badge ───────────────────────────────────────────────────────────────────── */
@@ -562,19 +562,19 @@ watch(
 }
 
 .step-badge.active {
-	background: #dbeafe;
-	color: #1d4ed8;
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
 }
 
 .step-badge.done {
-	background: #dcfce7;
-	color: #15803d;
+	background: color-mix(in srgb, var(--da-success) 12%, white);
+	color: var(--da-success);
 }
 
 .badge-dot {
 	width: 5px;
 	height: 5px;
-	background: #2563eb;
+	background: var(--da-primary);
 	border-radius: 50%;
 	animation: dotBlink 1s infinite;
 }
@@ -594,7 +594,7 @@ watch(
 	margin-top: 6px;
 	font-size: 12.5px;
 	line-height: 1.65;
-	color: #1e293b;
+	color: var(--da-ink);
 	min-width: 0;
 	overflow: hidden;
 }
@@ -605,26 +605,26 @@ watch(
 }
 
 .is-muted .text-body {
-	color: #94a3b8;
+	color: var(--da-muted);
 	font-style: italic;
 }
 
 .report-body {
-	color: #1e293b !important;
+	color: var(--da-ink) !important;
 	font-style: normal !important;
 }
 
 .report-brief {
 	display: flex;
 	align-items: center;
-	color: #64748b !important;
+	color: var(--da-muted) !important;
 	font-style: normal !important;
 	font-size: 12px;
 }
 
 :deep(.tl-code) {
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	border-radius: 8px;
 	padding: 6px 8px;
 	font-size: 12.5px;
@@ -649,12 +649,12 @@ watch(
 	margin-bottom: 6px;
 }
 .md-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
-	border: 1px solid #e1e4e8;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	padding: 1px 5px;
 	border-radius: 3px;
 	font-size: 12px;
-	color: #e83e8c;
+	color: #c026a0;
 }
 .md-body :deep(table) {
 	width: 100%;
@@ -671,42 +671,42 @@ watch(
 }
 .md-body :deep(tr) {
 	display: table-row;
-	border-top: 1px solid #c6cbd1;
+	border-top: 1px solid var(--da-line);
 }
 .md-body :deep(th) {
 	display: table-cell;
-	background: #f1f5f9;
+	background: var(--da-surface-soft);
 	padding: 3px 6px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	font-weight: 600;
 	font-size: 12px;
 }
 .md-body :deep(td) {
 	display: table-cell;
 	padding: 3px 6px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	font-size: 12px;
 }
 
 /* ── Code block with header ─────────────────────────────────────────────────── */
 .md-body :deep(.code-block-wrapper) {
 	margin: 8px 0;
-	border: 1px solid #e1e4e8;
+	border: 1px solid var(--da-line-soft);
 	border-radius: 6px;
 	overflow: auto;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 }
 .md-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	padding: 3px 8px;
-	border-bottom: 1px solid #e1e4e8;
+	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
 .md-body :deep(.code-language) {
-	color: #6a737d;
+	color: var(--da-muted);
 	font-weight: 600;
 	font-family: 'Monaco', 'Menlo', monospace;
 	font-size: 10px;
@@ -714,21 +714,21 @@ watch(
 }
 .md-body :deep(.code-copy-button) {
 	background: transparent;
-	border: 1px solid #d1d5da;
+	border: 1px solid var(--da-line);
 	padding: 2px 8px;
 	border-radius: 4px;
 	font-size: 10px;
 	cursor: pointer;
 	transition: all 0.2s;
-	color: #24292e;
+	color: var(--da-ink);
 }
 .md-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
-	border-color: #c6cbd1;
+	background: var(--da-surface-soft);
+	border-color: var(--da-line);
 }
 .md-body :deep(.code-copy-button.copied) {
-	background: #28a745;
-	border-color: #28a745;
+	background: var(--da-success);
+	border-color: var(--da-success);
 	color: white;
 }
 .md-body :deep(pre.hljs) {
@@ -736,7 +736,7 @@ watch(
 	padding: 8px 10px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	font-size: 11px;
 	line-height: 1.35;
 	white-space: pre;

@@ -257,8 +257,8 @@ async function downloadHtml() {
 	justify-content: space-between;
 	align-items: center;
 	padding: 4px 8px;
-	background: #f8fafc;
-	border-bottom: 1px solid #e8edf2;
+	background: var(--da-surface-soft);
+	border-bottom: 1px solid var(--da-line-soft);
 	flex-wrap: wrap;
 	gap: 4px;
 }
@@ -267,7 +267,7 @@ async function downloadHtml() {
 	align-items: center;
 	font-size: 13.5px;
 	font-weight: 600;
-	color: #1e293b;
+	color: var(--da-ink);
 	gap: 0;
 }
 .report-actions {
@@ -283,7 +283,7 @@ async function downloadHtml() {
 
 /* ── Format toggle ───────────────────────────────────────────────────────────── */
 .format-toggle {
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	border-radius: 6px;
 	overflow: hidden;
 }
@@ -311,7 +311,7 @@ async function downloadHtml() {
 .markdown-body :deep(h3) {
 	font-weight: 700;
 	margin: 10px 0 4px;
-	color: #0f172a;
+	color: var(--da-ink);
 }
 .markdown-body :deep(h1) {
 	font-size: 16.5px;
@@ -325,7 +325,7 @@ async function downloadHtml() {
 .markdown-body :deep(p) {
 	margin-bottom: 8px;
 	line-height: 1.75;
-	color: #374151;
+	color: var(--da-ink);
 	font-size: 13.5px;
 }
 .markdown-body :deep(ul),
@@ -336,15 +336,15 @@ async function downloadHtml() {
 .markdown-body :deep(li) {
 	line-height: 1.7;
 	font-size: 14px;
-	color: #374151;
+	color: var(--da-ink);
 }
 .markdown-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
-	border: 1px solid #e1e4e8;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	padding: 2px 5px;
 	border-radius: 3px;
 	font-size: 12.5px;
-	color: #e83e8c;
+	color: #c026a0;
 }
 .markdown-body :deep(table) {
 	width: 100%;
@@ -361,13 +361,13 @@ async function downloadHtml() {
 }
 .markdown-body :deep(tr) {
 	display: table-row;
-	border-top: 1px solid #c6cbd1;
+	border-top: 1px solid var(--da-line);
 }
 .markdown-body :deep(th) {
 	display: table-cell;
-	background: #f1f5f9;
+	background: var(--da-surface-soft);
 	padding: 5px 8px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	font-weight: 600;
 	font-size: 13px;
 	text-align: left;
@@ -375,40 +375,40 @@ async function downloadHtml() {
 .markdown-body :deep(td) {
 	display: table-cell;
 	padding: 6px 10px;
-	border: 1px solid #e8edf2;
+	border: 1px solid var(--da-line-soft);
 	font-size: 13px;
 }
 .markdown-body :deep(tr:nth-child(even) td) {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 }
 .markdown-body :deep(blockquote) {
-	border-left: 3px solid #3b82f6;
+	border-left: 3px solid var(--da-accent);
 	padding: 8px 14px;
 	margin-left: 0;
-	background: #eff6ff;
+	background: var(--da-primary-soft);
 	border-radius: 0 6px 6px 0;
-	color: #374151;
+	color: var(--da-ink);
 }
 
 /* ── Code block with header ─────────────────────────────────────────────────── */
 .markdown-body :deep(.code-block-wrapper) {
 	margin: 10px 0;
-	border: 1px solid #e1e4e8;
+	border: 1px solid var(--da-line-soft);
 	border-radius: 6px;
 	overflow: auto;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 }
 .markdown-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	padding: 6px 10px;
-	border-bottom: 1px solid #e1e4e8;
+	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
 .markdown-body :deep(.code-language) {
-	color: #6a737d;
+	color: var(--da-muted);
 	font-weight: 600;
 	font-family: 'Monaco', 'Menlo', monospace;
 	font-size: 10px;
@@ -416,21 +416,21 @@ async function downloadHtml() {
 }
 .markdown-body :deep(.code-copy-button) {
 	background: transparent;
-	border: 1px solid #d1d5da;
+	border: 1px solid var(--da-line);
 	padding: 3px 10px;
 	border-radius: 4px;
 	font-size: 10px;
 	cursor: pointer;
 	transition: all 0.2s;
-	color: #24292e;
+	color: var(--da-ink);
 }
 .markdown-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
-	border-color: #c6cbd1;
+	background: var(--da-surface-soft);
+	border-color: var(--da-line);
 }
 .markdown-body :deep(.code-copy-button.copied) {
-	background: #28a745;
-	border-color: #28a745;
+	background: var(--da-success);
+	border-color: var(--da-success);
 	color: white;
 }
 .markdown-body :deep(pre.hljs) {
@@ -438,7 +438,7 @@ async function downloadHtml() {
 	padding: 8px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	font-size: 11.5px;
 	line-height: 1.4;
 	white-space: pre;
@@ -470,18 +470,18 @@ async function downloadHtml() {
 	margin: 10px 0;
 	height: 120px;
 	border-radius: 8px;
-	border: 1px dashed #cbd5e1;
-	background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
+	border: 1px dashed var(--da-line);
+	background: linear-gradient(90deg, var(--da-surface-soft) 25%, var(--da-surface-soft) 50%, var(--da-surface-soft) 75%);
 	background-size: 200% 100%;
 	animation: skeletonShimmer 1.6s ease-in-out infinite;
-	color: #94a3b8;
+	color: var(--da-muted);
 	font-size: 13px;
 }
 :deep(.md-echarts-skeleton-icon) {
 	width: 16px;
 	height: 16px;
-	border: 2px solid #cbd5e1;
-	border-top-color: #3b82f6;
+	border: 2px solid var(--da-line);
+	border-top-color: var(--da-accent);
 	border-radius: 50%;
 	animation: skeletonSpin 0.8s linear infinite;
 }
@@ -516,15 +516,15 @@ async function downloadHtml() {
 
 /* Arceage-inspired header accent */
 .markdown-report {
-	background: #fff;
+	background: var(--da-surface);
 }
 .report-header {
-	background: linear-gradient(180deg, #f8fbff 0%, #fff 100%);
+	background: linear-gradient(180deg, var(--da-primary-soft) 0%, var(--da-surface) 100%);
 }
 .report-hairline {
 	height: 1px;
 	width: 100%;
-	background: linear-gradient(90deg, #bfdbfe 0%, #e2e8f0 55%, transparent 100%);
+	background: linear-gradient(90deg, color-mix(in srgb, var(--da-primary) 35%, transparent) 0%, var(--da-line-soft) 55%, transparent 100%);
 	transform-origin: left center;
 	animation: da-scale-x 0.65s var(--da-ease-out, ease) both;
 }
@@ -546,11 +546,11 @@ async function downloadHtml() {
 .markdown-body :deep(h1),
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
-	color: var(--da-ink, #0f172a);
+	color: var(--da-ink, var(--da-ink));
 }
 .markdown-body :deep(p),
 .markdown-body :deep(li) {
-	color: #334155;
+	color: var(--da-ink);
 	letter-spacing: -0.01em;
 }
 
