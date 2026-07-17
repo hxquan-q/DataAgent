@@ -88,4 +88,7 @@ API：`GET /api/model-config/check-ready` 应体现 `chatModelReady=true`。
 - R162–R163 激活/初始化后进问答  
 - R164 默认 published + 阶段图  
 - R165–R166 状态条就绪胶囊（可点）  
+- R169–R170 发送禁用 + 阻塞原因  
+- R171–R176 maxTokens/并发日志/无模型错误  
+- R177 流错误中文化  
 
