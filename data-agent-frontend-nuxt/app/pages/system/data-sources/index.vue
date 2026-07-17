@@ -78,16 +78,40 @@
 					<span v-if="activeDatasourceId">当前激活 ID：{{ activeDatasourceId }}。</span>
 					<span v-else class="text-warning">尚未激活任何数据源。</span>
 				</span>
-				<v-btn
-					v-if="!activeDatasourceId && datasourceList.length"
-					size="small"
-					color="primary"
-					variant="flat"
-					class="text-none"
-					@click="hintBindFirst"
-				>
-					如何绑定
-				</v-btn>
+				<div class="d-flex ga-2 flex-wrap">
+					<v-btn
+						v-if="!activeDatasourceId && datasourceList.length"
+						size="small"
+						color="primary"
+						variant="flat"
+						class="text-none"
+						@click="hintBindFirst"
+					>
+						如何绑定
+					</v-btn>
+					<v-btn
+						v-if="activeDatasourceId"
+						size="small"
+						color="primary"
+						variant="flat"
+						class="text-none"
+						prepend-icon="mdi-upload"
+						:loading="initStatus"
+						@click="handleInitDatasource"
+					>
+						初始化表结构
+					</v-btn>
+					<v-btn
+						v-if="activeDatasourceId && agentId"
+						size="small"
+						variant="outlined"
+						class="text-none"
+						prepend-icon="mdi-message-text-outline"
+						@click="goChatForAgent"
+					>
+						进入数据问答
+					</v-btn>
+				</div>
 			</div>
 		</v-alert>
 
@@ -405,6 +429,11 @@ async function fetchActiveDatasourceForAgent() {
 	}
 }
 
+function goChatForAgent() {
+	if (!agentId.value) return;
+	navigateTo({ path: '/chat', query: { agentId: String(agentId.value) } });
+}
+
 function hintBindFirst() {
 	$tip('请在表格「操作」列点击「设为当前智能体数据源」，然后使用右上角「初始化当前智能体数据源」。', {
 		icon: 'mdi-information',
@@ -451,7 +480,10 @@ async function handleBindDatasource(item: Datasource) {
 		const res = await agentDatasourceService.addDatasourceToAgent(agentId.value, item.id);
 		if (res.success) {
 			activeDatasourceId.value = item.id;
-			$tip('已设为当前智能体数据源');
+			$tip('已设为当前智能体数据源。建议下一步：初始化表结构，然后进入数据问答。', {
+				icon: 'mdi-check-circle',
+				color: 'success',
+			});
 		} else {
 			$tip(res.message || '绑定失败', { color: 'error', icon: 'mdi-alert-circle' });
 		}
