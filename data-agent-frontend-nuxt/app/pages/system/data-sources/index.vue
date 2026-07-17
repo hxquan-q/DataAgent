@@ -75,7 +75,10 @@
 			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
 				<span class="text-body-2">
 					正在为智能体 <strong>#{{ agentId }}</strong> 绑定数据源：在操作列点击「设为当前」激活，再「初始化」同步表结构。
-					<span v-if="activeDatasourceId">当前激活 ID：{{ activeDatasourceId }}。</span>
+					<span v-if="activeDatasourceId">
+						当前激活 ID：{{ activeDatasourceId }}
+						<span v-if="activeSelectedTableCount != null">，已选表 {{ activeSelectedTableCount }} 张</span>。
+					</span>
 					<span v-else class="text-warning">尚未激活任何数据源。</span>
 				</span>
 				<div class="d-flex ga-2 flex-wrap">
