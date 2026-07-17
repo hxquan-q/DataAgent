@@ -14,20 +14,22 @@
  * limitations under the License.
  */
 
+@import './tokens.css';
+
 /* 页面淡入淡出且轻微位移 */
 .page-enter-active,
 .page-leave-active {
-	transition: all 0.3s ease;
+	transition: opacity var(--da-dur-base) var(--da-ease-out), transform var(--da-dur-base) var(--da-ease-out);
 }
 
 .page-enter-from {
 	opacity: 0;
-	transform: translateY(10px); /* 从下方一点点浮现 */
+	transform: translateY(10px);
 }
 
 .page-leave-to {
 	opacity: 0;
-	transform: translateY(-10px); /* 向上方一点点消失 */
+	transform: translateY(-10px);
 }
 
 /* ── 公共页面样式 ──────────────────────────────────────────────────────────── */
@@ -36,29 +38,29 @@
 	padding: 20px 24px 32px;
 	max-width: 1280px;
 	margin: 0 auto;
-	color: var(--da-ink, #0f172a);
+	color: var(--da-ink);
 	box-sizing: border-box;
 }
 
 .page-shell h1,
 .page-shell .text-h4 {
 	letter-spacing: -0.02em;
-	color: var(--da-ink, #0f172a);
+	color: var(--da-ink);
 }
 
 .page-shell .text-medium-emphasis,
 .page-shell .text-caption {
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted);
 }
 
 .search-field .v-field__outline {
-	--v-field-border-color: #e2e8f0;
+	--v-field-border-color: var(--da-line-soft);
 }
 
 .custom-label {
 	font-size: 0.75rem;
 	font-weight: 600;
-	color: #64748b;
+	color: var(--da-muted);
 	text-transform: uppercase;
 	letter-spacing: 0.05em;
 	margin-bottom: 6px;
@@ -68,7 +70,7 @@
 .breathing-dot {
 	width: 8px;
 	height: 8px;
-	background-color: #10b981;
+	background-color: var(--da-success);
 	border-radius: 50%;
 	margin-right: 6px;
 	display: inline-block;
@@ -78,11 +80,11 @@
 .breathing-dot-green {
 	width: 8px;
 	height: 8px;
-	background-color: #10b981;
+	background-color: var(--da-success);
 	border-radius: 50%;
 	margin-right: 8px;
 	display: inline-block;
-	box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+	box-shadow: 0 0 0 color-mix(in srgb, var(--da-success) 40%, transparent);
 	animation: breathe 2s infinite ease-in-out;
 }
 
@@ -90,17 +92,17 @@
 	0% {
 		transform: scale(0.9);
 		opacity: 0.7;
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--da-success) 50%, transparent);
 	}
 	50% {
 		transform: scale(1.1);
 		opacity: 1;
-		box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+		box-shadow: 0 0 0 6px transparent;
 	}
 	100% {
 		transform: scale(0.9);
 		opacity: 0.7;
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+		box-shadow: 0 0 0 0 transparent;
 	}
 }
 
@@ -111,32 +113,15 @@
 	margin: 0 2px;
 	background: rgba(var(--v-theme-primary), 0.12);
 	color: rgb(var(--v-theme-primary));
-	border-radius: 4px;
-	font-family: monospace;
+	border-radius: var(--da-radius-sm);
+	font-family: var(--da-font-mono);
 	font-size: 0.85em;
 	font-weight: 500;
 	vertical-align: baseline;
 	line-height: 1.4;
 }
 
-
-/* ── Chat polish (Arceage/WeKnora · CSS-only, no motion lib) ───────────────── */
-:root {
-	--da-ink: #0f172a;
-	--da-muted: #64748b;
-	--da-line: #d9d9d9;
-	--da-line-soft: #e8edf2;
-	--da-surface: #ffffff;
-	--da-surface-soft: #f8fafc;
-	--da-primary: #1e40af;
-	--da-primary-soft: #eff6ff;
-	--da-accent: #3b82f6;
-	--da-radius-lg: 16px;
-	--da-radius-md: 10px;
-	--da-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-	--da-spring: cubic-bezier(0.34, 1.2, 0.64, 1);
-	--da-dur: 0.45s;
-}
+/* ── Chat polish (CSS-only, no motion lib) ─────────────────────────────────── */
 
 @keyframes da-fade-up {
 	from {
@@ -192,10 +177,23 @@
 }
 
 .da-msg-enter {
-	animation: da-soft-in 0.38s var(--da-ease-out) both;
+	animation: da-soft-in var(--da-dur-slow) var(--da-ease-out) both;
+}
+
+/* Focus ring utility for custom controls */
+.da-focus-ring:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.page-enter-active,
+	.page-leave-active {
+		transition: none !important;
+	}
+
+	.breathing-dot,
+	.breathing-dot-green,
 	.da-reveal,
 	.da-reveal-delay-1,
 	.da-reveal-delay-2,

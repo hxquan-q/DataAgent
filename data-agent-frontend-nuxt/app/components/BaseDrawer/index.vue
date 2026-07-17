@@ -79,19 +79,19 @@ const cssVars = computed(() => ({
 	width: 100%;
 	height: 100vh;
 	overflow: hidden;
-	background-color: #f8fafc;
+	background-color: var(--da-surface-soft, #f8fafc);
 }
 
 .base-drawer__left {
 	width: var(--drawer-width);
 	height: 100%;
-	background-color: #1e293b;
-	color: #e2e8f0;
-	transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+	background-color: var(--da-sidebar-bg, #1e293b);
+	color: var(--da-sidebar-ink, #e2e8f0);
+	transition: width var(--da-dur-slow, 0.3s) cubic-bezier(0.4, 0, 0.2, 1);
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
-	border-right: 1px solid rgba(255, 255, 255, 0.05);
+	border-right: 1px solid var(--da-sidebar-line, rgba(255, 255, 255, 0.05));
 	flex-shrink: 0;
 	white-space: nowrap;
 }
@@ -110,8 +110,8 @@ const cssVars = computed(() => ({
 
 .base-drawer__header {
 	height: 52px;
-	border-bottom: 1px solid #e2e8f0;
-	background-color: #ffffff;
+	border-bottom: 1px solid var(--da-line-soft, #e2e8f0);
+	background-color: var(--da-surface, #ffffff);
 	display: flex;
 	align-items: center;
 	padding: 0 14px;

@@ -1,0 +1,112 @@
+/*
+ * Copyright 2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Design tokens — single source of truth for DataAgent UI.
+ * Change color here first, then mirror static hex in nuxt.config Vuetify theme.
+ * Do not introduce new business primary hex in components.
+ */
+
+:root {
+	/* ── Color: surfaces & text ─────────────────────────────────────────────── */
+	--da-ink: #0f172a;
+	--da-muted: #64748b;
+	--da-line: #d9d9d9;
+	--da-line-soft: #e8edf2;
+	--da-surface: #ffffff;
+	--da-surface-soft: #f8fafc;
+	--da-primary: #1e40af;
+	--da-primary-soft: #eff6ff;
+	--da-accent: #3b82f6;
+	--da-on-primary: #ffffff;
+	--da-danger: #dc2626;
+	--da-on-danger: #ffffff;
+	--da-success: #10b981;
+	--da-warning: #d97706;
+	--da-info: #3b82f6;
+
+	/* ── Sidebar (dark rail) ────────────────────────────────────────────────── */
+	--da-sidebar-bg: #1e293b;
+	--da-sidebar-ink: #e2e8f0;
+	--da-sidebar-muted: #94a3b8;
+	--da-sidebar-line: rgba(255, 255, 255, 0.05);
+	--da-sidebar-field: rgba(30, 41, 59, 0.8);
+	--da-sidebar-accent: #60a5fa;
+	--da-sidebar-chip-bg: rgba(59, 130, 246, 0.15);
+	--da-sidebar-chip-ink: #93c5fd;
+	--da-sidebar-chip-line: rgba(59, 130, 246, 0.2);
+
+	/* ── Focus ──────────────────────────────────────────────────────────────── */
+	--da-ring: #1e40af;
+	--da-ring-offset: #ffffff;
+
+	/* ── Density ────────────────────────────────────────────────────────────── */
+	--da-space-1: 4px;
+	--da-space-2: 8px;
+	--da-space-3: 12px;
+	--da-space-4: 16px;
+	--da-space-5: 24px;
+	--da-space-6: 32px;
+	--da-control-height-sm: 32px;
+	--da-control-height-md: 40px;
+	--da-table-row-density: 36px;
+
+	/* ── Radius & shadow ────────────────────────────────────────────────────── */
+	--da-radius-sm: 6px;
+	--da-radius-md: 10px;
+	--da-radius-lg: 16px;
+	--da-shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.06);
+	--da-shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+
+	/* ── Motion (prefer 150–300ms for UI interaction) ───────────────────────── */
+	--da-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+	--da-spring: cubic-bezier(0.34, 1.2, 0.64, 1);
+	--da-dur-fast: 150ms;
+	--da-dur-base: 220ms;
+	--da-dur-slow: 300ms;
+	/* alias kept for existing animation usages */
+	--da-dur: var(--da-dur-slow);
+
+	/* ── Z-index scale ──────────────────────────────────────────────────────── */
+	--da-z-dropdown: 1000;
+	--da-z-dialog: 2000;
+	--da-z-toast: 3000;
+	--da-z-fullscreen-report: 4000;
+
+	/* ── Overlay & disabled ─────────────────────────────────────────────────── */
+	--da-overlay: rgba(15, 23, 42, 0.45);
+	--da-disabled-opacity: 0.5;
+
+	/* ── Typography (stack only; no forced CDN fonts in W0a) ────────────────── */
+	--da-font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+	--da-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* Dark product theme reserved; not toggled in W0a */
+.dark {
+	--da-ink: #f8fafc;
+	--da-muted: #94a3b8;
+	--da-line: #334155;
+	--da-line-soft: #1e293b;
+	--da-surface: #0f172a;
+	--da-surface-soft: #1e293b;
+	--da-primary: #3b82f6;
+	--da-primary-soft: #1e3a8a;
+	--da-accent: #60a5fa;
+	--da-on-primary: #0f172a;
+	--da-ring-offset: #0f172a;
+	--da-overlay: rgba(0, 0, 0, 0.55);
+}
