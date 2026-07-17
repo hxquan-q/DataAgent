@@ -198,7 +198,9 @@ public class ModelConfigDataServiceImpl implements ModelConfigDataService {
 	public ModelConfigDTO getActiveConfigByType(ModelType modelType) {
 		ModelConfig entity = modelConfigMapper.selectActiveByType(modelType.getCode());
 		if (entity == null) {
-			log.warn("Activation model configuration of type [{}] not found, attempting to downgrade...", modelType);
+			// R192: 中文可操作日志
+			log.warn("未找到已激活的 {} 模型配置。请到「模型服务」添加并激活（CHAT 为问答硬依赖，EMBEDDING 影响召回）。",
+					modelType);
 			return null;
 		}
 		return toDTO(entity);

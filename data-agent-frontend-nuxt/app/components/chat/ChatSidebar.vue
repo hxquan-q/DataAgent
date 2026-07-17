@@ -124,6 +124,7 @@
 					color="primary"
 					prepend-icon="mdi-plus-circle-outline"
 					class="new-session-btn"
+					title="创建新的分析会话"
 					@click="handleCreateNewSession"
 				>
 					新建分析会话
