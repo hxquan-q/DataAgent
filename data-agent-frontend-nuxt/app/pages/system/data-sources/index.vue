@@ -20,7 +20,11 @@
 			<div>
 				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">数据源配置</h1>
 				<p class="text-body-2 text-medium-emphasis">
-					管理全局数据库连接资源，配置连接信息与逻辑外键。
+					{{
+						agentId
+							? `为智能体 #${agentId} 管理/绑定数据源：连接配置、激活与表选择。`
+							: '管理全局数据库连接资源，配置连接信息与逻辑外键。'
+					}}
 				</p>
 			</div>
 			<div class="d-flex ga-3">
@@ -56,6 +60,36 @@
 				</v-btn>
 			</div>
 		</header>
+
+
+		<!-- R153: agent-scoped binding context -->
+		<v-alert
+			v-if="agentId"
+			type="info"
+			variant="tonal"
+			border="start"
+			class="mb-4"
+			density="comfortable"
+			icon="mdi-robot-outline"
+		>
+			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
+				<span class="text-body-2">
+					正在为智能体 <strong>#{{ agentId }}</strong> 绑定数据源：在操作列点击「设为当前」激活，再「初始化」同步表结构。
+					<span v-if="activeDatasourceId">当前激活 ID：{{ activeDatasourceId }}。</span>
+					<span v-else class="text-warning">尚未激活任何数据源。</span>
+				</span>
+				<v-btn
+					v-if="!activeDatasourceId && datasourceList.length"
+					size="small"
+					color="primary"
+					variant="flat"
+					class="text-none"
+					@click="hintBindFirst"
+				>
+					如何绑定
+				</v-btn>
+			</div>
+		</v-alert>
 
 		<v-card variant="flat" border class="rounded-lg">
 			<v-data-table
@@ -369,6 +403,13 @@ async function fetchActiveDatasourceForAgent() {
 	} catch {
 		activeDatasourceId.value = null;
 	}
+}
+
+function hintBindFirst() {
+	$tip('请在表格「操作」列点击「设为当前智能体数据源」，然后使用右上角「初始化当前智能体数据源」。', {
+		icon: 'mdi-information',
+		color: 'info',
+	});
 }
 
 function openFormDialog(mode: 'create' | 'edit', item?: Datasource) {

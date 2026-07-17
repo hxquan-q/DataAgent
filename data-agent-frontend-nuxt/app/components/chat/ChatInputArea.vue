@@ -49,7 +49,7 @@
 						</template>
 						<div v-else class="chip-dropdown-empty">
 							<p class="chip-dropdown-empty__text">
-								当前智能体未绑定可用数据源，NL2SQL 无法查库。请到智能体配置中关联数据源并激活。
+								当前智能体未绑定可用数据源，NL2SQL 无法查库。请到「数据源配置」关联并激活。
 							</p>
 							<button type="button" class="chip-dropdown-empty__cta" @click="goAgentDatasource">
 								去绑定数据源
@@ -222,10 +222,11 @@ function goModelConfig() {
 function goAgentDatasource() {
 	showDsMenu.value = false;
 	const id = store.currentAgentId;
+	// R153: 绑定入口在全局数据源页（带 agentId query），非 agent 详情页
 	if (id) {
-		navigateTo(`/agent/${id}`);
+		navigateTo({ path: '/system/data-sources', query: { agentId: String(id) } });
 	} else {
-		navigateTo('/system/agents');
+		navigateTo('/system/data-sources');
 	}
 }
 
