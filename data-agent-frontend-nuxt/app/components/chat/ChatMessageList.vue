@@ -21,6 +21,7 @@
 			v-if="store.currentAgentName && !showWelcome"
 			class="chat-status-strip"
 			role="status"
+			:aria-busy="store.isStreaming ? 'true' : 'false'"
 		>
 			<span class="chat-status-strip__agent">{{ store.currentAgentName }}</span>
 			<span v-if="store.activeChatModel || store.activeModelConfig?.modelName" class="chat-status-strip__model">

@@ -189,6 +189,12 @@ public class ReportGeneratorNode implements NodeAction {
 		// 获取优化配置（优先按智能体加载）
 		List<UserPromptConfig> optimizationConfigs = promptConfigService.getOptimizationConfigs("report-generator",
 				agentId);
+		// R217: 可观测 — 报告 prompt 各段体量
+		log.info("报告生成上下文体量: planLen={}, analysisLen={}, summaryLen={}, optCount={}",
+				userRequirementsAndPlan != null ? userRequirementsAndPlan.length() : 0,
+				analysisStepsAndData != null ? analysisStepsAndData.length() : 0,
+				summaryAndRecommendations != null ? summaryAndRecommendations.length() : 0,
+				optimizationConfigs != null ? optimizationConfigs.size() : 0);
 
 		// 构建报告生成提示词
 		String reportPrompt = PromptHelper.buildReportGeneratorPromptWithOptimization(userRequirementsAndPlan,
