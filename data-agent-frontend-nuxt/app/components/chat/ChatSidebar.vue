@@ -23,7 +23,10 @@
 		<div class="chat-sidebar">
 			<!-- Header -->
 			<div class="sidebar-header">
-				<span class="sidebar-title">历史会话</span>
+				<div class="sidebar-header__text">
+					<span class="sidebar-title">历史会话</span>
+					<span v-if="store.currentAgentName" class="sidebar-agent">{{ store.currentAgentName }}</span>
+				</div>
 				<v-btn
 					icon
 					variant="text"
@@ -525,5 +528,21 @@ async function confirmDelete() {
 	.sidebar-wrapper {
 		transition: none;
 	}
+}
+
+.sidebar-header__text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+.sidebar-agent {
+	font-size: 11px;
+	font-weight: 600;
+	color: var(--da-primary, #1e40af);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 160px;
 }
 </style>
