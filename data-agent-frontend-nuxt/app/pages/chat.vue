@@ -67,6 +67,13 @@ import ChatInputArea from '~/components/chat/ChatInputArea.vue';
 const route = useRoute();
 const store = useChatStore();
 
+useHead({
+	title: computed(() =>
+		store.currentAgentName ? `${store.currentAgentName} · 数据问答` : '数据问答',
+	),
+});
+
+
 const currentAgentId = computed(() => {
 	const q = route.query.agentId;
 	return q ? Number(q) : undefined;

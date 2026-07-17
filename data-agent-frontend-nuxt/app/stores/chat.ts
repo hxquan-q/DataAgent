@@ -163,13 +163,37 @@ export const useChatStore = defineStore('chat', () => {
 		} else {
 			await createNewSession(agentId);
 		}
-		// Load global datasources (active)
+		// R203: 优先加载智能体已绑定数据源；无绑定时再回退全局 active 列表
 		try {
-			const list = await datasourceService.getAllDatasource('active');
-			allDatasources.value = list;
-			activeDatasource.value = list[0] || null;
+			const agentDs = await agentDatasourceService.getAgentDatasource(agentId);
+			const mapped = (agentDs || [])
+				.map((ad) => {
+					const ds = ad.datasource || {};
+					return {
+						...ds,
+						id: ad.datasourceId ?? ds.id,
+						isActive: Number(ad.isActive) === 1,
+						selectTables: ad.selectTables,
+					} as Datasource;
+				})
+				.filter((ds) => ds.id != null);
+			if (mapped.length) {
+				allDatasources.value = mapped;
+				activeDatasource.value =
+					mapped.find((d) => d.isActive) || mapped[0] || null;
+			} else {
+				const list = await datasourceService.getAllDatasource('active');
+				allDatasources.value = list;
+				activeDatasource.value = list[0] || null;
+			}
 		} catch {
-			/* ignore */
+			try {
+				const list = await datasourceService.getAllDatasource('active');
+				allDatasources.value = list;
+				activeDatasource.value = list[0] || null;
+			} catch {
+				/* ignore */
+			}
 		}
 		// Load chat models
 		try {
