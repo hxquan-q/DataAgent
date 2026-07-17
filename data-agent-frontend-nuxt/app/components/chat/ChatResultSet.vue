@@ -349,6 +349,8 @@ function downloadCsv() {
 	justify-content: flex-end;
 }
 .action-btn {
+	min-width: 28px;
+	height: 28px;
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
