@@ -54,6 +54,8 @@
 					class="text-none px-6"
 					elevation="0"
 					:loading="initStatus"
+					:disabled="activeSelectedTableCount === 0"
+					:title="activeSelectedTableCount === 0 ? '请先选择数据表' : '初始化当前智能体数据源'"
 					@click="handleInitDatasource"
 				>
 					{{ initStatus ? '初始化中...' : '初始化当前智能体数据源' }}
@@ -101,6 +103,8 @@
 						class="text-none"
 						prepend-icon="mdi-upload"
 						:loading="initStatus"
+						:disabled="activeSelectedTableCount === 0"
+						:title="activeSelectedTableCount === 0 ? '请先选择数据表' : '初始化表结构到向量库'"
 						@click="handleInitDatasource"
 					>
 						初始化表结构
