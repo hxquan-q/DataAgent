@@ -128,21 +128,21 @@
 						<v-icon size="11">mdi-table-eye</v-icon>
 						显示SQL结果
 					</label>
-					<label class="option-chip" :class="{ active: store.requestOptions.humanFeedback }">
+					<label class="option-chip" :class="{ active: store.requestOptions.nl2sqlOnly }">
 						<input
-							v-model="store.requestOptions.humanFeedback"
+							v-model="store.requestOptions.nl2sqlOnly"
 							type="checkbox"
 							:disabled="store.requestOptions.nl2sqlOnly || store.isStreaming"
 							class="hidden-checkbox"
 						/>
-						<v-icon size="11">mdi-account-check-outline</v-icon>
-						人工反馈
+						<v-icon size="11">mdi-database-search-outline</v-icon>
+						仅NL2SQL
 					</label>
 					<label class="option-chip" :class="{ active: store.requestOptions.humanFeedback }">
 						<input
 							v-model="store.requestOptions.humanFeedback"
 							type="checkbox"
-							:disabled="store.requestOptions.nl2sqlOnly || store.isStreaming"
+							:disabled="store.requestOptions.humanFeedback || store.isStreaming"
 							class="hidden-checkbox"
 						/>
 						<v-icon size="11">mdi-account-check-outline</v-icon>
