@@ -29,6 +29,13 @@
 
 详见 [LOCAL_RUN_CHECKLIST.md](./LOCAL_RUN_CHECKLIST.md)。
 
+## 可观测性
+
+- 启动日志 `DataAgent runtime flags: enableConcurrentSteps=...`（R173）  
+- 并发波次日志 `尝试并发 SQL 波次执行`（R171）  
+- Restart 后检查上述日志确认 local 配置生效  
+
+
 ## 仍需人工完成
 
 1. 配置并激活 **CHAT** 模型（API Key）— 当前库 `model_config` 可能为 0  
