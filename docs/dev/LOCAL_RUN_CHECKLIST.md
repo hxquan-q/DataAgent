@@ -86,4 +86,6 @@ API：`GET /api/model-config/check-ready` 应体现 `chatModelReady=true`。
 - R157–R160 无 agent 空态 / 切换 / Welcome 清单 / 侧栏链  
 - R161 新建智能体 → 绑定数据源  
 - R162–R163 激活/初始化后进问答  
+- R164 默认 published + 阶段图  
+- R165–R166 状态条就绪胶囊（可点）  
 
