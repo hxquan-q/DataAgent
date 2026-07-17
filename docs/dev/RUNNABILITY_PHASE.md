@@ -45,3 +45,12 @@
 ## 代码质量/速度杠杆（更早轮次）
 
 报告 prompt 瘦身、PromptHelper 有界、schema 列/样本裁剪、全局 optimization 合并等见各 `REPORT-R*.md` / V1–V5。
+
+## 更新（R164–R190）
+
+- 默认 published 智能体、状态条就绪胶囊可点  
+- 发送 canSend + 阻塞原因 + placeholder  
+- maxTokens 1536 默认/空值兜底、响应超时 180s  
+- 启动 flags 日志、并发波次日志  
+- 模型创建/激活/智能体列表就绪横幅  
+- 初始化不强跳；列表名一点进问答  
