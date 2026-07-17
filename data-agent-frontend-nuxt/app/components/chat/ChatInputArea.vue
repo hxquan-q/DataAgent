@@ -165,7 +165,25 @@
 				</v-btn>
 			</div>
 		</div>
-		<p v-if="sendBlockReason" class="send-block-hint" role="status">{{ sendBlockReason }}</p>
+		<p v-if="sendBlockReason" class="send-block-hint" role="status">
+			<span>{{ sendBlockReason }}</span>
+			<button
+				v-if="sendBlockReason.includes('模型')"
+				type="button"
+				class="send-block-hint__link"
+				@click="showModelMenu = true"
+			>
+				打开模型菜单
+			</button>
+			<button
+				v-else-if="sendBlockReason.includes('数据源')"
+				type="button"
+				class="send-block-hint__link"
+				@click="showDsMenu = true"
+			>
+				打开数据源菜单
+			</button>
+		</p>
 
 		<!-- Human Feedback Panel -->
 		<Transition name="slide-up">
