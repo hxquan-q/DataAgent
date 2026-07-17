@@ -45,6 +45,20 @@
 			}}
 		</p>
 
+		<!-- R159: readiness checklist -->
+		<ul v-if="!readyToChat" class="ready-list da-reveal da-reveal-delay-3" aria-label="开始前检查">
+			<li class="ready-item" :class="{ ok: hasModel }">
+				<span class="ready-dot" aria-hidden="true" />
+				<span class="ready-text">{{ hasModel ? 'CHAT 模型已就绪' : '需要激活 CHAT 模型' }}</span>
+				<button v-if="!hasModel" type="button" class="ready-link" @click="goModels">去配置</button>
+			</li>
+			<li class="ready-item" :class="{ ok: hasDatasource }">
+				<span class="ready-dot" aria-hidden="true" />
+				<span class="ready-text">{{ hasDatasource ? '数据源已绑定' : '需要绑定并激活数据源' }}</span>
+				<button v-if="!hasDatasource" type="button" class="ready-link" @click="goDatasource">去绑定</button>
+			</li>
+		</ul>
+
 		<div
 			v-if="chips.length"
 			class="preset-row da-reveal da-reveal-delay-3"
@@ -57,7 +71,8 @@
 				type="button"
 				class="preset-chip"
 				role="listitem"
-				:disabled="store.isStreaming || sending"
+				:disabled="store.isStreaming || sending || !readyToChat"
+				:title="readyToChat ? q : '请先完成模型与数据源配置'"
 				@click="ask(q)"
 			>
 				{{ q }}
@@ -73,6 +88,26 @@ import presetQuestionService from '~/services/presetQuestion/index';
 const store = useChatStore();
 const sending = ref(false);
 const presets = ref<string[]>([]);
+
+const hasModel = computed(
+	() => store.chatModels.length > 0 && !!store.activeModelConfig,
+);
+const hasDatasource = computed(
+	() => store.allDatasources.length > 0 && !!store.activeDatasource,
+);
+const readyToChat = computed(() => hasModel.value && hasDatasource.value);
+
+function goModels() {
+	navigateTo('/system/model-config');
+}
+function goDatasource() {
+	const id = store.currentAgentId;
+	if (id) {
+		navigateTo({ path: '/system/data-sources', query: { agentId: String(id) } });
+	} else {
+		navigateTo('/system/data-sources');
+	}
+}
 
 const FALLBACK = [
 	'最近有哪些关键指标异常？',
@@ -105,6 +140,7 @@ async function ask(question: string) {
 	if (!q || store.isStreaming || sending.value) return;
 	const agentId = store.currentAgentId;
 	if (!agentId) return;
+	if (!readyToChat.value) return;
 
 	sending.value = true;
 	try {
@@ -241,5 +277,62 @@ watch(
 	.preset-chip {
 		transition: none;
 	}
+}
+
+.ready-list {
+	list-style: none;
+	margin: 18px 0 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	max-width: 360px;
+	width: 100%;
+}
+.ready-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-radius: 10px;
+	border: 1px solid var(--da-line-soft, #e8edf2);
+	background: var(--da-surface, #fff);
+	font-size: 13px;
+	color: var(--da-ink, #0f172a);
+	text-align: left;
+}
+.ready-item.ok {
+	border-color: #bbf7d0;
+	background: #f0fdf4;
+	color: #166534;
+}
+.ready-dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #f59e0b;
+	flex-shrink: 0;
+}
+.ready-item.ok .ready-dot {
+	background: #22c55e;
+}
+.ready-text {
+	flex: 1;
+	min-width: 0;
+}
+.ready-link {
+	appearance: none;
+	border: none;
+	background: transparent;
+	color: var(--da-primary, #1e40af);
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0;
+	white-space: nowrap;
+}
+.ready-link:focus-visible {
+	outline: 2px solid var(--da-accent, #3b82f6);
+	outline-offset: 2px;
 }
 </style>

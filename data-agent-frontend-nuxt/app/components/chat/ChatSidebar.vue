@@ -107,8 +107,9 @@
 					</template>
 				</div>
 
-				<div v-if="store.sessions.length === 0" class="empty-sessions">
-					暂无历史会话
+				<div v-if="store.sessions.length === 0" class="empty-sessions empty-sessions--hint">
+					<p class="empty-sessions__title">暂无历史会话</p>
+					<p class="empty-sessions__desc">在下方输入问题开始，或点击「新会话」。</p>
 				</div>
 			</div>
 
@@ -427,6 +428,25 @@ async function confirmDelete() {
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────────── */
+.empty-sessions--hint {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	align-items: center;
+}
+.empty-sessions__title {
+	margin: 0;
+	font-size: 12.5px;
+	font-weight: 600;
+	color: var(--da-muted, #64748b);
+}
+.empty-sessions__desc {
+	margin: 0;
+	font-size: 11.5px;
+	line-height: 1.45;
+	color: #94a3b8;
+	max-width: 160px;
+}
 .empty-sessions {
 	text-align: center;
 	font-size: 12px;
