@@ -132,8 +132,11 @@ public class PlanExecutorNode implements NodeAction {
 		// #10 并发执行（flag 默认关）：当前步骤起一个 >1 步的独立 SQL 波次时，并发执行整波后跳过
 		if (properties != null && properties.isEnableConcurrentSteps() && concurrentSqlStepExecutor != null
 				&& databaseUtil != null && SQL_GENERATE_NODE.equals(toolToUse)) {
+			// R171: 显式日志便于确认 local concurrent 已生效
+			log.info("尝试并发 SQL 波次执行（enableConcurrentSteps=true），currentStep={}", currentStep);
 			Map<String, Object> concurrent = tryConcurrentWave(state, plan, currentStep, executionPlan);
 			if (concurrent != null) {
+				log.info("并发 SQL 波次已接管执行，跳过串行单步分发");
 				return concurrent;
 			}
 		}

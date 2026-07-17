@@ -69,9 +69,9 @@ public class ModelConfigDTO {
 	@Builder.Default
 	private Double temperature = 0.0;
 
-	/** 最大生成 token 数（默认 2000） */
+	/** 最大生成 token 数（默认 1536，兼顾速度） */
 	@Builder.Default
-	private Integer maxTokens = 2000;
+	private Integer maxTokens = 1536;
 
 	/** 是否启用该模型配置 */
 	@Builder.Default

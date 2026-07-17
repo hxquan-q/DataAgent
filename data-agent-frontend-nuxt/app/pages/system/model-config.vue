@@ -371,6 +371,7 @@
 							</v-col>
 							<v-col cols="6">
 								<span class="custom-label">最大 Token 数</span>
+								<p class="text-caption text-medium-emphasis mb-1">默认 1536，过大会拖慢回答</p>
 								<v-text-field
 									v-model.number="form.maxTokens"
 									type="number"
@@ -447,7 +448,7 @@ const form = reactive<ModelConfig>({
 	modelName: '',
 	modelType: 'CHAT',
 	temperature: 0,
-	maxTokens: 2000,
+	maxTokens: 1536,
 	completionsPath: '',
 	embeddingsPath: '',
 	isActive: false,
@@ -493,7 +494,7 @@ const resetForm = (type: ModelType) => {
 	form.modelName = '';
 	form.modelType = type;
 	form.temperature = 0;
-	form.maxTokens = 2000;
+	form.maxTokens = 1536;
 	form.completionsPath = '';
 	form.embeddingsPath = '';
 	form.isActive = false;
