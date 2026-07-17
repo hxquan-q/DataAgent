@@ -66,7 +66,7 @@ export const useChatStore = defineStore('chat', () => {
 	const requestOptions = ref<ChatRequestOptions>({
 		humanFeedback: false,
 		nl2sqlOnly: false,
-		showSqlResults: false,
+		showSqlResults: true,
 		pageSize: 50,
 	});
 

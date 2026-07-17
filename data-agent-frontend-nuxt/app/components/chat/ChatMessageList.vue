@@ -376,13 +376,14 @@ function extractReportContent(timelineJson: string): string | null {
 		const blocks = JSON.parse(
 			timelineJson,
 		) as import('~/services/graph/index').GraphNodeResponse[][];
+		// R215: 兼容 textType 大小写/别名，并扫描 block 内任意节点
 		for (const block of blocks) {
-			if (
-				block[0]?.nodeName === 'ReportGeneratorNode' &&
-				block[0]?.textType === 'MARK_DOWN' &&
-				block[0]?.text
-			) {
-				return block[0].text;
+			for (const node of block || []) {
+				if (node?.nodeName !== 'ReportGeneratorNode' || !node?.text) continue;
+				const tt = String(node.textType || '').toUpperCase();
+				if (tt === 'MARK_DOWN' || tt === 'MARKDOWN' || tt === 'MD' || tt === 'HTML' || !tt) {
+					return node.text;
+				}
 			}
 		}
 	} catch {
