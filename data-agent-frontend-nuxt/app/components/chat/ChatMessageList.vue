@@ -26,16 +26,24 @@
 			<span v-if="store.activeChatModel || store.activeModelConfig?.modelName" class="chat-status-strip__model">
 				{{ store.activeModelConfig?.modelName || store.activeChatModel }}
 			</span>
-			<span
+			<button
+				type="button"
 				class="chat-status-strip__ready"
 				:class="{ ok: stripHasModel }"
-				:title="stripHasModel ? 'CHAT 模型就绪' : '缺少 CHAT 模型'"
-			>模型</span>
-			<span
+				:title="stripHasModel ? 'CHAT 模型就绪' : '点击配置 CHAT 模型'"
+				@click="goModels"
+			>
+				模型
+			</button>
+			<button
+				type="button"
 				class="chat-status-strip__ready"
 				:class="{ ok: stripHasDs }"
-				:title="stripHasDs ? '数据源就绪' : '缺少数据源'"
-			>数据源</span>
+				:title="stripHasDs ? '数据源就绪' : '点击绑定数据源'"
+				@click="goDatasource"
+			>
+				数据源
+			</button>
 			<span v-if="store.isStreaming" class="chat-status-strip__live">分析中</span>
 			<button
 				type="button"
@@ -250,6 +258,17 @@ const TIMELINE_ABSORBED_TYPES = new Set([
 
 const store = useChatStore();
 
+function goModels() {
+	navigateTo('/system/model-config');
+}
+function goDatasource() {
+	const id = store.currentAgentId;
+	if (id) {
+		navigateTo({ path: '/system/data-sources', query: { agentId: String(id) } });
+	} else {
+		navigateTo('/system/data-sources');
+	}
+}
 function goSwitchAgent() {
 	navigateTo('/system/agents');
 }
@@ -763,6 +782,9 @@ watch(
 }
 
 .chat-status-strip__ready {
+	appearance: none;
+	cursor: pointer;
+	font: inherit;
 	padding: 2px 8px;
 	border-radius: 999px;
 	font-size: 11px;
