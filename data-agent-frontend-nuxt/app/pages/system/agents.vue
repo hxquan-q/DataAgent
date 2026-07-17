@@ -200,6 +200,16 @@
 							<v-tooltip activator="parent" location="top">配置数据源</v-tooltip>
 						</v-btn>
 						<v-btn
+							icon="mdi-lightning-bolt-outline"
+							variant="text"
+							size="small"
+							color="amber-darken-2"
+							@click="goModelConfig"
+						>
+							<v-icon size="20" />
+							<v-tooltip activator="parent" location="top">模型配置</v-tooltip>
+						</v-btn>
+						<v-btn
 							icon="mdi-pencil-outline"
 							variant="text"
 							size="small"
@@ -437,7 +447,7 @@ const headers = [
 	{ title: '标签', key: 'tags', width: '220px', sortable: false },
 	{ title: '状态', key: 'status', width: '100px', sortable: false },
 	{ title: '创建时间', key: 'createTime', width: '170px', sortable: false },
-	{ title: '操作', key: 'actions', width: '180px', sortable: false, align: 'center' as const },
+	{ title: '操作', key: 'actions', width: '220px', sortable: false, align: 'center' as const },
 ];
 
 const statusOptions = [
@@ -477,6 +487,10 @@ function goChat(agent: Agent) {
 function goDatasource(agent: Agent) {
 	if (!agent?.id) return;
 	navigateTo({ path: '/system/data-sources', query: { agentId: String(agent.id) } });
+}
+
+function goModelConfig() {
+	navigateTo('/system/model-config');
 }
 
 function handleEdit(agent: Agent) {
