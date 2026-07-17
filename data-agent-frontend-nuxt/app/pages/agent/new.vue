@@ -213,7 +213,7 @@ const agentForm = reactive({
 	category: '',
 	tags: '',
 	prompt: '',
-	status: 'draft',
+	status: 'published',
 	workflowMode: 'nl2sql',
 	humanReviewEnabled: false,
 });

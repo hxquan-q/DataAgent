@@ -496,6 +496,13 @@ function goToCreateAgent() { router.push('/agent/new'); }
 
 function goChat(agent: Agent) {
 	if (!agent?.id) return;
+	// R164: 草稿也可问答，但提示建议发布
+	if (agent.status === 'draft') {
+		$tip('该智能体为草稿状态，仍可问答；发布后更易在列表中识别为可用。', {
+			icon: 'mdi-information',
+			color: 'info',
+		});
+	}
 	navigateTo({ path: '/chat', query: { agentId: String(agent.id) } });
 }
 
