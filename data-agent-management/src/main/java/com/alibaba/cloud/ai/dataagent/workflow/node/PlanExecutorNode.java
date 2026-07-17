@@ -151,11 +151,13 @@ public class PlanExecutorNode implements NodeAction {
 	 */
 	private Map<String, Object> determineNextNode(String toolToUse) {
 		if (SUPPORTED_NODES.contains(toolToUse)) {
-			log.info("确定下一个执行节点: {}", toolToUse);
+			// R221: 可观测 — step 路由日志
+			log.info("计划步骤路由: currentStep={}, nextNode={}, concurrent={}", currentStep, toolToUse,
+					properties != null && properties.isEnableConcurrentSteps());
 			return Map.of(PLAN_NEXT_NODE, toolToUse, PLAN_VALIDATION_STATUS, true);
 		}
 		else if (HUMAN_FEEDBACK_NODE.equals(toolToUse)) {
-			log.info("确定下一个执行节点: {}", toolToUse);
+			log.info("计划步骤路由(HumanFeedback): currentStep={}, nextNode={}", currentStep, toolToUse);
 			return Map.of(PLAN_NEXT_NODE, toolToUse, PLAN_VALIDATION_STATUS, true);
 		}
 		else {
