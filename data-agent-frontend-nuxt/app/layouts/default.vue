@@ -797,6 +797,8 @@ watch(
 .navigation-item.v-list-item--active {
 	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.14)) !important;
 	color: var(--da-sidebar-accent, #2f84d6) !important;
+	box-shadow: inset 3px 0 0 var(--da-sidebar-accent, #2f84d6);
+	font-weight: 600;
 }
 
 .navigation-sub-item {
@@ -829,12 +831,19 @@ watch(
 	color: var(--da-sidebar-ink, #1a2332);
 }
 
- .new-agent-item {
+.new-agent-item {
 	min-height: 40px !important;
 	background: var(--da-primary-soft, #e8f3fc) !important;
 	color: var(--da-primary, #2f84d6) !important;
 	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
-	box-shadow: none !important;
+	box-shadow: var(--da-shadow-sm) !important;
+	border-radius: var(--da-radius-md) !important;
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		box-shadow var(--da-dur-fast) var(--da-ease-out);
+}
+.new-agent-item:hover {
+	background: color-mix(in srgb, var(--da-primary-soft) 70%, white) !important;
+	box-shadow: var(--da-shadow-md) !important;
 }
 
 :deep(.v-list-group__items .v-list-item) {

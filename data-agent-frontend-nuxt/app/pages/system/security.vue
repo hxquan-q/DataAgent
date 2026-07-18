@@ -34,7 +34,7 @@
 							{{ enabled ? 'mdi-shield-check' : 'mdi-shield-alert' }}
 						</v-icon>
 						<div>
-							<div class="text-h6">{{ enabled ? '凭据已加密' : '凭据未加密（明文存储）' }}</div>
+							<div class="text-h6 font-weight-medium security-title">{{ enabled ? '凭据已加密' : '凭据未加密（明文存储）' }}</div>
 							<div class="text-caption text-medium-emphasis">
 								主密钥：{{ status?.keyConfigured === 'configured' ? '已配置' : '未配置' }}
 							</div>
@@ -77,8 +77,8 @@
 			<div class="text-body-2 mb-2">
 				凭据加密为 opt-in，需注入 32 字节 AES 主密钥后重启生效。已存的明文行无需迁移（启用后新写入即加密，旧明文行原样读出）。
 			</div>
-			<v-code tag="pre" class="text-caption">export SYSTEM_AES_KEY=&lt;32-byte-key&gt;
-# 或 application.yml: spring.ai.alibaba.data-agent.crypto.aes-key: &lt;32-byte-key&gt;</v-code>
+			<pre class="security-code">export SYSTEM_AES_KEY=&lt;32-byte-key&gt;
+# 或 application.yml: spring.ai.alibaba.data-agent.crypto.aes-key: &lt;32-byte-key&gt;</pre>
 		</v-card>
 	</div>
 </template>
@@ -114,3 +114,27 @@ async function load() {
 
 onMounted(load);
 </script>
+
+<style scoped>
+.security-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.01em;
+}
+.security-code {
+	margin: 0;
+	padding: 12px 14px;
+	border-radius: var(--da-radius-md);
+	border: 1px solid color-mix(in srgb, var(--da-warning) 25%, var(--da-line-soft));
+	background: color-mix(in srgb, var(--da-warning) 8%, var(--da-surface));
+	font-family: var(--da-font-mono);
+	font-size: 12px;
+	line-height: 1.55;
+	color: var(--da-ink);
+	overflow-x: auto;
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+.page-shell :deep(.v-card) {
+	box-shadow: var(--da-shadow-sm) !important;
+}
+</style>
