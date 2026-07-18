@@ -455,11 +455,11 @@ async function confirmDelete() {
 	flex: 1;
 	font-size: 13px;
 	border: 1px solid var(--da-accent);
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 	padding: 1px 5px;
 	outline: none;
 	min-width: 0;
-	background: white;
+	background: var(--da-surface);
 }
 
 /* ── Empty state ─────────────────────────────────────────────────────────────── */
@@ -501,7 +501,45 @@ async function confirmDelete() {
 	letter-spacing: 0 !important;
 	font-size: 13px !important;
 	border-style: dashed !important;
-	border-radius: 10px !important;
+	border-radius: var(--da-radius-md) !important;
+	min-height: 40px !important;
+}
+
+.sidebar-config-links {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	margin-top: 8px;
+	flex-wrap: wrap;
+}
+
+.sidebar-config-link {
+	appearance: none;
+	border: none;
+	background: transparent;
+	padding: 2px 4px;
+	font: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	color: var(--da-primary);
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+.sidebar-config-link:hover {
+	background: var(--da-primary-soft);
+}
+
+.sidebar-config-link:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 1px;
+}
+
+.sidebar-config-sep {
+	color: var(--da-muted);
+	font-size: 11px;
+	user-select: none;
 }
 
 /* ── Collapsed expand FAB ────────────────────────────────────────────────────── */
@@ -510,7 +548,7 @@ async function confirmDelete() {
 	top: 8px;
 	left: 6px;
 	z-index: 10;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+	box-shadow: var(--da-shadow-md) !important;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────────────── */
@@ -522,7 +560,7 @@ async function confirmDelete() {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
 	background: var(--da-line);
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 	background: var(--da-muted);
