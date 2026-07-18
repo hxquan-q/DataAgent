@@ -97,7 +97,7 @@
 					v-if="activeTab === 'EMBEDDING'"
 					icon="mdi-information-outline"
 					variant="tonal"
-					color="blue-grey"
+					color="grey"
 					class="mb-6 rounded-lg text-body-2"
 					border="start"
 				>

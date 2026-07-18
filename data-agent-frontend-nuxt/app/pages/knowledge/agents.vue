@@ -16,16 +16,11 @@
 
 <template>
 	<section class="page-shell">
-		<header class="d-flex align-center justify-space-between mb-8">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1" style="color: var(--da-primary)">
-					智能体知识库
-				</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					维护智能体专属知识资源，支持文档上传、问答配置与向量召回。
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+		<KnowledgePageHeader
+			title="智能体知识库"
+			subtitle="维护智能体专属知识资源，支持文档上传、问答配置与向量召回。"
+		>
+			<template #actions>
 				<v-btn
 					class="text-none"
 					style="border-color: var(--da-line-soft)"
@@ -37,10 +32,12 @@
 					刷新
 				</v-btn>
 				<v-btn
-					:color="filterVisible ? 'primary' : 'blue-grey-lighten-1'"
+					:color="filterVisible ? 'primary' : undefined"
+					:variant="filterVisible ? 'flat' : 'outlined'"
 					prepend-icon="mdi-filter-variant"
 					class="text-none px-6"
 					elevation="0"
+					style="border-color: var(--da-line-soft)"
 					@click="toggleFilter"
 				>
 					筛选
@@ -54,8 +51,8 @@
 				>
 					添加知识
 				</v-btn>
-			</div>
-		</header>
+			</template>
+		</KnowledgePageHeader>
 
 		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
 			<div class="d-flex flex-wrap ga-3 align-center">
@@ -223,7 +220,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.isRecall ? 'grey-darken-1' : 'primary'"
+							:color="item.isRecall ? 'grey' : 'primary'"
 							:icon="item.isRecall ? 'mdi-bookmark-off' : 'mdi-bookmark-plus'"
 							@click="toggleStatus(item)"
 						>

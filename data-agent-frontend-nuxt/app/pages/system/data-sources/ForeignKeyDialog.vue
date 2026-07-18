@@ -100,7 +100,7 @@
 					</v-table>
 				</div>
 
-				<div class="bg-blue-grey-lighten-5 pa-5 rounded-lg border">
+				<div class="bg-primary-soft pa-5 rounded-lg border">
 					<v-row dense>
 						<v-col cols="12" md="5">
 							<v-select
