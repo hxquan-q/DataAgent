@@ -253,14 +253,13 @@ function downloadCsv() {
 	display: flex;
 	align-items: center;
 	gap: 6px;
-	padding: 5px 6px;
-	font-size: 11px;
-	font-weight: 600;
-	color: var(--da-primary);
-	background: var(--da-primary-soft);
-	border: 1px solid color-mix(in srgb, var(--da-primary) 35%, transparent);
-	border-bottom: none;
-	border-radius: var(--da-radius-sm) var(--da-radius-sm) 0 0;
+	padding: 4px 2px 6px;
+	font-size: 11.5px;
+	font-weight: 500;
+	color: var(--da-muted);
+	background: transparent;
+	border: none;
+	border-radius: 0;
 }
 .result-pending-dot {
 	width: 6px;
@@ -297,28 +296,28 @@ function downloadCsv() {
 	justify-content: center;
 	text-align: center;
 	color: var(--da-muted);
-	padding: 12px 10px;
-	font-size: 12.5px;
-	background: var(--da-surface-soft);
-	border: 1px dashed var(--da-line-soft);
-	border-radius: var(--da-radius-sm);
-	gap: 4px;
+	padding: 20px 12px;
+	font-size: 13px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	gap: 6px;
 }
 .result-empty--soft {
-	border-radius: 0 0 var(--da-radius-sm) var(--da-radius-sm);
-	border-top: none;
+	border-radius: 12px;
+	border: 0.5px dashed var(--da-line-soft);
+	background: transparent;
 }
 .result-header {
-	min-height: 32px;
+	min-height: 28px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	gap: 6px;
-	padding: 4px 6px;
-	background: linear-gradient(180deg, color-mix(in srgb, var(--da-primary-soft) 40%, var(--da-surface-soft)) 0%, var(--da-surface-soft) 100%);
-	border: 1px solid var(--da-line-soft);
-	border-bottom: none;
-	border-radius: var(--da-radius-md) var(--da-radius-md) 0 0;
+	gap: 8px;
+	padding: 2px 2px 8px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
 }
 .result-set-wrap.is-pending-report .result-header {
 	border-radius: 0;
@@ -326,9 +325,10 @@ function downloadCsv() {
 .result-count {
 	font-size: 12px;
 	color: var(--da-muted);
+	font-weight: 400;
 }
 .result-count strong {
-	color: var(--da-primary);
+	color: var(--da-ink);
 	font-weight: 600;
 }
 .result-meta {
@@ -354,23 +354,22 @@ function downloadCsv() {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	padding: 0 10px;
-	background: var(--da-surface);
-	border: 1px solid var(--da-line-soft);
-	border-radius: 999px;
-	font-size: 11.5px;
-	font-weight: 600;
-	color: var(--da-ink);
+	padding: 0 8px;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--da-muted);
 	cursor: pointer;
 	transition:
 		background var(--da-dur-fast) var(--da-ease-out),
-		border-color var(--da-dur-fast) var(--da-ease-out),
 		color var(--da-dur-fast) var(--da-ease-out);
 }
 .action-btn:hover {
-	background: var(--da-primary-soft);
-	border-color: color-mix(in srgb, var(--da-primary) 45%, transparent);
-	color: var(--da-primary);
+	background: color-mix(in srgb, var(--da-muted) 10%, transparent);
+	border-color: transparent;
+	color: var(--da-ink);
 }
 .action-btn:focus-visible {
 	outline: 2px solid var(--da-primary);
@@ -394,19 +393,18 @@ function downloadCsv() {
 	justify-content: center;
 	width: 28px;
 	height: 28px;
-	background: var(--da-surface);
-	border: 1px solid var(--da-line-soft);
-	border-radius: 999px;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
 	cursor: pointer;
-	color: var(--da-ink);
+	color: var(--da-muted);
 	transition: background var(--da-dur-fast) var(--da-ease-out),
-		border-color var(--da-dur-fast) var(--da-ease-out),
 		color var(--da-dur-fast) var(--da-ease-out);
 }
 .page-btn:hover:not(:disabled) {
-	background: var(--da-primary-soft);
-	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
-	color: var(--da-primary);
+	background: color-mix(in srgb, var(--da-muted) 10%, transparent);
+	border-color: transparent;
+	color: var(--da-ink);
 }
 .page-btn:disabled {
 	opacity: 0.4;
@@ -419,9 +417,10 @@ function downloadCsv() {
 .table-container {
 	overflow: auto;
 	max-height: 360px;
-	border: 1px solid var(--da-line-soft);
-	border-radius: 0 0 var(--da-radius-md) var(--da-radius-md);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent);
+	border-radius: 12px;
 	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .result-table {
 	width: 100%;
@@ -433,25 +432,22 @@ function downloadCsv() {
 	position: sticky;
 	top: 0;
 	z-index: 1;
-	background: var(--da-surface-soft);
-	padding: 4px 6px;
-	border-bottom: 2px solid var(--da-line-soft);
-	font-weight: 600;
-	color: var(--da-ink);
-	font-size: 12px;
+	background: color-mix(in srgb, var(--da-surface) 92%, var(--da-surface-soft));
+	padding: 8px 10px;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent);
+	font-weight: 500;
+	font-size: 11.5px;
+	color: var(--da-muted);
 	text-align: left;
 	white-space: nowrap;
+	backdrop-filter: blur(6px);
 }
 .result-table td {
-	padding: 4px 6px;
-	border-bottom: 1px solid var(--da-surface-soft);
+	padding: 8px 10px;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line-soft) 90%, transparent);
+	font-size: 13px;
 	color: var(--da-ink);
-	font-size: 12px;
-	max-width: 320px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-	vertical-align: top;
+	line-height: 1.45;
 }
 .result-table tr:last-child td {
 	border-bottom: none;
