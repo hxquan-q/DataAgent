@@ -305,7 +305,7 @@
 								/>
 							</v-list-group>
 
-							<div class="mt-6 pt-4 border-t border-white/5">
+							<div class="mt-6 pt-4 sidebar-footer-sep">
 								<v-list-item
 									color="primary"
 									density="compact"
@@ -324,7 +324,7 @@
 							</div>
 						</v-list>
 
-						<div class="pa-2 border-t border-white/5">
+						<div class="pa-2 sidebar-footer-sep">
 							<v-list-item
 								class="rounded-lg navigation-item logout-item"
 								color="red-lighten-2"
@@ -354,7 +354,7 @@
 						</div>
 
 						<v-dialog v-model="pwdDialog" max-width="420">
-							<v-card class="pa-4">
+							<v-card rounded="lg" class="pa-4">
 								<div class="text-subtitle-1 font-weight-bold mb-3">修改密码</div>
 								<v-alert
 									v-if="pwdError"
@@ -804,7 +804,16 @@ watch(
 	background: color-mix(in srgb, var(--da-muted, #64748b) 55%, transparent);
 }
 
-.new-agent-item {
+.sidebar-footer-sep {
+	border-top: 1px solid var(--da-sidebar-line, #e4edf5);
+}
+
+.logout-item :deep(.v-list-item-title) {
+	color: var(--da-sidebar-ink, #1a2332);
+}
+
+ .new-agent-item {
+	min-height: 40px !important;
 	background: var(--da-primary-soft, #e8f3fc) !important;
 	color: var(--da-primary, #2f84d6) !important;
 	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
