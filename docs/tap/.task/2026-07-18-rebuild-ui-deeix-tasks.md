@@ -7,6 +7,6 @@
 - [x] S4 管理页 page-shell 收敛
 - [x] S5 a11y + reduced-motion + 窄屏
 - [x] 每阶段 `pnpm build` + commit + push（S0–S5）
-- [ ] 阶段满意后合并到主工作分支
+- [ ] S6 PR：`rebuild-ui` → `main`（用户仓库）
 
 **冻结**：chat store SSE、graph EventSource、后端。

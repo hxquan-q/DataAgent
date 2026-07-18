@@ -2,7 +2,8 @@
 
 > 分支：`rebuild-ui`  
 > 日期：2026-07-18  
-> 状态：执行中  
+> 状态：S0–S5 完成 · 已 push `origin/rebuild-ui` · 待合主分支  
+
 > 约束：**不影响当前功能实现**（SSE / Pinia / graph / 后端冻结）
 
 ## 1. 目标

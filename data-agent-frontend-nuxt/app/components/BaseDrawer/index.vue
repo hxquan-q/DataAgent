@@ -79,7 +79,7 @@ const cssVars = computed(() => ({
 	width: 100%;
 	height: 100vh;
 	overflow: hidden;
-	background-color: var(--da-surface-soft, #f8fafc);
+	background-color: var(--da-surface-soft, #f4f8fb);
 }
 
 .base-drawer__left {
