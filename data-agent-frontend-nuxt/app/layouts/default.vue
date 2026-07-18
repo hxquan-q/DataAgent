@@ -392,20 +392,21 @@
 				</template>
 
 				<template #header="{ toggle, isOpen }">
-					<v-btn icon variant="text" size="small" class="mr-2" @click="toggle">
+					<v-btn icon variant="text" size="small" class="mr-2 header-menu-btn" @click="toggle">
 						<v-icon :icon="isOpen ? 'mdi-menu-open' : 'mdi-menu'" />
 					</v-btn>
-					<div class="text-subtitle-1 font-weight-medium text-grey-darken-3">
+					<div class="text-subtitle-1 font-weight-medium app-header-title">
 						{{ currentRouteTitle }}
 					</div>
 					<v-spacer />
 					<v-chip
 						size="small"
-						variant="outlined"
+						variant="tonal"
 						color="primary"
-						class="font-weight-bold"
-						>Alibaba Edition</v-chip
+						class="font-weight-bold app-header-chip"
 					>
+						Data Workspace
+					</v-chip>
 				</template>
 
 				<slot />
@@ -669,6 +670,19 @@ watch(
 	font-size: 10px;
 	letter-spacing: 1px;
 	color: var(--da-sidebar-muted, #64748b);
+}
+
+.app-header-title {
+	color: var(--da-ink, #1a2332);
+	letter-spacing: -0.01em;
+}
+
+.header-menu-btn {
+	color: var(--da-muted, #64748b) !important;
+}
+
+.app-header-chip {
+	border-radius: 999px !important;
 }
 
 .brand-title {

@@ -16,29 +16,55 @@
 
 <template>
 	<header class="d-flex align-center justify-space-between mb-5 knowledge-header">
-		<div>
+		<div class="knowledge-header__text">
 			<h1 class="text-h4 font-weight-bold mb-1 knowledge-header__title">{{ title }}</h1>
-			<p class="text-body-2 text-medium-emphasis">{{ subtitle }}</p>
+			<p v-if="resolvedSubtitle" class="text-body-2 knowledge-header__subtitle">
+				{{ resolvedSubtitle }}
+			</p>
 		</div>
-		<div class="d-flex ga-3">
+		<div class="d-flex ga-3 knowledge-header__actions">
 			<slot name="actions" />
 		</div>
 	</header>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
 	title: string;
-	subtitle: string;
+	/** Preferred prop for page description */
+	subtitle?: string;
+	/** Alias used by some system pages (security / eval) */
+	description?: string;
 }>();
+
+const resolvedSubtitle = computed(() => props.subtitle || props.description || '');
 </script>
 
 <style scoped>
+.knowledge-header {
+	gap: 12px;
+	flex-wrap: wrap;
+}
+
+.knowledge-header__text {
+	min-width: 0;
+	flex: 1;
+}
+
 .knowledge-header__title {
 	color: var(--da-primary, #2f84d6);
 	letter-spacing: -0.02em;
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
 }
-.knowledge-header p {
+
+.knowledge-header__subtitle {
 	color: var(--da-muted, #64748b);
+	line-height: 1.55;
+	margin: 0;
+}
+
+.knowledge-header__actions {
+	flex-wrap: wrap;
 }
 </style>
