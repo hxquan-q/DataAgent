@@ -83,7 +83,7 @@
 					mandatory
 					rounded="pill"
 					color="primary"
-					class="filter-toggle"
+					class="filter-toggle segmented-toggle"
 					density="comfortable"
 					variant="flat"
 				>

@@ -41,6 +41,7 @@
 				<v-btn
 					size="x-small"
 					variant="outlined"
+					class="text-none report-action-btn"
 					prepend-icon="mdi-download"
 					title="下载 MD"
 					@click="downloadMd"
@@ -51,6 +52,7 @@
 					size="x-small"
 					variant="outlined"
 					color="success"
+					class="text-none report-action-btn"
 					prepend-icon="mdi-download"
 					title="下载 HTML"
 					@click="downloadHtml"
@@ -59,8 +61,9 @@
 				</v-btn>
 				<v-btn
 					size="x-small"
-					variant="outlined"
+					variant="tonal"
 					color="primary"
+					class="report-action-btn"
 					icon="mdi-fullscreen"
 					title="全屏查看"
 					@click="store.openReportFullscreen(content)"
@@ -268,12 +271,23 @@ async function downloadHtml() {
 	font-size: 13.5px;
 	font-weight: 600;
 	color: var(--da-ink);
-	gap: 0;
+	gap: 4px;
+	flex-wrap: wrap;
+	min-width: 0;
+}
+.report-title > span {
+	letter-spacing: -0.01em;
 }
 .report-actions {
 	display: flex;
 	align-items: center;
 	gap: 6px;
+	flex-wrap: wrap;
+}
+.report-action-btn {
+	border-radius: 999px !important;
+	letter-spacing: 0 !important;
+	min-height: 28px !important;
 }
 
 .report-actions :deep(.v-btn) {

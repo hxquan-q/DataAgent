@@ -30,7 +30,8 @@
 </template>
 
 <style scoped>
- .dashboard-placeholder {
+.dashboard-placeholder {
+
   max-width: 760px;
 }
 .dashboard-card {
@@ -73,9 +74,17 @@
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
+  box-shadow: 0 8px 18px color-mix(in srgb, var(--da-primary) 24%, transparent);
+  transition: background var(--da-dur-fast) var(--da-ease-out);
+}
+.dashboard-link:hover {
+  background: color-mix(in srgb, var(--da-primary) 88%, #000);
 }
 .dashboard-link:focus-visible {
   outline: 2px solid var(--da-ring);
   outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-link { transition: none; }
 }
 </style>
