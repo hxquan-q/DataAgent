@@ -573,7 +573,7 @@ onMounted(async () => {
 	border-radius: var(--da-radius-md);
 	padding: 12px 16px;
 	overflow-x: auto;
-	font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+	font-family: var(--da-font-mono);
 	font-size: 13px;
 	line-height: 1.6;
 	white-space: pre;

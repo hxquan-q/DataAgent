@@ -789,13 +789,17 @@ watch(
 	align-items: center;
 	gap: 6px;
 	flex-wrap: wrap;
-	padding: 4px 20px 0;
-	max-width: 960px;
-	width: 100%;
-	margin: 0 auto;
+	padding: 8px 12px;
+	max-width: var(--da-chat-max, 960px);
+	width: calc(100% - 40px);
+	margin: 10px auto 0;
 	box-sizing: border-box;
 	font-size: 11px;
 	color: var(--da-muted);
+	background: color-mix(in srgb, var(--da-surface) 88%, var(--da-primary-soft));
+	border: 1px solid var(--da-line-soft);
+	border-radius: 999px;
+	box-shadow: var(--da-shadow-sm);
 }
 .chat-status-strip__agent {
 	font-weight: 600;
@@ -846,6 +850,10 @@ watch(
 	font-size: 11px;
 	font-weight: 600;
 	cursor: pointer;
+	transition: background var(--da-dur-fast) var(--da-ease-out);
+}
+.chat-status-strip__switch:hover:not(:disabled) {
+	background: var(--da-primary-soft);
 }
 .chat-status-strip__switch:disabled {
 	opacity: var(--da-disabled-opacity);

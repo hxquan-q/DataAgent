@@ -302,10 +302,11 @@ watch(
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 8px 12px;
+	padding: 10px 12px;
 	border-radius: var(--da-radius-md);
 	border: 1px solid var(--da-line-soft);
-	background: var(--da-surface, #fff);
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 	font-size: 13px;
 	color: var(--da-ink);
 	text-align: left;
