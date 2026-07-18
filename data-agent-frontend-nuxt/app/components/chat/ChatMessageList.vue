@@ -534,19 +534,19 @@ watch(
 
 /* Timeline card: process secondary (DEEIX hierarchy) */
 .timeline-card {
-	padding: 8px 10px;
+	padding: 4px 2px 6px !important;
 	max-width: 100% !important;
 	flex: 1;
 	min-width: 0;
-	background: color-mix(in srgb, var(--da-surface-soft) 88%, var(--da-surface)) !important;
-	border: 1px dashed color-mix(in srgb, var(--da-line) 55%, transparent) !important;
+	background: transparent !important;
+	border: none !important;
 	box-shadow: none !important;
-	border-radius: var(--da-radius-md) !important;
-	opacity: 0.96;
+	border-radius: 0 !important;
+	opacity: 0.92;
 }
 .timeline-card:hover {
 	opacity: 1;
-	border-color: color-mix(in srgb, var(--da-primary) 22%, var(--da-line-soft)) !important;
+	border-color: transparent !important;
 }
 
 /* ── Thinking feedback (WeKnora-like status) ─────────────────────────────────── */

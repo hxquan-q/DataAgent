@@ -480,11 +480,11 @@ watch(
 	align-items: center;
 	justify-content: space-between;
 	gap: 6px;
-	margin-bottom: 6px;
-	padding: 3px 5px;
-	background: var(--da-surface-soft);
-	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-sm);
+	margin-bottom: 4px;
+	padding: 2px 2px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
 }
 
 .timeline-title-group {
@@ -496,22 +496,33 @@ watch(
 }
 
 .timeline-title {
-	font-size: 12.5px !important;
-	font-weight: 700;
-	color: var(--da-primary);
+	font-size: 13px !important;
+	font-weight: 500 !important;
+	color: var(--da-muted) !important;
 	display: flex;
 	align-items: center;
-	line-height: 1;
+	line-height: 1.2;
+	letter-spacing: -0.01em;
+	transition: color var(--da-dur-fast) var(--da-ease-out);
+}
+
+.workflow-timeline:not(.is-completed) .timeline-title {
+	color: var(--da-ink) !important;
 }
 
 .workflow-timeline.is-completed .timeline-title {
-	color: var(--da-success);
+	color: var(--da-muted) !important;
+}
+
+.timeline-title-bar:hover .timeline-title {
+	color: var(--da-ink) !important;
 }
 
 .timeline-summary {
-	font-size: 12px;
-	color: var(--da-muted);
-	font-weight: 500;
+	font-size: 11px;
+	color: color-mix(in srgb, var(--da-muted) 72%, transparent);
+	font-weight: 400;
+	line-height: 1.35;
 }
 
 .timeline-active-hint {
@@ -552,7 +563,10 @@ watch(
 
 .step-label {
 	font-size: 12.5px;
-	font-weight: 600;
+	font-weight: 500;
+	color: var(--da-muted);
+}
+.step-header:hover .step-label {
 	color: var(--da-ink);
 }
 
@@ -572,8 +586,8 @@ watch(
 }
 
 .step-badge.done {
-	background: color-mix(in srgb, var(--da-success) 12%, white);
-	color: var(--da-success);
+	background: color-mix(in srgb, var(--da-muted) 10%, white);
+	color: var(--da-muted);
 }
 
 .badge-dot {
@@ -596,10 +610,10 @@ watch(
 
 /* ── Step content ────────────────────────────────────────────────────────────── */
 .step-content {
-	margin-top: 6px;
-	font-size: 12.5px;
-	line-height: 1.65;
-	color: var(--da-ink);
+	margin-top: 4px;
+	font-size: 12px;
+	line-height: 1.55;
+	color: var(--da-muted);
 	min-width: 0;
 	overflow: hidden;
 }

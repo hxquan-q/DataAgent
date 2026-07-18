@@ -321,15 +321,15 @@ async function confirmDelete() {
 
 /* ── Expanded panel ──────────────────────────────────────────────────────────── */
 .chat-sidebar {
-	width: 240px;
-	background: var(--da-surface, #ffffff);
+	width: 248px;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface));
 	border-right: 1px solid var(--da-line-soft, #e4edf5);
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	overflow: hidden;
 	transition: opacity var(--da-dur-base, 0.2s) var(--da-ease-out);
-	box-shadow: var(--da-shadow-sm);
+	box-shadow: none;
 }
 
 .collapsed .chat-sidebar {
@@ -349,10 +349,11 @@ async function confirmDelete() {
 }
 
 .sidebar-title {
-	font-size: 13px;
+	font-size: 11px;
 	font-weight: 600;
 	color: var(--da-muted);
-	letter-spacing: 0.3px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
 	white-space: nowrap;
 }
 
@@ -383,19 +384,19 @@ async function confirmDelete() {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 6px 10px;
-	border-radius: var(--da-radius-sm, 8px);
+	padding: 4px 8px;
+	border-radius: 8px;
 	cursor: pointer;
-	transition: background var(--da-dur-fast, 0.12s);
-	margin-bottom: 2px;
-	min-height: 40px;
+	transition: background var(--da-dur-fast, 0.12s), color var(--da-dur-fast, 0.12s);
+	margin-bottom: 1px;
+	min-height: 32px;
 }
 .session-item:hover {
 	background: var(--da-sidebar-hover, rgba(47, 132, 214, 0.08));
 }
 .session-item.active {
-	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.14));
-	box-shadow: inset 0 0 0 1px var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
+	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.12));
+	box-shadow: none;
 }
 
 .session-item-info {
@@ -407,19 +408,21 @@ async function confirmDelete() {
 }
 
 .session-item-title {
-	font-size: 12px;
+	font-size: 13px;
+	font-weight: 400;
 	color: var(--da-ink);
-	line-height: 1.35;
+	line-height: 1.25;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 .session-item-time {
-	font-size: 10.5px;
-	color: var(--da-muted);
-	font-style: italic;
+	font-size: 10px;
+	color: color-mix(in srgb, var(--da-muted) 88%, transparent);
+	font-style: normal;
 	line-height: 1.2;
+	opacity: 0.9;
 }
 
 .session-item.active .session-item-title {
@@ -468,11 +471,11 @@ async function confirmDelete() {
 	flex-direction: column;
 	gap: 4px;
 	align-items: center;
-	margin: 12px 8px;
-	padding: 16px 12px;
-	border: 1px dashed var(--da-line-soft);
-	border-radius: var(--da-radius-md);
-	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
+	margin: 20px 10px;
+	padding: 12px 8px;
+	border: none;
+	border-radius: 0;
+	background: transparent;
 }
 .empty-sessions__title {
 	margin: 0;
@@ -505,9 +508,12 @@ async function confirmDelete() {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
 	font-size: 13px !important;
-	border-style: dashed !important;
-	border-radius: var(--da-radius-md) !important;
-	min-height: 40px !important;
+	font-weight: 500 !important;
+	border-style: solid !important;
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	background: var(--da-primary-soft) !important;
+	border-color: color-mix(in srgb, var(--da-primary) 22%, transparent) !important;
 }
 
 .sidebar-config-links {
