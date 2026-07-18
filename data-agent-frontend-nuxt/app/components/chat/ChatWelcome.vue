@@ -179,12 +179,11 @@ watch(
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	flex: 1;
-	padding: 36px 20px;
 	text-align: center;
-	max-width: 600px;
+	padding: 48px 24px 32px;
+	min-height: min(52vh, 420px);
+	max-width: 640px;
 	margin: 0 auto;
-	width: 100%;
 }
 
 .agent-avatar-wrap {
@@ -192,6 +191,8 @@ watch(
 }
 
 .agent-avatar {
+	box-shadow: var(--da-shadow-md);
+	border: 2px solid color-mix(in srgb, var(--da-primary) 18%, var(--da-surface));
 	box-shadow: var(--da-shadow-md);
 }
 
@@ -206,12 +207,12 @@ watch(
 
 .welcome-title {
 	font-family: var(--da-font-display);
-	font-size: clamp(24px, 3.4vw, 32px);
+	font-size: clamp(26px, 3.6vw, 34px);
 	font-weight: 500;
 	color: var(--da-ink, #1a2332);
-	margin: 0 0 14px;
-	letter-spacing: -0.02em;
-	line-height: 1.25;
+	margin: 0 0 12px;
+	letter-spacing: -0.03em;
+	line-height: 1.22;
 }
 
 .agent-name {
@@ -227,11 +228,12 @@ watch(
 
 .welcome-desc {
 	margin: 0;
-	font-size: 14px;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: 14.5px;
 	font-weight: 400;
 	color: var(--da-muted);
-	max-width: 440px;
-	line-height: 1.6;
+	max-width: 420px;
+	line-height: 1.65;
 	letter-spacing: -0.01em;
 }
 
@@ -246,15 +248,15 @@ watch(
 
 .preset-chip {
 	appearance: none;
-	border: 1px solid var(--da-line-soft, #e4edf5);
-	background: var(--da-surface, #fff);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	background: color-mix(in srgb, var(--da-surface) 88%, transparent);
 	color: var(--da-ink, #1a2332);
 	border-radius: 999px;
 	padding: 8px 14px;
 	min-height: 36px;
-	font-size: 12.5px;
+	font-size: 13px;
 	font-weight: 500;
-	line-height: 1.35;
+	line-height: 1.4;
 	cursor: pointer;
 	transition:
 		border-color var(--da-dur-fast, 0.15s) var(--da-ease-out),
@@ -263,6 +265,7 @@ watch(
 	box-shadow: var(--da-shadow-sm);
 	text-align: left;
 	max-width: 100%;
+	backdrop-filter: blur(6px);
 }
 
 .preset-chip:hover:not(:disabled) {
@@ -347,9 +350,10 @@ watch(
 }
 
 .ready-ok {
-	margin: 16px 0 0;
+	margin: 18px 0 0;
 	font-size: 12.5px;
-	font-weight: 600;
-	color: var(--da-success);
+	font-weight: 500;
+	color: var(--da-muted);
+	letter-spacing: -0.01em;
 }
 </style>

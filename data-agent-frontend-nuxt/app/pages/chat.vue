@@ -138,6 +138,7 @@ onUnmounted(() => {
 }
 
 .chat-body {
+	position: relative;
 	flex: 1;
 	display: flex;
 	flex-direction: column;
@@ -145,6 +146,22 @@ onUnmounted(() => {
 	min-width: 0;
 	background: transparent;
 	border-left: 1px solid var(--da-line-soft);
+}
+/* DEEIX-like soft fade above floating dock */
+.chat-body::after {
+	content: '';
+	pointer-events: none;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 72px;
+	z-index: 4;
+	background: linear-gradient(
+		to top,
+		color-mix(in srgb, var(--da-surface-soft) 92%, transparent) 0%,
+		transparent 100%
+	);
 }
 
 /* Empty agent gate — DEEIX-like centered paper card */

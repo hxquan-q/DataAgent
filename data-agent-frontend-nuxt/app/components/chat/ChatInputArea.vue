@@ -389,17 +389,31 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 </script>
 
 <style scoped>
+/* DEEIX dock: floating input group over fade */
 .input-area {
+	position: relative;
 	flex-shrink: 0;
-	background: var(--da-surface, #fff);
-	border: 1px solid var(--da-line-soft, #e4edf5);
-	border-radius: var(--da-composer-radius, 18px);
-	padding: 10px 14px 12px;
-	max-width: var(--da-chat-max, 960px);
-	width: calc(100% - 28px);
-	margin: 0 auto 14px;
+	z-index: 5;
+	background: color-mix(in srgb, var(--da-surface) 92%, transparent);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	border-radius: 24px;
+	padding: 8px 12px 10px;
+	max-width: min(100%, var(--da-answer-max, 880px));
+	width: calc(100% - 32px);
+	margin: 0 auto 16px;
 	box-sizing: border-box;
-	box-shadow: var(--da-shadow-composer);
+	box-shadow: var(--da-shadow-sm);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	transition:
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		box-shadow var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
+}
+.input-area:focus-within {
+	border-color: color-mix(in srgb, var(--da-line) 80%, var(--da-primary));
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-md);
 }
 
 /* ── Status bar ──────────────────────────────────────────────────────────────── */
@@ -422,13 +436,13 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	min-height: var(--da-control-height-sm, 32px);
-	padding: 4px 10px;
-	background: var(--da-surface-soft);
-	border: 1px solid var(--da-line-soft);
+	min-height: 28px;
+	padding: 3px 9px;
+	background: transparent;
+	border: 1px solid color-mix(in srgb, var(--da-line-soft) 90%, transparent);
 	border-radius: 999px;
 	font: inherit;
-	font-size: 12px;
+	font-size: 11.5px;
 	color: var(--da-muted);
 	cursor: pointer;
 	user-select: none;
@@ -551,18 +565,14 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 
 /* ── Textarea ────────────────────────────────────────────────────────────────── */
 .textarea-wrap {
-	background: var(--da-surface-soft);
-	border: 1px solid var(--da-line-soft, #e4edf5);
-	border-radius: var(--da-radius-md, 12px);
+	background: transparent;
+	border: none;
+	border-radius: 0;
 	overflow: hidden;
-	transition: border-color var(--da-dur-fast, 0.15s) var(--da-ease-out),
-		background var(--da-dur-fast, 0.15s) var(--da-ease-out),
-		box-shadow var(--da-dur-fast, 0.15s) var(--da-ease-out);
 }
 .textarea-wrap:focus-within {
-	border-color: color-mix(in srgb, var(--da-primary, #2f84d6) 55%, transparent);
-	background: var(--da-surface, #fff);
-	box-shadow: 0 0 0 3px color-mix(in srgb, var(--da-primary, #2f84d6) 14%, transparent);
+	background: transparent;
+	box-shadow: none;
 }
 .chat-textarea {
 	display: block;
@@ -826,9 +836,10 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 
 @media (max-width: 640px) {
 	.input-area {
-		width: calc(100% - 16px);
-		margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-		padding: 10px 12px 12px;
+		width: calc(100% - 20px);
+		margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+		padding: 8px 10px 10px;
+		border-radius: 20px;
 	}
 }
 

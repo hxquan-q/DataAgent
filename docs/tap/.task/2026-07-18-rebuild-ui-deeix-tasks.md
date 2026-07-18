@@ -11,6 +11,7 @@
 - [x] 持续 polish：header/embed/code/table density/nav/security/dialogs（多轮 push）
 - [x] 停止微 polish 循环（边际收益过低）
 - [x] **answer-first 对话排版**（DEEIX 消息层级 · `9507101`）
+- [x] **floating composer dock + welcome empty**（DEEIX InputGroup 语义）
 - [ ] **用户验收视觉后 merge PR**（下一门控，需人工）
 
 **冻结**：chat store SSE、graph EventSource、后端。
