@@ -246,7 +246,7 @@
 							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								用户查询
 							</p>
-							<v-card variant="tonal" color="primary" class="rounded pa-3">
+							<v-card variant="flat" border class="rounded-lg pa-3 query-detail-query">
 								<span class="text-body-1">{{ detail.userQuery || '—' }}</span>
 							</v-card>
 						</div>
@@ -567,6 +567,12 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.query-detail-query {
+	background: color-mix(in srgb, var(--da-primary-soft) 70%, var(--da-surface)) !important;
+	border-color: color-mix(in srgb, var(--da-primary) 22%, var(--da-line-soft)) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+}
+
 .code-block {
 	background-color: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);

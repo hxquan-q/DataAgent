@@ -110,13 +110,13 @@ const cssVars = computed(() => ({
 }
 
 .base-drawer__header {
-	height: 52px;
+	height: var(--da-header-height, 52px);
 	border-bottom: 1px solid var(--da-line-soft, #e4edf5);
 	background-color: color-mix(in srgb, var(--da-surface, #ffffff) 92%, transparent);
 	backdrop-filter: blur(10px);
 	display: flex;
 	align-items: center;
-	padding: 0 16px;
+	padding: 0 18px;
 	flex-shrink: 0;
 }
 
@@ -124,5 +124,20 @@ const cssVars = computed(() => ({
 	flex: 1;
 	overflow: auto;
 	position: relative;
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in srgb, var(--da-muted) 40%, transparent) transparent;
+}
+.base-drawer__content::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+.base-drawer__content::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--da-muted) 35%, transparent);
+	border-radius: 999px;
+}
+@media (prefers-reduced-motion: reduce) {
+.base-drawer__left {
+	transition: none !important;
+}
 }
 </style>
