@@ -381,8 +381,8 @@
 									class="mb-3"
 								/>
 								<div class="d-flex justify-end ga-2">
-									<v-btn variant="text" @click="pwdDialog = false">取消</v-btn>
-									<v-btn color="primary" :loading="pwdLoading" @click="submitChangePassword">
+									<v-btn variant="text" class="text-none" @click="pwdDialog = false">取消</v-btn>
+									<v-btn color="primary" class="text-none px-5" :loading="pwdLoading" @click="submitChangePassword">
 										确认
 									</v-btn>
 								</div>

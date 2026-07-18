@@ -320,3 +320,23 @@ button:focus-visible,
 	margin-right: auto;
 	line-height: 1.6;
 }
+
+
+/* Dialog paper surfaces */
+.v-dialog > .v-overlay__content > .v-card {
+	border: 1px solid var(--da-line-soft) !important;
+	box-shadow: var(--da-shadow-lg) !important;
+	border-radius: var(--da-radius-lg) !important;
+	overflow: hidden;
+}
+
+.v-dialog .v-card-title {
+	letter-spacing: -0.01em;
+	color: var(--da-ink);
+}
+
+.v-dialog .v-card-actions .v-btn {
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	border-radius: 999px !important;
+}

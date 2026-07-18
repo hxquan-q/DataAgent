@@ -2,7 +2,7 @@
 
 > 分支：`rebuild-ui`  
 > 日期：2026-07-18  
-> 状态：S0–S5 完成 · 已 push `origin/rebuild-ui` · 待合主分支  
+> 状态：S0–S5 完成 + 持续 polish · PR #1 open · 待用户验收后 merge  
 
 > 约束：**不影响当前功能实现**（SSE / Pinia / graph / 后端冻结）
 
