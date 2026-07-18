@@ -126,7 +126,7 @@
 			</div>
 		</v-alert>
 
-		<v-card variant="flat" border class="rounded-lg">
+		<v-card variant="flat" border class="rounded-lg ds-table-card">
 			<v-data-table
 				v-model:expanded="expandedRows"
 				:headers="headers"
@@ -316,23 +316,25 @@
 				<!-- R152: empty state -->
 				<template #no-data>
 					<div class="text-center py-12 ds-empty">
-						<v-icon icon="mdi-database-off-outline" size="56" color="grey" class="mb-3" />
-						<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">尚未配置数据源</h3>
-						<p class="text-body-2 text-medium-emphasis mb-2 ds-empty__desc">
+						<div class="ds-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-database-off-outline" size="28" color="primary" />
+						</div>
+						<h3 class="ds-empty__title">尚未配置数据源</h3>
+						<p class="ds-empty__desc">
 							{{
 								agentId
 									? `智能体 #${agentId} 需要可用连接：请先添加数据库并测试通过，再「设为当前」并初始化。`
 									: '全局数据源是 NL2SQL 的连接入口。请先添加数据库连接并测试通过，再在智能体中绑定并激活。'
 							}}
 						</p>
-						<p class="text-caption text-medium-emphasis mb-5">
+						<p class="ds-empty__hint">
 							聊天页若提示「未绑定数据源」，请先完成此页配置，再到智能体详情关联。
 						</p>
-						<div class="d-flex justify-center ga-3 flex-wrap">
-							<v-btn color="primary" variant="flat" class="text-none" prepend-icon="mdi-plus" @click="openFormDialog('create')">
+						<div class="d-flex justify-center ga-2 flex-wrap ds-empty__actions">
+							<v-btn color="primary" variant="flat" class="text-none ds-empty__btn" prepend-icon="mdi-plus" @click="openFormDialog('create')">
 								添加数据源
 							</v-btn>
-							<v-btn variant="outlined" class="text-none" prepend-icon="mdi-robot-outline" @click="navigateTo('/system/agents')">
+							<v-btn variant="text" class="text-none ds-empty__btn" prepend-icon="mdi-robot-outline" @click="navigateTo('/system/agents')">
 								管理智能体绑定
 							</v-btn>
 						</div>
@@ -774,17 +776,59 @@ onMounted(() => {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
+.ds-table-card {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	box-shadow: none !important;
+	border-radius: 12px !important;
+	overflow: hidden;
+}
 .ds-empty {
-	padding: 40px 24px;
-	border: 1.5px dashed var(--da-line-soft);
-	border-radius: var(--da-radius-lg);
-	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
+	padding: 48px 24px 40px;
+	border: none;
+	border-radius: 0;
+	background: transparent;
 	margin: 8px;
 }
+.ds-empty__icon {
+	width: 52px;
+	height: 52px;
+	margin: 0 auto 14px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 14px;
+	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 48%, transparent);
+	box-shadow: var(--da-shadow-sm);
+}
+.ds-empty__title {
+	margin: 0 0 8px;
+	font-family: var(--da-font-display);
+	font-size: 1.2rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+}
 .ds-empty__desc {
-	max-width: 440px;
-	margin-left: auto;
-	margin-right: auto;
+	max-width: 420px;
+	margin: 0 auto 8px;
 	line-height: 1.6;
+	font-size: 13.5px;
+	color: var(--da-muted);
+}
+.ds-empty__hint {
+	max-width: 420px;
+	margin: 0 auto 20px;
+	font-size: 12px;
+	color: color-mix(in srgb, var(--da-muted) 88%, transparent);
+	line-height: 1.5;
+}
+.ds-empty__actions :deep(.v-btn),
+.ds-empty__btn {
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	font-weight: 500 !important;
+	letter-spacing: 0 !important;
+	box-shadow: none !important;
 }
 </style>

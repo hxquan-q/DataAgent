@@ -57,7 +57,7 @@
 						头像设置
 					</p>
 					<div class="d-flex align-center ga-4 flex-wrap">
-						<v-avatar size="88" rounded="lg" class="avatar-preview">
+						<v-avatar size="72" rounded="lg" class="avatar-preview">
 							<v-img :src="agentForm.avatar" cover @error="handleImageError" />
 						</v-avatar>
 						<div class="d-flex ga-2">
