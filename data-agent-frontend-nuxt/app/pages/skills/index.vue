@@ -18,7 +18,7 @@
 	<section class="page-shell">
 		<KnowledgePageHeader title="技能管理" subtitle="维护可复用的 Agent 技能（报告风格等），按智能体绑定后注入对应 Prompt。">
 			<template #actions>
-				<v-btn class="text-none" style="border-color: #e2e8f0" variant="outlined" prepend-icon="mdi-refresh" :loading="loading" @click="loadSkills">刷新</v-btn>
+				<v-btn class="text-none" style="border-color: var(--da-line-soft)" variant="outlined" prepend-icon="mdi-refresh" :loading="loading" @click="loadSkills">刷新</v-btn>
 				<v-btn color="primary" prepend-icon="mdi-plus" class="text-none px-6" elevation="0" @click="openCreate">添加技能</v-btn>
 			</template>
 		</KnowledgePageHeader>

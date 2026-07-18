@@ -16,6 +16,7 @@
 
 <template>
   <section class="page-shell dashboard-placeholder">
+    <div class="dashboard-card">
     <p class="dashboard-kicker">Data Agent</p>
     <h1>数据看板</h1>
     <p class="dashboard-desc">
@@ -24,12 +25,20 @@
     <div class="dashboard-actions">
       <NuxtLink to="/chat" class="dashboard-link">前往数据问答</NuxtLink>
     </div>
+      </div>
   </section>
 </template>
 
 <style scoped>
-.dashboard-placeholder {
-  max-width: 720px;
+ .dashboard-placeholder {
+  max-width: 760px;
+}
+.dashboard-card {
+  padding: 28px 24px;
+  background: var(--da-surface);
+  border: 1px solid var(--da-line-soft);
+  border-radius: var(--da-radius-lg);
+  box-shadow: var(--da-shadow-md);
 }
 .dashboard-kicker {
   margin: 0 0 8px;
@@ -41,8 +50,9 @@
 }
 .dashboard-placeholder h1 {
   margin: 0 0 12px;
+  font-family: var(--da-font-display);
   font-size: 28px;
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.02em;
   color: var(--da-ink);
 }
@@ -59,13 +69,13 @@
   padding: 0 16px;
   border-radius: 999px;
   background: var(--da-primary);
-  color: white;
+  color: var(--da-on-primary);
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
 }
 .dashboard-link:focus-visible {
-  outline: 2px solid var(--da-accent);
+  outline: 2px solid var(--da-ring);
   outline-offset: 2px;
 }
 </style>

@@ -20,7 +20,7 @@
 		max-width="400"
 		@update:model-value="$emit('update:modelValue', $event)"
 	>
-		<v-card :prepend-icon="prependIcon" :title="title">
+		<v-card rounded="lg" :prepend-icon="prependIcon" :title="title">
 			<v-card-text style="white-space: pre-line">{{ message }}</v-card-text>
 			<v-card-actions>
 				<v-spacer></v-spacer>
