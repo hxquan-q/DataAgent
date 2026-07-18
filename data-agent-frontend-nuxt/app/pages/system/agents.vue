@@ -62,7 +62,7 @@
 		</v-alert>
 
 		<!-- Filter and Search Section -->
-		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 agents-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="searchKeyword"
@@ -655,17 +655,33 @@ onMounted(() => {
 
 
 
+.agents-toolbar {
+	box-shadow: var(--da-shadow-sm) !important;
+	background: var(--da-surface) !important;
+}
+
 .filter-toggle {
 	background-color: var(--da-surface-soft) !important;
 	padding: 4px !important;
+	border: 1px solid var(--da-line-soft) !important;
+	border-radius: 999px !important;
 }
 
 .filter-toggle .v-btn {
 	text-transform: none !important;
+	letter-spacing: 0 !important;
+	border-radius: 999px !important;
+	font-weight: 600 !important;
 }
 
 .search-field {
 	border-color: var(--da-line-soft);
+}
+
+.agent-name-link:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+	border-radius: 4px;
 }
 
 .agent-name-link {

@@ -402,3 +402,14 @@ button:focus-visible,
 .page-shell :deep(tbody tr:hover) {
 	background: color-mix(in srgb, var(--da-primary-soft) 40%, transparent) !important;
 }
+
+
+/* Alert paper */
+.page-shell :deep(.v-alert) {
+	border-radius: var(--da-radius-md) !important;
+	box-shadow: var(--da-shadow-sm);
+}
+
+.page-shell :deep(.v-alert--variant-tonal) {
+	border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}

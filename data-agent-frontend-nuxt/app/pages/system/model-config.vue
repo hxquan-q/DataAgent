@@ -133,11 +133,12 @@
 								<div class="pa-5 d-flex align-center">
 									<!-- Icon -->
 									<v-avatar
-										:color="model.isActive ? 'primary' : 'grey-lighten-4'"
+										:color="model.isActive ? 'primary' : 'primary'"
+										:variant="model.isActive ? 'flat' : 'tonal'"
 										:class="{ 'text-white': model.isActive }"
 										size="48"
 										rounded="lg"
-										class="mr-4"
+										class="mr-4 model-avatar"
 									>
 										<v-icon
 											:icon="
@@ -689,20 +690,31 @@ onMounted(fetchConfigs);
 
 
 .model-item-card {
-	transition: border-color var(--da-dur-base) var(--da-ease-out), box-shadow var(--da-dur-base) var(--da-ease-out), transform var(--da-dur-base) var(--da-ease-out);
+	transition: border-color var(--da-dur-base) var(--da-ease-out),
+		box-shadow var(--da-dur-base) var(--da-ease-out),
+		transform var(--da-dur-base) var(--da-ease-out);
 	border: 1px solid var(--da-line-soft) !important;
 	background-color: var(--da-surface) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+	border-radius: var(--da-radius-md) !important;
+	overflow: hidden;
 }
 
 .model-item-card:hover {
-	border-color: var(--da-muted) !important;
+	border-color: color-mix(in srgb, var(--da-primary) 35%, var(--da-line-soft)) !important;
 	transform: translateY(-2px);
-	box-shadow: var(--da-shadow-md);
+	box-shadow: var(--da-shadow-md) !important;
 }
 
 .model-item-card.is-active {
-	border-color: var(--da-primary) !important;
-	background-color: var(--da-primary-soft) !important;
+	border-color: color-mix(in srgb, var(--da-primary) 45%, transparent) !important;
+	background:
+		linear-gradient(
+			135deg,
+			color-mix(in srgb, var(--da-primary-soft) 80%, var(--da-surface)) 0%,
+			var(--da-surface) 70%
+		) !important;
+	box-shadow: var(--da-shadow-md) !important;
 }
 
 .border-dashed {
@@ -722,6 +734,15 @@ onMounted(fetchConfigs);
 /* 列表容器需要相对定位，方便子元素离开时绝对定位 */
 .list-container {
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.list-item-wrap {
+	width: 100%;
+}
+.model-avatar {
+	box-shadow: var(--da-shadow-sm);
 }
 
 /* 所有的过渡和位移都在 0.4s 内完成 */
