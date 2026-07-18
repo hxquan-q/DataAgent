@@ -23,7 +23,7 @@ const embedded = ref(false);
 const form = ref<EmbedConfig>({
 	allowedOrigins: [],
 	welcomeMessage: '',
-	primaryColor: '#07C05F',
+	primaryColor: '#2F84D6',
 	widgetPosition: 'bottom-right',
 	showSuggestedQuestions: true,
 	defaultLocale: 'zh-CN',
@@ -92,7 +92,7 @@ async function loadConfig() {
 		form.value = {
 			allowedOrigins: c.allowedOrigins || [],
 			welcomeMessage: c.welcomeMessage || '',
-			primaryColor: c.primaryColor || '#07C05F',
+			primaryColor: c.primaryColor || '#2F84D6',
 			widgetPosition: c.widgetPosition || 'bottom-right',
 			showSuggestedQuestions: c.showSuggestedQuestions ?? true,
 			defaultLocale: c.defaultLocale || 'zh-CN',

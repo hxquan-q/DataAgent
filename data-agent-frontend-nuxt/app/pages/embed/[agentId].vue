@@ -109,7 +109,7 @@ const SANITIZE_OPTIONS = {
 	ADD_ATTR: ['style', 'class', 'data-echarts-config'],
 };
 
-const themeColor = computed(() => config.value?.primaryColor || '#07C05F');
+const themeColor = computed(() => config.value?.primaryColor || '#2F84D6');
 const initHint = computed(() => {
 	if (!config.value) return '正在加载配置…';
 	if (!token.value) return '等待宿主鉴权（会话令牌）…';
@@ -739,7 +739,7 @@ onBeforeUnmount(() => {
 <style scoped>
 /* ── Shell（WeKnora embed-chat 布局） ─────────────────────────── */
 .embed-chat {
-	--embed-primary: var(--da-success);
+	--embed-primary: var(--da-primary);
 	--embed-bg: var(--da-surface-soft);
 	--embed-surface: var(--da-surface);
 	--embed-text: var(--da-ink);
@@ -750,14 +750,7 @@ onBeforeUnmount(() => {
 	height: 100vh;
 	background: var(--embed-bg);
 	color: var(--embed-text);
-	font-family:
-		-apple-system,
-		BlinkMacSystemFont,
-		'Segoe UI',
-		'PingFang SC',
-		'Hiragino Sans GB',
-		'Microsoft YaHei',
-		sans-serif;
+	font-family: var(--da-font-sans);
 	font-size: 16px;
 	line-height: 1.625;
 	-webkit-font-smoothing: antialiased;
@@ -766,12 +759,32 @@ onBeforeUnmount(() => {
 
 .embed-chat__header {
 	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
 	padding: 12px 16px;
-	background: var(--embed-primary);
-	color: white;
+	background: color-mix(in srgb, var(--embed-primary) 10%, var(--embed-surface));
+	color: var(--embed-text);
 	font-weight: 600;
 	font-size: 15px;
-	letter-spacing: 0.01em;
+	letter-spacing: -0.01em;
+	border-bottom: 1px solid var(--embed-border);
+	backdrop-filter: blur(8px);
+}
+.embed-chat__title {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.embed-chat__status {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--embed-primary);
 }
 
 .embed-chat__scroll {
@@ -805,7 +818,7 @@ onBeforeUnmount(() => {
 	background: color-mix(in srgb, var(--embed-primary) 7%, var(--da-surface));
 	border: 1px solid color-mix(in srgb, var(--embed-primary) 14%, var(--da-line-soft));
 	border-radius: 4px 14px 14px 14px;
-	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	box-shadow: var(--da-shadow-sm);
 }
 .embed-welcome__text.muted {
 	color: var(--embed-muted);
@@ -841,7 +854,7 @@ onBeforeUnmount(() => {
 .embed-suggested__card {
 	text-align: left;
 	padding: 10px 12px;
-	border-radius: 10px;
+	border-radius: var(--da-radius-md);
 	border: 1px solid var(--embed-border);
 	background: var(--embed-surface);
 	font-size: 13px;
@@ -856,7 +869,7 @@ onBeforeUnmount(() => {
 }
 .embed-suggested__card:hover {
 	border-color: color-mix(in srgb, var(--embed-primary) 45%, var(--embed-border));
-	box-shadow: 0 2px 8px rgba(15, 23, 42, 0.06);
+	box-shadow: var(--da-shadow-md);
 	transform: translateY(-1px);
 }
 .embed-suggested__card:focus-visible {
@@ -899,7 +912,7 @@ onBeforeUnmount(() => {
 	border: 1px solid color-mix(in srgb, var(--embed-primary) 22%, var(--da-line-soft));
 	border-radius: 10px;
 	overflow: hidden;
-	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	box-shadow: var(--da-shadow-sm);
 }
 .msg-bot__artifact-label {
 	font-size: 11px;
@@ -1062,6 +1075,7 @@ onBeforeUnmount(() => {
 
 /* ── Input ───────────────────────────────────────────────────── */
 .embed-chat__input {
+	/* DEEIX floating composer base */
 	flex-shrink: 0;
 	padding: 8px 16px 16px;
 	background: linear-gradient(to top, var(--embed-bg) 70%, transparent);
@@ -1072,15 +1086,18 @@ onBeforeUnmount(() => {
 	align-items: flex-end;
 	max-width: 880px;
 	margin: 0 auto;
-	padding: 8px 10px;
+	padding: 10px 12px;
 	background: var(--embed-surface);
 	border: 1px solid var(--embed-border);
-	border-radius: 14px;
-	box-shadow: 0 2px 12px rgba(15, 23, 42, 0.04);
-	transition: border-color 0.15s ease;
+	border-radius: var(--da-composer-radius, 18px);
+	box-shadow: var(--da-shadow-composer, var(--da-shadow-md));
+	transition: border-color var(--da-dur-fast) var(--da-ease-out),
+		box-shadow var(--da-dur-fast) var(--da-ease-out);
 }
 .input-shell:focus-within {
 	border-color: color-mix(in srgb, var(--embed-primary) 50%, var(--embed-border));
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--embed-primary) 14%, transparent),
+		var(--da-shadow-composer, var(--da-shadow-md));
 }
 .input-shell__field {
 	flex: 1;
@@ -1102,7 +1119,7 @@ onBeforeUnmount(() => {
 .input-shell__send {
 	flex-shrink: 0;
 	border: none;
-	border-radius: 10px;
+	border-radius:  999px;
 	padding: 0 16px;
 	height: 36px;
 	min-width: 64px;
@@ -1276,7 +1293,7 @@ onBeforeUnmount(() => {
 /* R3 polish: answer surface + process micro-interactions */
 .msg-bot__answer {
 	letter-spacing: -0.01em !important;
-	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+	box-shadow: var(--da-shadow-sm);
 	animation: da-soft-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .pipeline__root:hover {
