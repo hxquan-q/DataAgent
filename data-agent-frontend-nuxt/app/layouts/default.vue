@@ -399,14 +399,7 @@
 						{{ currentRouteTitle }}
 					</div>
 					<v-spacer />
-					<v-chip
-						size="small"
-						variant="tonal"
-						color="primary"
-						class="font-weight-medium app-header-chip"
-					>
-						Data Workspace
-					</v-chip>
+					<span class="app-header-meta">Data Workspace</span>
 				</template>
 
 				<slot />
@@ -681,15 +674,20 @@ watch(
 
 .app-header-title {
 	color: var(--da-ink, #1a2332);
-	letter-spacing: -0.01em;
+	letter-spacing: -0.02em;
+	font-size: 0.95rem !important;
 }
 
 .header-menu-btn {
 	color: var(--da-muted, #64748b) !important;
 }
 
-.app-header-chip {
-	border-radius: 999px !important;
+.app-header-meta {
+	font-size: 11.5px;
+	font-weight: 500;
+	color: var(--da-muted);
+	letter-spacing: 0.02em;
+	user-select: none;
 }
 
 /* rebuild-ui: light paper sidebar brand */

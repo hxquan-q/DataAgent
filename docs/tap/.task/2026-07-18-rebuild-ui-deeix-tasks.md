@@ -16,6 +16,7 @@
 - [x] **report prose + quiet chrome**（报告正文 15px + 状态条去胶囊）
 - [x] **result-set ghost meta**（结果表工具条 ghost · DEEIX message-meta）
 - [x] **thinking demote + admin table quiet + expand fab**
+- [x] **login quiet + header meta**（DEEIX 居中登录 / 顶栏去 chip）
 - [ ] **用户验收视觉后 merge PR**（下一门控，需人工）
 
 **冻结**：chat store SSE、graph EventSource、后端。

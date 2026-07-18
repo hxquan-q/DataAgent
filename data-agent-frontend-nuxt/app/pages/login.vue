@@ -15,22 +15,26 @@
 -->
 <template>
 	<div class="login-page d-flex align-center justify-center">
-		<v-card width="400" max-width="92vw" class="pa-6 login-card" elevation="0">
-			<div class="login-title">DataAgent 管理登录</div>
-			<div class="text-caption text-medium-emphasis mb-4">
-				请使用管理员账号密码登录
+		<div class="login-shell">
+			<div class="login-brand" aria-hidden="true">
+				<div class="login-mark">
+					<v-icon icon="mdi-robot-outline" size="22" color="primary" />
+				</div>
 			</div>
+			<div class="login-title">DataAgent</div>
+			<div class="login-subtitle">管理登录</div>
 
-			<v-alert v-if="error" type="error" variant="tonal" density="compact" class="mb-3" :text="error" />
+			<v-alert v-if="error" type="error" variant="tonal" density="compact" class="mb-4" :text="error" />
 
-			<v-form @submit.prevent="onSubmit">
+			<v-form class="login-form" @submit.prevent="onSubmit">
 				<v-text-field
 					v-model="username"
 					label="用户名"
 					autocomplete="username"
 					density="comfortable"
 					variant="outlined"
-					class="mb-2"
+					hide-details="auto"
+					class="mb-3"
 					:disabled="loading"
 				/>
 				<v-text-field
@@ -40,7 +44,8 @@
 					autocomplete="current-password"
 					density="comfortable"
 					variant="outlined"
-					class="mb-4"
+					hide-details="auto"
+					class="mb-5"
 					:disabled="loading"
 				/>
 				<v-btn
@@ -55,7 +60,8 @@
 					登录
 				</v-btn>
 			</v-form>
-		</v-card>
+			<p class="login-hint">请使用管理员账号密码登录</p>
+		</div>
 	</div>
 </template>
 
@@ -91,37 +97,74 @@ async function onSubmit() {
 <style scoped>
 .login-page {
 	min-height: 100vh;
-	padding: 24px;
-	background:
-		radial-gradient(
-			900px 420px at 50% -10%,
-			color-mix(in srgb, var(--da-primary) 22%, transparent),
-			transparent 60%
-		),
-		linear-gradient(165deg, var(--da-surface-soft) 0%, #e8f1f8 48%, var(--da-surface-soft) 100%);
+	padding: 32px 16px;
+	background: var(--da-surface-soft);
+	color: var(--da-ink);
 }
 
-.login-page :deep(.v-card),
-.login-card {
-	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-lg) !important;
-	box-shadow: var(--da-shadow-lg) !important;
-	background: var(--da-surface) !important;
+.login-shell {
+	width: 100%;
+	max-width: 360px;
+	padding: 8px 8px 0;
+}
+
+.login-brand {
+	display: flex;
+	justify-content: center;
+	margin-bottom: 18px;
+}
+
+.login-mark {
+	width: 40px;
+	height: 40px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 12px;
+	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent);
+	box-shadow: var(--da-shadow-sm);
 }
 
 .login-title {
 	font-family: var(--da-font-display);
-	font-size: 1.35rem;
+	font-size: 1.5rem;
 	font-weight: 500;
-	letter-spacing: -0.02em;
+	letter-spacing: -0.03em;
 	color: var(--da-ink);
-	margin-bottom: 4px;
+	text-align: center;
+	margin: 0 0 4px;
+}
+
+.login-subtitle {
+	text-align: center;
+	font-size: 13px;
+	color: var(--da-muted);
+	margin: 0 0 28px;
+	letter-spacing: -0.01em;
+}
+
+.login-form :deep(.v-field) {
+	border-radius: 12px !important;
+	background: var(--da-surface) !important;
+}
+
+.login-form :deep(.v-field__outline) {
+	--v-field-border-opacity: 0.55;
 }
 
 .login-submit {
-	border-radius: 999px !important;
+	border-radius: 12px !important;
 	font-weight: 600 !important;
 	min-height: 44px;
-	box-shadow: 0 8px 18px color-mix(in srgb, var(--da-primary) 24%, transparent) !important;
+	letter-spacing: 0 !important;
+	box-shadow: none !important;
+}
+
+.login-hint {
+	margin: 18px 0 0;
+	text-align: center;
+	font-size: 12px;
+	color: color-mix(in srgb, var(--da-muted) 85%, transparent);
 }
 </style>

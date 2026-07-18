@@ -111,12 +111,12 @@ const cssVars = computed(() => ({
 
 .base-drawer__header {
 	height: var(--da-header-height, 52px);
-	border-bottom: 1px solid var(--da-line-soft, #e4edf5);
-	background-color: color-mix(in srgb, var(--da-surface, #ffffff) 92%, transparent);
-	backdrop-filter: blur(10px);
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 42%, transparent);
+	background-color: color-mix(in srgb, var(--da-surface, #ffffff) 88%, transparent);
+	backdrop-filter: blur(12px);
 	display: flex;
 	align-items: center;
-	padding: 0 18px;
+	padding: 0 16px;
 	flex-shrink: 0;
 }
 
