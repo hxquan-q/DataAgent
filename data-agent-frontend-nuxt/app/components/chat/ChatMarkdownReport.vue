@@ -88,7 +88,7 @@
 		<!-- Fullscreen dialog -->
 		<v-dialog v-model="store.showReportFullscreen" fullscreen>
 			<v-card>
-				<v-toolbar density="compact" color="white" border="b">
+				<v-toolbar density="compact" color="surface" border="b" class="report-fullscreen-toolbar">
 					<v-toolbar-title class="text-body-2 font-weight-bold">
 						{{
 							store.reportFormat === 'markdown' ? 'Markdown 报告' : 'HTML 报告'
@@ -121,7 +121,7 @@
 					</v-btn>
 				</v-toolbar>
 				<v-card-text
-					style="height: calc(100vh - 64px); overflow-y: auto; padding: 18px"
+					class="report-fullscreen-body"
 				>
 					<div
 						v-if="store.reportFormat === 'markdown'"
@@ -179,7 +179,7 @@ function loadHtmlToIframe(
 	if (!iframe) return;
 	if (!markdownContent) {
 		iframe.srcdoc =
-			'<html><body style="padding:16px;color:#666;">暂无报告内容</body></html>';
+			'<html><body style="padding:16px;color:var(--da-muted);">暂无报告内容</body></html>';
 		return;
 	}
 	const html = buildReportHtml(markdownContent);
@@ -344,7 +344,7 @@ async function downloadHtml() {
 	padding: 2px 5px;
 	border-radius: 3px;
 	font-size: 12.5px;
-	color: #c026a0;
+	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .markdown-body :deep(table) {
 	width: 100%;
@@ -560,5 +560,16 @@ async function downloadHtml() {
 }
 .report-header {
 	min-height: 30px;
+}
+
+.report-fullscreen-toolbar {
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface)) !important;
+	border-bottom: 1px solid var(--da-line-soft) !important;
+}
+.report-fullscreen-body {
+	height: calc(100vh - 64px);
+	overflow-y: auto;
+	padding: 20px 22px;
+	background: var(--da-surface-soft);
 }
 </style>

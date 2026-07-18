@@ -225,7 +225,7 @@ onBeforeUnmount(() => {
 	padding: 2px 5px;
 	border-radius: 3px;
 	font-size: 12.5px;
-	color: #c026a0;
+	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .markdown-body :deep(table) {
 	width: 100%;
