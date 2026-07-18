@@ -910,7 +910,7 @@ onBeforeUnmount(() => {
 	padding: 0 0 8px;
 	background: var(--da-surface);
 	border: 1px solid color-mix(in srgb, var(--embed-primary) 22%, var(--da-line-soft));
-	border-radius: 10px;
+	border-radius: var(--da-radius-md);
 	overflow: hidden;
 	box-shadow: var(--da-shadow-sm);
 }
@@ -938,7 +938,7 @@ onBeforeUnmount(() => {
 	width: 100%;
 	padding: 8px 10px;
 	border: 1px solid var(--embed-border);
-	border-radius: 8px;
+	border-radius: var(--da-radius-sm);
 	background: var(--da-surface-soft);
 	cursor: pointer;
 	font-size: 13px;
@@ -1059,7 +1059,7 @@ onBeforeUnmount(() => {
 	border-radius: 50%;
 	background: var(--embed-surface);
 	border: 1px solid var(--embed-border);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: var(--da-shadow-md);
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1206,20 +1206,20 @@ onBeforeUnmount(() => {
 	padding: 0.12em 0.4em;
 	border-radius: 999px;
 	font-size: 0.88em;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-family: var(--da-font-mono);
 }
 .markdown-body :deep(pre) {
 	background: var(--da-ink);
 	color: var(--da-line-soft);
 	padding: 12px 14px;
-	border-radius: 10px;
+	border-radius: var(--da-radius-md);
 	overflow-x: auto;
 	font-size: 13px;
 	line-height: 1.5;
 	margin: 0.65em 0;
 }
 .markdown-body :deep(pre code) {
-	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	font-family: var(--da-font-mono);
 	background: transparent;
 	padding: 0;
 }
@@ -1254,7 +1254,7 @@ onBeforeUnmount(() => {
 	width: 100%;
 	min-height: 300px;
 	margin: 12px 0;
-	border-radius: 10px;
+	border-radius: var(--da-radius-md);
 	background: var(--da-surface-soft);
 }
 .markdown-body :deep(.md-echarts-skeleton) {
@@ -1266,7 +1266,7 @@ onBeforeUnmount(() => {
 	background: linear-gradient(90deg, var(--da-surface-soft) 25%, var(--da-line-soft) 50%, var(--da-surface-soft) 75%);
 	background-size: 200% 100%;
 	animation: shimmer 1.2s ease-in-out infinite;
-	border-radius: 10px;
+	border-radius: var(--da-radius-md);
 	color: var(--embed-muted);
 	font-size: 13px;
 	margin: 12px 0;

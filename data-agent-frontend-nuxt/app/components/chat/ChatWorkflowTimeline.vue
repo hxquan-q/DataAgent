@@ -756,7 +756,7 @@ watch(
 	margin: 0;
 	background: transparent;
 	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	color: inherit;
 	white-space: pre;
 	min-width: max-content;

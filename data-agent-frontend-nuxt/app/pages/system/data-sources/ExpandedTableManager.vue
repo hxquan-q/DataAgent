@@ -94,7 +94,7 @@ function clearAll() {
 <style scoped>
 .manage-tables-container {
 	background: white;
-	border-radius: 12px;
+	border-radius: var(--da-radius-md);
 	border: 1px solid var(--da-line-soft);
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 	padding: 24px;

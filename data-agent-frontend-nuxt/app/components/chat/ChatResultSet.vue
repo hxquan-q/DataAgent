@@ -457,7 +457,7 @@ function downloadCsv() {
 .cell-null {
 	color: var(--da-muted);
 	font-style: italic;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-family: var(--da-font-mono);
 	font-size: 11.5px;
 }
 .cell-empty {
@@ -467,7 +467,7 @@ function downloadCsv() {
 	font-size: 12px;
 	text-align: right;
 	font-variant-numeric: tabular-nums;
-	font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	font-family: var(--da-font-mono);
 }
 .custom-scrollbar::-webkit-scrollbar {
 	height: 6px;

@@ -59,7 +59,7 @@ defineProps<{
 }
 
 .font-mono {
-	font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+	font-family: var(--da-font-mono);
 	font-size: 0.8125rem;
 }
 </style>

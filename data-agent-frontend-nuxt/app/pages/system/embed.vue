@@ -340,7 +340,7 @@ watch(selectedAgentId, () => {
 }
 .preview-wrap {
 	border: 1px solid var(--da-line-soft);
-	border-radius: 12px;
+	border-radius: var(--da-radius-md);
 	overflow: hidden;
 	height: 560px;
 	background: var(--da-surface-soft);

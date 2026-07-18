@@ -625,7 +625,7 @@ watch(
 	padding: 1px 4px;
 	border-radius: var(--da-radius-sm);
 	font-size: 12.5px;
-	font-family: 'Monaco', 'Menlo', 'Fira Code', monospace;
+	font-family: var(--da-font-mono);
 	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .md-body :deep(blockquote) {
@@ -702,7 +702,7 @@ watch(
 .md-body :deep(.code-language) {
 	color: var(--da-muted);
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	font-size: 9.5px;
 	text-transform: uppercase;
 }
@@ -741,7 +741,7 @@ watch(
 	margin: 0;
 	background: transparent;
 	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	color: inherit;
 	white-space: pre;
 	min-width: max-content;

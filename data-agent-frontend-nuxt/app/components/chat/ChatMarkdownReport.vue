@@ -411,7 +411,7 @@ async function downloadHtml() {
 .markdown-body :deep(.code-language) {
 	color: var(--da-muted);
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	font-size: 10px;
 	text-transform: uppercase;
 }
@@ -453,7 +453,7 @@ async function downloadHtml() {
 	margin: 0;
 	background: transparent;
 	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	color: inherit;
 	white-space: pre;
 	min-width: max-content;
