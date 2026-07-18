@@ -35,7 +35,7 @@ defineProps<{
 
 <style scoped>
 .knowledge-header__title {
-	color: var(--da-primary, #1e40af);
+	color: var(--da-primary, #2f84d6);
 	letter-spacing: -0.02em;
 }
 .knowledge-header p {
