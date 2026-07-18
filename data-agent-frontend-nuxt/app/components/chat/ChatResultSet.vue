@@ -318,7 +318,7 @@ function downloadCsv() {
 	background: linear-gradient(180deg, color-mix(in srgb, var(--da-primary-soft) 40%, var(--da-surface-soft)) 0%, var(--da-surface-soft) 100%);
 	border: 1px solid var(--da-line-soft);
 	border-bottom: none;
-	border-radius: 8px 8px 0 0;
+	border-radius: var(--da-radius-md) var(--da-radius-md) 0 0;
 }
 .result-set-wrap.is-pending-report .result-header {
 	border-radius: 0;
@@ -354,18 +354,18 @@ function downloadCsv() {
 	display: inline-flex;
 	align-items: center;
 	gap: 4px;
-	height: 28px;
 	padding: 0 10px;
 	background: var(--da-surface);
-	border: 1px solid var(--da-line);
-	border-radius: 6px;
+	border: 1px solid var(--da-line-soft);
+	border-radius: 999px;
 	font-size: 11.5px;
+	font-weight: 600;
 	color: var(--da-ink);
 	cursor: pointer;
 	transition:
-		background 0.15s,
-		border-color 0.15s,
-		color 0.15s;
+		background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out);
 }
 .action-btn:hover {
 	background: var(--da-primary-soft);

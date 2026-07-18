@@ -61,7 +61,7 @@
 						</v-col>
 						<v-spacer />
 						<v-col cols="auto">
-							<v-btn color="primary" :loading="gen.loading" @click="runGeneration">
+							<v-btn color="primary" class="text-none" :loading="gen.loading" @click="runGeneration">
 								<v-icon start>mdi-calculator</v-icon>
 								计算
 							</v-btn>
@@ -72,7 +72,7 @@
 						:text="gen.error" />
 					<v-row v-if="gen.result" class="mt-2" dense>
 						<v-col v-for="m in genMetrics" :key="m.label" cols="6" sm="4" md="3">
-							<v-card variant="tonal" class="text-center pa-3">
+							<v-card variant="flat" border class="text-center pa-3 eval-score-card">
 								<div class="text-caption text-medium-emphasis">{{ m.label }}</div>
 								<div class="text-h6 font-weight-bold" :class="scoreColor(m.value)">
 									{{ m.value.toFixed(4) }}
@@ -104,7 +104,7 @@
 						</v-col>
 						<v-spacer />
 						<v-col cols="auto">
-							<v-btn color="primary" :loading="ret.loading" @click="runRetrieval">
+							<v-btn color="primary" class="text-none" :loading="ret.loading" @click="runRetrieval">
 								<v-icon start>mdi-calculator</v-icon>
 								计算
 							</v-btn>
@@ -115,7 +115,7 @@
 						:text="ret.error" />
 					<v-row v-if="ret.result" class="mt-2" dense>
 						<v-col v-for="m in retMetrics" :key="m.label" cols="6" sm="4" md="3">
-							<v-card variant="tonal" class="text-center pa-3">
+							<v-card variant="flat" border class="text-center pa-3 eval-score-card">
 								<div class="text-caption text-medium-emphasis">{{ m.label }}</div>
 								<div class="text-h6 font-weight-bold" :class="scoreColor(m.value)">
 									{{ m.value.toFixed(4) }}
@@ -245,3 +245,15 @@ function scoreColor(v: number): string {
 	return 'text-medium-emphasis';
 }
 </script>
+
+<style scoped>
+.eval-score-card {
+	border-radius: var(--da-radius-md) !important;
+	background: var(--da-surface) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+}
+.eval-score-card .text-h6 {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.02em;
+}
+</style>

@@ -28,7 +28,7 @@
 
 		<v-row class="mt-1">
 			<v-col cols="12" md="6">
-				<v-card variant="flat" border class="pa-4 h-100">
+				<v-card variant="flat" border class="pa-4 h-100 rounded-lg">
 					<div class="d-flex align-center mb-3">
 						<v-icon :color="enabled ? 'success' : 'warning'" size="32" class="mr-2">
 							{{ enabled ? 'mdi-shield-check' : 'mdi-shield-alert' }}
@@ -55,7 +55,7 @@
 			</v-col>
 
 			<v-col cols="12" md="6">
-				<v-card variant="flat" border class="pa-4 h-100">
+				<v-card variant="flat" border class="pa-4 h-100 rounded-lg">
 					<div class="text-subtitle-2 mb-2">
 						<v-icon size="small" class="mr-1">mdi-database-lock</v-icon>
 						加密覆盖范围

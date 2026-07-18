@@ -692,44 +692,48 @@ watch(
 .md-body :deep(.code-block-wrapper) {
 	margin: 8px 0;
 	border: 1px solid var(--da-line-soft);
-	border-radius: 6px;
+	border-radius: var(--da-radius-md);
 	overflow: auto;
-	background: var(--da-surface-soft);
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .md-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: var(--da-surface-soft);
-	padding: 3px 8px;
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface-soft));
+	padding: 6px 10px;
 	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
 .md-body :deep(.code-language) {
 	color: var(--da-muted);
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	font-size: 10px;
 	text-transform: uppercase;
 }
 .md-body :deep(.code-copy-button) {
-	background: transparent;
-	border: 1px solid var(--da-line);
-	padding: 2px 8px;
-	border-radius: 4px;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	padding: 2px 10px;
+	border-radius: 999px;
 	font-size: 10px;
+	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s;
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out);
 	color: var(--da-ink);
 }
 .md-body :deep(.code-copy-button:hover) {
-	background: var(--da-surface-soft);
-	border-color: var(--da-line);
+	background: var(--da-primary-soft);
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	color: var(--da-primary);
 }
 .md-body :deep(.code-copy-button.copied) {
 	background: var(--da-success);
 	border-color: var(--da-success);
-	color: white;
+	color: var(--da-on-primary, #fff);
 }
 .md-body :deep(pre.hljs) {
 	margin: 0;
