@@ -551,7 +551,10 @@ watch(
 
 /* ── Thinking feedback (WeKnora-like status) ─────────────────────────────────── */
 .thinking-card {
-	padding: 8px 12px !important;
+	padding: 10px 14px !important;
+	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface)) !important;
+	border: 1px solid color-mix(in srgb, var(--da-primary) 18%, var(--da-line-soft)) !important;
+	box-shadow: none !important;
 }
 .thinking-row {
 	display: flex;
@@ -573,9 +576,10 @@ watch(
 .dot {
 	width: 6px;
 	height: 6px;
-	background: var(--da-muted);
+	background: var(--da-primary);
 	border-radius: 50%;
 	animation: dotBounce 1.2s infinite;
+	opacity: 0.55;
 }
 .dot--2 {
 	animation-delay: 0.2s;

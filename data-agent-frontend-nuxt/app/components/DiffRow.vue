@@ -17,7 +17,7 @@
 <!--
 	DiffRow —— 口径版本对比的单行字段渲染。
 	- value 为空显示「—」占位，避免空白
-	- changed=true 时整行高亮（amber 底色 + 左侧色条），直观标记差异点
+	- changed=true 时整行高亮（warning 底色 + 左侧色条），直观标记差异点
 	- mono=true 时等宽字体（用于 SQL/JSON 片段）
 -->
 <template>
@@ -48,14 +48,14 @@ defineProps<{
 <style scoped>
 .diff-row {
 	padding: 8px 10px;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 	margin-bottom: 6px;
-	transition: background-color 0.15s ease;
+	transition: background-color var(--da-dur-fast) var(--da-ease-out);
 }
 
 .diff-row--changed {
-	background-color: rgb(255 248 220);
-	border-left: 3px solid rgb(245 158 11);
+	background-color: color-mix(in srgb, var(--da-warning) 12%, white);
+	border-left: 3px solid var(--da-warning);
 }
 
 .font-mono {

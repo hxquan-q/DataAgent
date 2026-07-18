@@ -15,8 +15,8 @@
 -->
 <template>
 	<div class="login-page d-flex align-center justify-center">
-		<v-card width="400" max-width="92vw" class="pa-6" elevation="2">
-			<div class="text-h6 font-weight-bold mb-1">DataAgent 管理登录</div>
+		<v-card width="400" max-width="92vw" class="pa-6 login-card" elevation="0">
+			<div class="login-title">DataAgent 管理登录</div>
 			<div class="text-caption text-medium-emphasis mb-4">
 				请使用管理员账号密码登录
 			</div>
@@ -48,6 +48,7 @@
 					color="primary"
 					block
 					size="large"
+					class="text-none login-submit"
 					:loading="loading"
 					:disabled="!username || !password"
 				>
@@ -100,10 +101,27 @@ async function onSubmit() {
 		linear-gradient(165deg, var(--da-surface-soft) 0%, #e8f1f8 48%, var(--da-surface-soft) 100%);
 }
 
-.login-page :deep(.v-card) {
+.login-page :deep(.v-card),
+.login-card {
 	border: 1px solid var(--da-line-soft);
 	border-radius: var(--da-radius-lg) !important;
 	box-shadow: var(--da-shadow-lg) !important;
 	background: var(--da-surface) !important;
+}
+
+.login-title {
+	font-family: var(--da-font-display);
+	font-size: 1.35rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+	margin-bottom: 4px;
+}
+
+.login-submit {
+	border-radius: 999px !important;
+	font-weight: 600 !important;
+	min-height: 44px;
+	box-shadow: 0 8px 18px color-mix(in srgb, var(--da-primary) 24%, transparent) !important;
 }
 </style>

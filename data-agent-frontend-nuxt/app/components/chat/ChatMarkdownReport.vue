@@ -284,15 +284,21 @@ async function downloadHtml() {
 /* ── Format toggle ───────────────────────────────────────────────────────────── */
 .format-toggle {
 	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-sm);
+	border-radius: 999px;
 	overflow: hidden;
+	background: var(--da-surface-soft);
+	padding: 2px;
 }
 
 .fmt-btn {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
 	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	border-radius: 999px !important;
+	min-height: 28px !important;
 }
+
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .report-body {
