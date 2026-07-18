@@ -703,10 +703,11 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 /* ── Human feedback ──────────────────────────────────────────────────────────── */
 .human-feedback-panel {
 	margin-top: 8px;
-	background: #fffbeb;
-	border: 1px solid #fde68a;
-	border-radius: 8px;
-	padding: 8px 10px;
+	background: color-mix(in srgb, var(--da-warning) 10%, white);
+	border: 1px solid color-mix(in srgb, var(--da-warning) 35%, white);
+	border-radius: var(--da-radius-md);
+	padding: 10px 12px;
+	box-shadow: var(--da-shadow-sm);
 }
 .feedback-header {
 	display: flex;
@@ -724,10 +725,10 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 }
 .feedback-textarea {
 	width: 100%;
-	background: white;
-	border: 1px solid #fde68a;
-	border-radius: 6px;
-	padding: 6px 8px;
+	background: var(--da-surface);
+	border: 1px solid color-mix(in srgb, var(--da-warning) 35%, white);
+	border-radius: var(--da-radius-sm);
+	padding: 8px 10px;
 	font-size: 12.5px;
 	resize: none;
 	outline: none;
@@ -735,32 +736,42 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font-family: inherit;
 	margin-bottom: 8px;
 }
+.feedback-textarea:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 1px;
+}
 .feedback-actions {
 	display: flex;
 	gap: 8px;
+	flex-wrap: wrap;
 }
 .feedback-btn {
 	display: inline-flex;
 	align-items: center;
+	min-height: var(--da-control-height-sm);
 	padding: 5px 12px;
-	border-radius: 6px;
+	border-radius: 999px;
 	font-size: 12.5px;
 	font-weight: 600;
 	border: none;
 	cursor: pointer;
-	transition: opacity 0.1s;
+	transition: opacity var(--da-dur-fast) var(--da-ease-out);
 }
 .feedback-btn--accept {
 	background: var(--da-success);
-	color: white;
+	color: var(--da-on-primary);
 }
 .feedback-btn--reject {
-	background: white;
+	background: var(--da-surface);
 	color: var(--da-danger);
 	border: 1px solid var(--da-danger);
 }
 .feedback-btn:hover {
-	opacity: 0.85;
+	opacity: 0.9;
+}
+.feedback-btn:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
 }
 
 /* ── Transitions ─────────────────────────────────────────────────────────────── */

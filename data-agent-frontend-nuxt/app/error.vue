@@ -49,7 +49,7 @@ const handleBack = () => clearError({ redirect: '/' });
 	<div class="error-page">
 		<div class="error-card">
 			<div class="error-icon-wrap">
-				<v-icon :icon="illustration" size="72" color="#94a3b8" />
+				<v-icon :icon="illustration" size="72" color="primary" />
 			</div>
 
 			<div class="error-code">{{ statusCode }}</div>
@@ -90,42 +90,54 @@ const handleBack = () => clearError({ redirect: '/' });
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 	padding: 24px;
+	background:
+		radial-gradient(
+			900px 420px at 50% -10%,
+			color-mix(in srgb, var(--da-primary) 16%, transparent),
+			transparent 60%
+		),
+		linear-gradient(160deg, var(--da-surface-soft) 0%, #e8f1f8 50%, var(--da-surface-soft) 100%);
 }
 
 .error-card {
 	text-align: center;
 	max-width: 460px;
 	width: 100%;
+	padding: 36px 28px;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-lg);
+	box-shadow: var(--da-shadow-lg);
 }
 
 .error-icon-wrap {
-	margin-bottom: 20px;
-	opacity: 0.6;
+	margin-bottom: 16px;
+	opacity: 0.85;
 }
 
 .error-code {
-	font-size: 96px;
-	font-weight: 800;
+	font-family: var(--da-font-display);
+	font-size: 84px;
+	font-weight: 700;
 	line-height: 1;
-	color: #cbd5e1;
-	letter-spacing: -4px;
+	color: color-mix(in srgb, var(--da-primary) 28%, var(--da-line));
+	letter-spacing: -0.04em;
 	margin-bottom: 12px;
 }
 
 .error-text {
 	font-size: 20px;
 	font-weight: 600;
-	color: #334155;
+	color: var(--da-ink);
 	margin-bottom: 8px;
 }
 
 .error-detail {
 	font-size: 14px;
-	color: #94a3b8;
+	color: var(--da-muted);
 	line-height: 1.6;
-	margin-bottom: 32px;
+	margin-bottom: 28px;
 	word-break: break-word;
 }
 
@@ -134,14 +146,25 @@ const handleBack = () => clearError({ redirect: '/' });
 	align-items: center;
 	justify-content: center;
 	gap: 12px;
-	margin-top: 28px;
+	margin-top: 8px;
+	flex-wrap: wrap;
 }
 
 .action-btn {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
 	font-weight: 600 !important;
-	border-radius: 12px !important;
-	padding: 0 24px !important;
+	border-radius: 999px !important;
+	padding: 0 22px !important;
+	min-height: var(--da-control-height-md);
+}
+
+@media (max-width: 480px) {
+	.error-card {
+		padding: 28px 18px;
+	}
+	.action-btn {
+		width: 100%;
+	}
 }
 </style>

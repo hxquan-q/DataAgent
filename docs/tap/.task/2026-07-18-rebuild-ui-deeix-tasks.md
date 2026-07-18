@@ -6,7 +6,8 @@
 - [x] S3 报告 / 结果表 / 时间线
 - [x] S4 管理页 page-shell 收敛
 - [x] S5 a11y + reduced-motion + 窄屏
-- [x] 每阶段 `pnpm build` + commit + push（S0–S5）
-- [ ] S6 PR：`rebuild-ui` → `main`（用户仓库）
+- [x] 每阶段 `pnpm build` + commit + push（S0–S5 + 持续 polish）
+- [x] S6 PR：`rebuild-ui` → `main`（用户仓库）→ https://github.com/hxquan-q/DataAgent/pull/1
+- [ ] 用户验收视觉后 merge PR
 
 **冻结**：chat store SSE、graph EventSource、后端。
