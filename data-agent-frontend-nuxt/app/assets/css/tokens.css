@@ -101,6 +101,10 @@
 	--da-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
 		'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
 	--da-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	--da-font-chat: var(--da-font-sans);
+	--da-chat-font-size: 15px;
+	--da-chat-line-height: 1.75;
+	--da-answer-max: 880px;
 	--da-font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', Georgia,
 		'Noto Serif SC', 'Songti SC', serif;
 }

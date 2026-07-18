@@ -451,7 +451,7 @@ watch(
 	flex-direction: column;
 	gap: 16px;
 	width: 100%;
-	max-width: var(--da-chat-max, 960px);
+	max-width: min(100%, var(--da-answer-max, 880px));
 	margin: 0 auto;
 }
 
@@ -480,56 +480,56 @@ watch(
 	margin-top: 2px;
 }
 
-/* ── User card ───────────────────────────────────────────────────────────────── */
+/* ── User card (DEEIX: muted soft bubble, not primary fill) ─────────────────── */
 .user-card {
-	background: linear-gradient(
-		135deg,
-		var(--da-primary, #2f84d6) 0%,
-		var(--da-accent, #3b9eea) 100%
-	) !important;
-	color: white !important;
-	padding: 10px 14px;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-primary-soft)) !important;
+	color: var(--da-ink) !important;
+	padding: 12px 14px;
 	border-radius: var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) var(--da-radius-sm, 8px) var(--da-composer-radius, 18px) !important;
-	font-size: 13.5px;
-	line-height: 1.55;
-	max-width: min(62%, 560px);
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	font-weight: 400;
+	line-height: var(--da-chat-line-height, 1.75);
+	max-width: min(70%, 640px);
 	word-break: break-word;
-	box-shadow: 0 8px 20px color-mix(in srgb, var(--da-primary, #2f84d6) 24%, transparent) !important;
+	border: 1px solid color-mix(in srgb, var(--da-primary) 14%, var(--da-line-soft)) !important;
+	box-shadow: var(--da-shadow-sm) !important;
 	letter-spacing: -0.01em;
 }
 
-/* ── AI card ─────────────────────────────────────────────────────────────────── */
+/* ── AI card (DEEIX answer-first: open canvas, minimal chrome) ─────────────── */
 .ai-card {
-	padding: 12px 14px;
-	border-radius: var(--da-radius-sm, 8px) var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) !important;
-	font-size: 13.5px;
-	line-height: 1.65;
-	max-width: min(82%, 760px);
+	padding: 4px 2px 8px;
+	border-radius: 0 !important;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	font-weight: 400;
+	line-height: var(--da-chat-line-height, 1.75);
+	max-width: min(100%, var(--da-answer-max, 880px));
 	word-break: break-word;
 	color: var(--da-ink, #1a2332);
-	background: var(--da-surface, #fff) !important;
-	border: 1px solid var(--da-line-soft, #e4edf5) !important;
-	box-shadow: var(--da-shadow-sm) !important;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
 	letter-spacing: -0.01em;
-	transition: box-shadow var(--da-dur-base, 0.2s) var(--da-ease-out),
-		border-color var(--da-dur-base, 0.2s) var(--da-ease-out);
 }
 
 .ai-card:hover {
-	border-color: color-mix(in srgb, var(--da-primary, #2f84d6) 22%, var(--da-line-soft, #e4edf5)) !important;
-	box-shadow: var(--da-shadow-md) !important;
+	border-color: transparent !important;
+	box-shadow: none !important;
 }
 
-/* Report card: answer primary — stronger frame */
+/* Report card: artifact paper (elevated vs open answer) */
 .report-card {
 	max-width: 100% !important;
 	padding: 0 !important;
 	flex: 1;
 	min-width: 0;
-	border: 1px solid color-mix(in srgb, var(--da-primary, #2f84d6) 28%, transparent) !important;
-	box-shadow: var(--da-shadow-lg) !important;
+	background: var(--da-surface) !important;
+	border: 1px solid color-mix(in srgb, var(--da-primary) 24%, var(--da-line-soft)) !important;
+	box-shadow: var(--da-shadow-md) !important;
 	overflow: hidden;
-	border-radius: var(--da-radius-md, 14px) !important;
+	border-radius: var(--da-radius-md) !important;
 }
 
 /* Timeline card: process secondary (DEEIX hierarchy) */

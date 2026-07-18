@@ -572,10 +572,10 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	border: none;
 	outline: none;
 	resize: vertical;
-	font-size: 14px;
-	line-height: 1.6;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: 1.55;
 	color: var(--da-ink);
-	font-family: inherit;
 	min-height: 56px;
 	max-height: 240px;
 }
