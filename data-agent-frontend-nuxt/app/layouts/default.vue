@@ -674,6 +674,7 @@ watch(
 }
 
 .brand-title {
+	color: var(--da-sidebar-ink, #1a2332);
 	font-family: var(--da-font-display);
 	letter-spacing: -0.02em;
 }
@@ -689,12 +690,6 @@ watch(
 
 .app-header-chip {
 	border-radius: 999px !important;
-}
-
-.brand-title {
-	color: var(--da-sidebar-ink, #1a2332);
-	font-family: var(--da-font-display);
-	letter-spacing: -0.02em;
 }
 
 /* rebuild-ui: light paper sidebar brand */

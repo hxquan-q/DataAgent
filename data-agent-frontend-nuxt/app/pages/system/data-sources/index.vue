@@ -774,4 +774,17 @@ onMounted(() => {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
+.ds-empty {
+	padding: 40px 24px;
+	border: 1.5px dashed var(--da-line-soft);
+	border-radius: var(--da-radius-lg);
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
+	margin: 8px;
+}
+.ds-empty__desc {
+	max-width: 440px;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 1.6;
+}
 </style>

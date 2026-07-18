@@ -93,7 +93,7 @@ function clearAll() {
 
 <style scoped>
 .manage-tables-container {
-	background: white;
+	background: var(--da-surface);
 	border-radius: var(--da-radius-md);
 	border: 1px solid var(--da-line-soft);
 	box-shadow: inset 0 1px 0 var(--da-line-soft);
@@ -123,5 +123,10 @@ function clearAll() {
 @keyframes expandSlideDown {
 	from { max-height: 0; opacity: 0; overflow: hidden; }
 	to { max-height: 800px; opacity: 1; overflow: visible; }
+}
+@media (prefers-reduced-motion: reduce) {
+.expand-row-content {
+	animation: none !important;
+}
 }
 </style>

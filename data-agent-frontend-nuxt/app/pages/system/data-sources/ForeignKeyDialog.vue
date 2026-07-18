@@ -68,7 +68,7 @@
 								</td>
 								<td class="text-center">
 									<v-icon size="16" color="grey">mdi-link-variant</v-icon>
-									<div class="text-caption font-weight-bold text-medium-emphasis">
+									<div class="text-caption font-weight-medium text-medium-emphasis">
 										{{ fk.relationType }}
 									</div>
 								</td>
