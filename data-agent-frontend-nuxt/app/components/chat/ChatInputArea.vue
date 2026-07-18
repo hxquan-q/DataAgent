@@ -625,6 +625,10 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	border-color: var(--da-accent);
 	color: var(--da-accent);
 }
+.option-chip:focus-within {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
 .option-chip.active {
 	background: var(--da-primary-soft);
 	border-color: var(--da-accent);

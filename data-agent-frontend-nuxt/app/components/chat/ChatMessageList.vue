@@ -531,16 +531,21 @@ watch(
 	border-radius: var(--da-radius-md, 14px) !important;
 }
 
-/* Timeline card: process secondary (WeKnora hierarchy) */
+/* Timeline card: process secondary (DEEIX hierarchy) */
 .timeline-card {
-	padding: 10px 12px;
+	padding: 8px 10px;
 	max-width: 100% !important;
 	flex: 1;
 	min-width: 0;
-	background: var(--da-surface-soft) !important;
-	border: 1px dashed var(--da-line-soft) !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 88%, var(--da-surface)) !important;
+	border: 1px dashed color-mix(in srgb, var(--da-line) 55%, transparent) !important;
 	box-shadow: none !important;
-	border-radius: 12px !important;
+	border-radius: var(--da-radius-md) !important;
+	opacity: 0.96;
+}
+.timeline-card:hover {
+	opacity: 1;
+	border-color: color-mix(in srgb, var(--da-primary) 22%, var(--da-line-soft)) !important;
 }
 
 /* ── Thinking feedback (WeKnora-like status) ─────────────────────────────────── */
@@ -614,7 +619,7 @@ watch(
 	margin-bottom: 2px;
 }
 .md-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
 	padding: 1px 4px;
 	border-radius: 3px;
@@ -682,13 +687,13 @@ watch(
 	border: 1px solid var(--da-line-soft);
 	border-radius: 6px;
 	overflow: auto;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 }
 .md-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	padding: 3px 6px;
 	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
@@ -711,7 +716,7 @@ watch(
 	color: var(--da-ink);
 }
 .md-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
+	background: var(--da-surface-soft);
 	border-color: var(--da-line);
 }
 .md-body :deep(.code-copy-button.copied) {
@@ -724,7 +729,7 @@ watch(
 	padding: 8px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 	font-size: 11.5px;
 	line-height: 1.4;
 	white-space: pre;
