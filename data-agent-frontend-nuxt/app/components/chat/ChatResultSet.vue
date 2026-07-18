@@ -315,7 +315,7 @@ function downloadCsv() {
 	align-items: center;
 	gap: 6px;
 	padding: 4px 6px;
-	background: linear-gradient(180deg, var(--da-surface-soft) 0%, var(--da-surface-soft) 100%);
+	background: linear-gradient(180deg, color-mix(in srgb, var(--da-primary-soft) 40%, var(--da-surface-soft)) 0%, var(--da-surface-soft) 100%);
 	border: 1px solid var(--da-line-soft);
 	border-bottom: none;
 	border-radius: 8px 8px 0 0;

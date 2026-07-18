@@ -247,8 +247,8 @@ async function downloadHtml() {
 </script>
 
 <style scoped>
-.markdown-report {
-	background: white;
+ .markdown-report {
+	background: var(--da-surface);
 }
 
 /* ── Header ──────────────────────────────────────────────────────────────────── */
@@ -256,11 +256,11 @@ async function downloadHtml() {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 4px 8px;
-	background: var(--da-surface-soft);
+	padding: 8px 12px;
+	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface-soft));
 	border-bottom: 1px solid var(--da-line-soft);
 	flex-wrap: wrap;
-	gap: 4px;
+	gap: 6px;
 }
 .report-title {
 	display: flex;
