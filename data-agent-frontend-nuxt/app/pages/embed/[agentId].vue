@@ -809,16 +809,18 @@ onBeforeUnmount(() => {
 .embed-welcome__text {
 	margin: 0;
 	max-width: min(88%, 520px);
-	padding: 10px 14px;
-	font-size: 14px;
-	line-height: 1.55;
+	padding: 4px 2px;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
 	color: var(--embed-text);
 	white-space: pre-wrap;
 	word-break: break-word;
-	background: color-mix(in srgb, var(--embed-primary) 7%, var(--da-surface));
-	border: 1px solid color-mix(in srgb, var(--embed-primary) 14%, var(--da-line-soft));
-	border-radius: var(--da-radius-sm) var(--da-composer-radius) var(--da-composer-radius) var(--da-composer-radius);
-	box-shadow: var(--da-shadow-sm);
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+	text-align: center;
 }
 .embed-welcome__text.muted {
 	color: var(--embed-muted);
@@ -854,23 +856,25 @@ onBeforeUnmount(() => {
 .embed-suggested__card {
 	text-align: left;
 	padding: 10px 12px;
-	border-radius: var(--da-radius-md);
-	border: 1px solid var(--embed-border);
-	background: var(--embed-surface);
+	border-radius: 999px;
+	border: 0.5px solid color-mix(in srgb, var(--embed-border) 80%, transparent);
+	background: color-mix(in srgb, var(--embed-surface) 88%, transparent);
 	font-size: 13px;
-	line-height: 1.45;
+	line-height: 1.4;
 	color: var(--embed-text);
 	cursor: pointer;
 	transition:
-		border-color 0.18s ease,
-		box-shadow 0.18s ease,
-		transform 0.18s ease;
-	min-height: 44px;
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
+	min-height: 40px;
+	box-shadow: var(--da-shadow-sm);
 }
 .embed-suggested__card:hover {
-	border-color: color-mix(in srgb, var(--embed-primary) 45%, var(--embed-border));
-	box-shadow: var(--da-shadow-md);
-	transform: translateY(-1px);
+	border-color: color-mix(in srgb, var(--embed-primary) 40%, var(--embed-border));
+	background: color-mix(in srgb, var(--embed-primary) 8%, var(--embed-surface));
+	box-shadow: var(--da-shadow-sm);
+	transform: none;
+	color: var(--embed-primary);
 }
 .embed-suggested__card:focus-visible {
 	outline: 2px solid var(--embed-primary);
@@ -888,29 +892,37 @@ onBeforeUnmount(() => {
 	justify-content: flex-end;
 }
 .msg-user__bubble {
-	max-width: min(88%, 560px);
-	padding: 10px 14px;
-	background: color-mix(in srgb, var(--embed-primary) 12%, var(--da-surface));
-	border: 1px solid color-mix(in srgb, var(--embed-primary) 18%, var(--da-line-soft));
-	border-radius: var(--da-composer-radius) var(--da-radius-sm) var(--da-composer-radius) var(--da-composer-radius);
-	font-size: 14px;
-	line-height: 1.55;
+	max-width: min(70%, 640px);
+	padding: 12px 14px;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, color-mix(in srgb, var(--embed-primary) 12%, var(--da-surface)));
+	border: 1px solid color-mix(in srgb, var(--embed-primary) 14%, var(--da-line-soft));
+	border-radius: var(--da-composer-radius) var(--da-composer-radius) var(--da-radius-sm) var(--da-composer-radius);
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	font-weight: 400;
 	white-space: pre-wrap;
 	word-break: break-word;
+	color: var(--embed-text);
+	box-shadow: var(--da-shadow-sm);
 }
 .msg-bot {
 	display: flex;
 	flex-direction: column;
-	gap: 10px;
-	max-width: 100%;
-	padding: 2px 0;
+	gap: 12px;
+	max-width: min(100%, var(--da-answer-max, 880px));
+	padding: 4px 2px 8px;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--embed-text);
 }
 .msg-bot__artifact {
 	margin-top: 8px;
 	padding: 0 0 8px;
 	background: var(--da-surface);
-	border: 1px solid color-mix(in srgb, var(--embed-primary) 22%, var(--da-line-soft));
-	border-radius: var(--da-radius-md);
+	border: 0.5px solid color-mix(in srgb, var(--embed-primary) 22%, var(--da-line-soft));
+	border-radius: 12px;
 	overflow: hidden;
 	box-shadow: var(--da-shadow-sm);
 }
@@ -921,8 +933,11 @@ onBeforeUnmount(() => {
 	padding: 8px 12px 4px;
 }
 .msg-bot__answer {
-	/* 答案区不包重边框气泡，贴近 WeKnora content-wrapper */
+	/* DEEIX answer-first open canvas */
 	padding: 2px 0;
+	background: transparent;
+	border: none;
+	box-shadow: none;
 }
 
 /* ── Pipeline（折叠分析过程） ─────────────────────────────────── */
@@ -1084,29 +1099,32 @@ onBeforeUnmount(() => {
 	display: flex;
 	gap: 8px;
 	align-items: flex-end;
-	max-width: 880px;
+	max-width: min(100%, var(--da-answer-max, 880px));
 	margin: 0 auto;
-	padding: 10px 12px;
-	background: var(--embed-surface);
-	border: 1px solid var(--embed-border);
-	border-radius: var(--da-composer-radius, 18px);
-	box-shadow: var(--da-shadow-composer, var(--da-shadow-md));
+	padding: 8px 12px 10px;
+	background: color-mix(in srgb, var(--embed-surface) 92%, transparent);
+	border: 0.5px solid color-mix(in srgb, var(--embed-border) 80%, transparent);
+	border-radius: 24px;
+	box-shadow: var(--da-shadow-sm);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
 	transition: border-color var(--da-dur-fast) var(--da-ease-out),
-		box-shadow var(--da-dur-fast) var(--da-ease-out);
+		box-shadow var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
 }
 .input-shell:focus-within {
-	border-color: color-mix(in srgb, var(--embed-primary) 50%, var(--embed-border));
-	box-shadow: 0 0 0 3px color-mix(in srgb, var(--embed-primary) 14%, transparent),
-		var(--da-shadow-composer, var(--da-shadow-md));
+	border-color: color-mix(in srgb, var(--embed-primary) 40%, var(--embed-border));
+	background: var(--embed-surface);
+	box-shadow: var(--da-shadow-md);
 }
 .input-shell__field {
 	flex: 1;
 	border: none;
 	outline: none;
 	resize: none;
-	font: inherit;
-	font-size: 14px;
-	line-height: 1.5;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: 1.55;
 	max-height: 120px;
 	min-height: 24px;
 	padding: 6px 4px;
@@ -1119,16 +1137,17 @@ onBeforeUnmount(() => {
 .input-shell__send {
 	flex-shrink: 0;
 	border: none;
-	border-radius:  999px;
-	padding: 0 16px;
+	border-radius: 12px;
+	padding: 0 14px;
 	height: 36px;
 	min-width: 64px;
 	background: var(--embed-primary);
 	color: white;
-	font-size: 14px;
-	font-weight: 500;
+	font-size: 13.5px;
+	font-weight: 600;
 	cursor: pointer;
 	transition: opacity 0.15s ease;
+	box-shadow: none;
 }
 .input-shell__send:disabled {
 	opacity: 0.45;
