@@ -16,18 +16,13 @@
 
 <template>
 	<section class="page-shell">
-		<header class="d-flex align-center justify-space-between mb-5">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1 page-title">数据源配置</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					{{
-						agentId
-							? `为智能体 #${agentId} 管理/绑定数据源：连接配置、激活与表选择。`
-							: '管理全局数据库连接资源，配置连接信息与逻辑外键。'
-					}}
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+		<KnowledgePageHeader
+			title="数据源配置"
+			:subtitle="agentId
+				? `为智能体 #${agentId} 管理/绑定数据源：连接配置、激活与表选择。`
+				: '管理全局数据库连接资源，配置连接信息与逻辑外键。'"
+		>
+			<template #actions>
 				<v-btn
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -60,9 +55,8 @@
 				>
 					{{ initStatus ? '初始化中...' : '初始化当前智能体数据源' }}
 				</v-btn>
-			</div>
-		</header>
-
+			</template>
+		</KnowledgePageHeader>
 
 		<!-- R153: agent-scoped binding context -->
 		<v-alert

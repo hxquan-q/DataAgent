@@ -16,27 +16,23 @@
 
 <template>
 	<v-container fluid class="page-shell pa-6 agents-container">
-		<!-- Header Section -->
-		<header class="d-flex align-center justify-space-between mb-5">
-			<div>
-				<h1 class="text-h5 font-weight-bold mb-1 page-title">智能体管理</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					创建和管理您的AI智能体,让数据分析更智能
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+		<KnowledgePageHeader
+			title="智能体管理"
+			subtitle="创建、配置与发布问数智能体，管理绑定数据源与运行参数。"
+		>
+			<template #actions>
 				<v-btn
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
-					@click="loadAgents"
 					class="text-none"
 					style="border-color: var(--da-line-soft)"
+					@click="loadAgents"
 				>
 					刷新
 				</v-btn>
 				<v-btn
-					color="black"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -44,8 +40,8 @@
 				>
 					新建智能体
 				</v-btn>
-			</div>
-		</header>
+			</template>
+		</KnowledgePageHeader>
 
 		
 		<!-- R181: global chat model readiness -->
@@ -653,7 +649,7 @@ onMounted(() => {
 
 <style scoped>
 .agents-container {
-	background-color: var(--da-surface-soft);
+	background: transparent;
 	min-height: 100%;
 }
 

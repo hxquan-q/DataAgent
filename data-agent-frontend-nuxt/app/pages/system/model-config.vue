@@ -16,15 +16,11 @@
 
 <template>
 	<v-container fluid class="page-shell pa-6 model-config-container">
-		<!-- Header Section -->
-		<header class="d-flex align-center justify-space-between mb-5">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1 page-title">模型服务</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					连接 LLM 供应商，支持对话生成与向量检索。
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+		<KnowledgePageHeader
+			title="模型服务"
+			subtitle="连接 LLM 供应商，支持对话生成与向量检索。"
+		>
+			<template #actions>
 				<v-btn
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -36,7 +32,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="black"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -44,8 +40,8 @@
 				>
 					{{ activeTab === 'CHAT' ? '添加对话模型' : '添加嵌入模型' }}
 				</v-btn>
-			</div>
-		</header>
+			</template>
+		</KnowledgePageHeader>
 
 		<!-- Tab Navigation (Segmented Toggle) -->
 		<div class="d-flex justify-center mb-5">
@@ -364,7 +360,7 @@
 									min="0"
 									max="2"
 									step="0.1"
-									color="black"
+									color="primary"
 									density="compact"
 									hide-details
 								/>
@@ -391,7 +387,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="black"
+						color="primary"
 						class="text-none px-8"
 						elevation="0"
 						:loading="saving"
@@ -686,7 +682,7 @@ onMounted(fetchConfigs);
 
 <style scoped>
 .model-config-container {
-	background-color: var(--da-surface-soft);
+	background: transparent;
 	min-height: 100%;
 }
 
