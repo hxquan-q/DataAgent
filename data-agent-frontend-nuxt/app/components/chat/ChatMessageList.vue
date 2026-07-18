@@ -762,11 +762,11 @@ watch(
 }
 
 /* ── Status banners (warning / error) ────────────────────────────────────────── */
-.status-banner {
+ .status-banner {
 	display: flex;
 	align-items: center;
-	padding: 6px 10px;
-	border-radius: 6px;
+	padding: 8px 12px;
+	border-radius: var(--da-radius-sm);
 	font-size: 13px;
 	font-weight: 500;
 	line-height: 1.5;
@@ -774,12 +774,12 @@ watch(
 }
 .status-banner--warning {
 	background: color-mix(in srgb, var(--da-warning) 10%, white);
-	border: 1px solid #fcd34d;
+	border: 1px solid color-mix(in srgb, var(--da-warning) 40%, white);
 	color: var(--da-warning);
 }
 .status-banner--error {
 	background: color-mix(in srgb, var(--da-danger) 8%, white);
-	border: 1px solid #fca5a5;
+	border: 1px solid color-mix(in srgb, var(--da-danger) 35%, white);
 	color: var(--da-danger);
 }
 
