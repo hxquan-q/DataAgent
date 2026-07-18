@@ -21,6 +21,7 @@
 - [x] **page header ink + dialog soft**（管理页标题去 primary · 对话框 10px 按钮）
 - [x] **admin cards quiet + denser segmented**（模型卡去抬升 · 分段控件 36px）
 - [x] **embed answer-first dock**（嵌入聊天对齐主 chat 层级）
+- [x] **agent create form + toast soft**（新建表单扁平 · snackbar 轻边）
 - [ ] **用户验收视觉后 merge PR**（下一门控，需人工）
 
 **冻结**：chat store SSE、graph EventSource、后端。

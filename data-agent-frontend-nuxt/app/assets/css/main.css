@@ -146,11 +146,11 @@
 }
 
 .custom-label {
-	font-size: 0.75rem;
+	font-size: 11.5px;
 	font-weight: 600;
 	color: var(--da-muted);
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	letter-spacing: 0.04em;
 	margin-bottom: 6px;
 	display: block;
 }
@@ -467,3 +467,23 @@ button:focus-visible,
 	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
+
+
+/* Form field soft radius (admin/create forms) */
+.page-shell :deep(.v-field) {
+	border-radius: 10px !important;
+}
+
+.page-shell :deep(.v-field--variant-outlined .v-field__outline) {
+	--v-field-border-opacity: 0.5;
+}
+
+.page-shell :deep(.v-field--focused .v-field__outline) {
+	--v-field-border-opacity: 0.85;
+}
+
+.page-shell :deep(.v-label),
+.page-shell :deep(.v-field-label) {
+	letter-spacing: -0.01em;
+}
+

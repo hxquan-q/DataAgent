@@ -21,7 +21,7 @@
 		:timeout="timeout"
 		:location="location"
 		rounded="lg"
-		elevation="2"
+		elevation="0"
 		class="da-tip-snackbar"
 	>
 		<div class="d-flex align-center w-100">
@@ -53,9 +53,16 @@ const { isVisible, message, color, timeout, location, icon } =
 
 <style scoped>
 .da-tip-snackbar :deep(.v-snackbar__wrapper) {
-	border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
-	box-shadow: var(--da-shadow-md) !important;
-	font-size: 13.5px;
+	min-width: 280px;
+	border: 0.5px solid color-mix(in srgb, currentColor 22%, transparent);
+	box-shadow: var(--da-shadow-sm) !important;
+	border-radius: 12px !important;
+	font-size: 13px;
+	font-weight: 500;
 	letter-spacing: -0.01em;
+	backdrop-filter: blur(8px);
+}
+.da-tip-snackbar :deep(.v-btn) {
+	border-radius: 8px !important;
 }
 </style>

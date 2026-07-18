@@ -43,14 +43,14 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-alert type="info" variant="tonal" border="start" class="mb-4" density="comfortable">
+		<v-alert type="info" variant="tonal" class="mb-4 agent-create-alert" density="comfortable">
 			<span class="text-body-2">创建前建议：先</span>
 			<a class="text-primary text-decoration-none font-weight-medium" href="/system/model-config">配置 CHAT 模型</a>
 			<span class="text-body-2">；创建后将引导绑定数据源。</span>
 		</v-alert>
 
 
-		<v-card variant="flat" border class="rounded-lg pa-6 agent-create-card">
+		<v-card variant="flat" border class="rounded-lg pa-5 agent-create-card">
 			<v-form ref="formRef">
 				<div class="mb-6">
 					<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
@@ -340,14 +340,41 @@ onMounted(() => {
 
 <style scoped>
 .agent-create-card {
-	box-shadow: var(--da-shadow-sm) !important;
-	border-color: var(--da-line-soft) !important;
+	box-shadow: none !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 48%, transparent) !important;
 	background: var(--da-surface) !important;
+	border-radius: 14px !important;
+}
+
+.agent-create-alert {
+	border-radius: 12px !important;
+	box-shadow: none !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-info) 22%, transparent) !important;
+}
+
+.agent-create-card :deep(.text-body-2.font-weight-medium) {
+	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--da-muted) !important;
+}
+
+.agent-create-card :deep(.v-field) {
+	border-radius: 10px !important;
+}
+
+.agent-create-card :deep(.v-btn) {
+	border-radius: 10px !important;
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 500 !important;
 }
 
 .avatar-preview {
-	border: 2px solid var(--da-line-soft);
-	box-shadow: var(--da-shadow-sm);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent);
+	box-shadow: none;
 	background: var(--da-surface-soft);
+	border-radius: 12px !important;
 }
 </style>
