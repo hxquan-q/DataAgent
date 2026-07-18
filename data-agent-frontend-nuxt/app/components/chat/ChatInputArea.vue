@@ -691,10 +691,14 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font-size: 13.5px;
 	font-weight: 600;
 	cursor: pointer;
-	transition: background var(--da-dur-fast, 0.15s);
+	box-shadow: 0 6px 16px color-mix(in srgb, var(--da-danger) 28%, transparent);
+	transition:
+		background var(--da-dur-fast, 0.15s) var(--da-ease-out),
+		box-shadow var(--da-dur-fast, 0.15s) var(--da-ease-out);
 }
 .stop-btn:hover {
-	background: var(--da-danger);
+	background: color-mix(in srgb, var(--da-danger) 88%, #000);
+	box-shadow: 0 8px 18px color-mix(in srgb, var(--da-danger) 32%, transparent);
 }
 .stop-btn:focus-visible {
 	outline: 2px solid var(--da-ring, var(--da-primary));
