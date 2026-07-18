@@ -22,7 +22,7 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -32,7 +32,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -75,7 +75,7 @@
 				/>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -162,7 +162,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editModel(item)"
 						>
@@ -194,7 +194,7 @@
 						<v-icon
 							icon="mdi-chart-line"
 							size="64"
-							color="blue-lighten-3"
+							color="primary"
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">暂无指标定义</p>
@@ -202,7 +202,7 @@
 							点击「添加指标」开始配置 NL2Semantic2SQL 指标
 						</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -220,7 +220,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -489,7 +489,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -525,7 +525,7 @@
 				<v-card-text class="pa-5">
 					<v-alert
 						variant="tonal"
-						color="blue-lighten-4"
+						color="primary"
 						density="compact"
 						class="mb-4"
 					>

@@ -27,7 +27,7 @@
 			</div>
 			<div class="d-flex ga-3">
 				<v-btn
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -37,7 +37,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					:color="filterVisible ? 'blue-darken-1' : 'blue-grey-lighten-1'"
+					:color="filterVisible ? 'primary' : 'blue-grey-lighten-1'"
 					prepend-icon="mdi-filter-variant"
 					class="text-none px-6"
 					elevation="0"
@@ -46,7 +46,7 @@
 					筛选
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -74,7 +74,7 @@
 				/>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -191,7 +191,7 @@
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.isRecall="{ item }">
 					<v-chip
-						:color="item.isRecall ? 'blue-darken-1' : 'grey'"
+						:color="item.isRecall ? 'primary' : 'grey'"
 						size="small"
 						variant="tonal"
 					>
@@ -205,7 +205,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-cog"
 							@click="editKnowledge(item)"
 						/>
@@ -223,7 +223,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.isRecall ? 'grey-darken-1' : 'blue-darken-1'"
+							:color="item.isRecall ? 'grey-darken-1' : 'primary'"
 							:icon="item.isRecall ? 'mdi-bookmark-off' : 'mdi-bookmark-plus'"
 							@click="toggleStatus(item)"
 						>
@@ -246,7 +246,7 @@
 						<v-icon
 							icon="mdi-brain"
 							size="64"
-							color="blue-lighten-3"
+							color="primary"
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">暂无智能体知识</p>
@@ -254,7 +254,7 @@
 							点击「添加知识」为智能体补充知识资源
 						</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -283,7 +283,7 @@
 					:model-value="queryParams.pageNum"
 					:length="totalPages"
 					density="comfortable"
-					color="blue-darken-2"
+					color="primary"
 					@update:model-value="handleCurrentChange"
 				/>
 			</div>
@@ -294,7 +294,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -470,7 +470,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -665,7 +665,7 @@ function getTypeLabel(type?: string) {
 function getTypeColor(type?: string) {
 	switch (type) {
 		case 'DOCUMENT':
-			return 'blue-darken-1';
+			return 'primary';
 		case 'QA':
 			return 'indigo';
 		case 'FAQ':
@@ -680,7 +680,7 @@ function getEmbeddingStatusColor(status?: string) {
 		case 'COMPLETED':
 			return 'success';
 		case 'PROCESSING':
-			return 'blue-darken-1';
+			return 'primary';
 		case 'FAILED':
 			return 'error';
 		case 'PENDING':

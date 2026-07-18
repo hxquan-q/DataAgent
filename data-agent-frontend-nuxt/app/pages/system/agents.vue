@@ -19,7 +19,7 @@
 		<!-- Header Section -->
 		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
-				<h1 class="text-h5 font-weight-bold mb-1 text-slate-900">智能体管理</h1>
+				<h1 class="text-h5 font-weight-bold mb-1">智能体管理</h1>
 				<p class="text-body-2 text-medium-emphasis">
 					创建和管理您的AI智能体,让数据分析更智能
 				</p>
@@ -233,7 +233,7 @@
 							icon="mdi-pencil-outline"
 							variant="text"
 							size="small"
-							color="blue-darken-1"
+							color="primary"
 							@click="handleEdit(item)"
 						>
 							<v-icon size="20" />
@@ -299,7 +299,7 @@
 			<v-card rounded="lg">
 				<v-card-title class="d-flex align-center justify-space-between px-6 pt-6 pb-4">
 					<div class="d-flex align-center">
-						<v-icon icon="mdi-pencil-circle" color="blue-darken-1" class="mr-3" size="28" />
+						<v-icon icon="mdi-pencil-circle" color="primary" class="mr-3" size="28" />
 						<span class="text-h6 font-weight-bold">编辑智能体</span>
 					</div>
 					<v-btn icon="mdi-close" variant="text" size="small" @click="closeEditDialog" />
@@ -375,7 +375,7 @@
 				<v-card-actions class="pa-4 d-flex justify-end ga-2">
 					<v-btn variant="outlined" class="text-none px-6" @click="closeEditDialog">取消</v-btn>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -657,9 +657,7 @@ onMounted(() => {
 	min-height: 100%;
 }
 
-.text-slate-900 {
-	color: var(--da-ink);
-}
+
 
 .filter-toggle {
 	background-color: var(--da-surface-soft) !important;

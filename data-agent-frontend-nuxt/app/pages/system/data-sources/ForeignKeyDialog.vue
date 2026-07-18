@@ -59,7 +59,7 @@
 						<tbody>
 							<tr v-for="(fk, index) in relations" :key="index">
 								<td>
-									<div class="font-weight-bold text-blue-darken-2">
+									<div class="font-weight-bold text-primary">
 										{{ fk.sourceTableName }}
 									</div>
 									<div class="text-caption text-grey">

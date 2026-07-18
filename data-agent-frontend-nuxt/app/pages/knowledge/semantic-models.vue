@@ -22,7 +22,7 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -32,7 +32,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="blue-darken-1"
+					color="primary"
 					prepend-icon="mdi-upload"
 					class="text-none px-6"
 					elevation="0"
@@ -41,7 +41,7 @@
 					批量导入
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -79,7 +79,7 @@
 				</v-btn>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -140,7 +140,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editModel(item)"
 						/>
@@ -170,7 +170,7 @@
 						<v-icon
 							icon="mdi-vector-intersection"
 							size="64"
-							color="blue-lighten-3"
+							color="primary"
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">暂无语义模型</p>
@@ -178,7 +178,7 @@
 							点击「添加语义模型」开始配置字段语义映射
 						</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -196,7 +196,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -331,7 +331,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -348,7 +348,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-upload"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -376,7 +376,7 @@
 					<div class="d-flex ga-2 mt-4">
 						<v-btn
 							variant="tonal"
-							color="blue-darken-1"
+							color="primary"
 							prepend-icon="mdi-download"
 							class="text-none"
 							@click="downloadExcelTemplate"
@@ -384,7 +384,7 @@
 							下载模板
 						</v-btn>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-upload"
 							class="text-none"
 							elevation="0"

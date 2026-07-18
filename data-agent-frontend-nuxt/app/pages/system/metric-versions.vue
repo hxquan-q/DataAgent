@@ -22,7 +22,7 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -33,7 +33,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -64,7 +64,7 @@
 				/>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -140,7 +140,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editModel(item)"
 						>
@@ -163,7 +163,7 @@
 						<v-icon
 							icon="mdi-source-branch"
 							size="64"
-							color="blue-lighten-3"
+							color="primary"
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">
@@ -178,7 +178,7 @@
 						</p>
 						<v-btn
 							v-if="selectedMetricId"
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -194,9 +194,9 @@
 		<!-- 口径版本对比：选两个版本并排 diff，直观查看口径差异（杜绝金额歧义） -->
 		<v-card variant="flat" border class="rounded-lg pa-5">
 			<div class="d-flex align-center mb-3">
-				<v-icon icon="mdi-compare-horizontal" color="blue-darken-2" class="mr-2" size="22" />
+				<v-icon icon="mdi-compare-horizontal" color="primary" class="mr-2" size="22" />
 				<span class="text-subtitle-1 font-weight-bold">口径版本对比</span>
-				<v-chip size="x-small" variant="tonal" color="blue-lighten-3" class="ml-3">
+				<v-chip size="x-small" variant="tonal" color="primary" class="ml-3">
 					Diff
 				</v-chip>
 			</div>
@@ -240,7 +240,7 @@
 				<div class="d-flex">
 					<div class="flex-grow-1 pa-4 diff-col diff-col--left">
 						<div class="d-flex align-center mb-3">
-							<v-chip size="small" color="blue-lighten-4" variant="flat">
+							<v-chip size="small" color="primary" variant="flat">
 								{{ diffLeft.verCode }}
 							</v-chip>
 							<v-chip
@@ -260,7 +260,7 @@
 					<v-divider vertical />
 					<div class="flex-grow-1 pa-4 diff-col diff-col--right">
 						<div class="d-flex align-center mb-3">
-							<v-chip size="small" color="blue-lighten-4" variant="flat">
+							<v-chip size="small" color="primary" variant="flat">
 								{{ diffRight.verCode }}
 							</v-chip>
 							<v-chip
@@ -316,7 +316,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -437,7 +437,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"

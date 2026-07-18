@@ -22,7 +22,7 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -79,7 +79,7 @@
 					@update:model-value="onFilterChange"
 				/>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-refresh"
 					class="text-none px-6"
 					elevation="0"
@@ -91,7 +91,7 @@
 				<v-spacer />
 				<v-chip
 					v-if="total > 0"
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -185,7 +185,7 @@
 					<v-btn
 						size="small"
 						variant="text"
-						color="blue-darken-1"
+						color="primary"
 						icon="mdi-file-eye-outline"
 						:loading="detailId === item.id"
 						@click="openDetail(item)"
@@ -199,7 +199,7 @@
 						<v-icon
 							icon="mdi-file-document-multiple-outline"
 							size="64"
-							color="blue-lighten-3"
+							color="primary"
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">
@@ -219,7 +219,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-shield-link-variant-outline"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -237,7 +237,7 @@
 				<v-card-text class="pa-5">
 					<template v-if="detailLoading">
 						<div class="d-flex justify-center align-center py-12">
-							<v-progress-circular indeterminate color="blue-darken-2" />
+							<v-progress-circular indeterminate color="primary" />
 						</div>
 					</template>
 					<template v-else-if="detail">
@@ -246,7 +246,7 @@
 							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
 								用户查询
 							</p>
-							<v-card variant="tonal" color="blue-lighten-5" class="rounded pa-3">
+							<v-card variant="tonal" color="primary" class="rounded pa-3">
 								<span class="text-body-1">{{ detail.userQuery || '—' }}</span>
 							</v-card>
 						</div>

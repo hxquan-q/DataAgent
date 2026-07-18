@@ -87,6 +87,11 @@
 }
 
 /* Shared paper panel utility */
+.bg-primary-soft {
+	background: var(--da-primary-soft) !important;
+	color: var(--da-ink);
+}
+
 .da-paper {
 	background: var(--da-surface);
 	border: 1px solid var(--da-line-soft);

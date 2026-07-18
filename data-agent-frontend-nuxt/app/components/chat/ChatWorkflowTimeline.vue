@@ -326,7 +326,7 @@ const timelineSteps = computed<TimelineStep[]>(() => {
 
 function dotColor(status: string): string {
 	if (status === 'done') return 'green';
-	if (status === 'active') return 'blue-darken-2';
+	if (status === 'active') return 'primary';
 	return 'grey-lighten-1';
 }
 

@@ -22,7 +22,7 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
@@ -33,7 +33,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -77,7 +77,7 @@
 				/>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -168,7 +168,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editModel(item)"
 						>
@@ -191,7 +191,7 @@
 						<v-icon
 							icon="mdi-tag-multiple"
 							size="64"
-							color="blue-lighten-3"
+							color="primary"
 							class="mb-4"
 						/>
 						<p class="text-body-1 text-medium-emphasis mb-2">
@@ -206,7 +206,7 @@
 						</p>
 						<v-btn
 							v-if="selectedAgentId"
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -222,9 +222,9 @@
 		<!-- 别名测试器：输入业务黑话 → 实时显示命中的别名映射（调试/校验用） -->
 		<v-card variant="flat" border class="rounded-lg pa-5">
 			<div class="d-flex align-center mb-3">
-				<v-icon icon="mdi-flask-outline" color="blue-darken-2" class="mr-2" size="22" />
+				<v-icon icon="mdi-flask-outline" color="primary" class="mr-2" size="22" />
 				<span class="text-subtitle-1 font-weight-bold">别名测试器</span>
-				<v-chip size="x-small" variant="tonal" color="blue-lighten-3" class="ml-3">
+				<v-chip size="x-small" variant="tonal" color="primary" class="ml-3">
 					Playground
 				</v-chip>
 			</div>
@@ -246,7 +246,7 @@
 					@keyup.enter="runTester"
 				/>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-play"
 					class="text-none"
 					elevation="0"
@@ -269,7 +269,7 @@
 				未命中任何别名。考虑将该业务说法新增为别名，或检查匹配类型/优先级配置。
 			</v-alert>
 			<div v-else-if="testerResult" class="mt-3">
-				<v-sheet border rounded="lg" class="pa-4 bg-blue-lighten-5">
+				<v-sheet border rounded="lg" class="pa-4 bg-primary-soft">
 					<div class="d-flex flex-wrap ga-4 align-center">
 						<div class="d-flex flex-column">
 							<span class="text-caption text-medium-emphasis">命中别名</span>
@@ -325,7 +325,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -447,7 +447,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -559,7 +559,7 @@ function getTargetTypeLabel(type: string): string {
 
 function getTargetTypeColor(type: string): string {
 	const map: Record<string, string> = {
-		METRIC: 'blue-lighten-4',
+		METRIC: 'primary',
 		DIM: 'purple-lighten-4',
 		VER: 'teal-lighten-4',
 		FILTER: 'orange-lighten-4',

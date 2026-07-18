@@ -85,7 +85,7 @@
 						<!-- ── AI messages ──────────────────────────────────── -->
 						<div v-else class="row ai-row">
 							<v-avatar
-								color="blue-darken-3"
+								color="primary"
 								size="32"
 								rounded="lg"
 								class="avatar"
@@ -174,7 +174,7 @@
 					v-if="store.isReportStreaming && store.streamingReportContent"
 					class="row ai-row"
 				>
-					<v-avatar color="blue-darken-3" size="32" rounded="lg" class="avatar">
+					<v-avatar color="primary" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
 					<v-card class="ai-card report-card" elevation="1">
@@ -188,7 +188,7 @@
 					class="row ai-row"
 				>
 					<v-avatar
-						color="blue-darken-3"
+						color="primary"
 						size="32"
 						rounded="lg"
 						class="avatar"
@@ -210,7 +210,7 @@
 					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
 					class="row ai-row"
 				>
-					<v-avatar color="blue-darken-3" size="32" rounded="lg" class="avatar">
+					<v-avatar color="primary" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
 					<v-card class="ai-card thinking-card" elevation="1">

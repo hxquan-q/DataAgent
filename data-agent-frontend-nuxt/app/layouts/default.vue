@@ -173,7 +173,7 @@
 									<v-list-item
 										v-bind="props"
 										title="知识库管理"
-										class="text-overline text-slate-500 mt-4"
+										class="text-overline nav-group-label mt-4"
 									/>
 								</template>
 								<v-list-item
@@ -210,7 +210,7 @@
 									<v-list-item
 										v-bind="props"
 										title="通用设置"
-										class="text-overline text-slate-500 mt-2"
+										class="text-overline nav-group-label mt-2"
 									/>
 								</template>
 								<v-list-item
@@ -657,6 +657,12 @@ watch(
 
 .agent-switcher-label {
 	color: var(--da-sidebar-muted, #64748b);
+}
+
+.nav-group-label {
+	color: var(--da-sidebar-muted, #64748b) !important;
+	letter-spacing: 0.08em;
+	opacity: 0.95;
 }
 
 .brand-subtitle {

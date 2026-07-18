@@ -18,7 +18,7 @@
 	<section class="page-shell">
 		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
-				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">数据源配置</h1>
+				<h1 class="text-h4 font-weight-bold mb-1">数据源配置</h1>
 				<p class="text-body-2 text-medium-emphasis">
 					{{
 						agentId
@@ -32,7 +32,7 @@
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
-					class="text-none bg-white"
+					class="text-none"
 					style="border-color: #e2e8f0"
 					@click="fetchDatasources"
 				>
@@ -183,7 +183,7 @@
 				<template #item.name="{ item }">
 					<div class="d-flex align-center py-2">
 						<v-avatar
-							color="blue-lighten-5"
+							color="primary"
 							rounded="lg"
 							size="36"
 							class="mr-3"
