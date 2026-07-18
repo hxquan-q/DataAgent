@@ -50,7 +50,7 @@
 		</v-alert>
 
 
-		<v-card variant="flat" border class="rounded-lg pa-6">
+		<v-card variant="flat" border class="rounded-lg pa-6 agent-create-card">
 			<v-form ref="formRef">
 				<div class="mb-6">
 					<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
@@ -339,9 +339,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-
+.agent-create-card {
+	box-shadow: var(--da-shadow-sm) !important;
+	border-color: var(--da-line-soft) !important;
+	background: var(--da-surface) !important;
+}
 
 .avatar-preview {
 	border: 2px solid var(--da-line-soft);
+	box-shadow: var(--da-shadow-sm);
+	background: var(--da-surface-soft);
 }
 </style>

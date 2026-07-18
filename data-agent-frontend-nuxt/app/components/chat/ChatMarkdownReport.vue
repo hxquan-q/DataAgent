@@ -394,16 +394,17 @@ async function downloadHtml() {
 .markdown-body :deep(.code-block-wrapper) {
 	margin: 10px 0;
 	border: 1px solid var(--da-line-soft);
-	border-radius: 6px;
+	border-radius: var(--da-radius-md);
 	overflow: auto;
-	background: var(--da-surface-soft);
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .markdown-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: var(--da-surface-soft);
-	padding: 6px 10px;
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface-soft));
+	padding: 7px 12px;
 	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
@@ -415,23 +416,26 @@ async function downloadHtml() {
 	text-transform: uppercase;
 }
 .markdown-body :deep(.code-copy-button) {
-	background: transparent;
-	border: 1px solid var(--da-line);
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
 	padding: 3px 10px;
-	border-radius: 4px;
+	border-radius: 999px;
 	font-size: 10px;
+	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s;
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out);
 	color: var(--da-ink);
 }
 .markdown-body :deep(.code-copy-button:hover) {
-	background: var(--da-surface-soft);
-	border-color: var(--da-line);
+	background: var(--da-primary-soft);
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	color: var(--da-primary);
 }
 .markdown-body :deep(.code-copy-button.copied) {
 	background: var(--da-success);
 	border-color: var(--da-success);
-	color: white;
+	color: var(--da-on-primary, #fff);
 }
 .markdown-body :deep(pre.hljs) {
 	margin: 0;
