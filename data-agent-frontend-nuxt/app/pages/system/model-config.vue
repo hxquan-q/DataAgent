@@ -750,25 +750,31 @@ onMounted(fetchConfigs);
 }
 
 /* 分段开关样式优化 */
-.segmented-control {
+.segmented-control,
+.segmented-toggle {
 	background-color: var(--da-surface-soft) !important;
 	padding: 4px !important;
 	height: 48px !important;
-	border: none !important;
+	border: 1px solid var(--da-line-soft) !important;
 }
 
-.segmented-control .v-btn {
+.segmented-control .v-btn,
+.segmented-toggle .v-btn {
 	border: none !important;
 	height: 40px !important;
 	font-weight: 600 !important;
-	letter-spacing: 0.02em !important;
+	letter-spacing: 0 !important;
+	text-transform: none !important;
 	color: var(--da-muted) !important;
+	border-radius: 999px !important;
 }
 
-.segmented-control .v-btn--selected {
+.segmented-control .v-btn--selected,
+.segmented-toggle .v-btn--selected,
+.segmented-toggle .v-btn--active {
 	background-color: var(--da-surface) !important;
-	color: var(--da-ink) !important;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+	color: var(--da-primary) !important;
+	box-shadow: var(--da-shadow-sm) !important;
 }
 @media (prefers-reduced-motion: reduce) {
 .model-item-card:hover {

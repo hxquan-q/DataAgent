@@ -110,6 +110,40 @@
 	--v-field-border-color: var(--da-line-soft);
 }
 
+.search-field :deep(.v-field) {
+	border-radius: 999px !important;
+	background: var(--da-surface) !important;
+}
+
+.search-field :deep(.v-field--focused) {
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--da-primary) 12%, transparent);
+}
+
+/* Segmented pill toggle (model tabs etc.) */
+.segmented-toggle {
+	background: var(--da-surface-soft) !important;
+	border: 1px solid var(--da-line-soft) !important;
+	padding: 4px !important;
+	box-shadow: var(--da-shadow-sm);
+}
+
+.segmented-toggle .v-btn {
+	border: none !important;
+	border-radius: 999px !important;
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 600 !important;
+	color: var(--da-muted) !important;
+	min-height: 36px !important;
+}
+
+.segmented-toggle .v-btn--active,
+.segmented-toggle .v-btn--selected {
+	background: var(--da-surface) !important;
+	color: var(--da-primary) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+}
+
 .custom-label {
 	font-size: 0.75rem;
 	font-weight: 600;
