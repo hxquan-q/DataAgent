@@ -656,22 +656,27 @@ onMounted(() => {
 
 
 .agents-toolbar {
-	box-shadow: var(--da-shadow-sm) !important;
-	background: var(--da-surface) !important;
+	box-shadow: none !important;
+	background: transparent !important;
+	border: none !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
 }
 
 .filter-toggle {
-	background-color: var(--da-surface-soft) !important;
-	padding: 4px !important;
-	border: 1px solid var(--da-line-soft) !important;
-	border-radius: 999px !important;
+	background-color: color-mix(in srgb, var(--da-surface-soft) 80%, var(--da-surface)) !important;
+	padding: 3px !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	border-radius: 10px !important;
 }
 
 .filter-toggle .v-btn {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
-	border-radius: 999px !important;
-	font-weight: 600 !important;
+	border-radius: 8px !important;
+	font-weight: 500 !important;
+	min-height: 30px !important;
+	font-size: 13px !important;
 }
 
 .search-field {

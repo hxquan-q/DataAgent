@@ -435,9 +435,10 @@ button:focus-visible,
 /* Admin filter toolbar paper */
 .page-shell :deep(.da-toolbar),
 .da-toolbar {
-	box-shadow: var(--da-shadow-sm) !important;
-	background: var(--da-surface) !important;
-	border-color: var(--da-line-soft) !important;
+	box-shadow: none !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface)) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 40%, transparent) !important;
+	border-radius: 12px !important;
 }
 
 

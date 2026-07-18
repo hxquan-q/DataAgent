@@ -130,13 +130,13 @@
 								:class="{ 'is-active': model.isActive }"
 								rounded="lg"
 							>
-								<div class="pa-5 d-flex align-center">
+								<div class="pa-4 d-flex align-center">
 									<!-- Icon -->
 									<v-avatar
 										:color="model.isActive ? 'primary' : 'primary'"
 										:variant="model.isActive ? 'flat' : 'tonal'"
 										:class="{ 'text-white': model.isActive }"
-										size="48"
+										size="40"
 										rounded="lg"
 										class="mr-4 model-avatar"
 									>
@@ -690,31 +690,26 @@ onMounted(fetchConfigs);
 
 
 .model-item-card {
-	transition: border-color var(--da-dur-base) var(--da-ease-out),
-		box-shadow var(--da-dur-base) var(--da-ease-out),
-		transform var(--da-dur-base) var(--da-ease-out);
-	border: 1px solid var(--da-line-soft) !important;
+	transition: border-color var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
 	background-color: var(--da-surface) !important;
-	box-shadow: var(--da-shadow-sm) !important;
-	border-radius: var(--da-radius-md) !important;
+	box-shadow: none !important;
+	border-radius: 12px !important;
 	overflow: hidden;
 }
 
 .model-item-card:hover {
-	border-color: color-mix(in srgb, var(--da-primary) 35%, var(--da-line-soft)) !important;
-	transform: translateY(-2px);
-	box-shadow: var(--da-shadow-md) !important;
+	border-color: color-mix(in srgb, var(--da-line) 70%, var(--da-primary)) !important;
+	transform: none;
+	box-shadow: none !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 40%, var(--da-surface)) !important;
 }
 
 .model-item-card.is-active {
-	border-color: color-mix(in srgb, var(--da-primary) 45%, transparent) !important;
-	background:
-		linear-gradient(
-			135deg,
-			color-mix(in srgb, var(--da-primary-soft) 80%, var(--da-surface)) 0%,
-			var(--da-surface) 70%
-		) !important;
-	box-shadow: var(--da-shadow-md) !important;
+	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent) !important;
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface)) !important;
+	box-shadow: none !important;
 }
 
 .border-dashed {
@@ -736,13 +731,13 @@ onMounted(fetchConfigs);
 	position: relative;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 8px;
 }
 .list-item-wrap {
 	width: 100%;
 }
 .model-avatar {
-	box-shadow: var(--da-shadow-sm);
+	box-shadow: none;
 }
 
 /* 所有的过渡和位移都在 0.4s 内完成 */
@@ -773,21 +768,24 @@ onMounted(fetchConfigs);
 /* 分段开关样式优化 */
 .segmented-control,
 .segmented-toggle {
-	background-color: var(--da-surface-soft) !important;
-	padding: 4px !important;
-	height: 48px !important;
-	border: 1px solid var(--da-line-soft) !important;
+	background-color: color-mix(in srgb, var(--da-surface-soft) 80%, var(--da-surface)) !important;
+	padding: 3px !important;
+	height: 36px !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	border-radius: 10px !important;
 }
 
 .segmented-control .v-btn,
 .segmented-toggle .v-btn {
 	border: none !important;
-	height: 40px !important;
-	font-weight: 600 !important;
+	height: 30px !important;
+	min-height: 30px !important;
+	font-weight: 500 !important;
 	letter-spacing: 0 !important;
 	text-transform: none !important;
 	color: var(--da-muted) !important;
-	border-radius: 999px !important;
+	border-radius: 8px !important;
+	font-size: 13px !important;
 }
 
 .segmented-control .v-btn--selected,

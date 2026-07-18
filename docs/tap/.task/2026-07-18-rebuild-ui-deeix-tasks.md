@@ -19,6 +19,7 @@
 - [x] **login quiet + header meta**（DEEIX 居中登录 / 顶栏去 chip）
 - [x] **global nav densify**（侧栏 h-8 导航行 · 弱新建 agent）
 - [x] **page header ink + dialog soft**（管理页标题去 primary · 对话框 10px 按钮）
+- [x] **admin cards quiet + denser segmented**（模型卡去抬升 · 分段控件 36px）
 - [ ] **用户验收视觉后 merge PR**（下一门控，需人工）
 
 **冻结**：chat store SSE、graph EventSource、后端。
