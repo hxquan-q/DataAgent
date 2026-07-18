@@ -213,17 +213,12 @@
 				</template>
 
 				<template #no-data>
-					<div class="d-flex flex-column align-center py-12">
-						<v-icon
-							icon="mdi-text-box-edit-outline"
-							size="64"
-							color="primary"
-							class="mb-4"
-						/>
-						<p class="text-body-1 text-medium-emphasis mb-2">暂无提示词配置</p>
-						<p class="text-body-2 text-disabled mb-6">
-							点击「添加配置」开始创建增强提示词
-						</p>
+					<div class="d-flex flex-column align-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-text-box-edit-outline" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无提示词配置</h3>
+						<p class="da-empty__desc">点击「添加配置」开始创建增强提示词</p>
 						<v-btn
 							color="primary"
 							prepend-icon="mdi-plus"

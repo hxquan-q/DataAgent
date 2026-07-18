@@ -46,7 +46,13 @@
 					</div>
 				</template>
 				<template #no-data>
-					<div class="pa-6 text-medium-emphasis">暂无技能，点击右上角“添加技能”创建。</div>
+					<div class="da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-puzzle-outline" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无技能</h3>
+						<p class="da-empty__desc">点击右上角「添加技能」创建第一条技能配置。</p>
+					</div>
 				</template>
 			</v-data-table>
 		</v-card>

@@ -166,17 +166,12 @@
 				</template>
 
 				<template #no-data>
-					<div class="d-flex flex-column align-center py-12">
-						<v-icon
-							icon="mdi-vector-intersection"
-							size="64"
-							color="primary"
-							class="mb-4"
-						/>
-						<p class="text-body-1 text-medium-emphasis mb-2">暂无语义模型</p>
-						<p class="text-body-2 text-disabled mb-6">
-							点击「添加语义模型」开始配置字段语义映射
-						</p>
+					<div class="d-flex flex-column align-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-vector-intersection" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无语义模型</h3>
+						<p class="da-empty__desc">点击「添加语义模型」开始配置字段语义映射</p>
 						<v-btn
 							color="primary"
 							prepend-icon="mdi-plus"
