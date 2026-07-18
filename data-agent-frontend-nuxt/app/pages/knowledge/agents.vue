@@ -664,7 +664,7 @@ function getTypeColor(type?: string) {
 		case 'DOCUMENT':
 			return 'primary';
 		case 'QA':
-			return 'indigo';
+			return 'primary';
 		case 'FAQ':
 			return 'info';
 		default:

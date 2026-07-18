@@ -368,10 +368,14 @@ async function downloadHtml() {
 }
 .markdown-body :deep(table) {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 	margin: 10px 0;
-	display: block;
-	overflow-x: auto;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .markdown-body :deep(thead) {
 	display: table-header-group;

@@ -663,10 +663,14 @@ watch(
 }
 .md-body :deep(table) {
 	width: 100%;
-	border-collapse: collapse;
-	margin: 6px 0;
-	display: block;
-	overflow-x: auto;
+	border-collapse: separate;
+	border-spacing: 0;
+	margin: 10px 0;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .md-body :deep(thead) {
 	display: table-header-group;

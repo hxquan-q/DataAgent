@@ -433,7 +433,7 @@
 
 				<v-divider />
 				<v-card-actions class="pa-4 d-flex justify-end ga-2">
-					<v-btn variant="outlined" class="text-none px-6" @click="closeDialog"
+					<v-btn variant="text" class="text-none px-6" @click="closeDialog"
 						>取消</v-btn
 					>
 					<v-btn
@@ -691,4 +691,16 @@ onMounted(async () => {
 });
 </script>
 
-<style scoped></style>
+<style scoped>
+.diff-col {
+	background: var(--da-surface);
+	min-width: 0;
+}
+.diff-col--left {
+	border-right: 1px solid var(--da-line-soft);
+	background: color-mix(in srgb, var(--da-primary-soft) 40%, var(--da-surface));
+}
+.diff-col--right {
+	background: color-mix(in srgb, var(--da-surface-soft) 75%, var(--da-surface));
+}
+</style>
