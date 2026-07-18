@@ -260,7 +260,7 @@ function downloadCsv() {
 	background: var(--da-primary-soft);
 	border: 1px solid color-mix(in srgb, var(--da-primary) 35%, transparent);
 	border-bottom: none;
-	border-radius: 6px 6px 0 0;
+	border-radius: var(--da-radius-sm) var(--da-radius-sm) 0 0;
 }
 .result-pending-dot {
 	width: 6px;
@@ -288,7 +288,7 @@ function downloadCsv() {
 	color: var(--da-danger);
 	padding: 6px 10px;
 	font-size: 13px;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 }
 .result-empty {
 	display: flex;
@@ -301,11 +301,11 @@ function downloadCsv() {
 	font-size: 12.5px;
 	background: var(--da-surface-soft);
 	border: 1px dashed var(--da-line-soft);
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 	gap: 4px;
 }
 .result-empty--soft {
-	border-radius: 0 0 6px 6px;
+	border-radius: 0 0 var(--da-radius-sm) var(--da-radius-sm);
 	border-top: none;
 }
 .result-header {
@@ -396,7 +396,7 @@ function downloadCsv() {
 	height: 28px;
 	background: white;
 	border: 1px solid var(--da-line-soft);
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 	cursor: pointer;
 	transition: background 0.15s;
 }
@@ -415,7 +415,7 @@ function downloadCsv() {
 	overflow: auto;
 	max-height: 360px;
 	border: 1px solid var(--da-line-soft);
-	border-radius: 0 0 8px 8px;
+	border-radius: 0 0 var(--da-radius-md) var(--da-radius-md);
 	background: var(--da-surface);
 }
 .result-table {
@@ -478,7 +478,7 @@ function downloadCsv() {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
 	background: var(--da-line);
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 }
 @media (prefers-reduced-motion: reduce) {
 	.result-pending-dot {

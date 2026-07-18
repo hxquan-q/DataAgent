@@ -484,7 +484,7 @@ watch(
 	padding: 3px 5px;
 	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
-	border-radius: 8px;
+	border-radius: var(--da-radius-sm);
 }
 
 .timeline-title-group {
@@ -535,8 +535,13 @@ watch(
 	align-items: center;
 	justify-content: space-between;
 	cursor: pointer;
-	padding: 4px 6px;
+	padding: 6px 8px;
 	user-select: none;
+	border-radius: var(--da-radius-sm);
+	transition: background var(--da-dur-fast) var(--da-ease-out);
+}
+.step-header:hover {
+	background: color-mix(in srgb, var(--da-primary-soft) 55%, transparent);
 }
 
 .step-header-left {
@@ -558,7 +563,7 @@ watch(
 	gap: 4px;
 	font-size: 10.5px;
 	padding: 2px 7px;
-	border-radius: 10px;
+	border-radius: 999px;
 }
 
 .step-badge.active {
@@ -625,7 +630,7 @@ watch(
 :deep(.tl-code) {
 	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
-	border-radius: 8px;
+	border-radius: var(--da-radius-sm);
 	padding: 6px 8px;
 	font-size: 12.5px;
 	overflow-x: auto;
@@ -773,6 +778,11 @@ watch(
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.badge-dot {
+		animation: none !important;
+		opacity: 0.85;
+	}
+
 	* {
 		transition: none !important;
 		animation: none !important;

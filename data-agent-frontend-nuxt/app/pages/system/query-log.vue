@@ -570,7 +570,7 @@ onMounted(async () => {
 .code-block {
 	background-color: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
-	border-radius: 8px;
+	border-radius: var(--da-radius-md);
 	padding: 12px 16px;
 	overflow-x: auto;
 	font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
