@@ -254,7 +254,7 @@
 
 				<!-- No Data Slot -->
 				<template #no-data>
-					<div class="text-center py-12">
+					<div class="text-center py-12 da-empty">
 						<v-icon icon="mdi-robot-outline" size="56" color="grey-lighten-1" class="mb-3" />
 						<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">暂无智能体</h3>
 						<p class="text-body-2 text-medium-emphasis mb-2" style="max-width: 420px; margin: 0 auto 12px; line-height: 1.6">

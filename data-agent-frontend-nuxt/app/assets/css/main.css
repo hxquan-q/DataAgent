@@ -291,3 +291,25 @@ button:focus-visible,
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 	background: color-mix(in srgb, var(--da-muted) 55%, transparent);
 }
+
+
+/* Shared empty state (admin lists) */
+.da-empty,
+.model-empty {
+	padding: 40px 24px;
+	border: 1.5px dashed var(--da-line-soft);
+	border-radius: var(--da-radius-lg);
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
+}
+.da-empty__title,
+.model-empty h3 {
+	color: var(--da-ink);
+	letter-spacing: -0.01em;
+}
+.da-empty__desc,
+.model-empty__desc {
+	max-width: 420px;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 1.6;
+}

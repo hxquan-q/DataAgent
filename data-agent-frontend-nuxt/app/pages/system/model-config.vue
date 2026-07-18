@@ -693,7 +693,7 @@ onMounted(fetchConfigs);
 
 
 .model-item-card {
-	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+	transition: border-color var(--da-dur-base) var(--da-ease-out), box-shadow var(--da-dur-base) var(--da-ease-out), transform var(--da-dur-base) var(--da-ease-out);
 	border: 1px solid var(--da-line-soft) !important;
 	background-color: var(--da-surface) !important;
 }
@@ -701,7 +701,7 @@ onMounted(fetchConfigs);
 .model-item-card:hover {
 	border-color: var(--da-muted) !important;
 	transform: translateY(-2px);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+	box-shadow: var(--da-shadow-md);
 }
 
 .model-item-card.is-active {
@@ -773,5 +773,15 @@ onMounted(fetchConfigs);
 	background-color: var(--da-surface) !important;
 	color: var(--da-ink) !important;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+.model-item-card:hover {
+	transform: none;
+}
+.list-enter-active,
+.list-leave-active,
+.list-move {
+	transition: none !important;
+}
 }
 </style>
