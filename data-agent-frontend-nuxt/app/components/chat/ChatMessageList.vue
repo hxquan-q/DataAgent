@@ -441,7 +441,7 @@ watch(
 	flex-direction: column;
 	background:
 		radial-gradient(1000px 380px at 50% -100px, color-mix(in srgb, var(--da-primary, #2f84d6) 8%, transparent), transparent 62%),
-		var(--da-surface-soft, var(--da-surface-soft));
+		var(--da-surface-soft);
 }
 
 .messages-inner {
@@ -537,7 +537,7 @@ watch(
 	max-width: 100% !important;
 	flex: 1;
 	min-width: 0;
-	background: var(--da-surface-soft, var(--da-surface-soft)) !important;
+	background: var(--da-surface-soft) !important;
 	border: 1px dashed var(--da-line-soft) !important;
 	box-shadow: none !important;
 	border-radius: 12px !important;
@@ -555,7 +555,7 @@ watch(
 .thinking-label {
 	font-size: 12.5px;
 	font-weight: 500;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 	letter-spacing: -0.01em;
 }
 .thinking-dots {
@@ -789,17 +789,17 @@ watch(
 	margin: 0 auto;
 	box-sizing: border-box;
 	font-size: 11px;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 }
 .chat-status-strip__agent {
 	font-weight: 600;
-	color: var(--da-ink, var(--da-ink));
+	color: var(--da-ink);
 }
 .chat-status-strip__model {
 	padding: 2px 8px;
 	border-radius: 999px;
-	background: var(--da-primary-soft, var(--da-primary-soft));
-	color: var(--da-primary, var(--da-primary));
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
 	font-weight: 500;
 }
 .chat-status-strip__live {

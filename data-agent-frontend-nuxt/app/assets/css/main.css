@@ -32,7 +32,7 @@
 	transform: translateY(-10px);
 }
 
-/* ── 公共页面样式 ──────────────────────────────────────────────────────────── */
+/* ── 公共页面样式（rebuild-ui · DEEIX paper shell） ─────────────────────────── */
 
 .page-shell {
 	padding: 20px 24px 32px;
@@ -40,17 +40,58 @@
 	margin: 0 auto;
 	color: var(--da-ink);
 	box-sizing: border-box;
+	background: transparent;
 }
 
 .page-shell h1,
 .page-shell .text-h4 {
 	letter-spacing: -0.02em;
 	color: var(--da-ink);
+	font-weight: 600;
 }
 
 .page-shell .text-medium-emphasis,
 .page-shell .text-caption {
 	color: var(--da-muted);
+}
+
+/* Soft paper cards across admin pages without touching business markup */
+.page-shell :deep(.v-card) {
+	border: 1px solid var(--da-line-soft) !important;
+	border-radius: var(--da-radius-md) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+	background: var(--da-surface) !important;
+}
+
+.page-shell :deep(.v-card.v-card--variant-outlined) {
+	border-color: var(--da-line-soft) !important;
+}
+
+.page-shell :deep(.v-table),
+.page-shell :deep(.v-data-table) {
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+}
+
+.page-shell :deep(.v-field) {
+	border-radius: var(--da-radius-sm) !important;
+}
+
+.page-shell :deep(.v-btn) {
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.page-shell :deep(.v-chip) {
+	border-radius: 999px;
+}
+
+/* Shared paper panel utility */
+.da-paper {
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	box-shadow: var(--da-shadow-sm);
 }
 
 .search-field .v-field__outline {
@@ -186,6 +227,21 @@
 	outline-offset: 2px;
 }
 
+/* Global keyboard affordance for custom buttons without Vuetify */
+button:focus-visible,
+[role='button']:focus-visible,
+[role='option']:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+
+/* Narrow screens: denser page shell */
+@media (max-width: 640px) {
+	.page-shell {
+		padding: 14px 14px 24px;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.page-enter-active,
 	.page-leave-active {
@@ -201,5 +257,11 @@
 	.da-hairline,
 	.da-msg-enter {
 		animation: none !important;
+	}
+
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
 	}
 }

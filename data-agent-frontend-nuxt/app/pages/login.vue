@@ -90,6 +90,6 @@ async function onSubmit() {
 <style scoped>
 .login-page {
 	min-height: 100vh;
-	background: linear-gradient(160deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+	background: linear-gradient(160deg, var(--da-ink) 0%, var(--da-ink) 50%, var(--da-ink) 100%);
 }
 </style>

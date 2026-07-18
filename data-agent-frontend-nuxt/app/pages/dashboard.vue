@@ -37,20 +37,20 @@
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--da-muted, #64748b);
+  color: var(--da-muted);
 }
 .dashboard-placeholder h1 {
   margin: 0 0 12px;
   font-size: 28px;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: var(--da-ink, #0f172a);
+  color: var(--da-ink);
 }
 .dashboard-desc {
   margin: 0 0 20px;
   font-size: 14.5px;
   line-height: 1.7;
-  color: var(--da-muted, #64748b);
+  color: var(--da-muted);
 }
 .dashboard-link {
   display: inline-flex;
@@ -58,14 +58,14 @@
   min-height: 40px;
   padding: 0 16px;
   border-radius: 999px;
-  background: var(--da-primary, #1e40af);
-  color: #fff;
+  background: var(--da-primary);
+  color: white;
   font-size: 13.5px;
   font-weight: 600;
   text-decoration: none;
 }
 .dashboard-link:focus-visible {
-  outline: 2px solid var(--da-accent, #3b82f6);
+  outline: 2px solid var(--da-accent);
   outline-offset: 2px;
 }
 </style>

@@ -343,7 +343,7 @@ async function confirmDelete() {
 	align-items: center;
 	justify-content: space-between;
 	padding: 8px 8px 8px 14px;
-	border-bottom: 1px solid var(--da-line-soft, var(--da-line-soft));
+	border-bottom: 1px solid var(--da-line-soft);
 	min-height: 48px;
 	flex-shrink: 0;
 }
@@ -351,13 +351,13 @@ async function confirmDelete() {
 .sidebar-title {
 	font-size: 13px;
 	font-weight: 600;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 	letter-spacing: 0.3px;
 	white-space: nowrap;
 }
 
 .toggle-btn {
-	color: var(--da-muted, var(--da-muted)) !important;
+	color: var(--da-muted) !important;
 }
 .toggle-btn:hover {
 	color: var(--da-primary, #2f84d6) !important;
@@ -408,7 +408,7 @@ async function confirmDelete() {
 
 .session-item-title {
 	font-size: 12px;
-	color: var(--da-ink, var(--da-ink));
+	color: var(--da-ink);
 	line-height: 1.35;
 	white-space: nowrap;
 	overflow: hidden;
@@ -417,13 +417,13 @@ async function confirmDelete() {
 
 .session-item-time {
 	font-size: 10.5px;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 	font-style: italic;
 	line-height: 1.2;
 }
 
 .session-item.active .session-item-title {
-	color: var(--da-primary, var(--da-primary));
+	color: var(--da-primary);
 	font-weight: 500;
 }
 
@@ -473,7 +473,7 @@ async function confirmDelete() {
 	margin: 0;
 	font-size: 12.5px;
 	font-weight: 600;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 }
 .empty-sessions__desc {
 	margin: 0;
@@ -492,7 +492,7 @@ async function confirmDelete() {
 /* ── Bottom new session ──────────────────────────────────────────────────────── */
 .sidebar-bottom {
 	padding: 8px 10px 10px;
-	border-top: 1px solid var(--da-line-soft, var(--da-line-soft));
+	border-top: 1px solid var(--da-line-soft);
 	flex-shrink: 0;
 }
 
@@ -542,7 +542,7 @@ async function confirmDelete() {
 .sidebar-agent {
 	font-size: 11px;
 	font-weight: 600;
-	color: var(--da-primary, var(--da-primary));
+	color: var(--da-primary);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;

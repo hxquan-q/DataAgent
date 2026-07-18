@@ -739,12 +739,12 @@ onBeforeUnmount(() => {
 <style scoped>
 /* ── Shell（WeKnora embed-chat 布局） ─────────────────────────── */
 .embed-chat {
-	--embed-primary: #07c05f;
-	--embed-bg: #f8fafc;
-	--embed-surface: #ffffff;
-	--embed-text: #0f172a;
-	--embed-muted: #64748b;
-	--embed-border: #e2e8f0;
+	--embed-primary: var(--da-success);
+	--embed-bg: var(--da-surface-soft);
+	--embed-surface: var(--da-surface);
+	--embed-text: var(--da-ink);
+	--embed-muted: var(--da-muted);
+	--embed-border: var(--da-line-soft);
 	display: flex;
 	flex-direction: column;
 	height: 100vh;
@@ -768,7 +768,7 @@ onBeforeUnmount(() => {
 	flex-shrink: 0;
 	padding: 12px 16px;
 	background: var(--embed-primary);
-	color: #fff;
+	color: white;
 	font-weight: 600;
 	font-size: 15px;
 	letter-spacing: 0.01em;
@@ -802,8 +802,8 @@ onBeforeUnmount(() => {
 	color: var(--embed-text);
 	white-space: pre-wrap;
 	word-break: break-word;
-	background: color-mix(in srgb, var(--embed-primary) 7%, #fff);
-	border: 1px solid color-mix(in srgb, var(--embed-primary) 14%, #e7e7e7);
+	background: color-mix(in srgb, var(--embed-primary) 7%, var(--da-surface));
+	border: 1px solid color-mix(in srgb, var(--embed-primary) 14%, var(--da-line-soft));
 	border-radius: 4px 14px 14px 14px;
 	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
@@ -877,8 +877,8 @@ onBeforeUnmount(() => {
 .msg-user__bubble {
 	max-width: min(88%, 560px);
 	padding: 10px 14px;
-	background: color-mix(in srgb, var(--embed-primary) 12%, #fff);
-	border: 1px solid color-mix(in srgb, var(--embed-primary) 18%, #e7e7e7);
+	background: color-mix(in srgb, var(--embed-primary) 12%, var(--da-surface));
+	border: 1px solid color-mix(in srgb, var(--embed-primary) 18%, var(--da-line-soft));
 	border-radius: 14px 4px 14px 14px;
 	font-size: 14px;
 	line-height: 1.55;
@@ -895,8 +895,8 @@ onBeforeUnmount(() => {
 .msg-bot__artifact {
 	margin-top: 8px;
 	padding: 0 0 8px;
-	background: #fff;
-	border: 1px solid color-mix(in srgb, var(--embed-primary) 22%, #e2e8f0);
+	background: var(--da-surface);
+	border: 1px solid color-mix(in srgb, var(--embed-primary) 22%, var(--da-line-soft));
 	border-radius: 10px;
 	overflow: hidden;
 	box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -926,7 +926,7 @@ onBeforeUnmount(() => {
 	padding: 8px 10px;
 	border: 1px solid var(--embed-border);
 	border-radius: 8px;
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 	cursor: pointer;
 	font-size: 13px;
 	color: var(--embed-muted);
@@ -935,7 +935,7 @@ onBeforeUnmount(() => {
 	text-align: left;
 }
 .pipeline__root:hover {
-	background: #f1f5f9;
+	background: var(--da-surface-soft);
 }
 .pipeline__icon {
 	display: inline-flex;
@@ -948,7 +948,7 @@ onBeforeUnmount(() => {
 	align-items: center;
 	gap: 6px;
 	font-weight: 500;
-	color: #334155;
+	color: var(--da-ink);
 }
 .pipeline__pulse {
 	width: 6px;
@@ -973,7 +973,7 @@ onBeforeUnmount(() => {
 	line-height: 1;
 	transform: rotate(0deg);
 	transition: transform 0.18s ease;
-	color: #94a3b8;
+	color: var(--da-muted);
 }
 .pipeline__chevron.open {
 	transform: rotate(90deg);
@@ -981,7 +981,7 @@ onBeforeUnmount(() => {
 .pipeline__children {
 	margin: 4px 0 0 10px;
 	padding-left: 12px;
-	border-left: 2px solid color-mix(in srgb, var(--embed-primary) 25%, #e2e8f0);
+	border-left: 2px solid color-mix(in srgb, var(--embed-primary) 25%, var(--da-line-soft));
 	display: flex;
 	flex-direction: column;
 	gap: 8px;
@@ -1107,7 +1107,7 @@ onBeforeUnmount(() => {
 	height: 36px;
 	min-width: 64px;
 	background: var(--embed-primary);
-	color: #fff;
+	color: white;
 	font-size: 14px;
 	font-weight: 500;
 	cursor: pointer;
@@ -1118,7 +1118,7 @@ onBeforeUnmount(() => {
 	cursor: not-allowed;
 }
 .input-shell__send.stop {
-	background: #94a3b8;
+	background: var(--da-muted);
 }
 .input-shell__send:not(:disabled):hover {
 	filter: brightness(0.96);
@@ -1149,7 +1149,7 @@ onBeforeUnmount(() => {
 	margin: 1.1em 0 0.45em;
 	line-height: 1.35;
 	font-weight: 600;
-	color: #0f172a;
+	color: var(--da-ink);
 }
 .markdown-body :deep(h1) {
 	font-size: 1.35em;
@@ -1185,15 +1185,15 @@ onBeforeUnmount(() => {
 	text-underline-offset: 2px;
 }
 .markdown-body :deep(code:not(pre code)) {
-	background: #f1f5f9;
+	background: var(--da-surface-soft);
 	padding: 0.12em 0.4em;
 	border-radius: 999px;
 	font-size: 0.88em;
 	font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 .markdown-body :deep(pre) {
-	background: #0f172a;
-	color: #e2e8f0;
+	background: var(--da-ink);
+	color: var(--da-line-soft);
 	padding: 12px 14px;
 	border-radius: 10px;
 	overflow-x: auto;
@@ -1209,8 +1209,8 @@ onBeforeUnmount(() => {
 .markdown-body :deep(blockquote) {
 	margin: 0.75em 0;
 	padding: 0.35em 0 0.35em 12px;
-	border-left: 3px solid color-mix(in srgb, var(--embed-primary) 55%, #cbd5e1);
-	color: #475569;
+	border-left: 3px solid color-mix(in srgb, var(--embed-primary) 55%, var(--da-line));
+	color: var(--da-muted);
 }
 .markdown-body :deep(table) {
 	border-collapse: collapse;
@@ -1222,23 +1222,23 @@ onBeforeUnmount(() => {
 }
 .markdown-body :deep(th),
 .markdown-body :deep(td) {
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	padding: 8px 10px;
 	text-align: left;
 }
 .markdown-body :deep(th) {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 	font-weight: 600;
 }
 .markdown-body :deep(tr:nth-child(even) td) {
-	background: #fcfcfd;
+	background: var(--da-surface-soft);
 }
 .markdown-body :deep(.md-echarts) {
 	width: 100%;
 	min-height: 300px;
 	margin: 12px 0;
 	border-radius: 10px;
-	background: #fafafa;
+	background: var(--da-surface-soft);
 }
 .markdown-body :deep(.md-echarts-skeleton) {
 	display: flex;
@@ -1246,7 +1246,7 @@ onBeforeUnmount(() => {
 	justify-content: center;
 	gap: 8px;
 	min-height: 140px;
-	background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+	background: linear-gradient(90deg, var(--da-surface-soft) 25%, var(--da-line-soft) 50%, var(--da-surface-soft) 75%);
 	background-size: 200% 100%;
 	animation: shimmer 1.2s ease-in-out infinite;
 	border-radius: 10px;
@@ -1280,7 +1280,7 @@ onBeforeUnmount(() => {
 	animation: da-soft-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 .pipeline__root:hover {
-	background: color-mix(in srgb, var(--embed-primary) 6%, #fff);
+	background: color-mix(in srgb, var(--embed-primary) 6%, var(--da-surface));
 }
 .pipeline__chevron {
 	transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
@@ -1307,7 +1307,7 @@ onBeforeUnmount(() => {
 	width: 7px;
 	height: 7px;
 	border-radius: 50%;
-	background: #fff;
+	background: var(--da-surface);
 	animation: pendingPulse 1s ease-in-out infinite;
 }
 .thinking-row {

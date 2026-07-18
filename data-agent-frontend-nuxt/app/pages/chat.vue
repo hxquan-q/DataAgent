@@ -134,7 +134,7 @@ onUnmounted(() => {
 	display: flex;
 	height: calc(100vh - 52px);
 	overflow: hidden;
-	background: var(--da-surface-soft, #f4f8fb);
+	background: var(--da-surface-soft);
 }
 
 .chat-body {
@@ -144,6 +144,136 @@ onUnmounted(() => {
 	overflow: hidden;
 	min-width: 0;
 	background: transparent;
-	border-left: 1px solid var(--da-line-soft, #e4edf5);
+	border-left: 1px solid var(--da-line-soft);
+}
+
+/* Empty agent gate — DEEIX-like centered paper card */
+.chat-no-agent {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 24px 16px;
+	background:
+		radial-gradient(
+			900px 360px at 50% -80px,
+			color-mix(in srgb, var(--da-primary) 10%, transparent),
+			transparent 65%
+		),
+		var(--da-surface-soft);
+}
+
+.chat-no-agent__card {
+	width: min(520px, 100%);
+	padding: 32px 28px;
+	text-align: center;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-lg);
+	box-shadow: var(--da-shadow-lg);
+}
+
+.chat-no-agent__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	margin: 0 auto 16px;
+	border-radius: 50%;
+	color: var(--da-primary);
+	background: var(--da-primary-soft);
+	box-shadow: var(--da-shadow-sm);
+}
+
+.chat-no-agent__kicker {
+	margin: 0 0 8px;
+	font-size: 12px;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--da-muted);
+}
+
+.chat-no-agent__title {
+	margin: 0 0 12px;
+	font-family: var(--da-font-display);
+	font-size: clamp(22px, 3vw, 28px);
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+}
+
+.chat-no-agent__desc {
+	margin: 0 auto 22px;
+	max-width: 420px;
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--da-muted);
+}
+
+.chat-no-agent__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+}
+
+.chat-no-agent__btn {
+	appearance: none;
+	min-height: var(--da-control-height-md);
+	padding: 8px 16px;
+	border-radius: 999px;
+	border: 1px solid var(--da-line-soft);
+	background: var(--da-surface);
+	color: var(--da-ink);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	box-shadow: var(--da-shadow-sm);
+	transition:
+		background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		box-shadow var(--da-dur-fast) var(--da-ease-out);
+}
+
+.chat-no-agent__btn:hover {
+	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent);
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
+}
+
+.chat-no-agent__btn:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+
+.chat-no-agent__btn--primary {
+	background: var(--da-primary);
+	border-color: var(--da-primary);
+	color: var(--da-on-primary);
+	box-shadow: 0 8px 18px color-mix(in srgb, var(--da-primary) 28%, transparent);
+}
+
+.chat-no-agent__btn--primary:hover {
+	background: color-mix(in srgb, var(--da-primary) 88%, #000);
+	border-color: transparent;
+	color: var(--da-on-primary);
+}
+
+@media (max-width: 480px) {
+	.chat-no-agent__card {
+		padding: 24px 18px;
+	}
+	.chat-no-agent__btn {
+		width: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.chat-no-agent__btn {
+		transition: none;
+	}
 }
 </style>

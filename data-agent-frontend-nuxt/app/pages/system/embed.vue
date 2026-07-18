@@ -339,11 +339,11 @@ watch(selectedAgentId, () => {
 	gap: 8px;
 }
 .preview-wrap {
-	border: 1px solid #e0e0e0;
+	border: 1px solid var(--da-line-soft);
 	border-radius: 12px;
 	overflow: hidden;
 	height: 560px;
-	background: #f7f8fa;
+	background: var(--da-surface-soft);
 }
 .preview-frame {
 	width: 100%;

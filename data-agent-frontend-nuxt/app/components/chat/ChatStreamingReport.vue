@@ -396,15 +396,15 @@ onBeforeUnmount(() => {
 
 /* design tokens + reduced motion (R2) */
 .report-header {
-	background: var(--da-surface-soft, var(--da-surface-soft));
-	border-bottom-color: var(--da-line-soft, var(--da-line-soft));
-	color: var(--da-ink, var(--da-ink));
+	background: var(--da-surface-soft);
+	border-bottom-color: var(--da-line-soft);
+	color: var(--da-ink);
 }
 .typing-dot {
-	background: var(--da-accent, var(--da-accent));
+	background: var(--da-accent);
 }
 .markdown-body.streaming :deep(> :last-child::after) {
-	background: var(--da-accent, var(--da-accent));
+	background: var(--da-accent);
 }
 @media (prefers-reduced-motion: reduce) {
 	.typing-dot,

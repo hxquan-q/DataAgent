@@ -424,12 +424,12 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	gap: 4px;
 	min-height: var(--da-control-height-sm, 32px);
 	padding: 4px 10px;
-	background: var(--da-surface-soft, var(--da-surface-soft));
-	border: 1px solid var(--da-line-soft, var(--da-line-soft));
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	border-radius: 20px;
 	font: inherit;
 	font-size: 12px;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 	cursor: pointer;
 	user-select: none;
 	white-space: nowrap;
@@ -447,12 +447,12 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	outline-offset: 2px;
 }
 .status-chip.warn {
-	border-color: color-mix(in srgb, var(--da-warning, var(--da-warning)) 45%, transparent);
+	border-color: color-mix(in srgb, var(--da-warning) 45%, transparent);
 }
 .status-chip--model {
-	background: var(--da-primary-soft, var(--da-primary-soft));
+	background: var(--da-primary-soft);
 	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent);
-	color: var(--da-primary, var(--da-primary));
+	color: var(--da-primary);
 }
 .status-chip--model:hover:not(:disabled) {
 	border-color: color-mix(in srgb, var(--da-primary) 45%, transparent);
@@ -464,7 +464,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	left: 0;
 	z-index: var(--da-z-dropdown, 999);
 	background: var(--da-surface, #fff);
-	border: 1px solid var(--da-line-soft, var(--da-line-soft));
+	border: 1px solid var(--da-line-soft);
 	border-radius: var(--da-radius-md, 8px);
 	box-shadow: var(--da-shadow-md, 0 4px 16px rgba(0, 0, 0, 0.1));
 	min-width: 180px;
@@ -487,21 +487,21 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font: inherit;
 	font-size: 12.5px;
 	text-align: left;
-	color: var(--da-ink, var(--da-ink));
+	color: var(--da-ink);
 	cursor: pointer;
 	transition: background var(--da-dur-fast, 0.1s);
 }
 .chip-dropdown-item:hover {
-	background: var(--da-surface-soft, var(--da-surface-soft));
+	background: var(--da-surface-soft);
 }
 .chip-dropdown-item:focus-visible {
 	outline: 2px solid var(--da-ring, var(--da-primary));
 	outline-offset: -2px;
-	background: var(--da-primary-soft, var(--da-primary-soft));
+	background: var(--da-primary-soft);
 }
 .chip-dropdown-item.active {
-	background: var(--da-primary-soft, var(--da-primary-soft));
-	color: var(--da-primary, var(--da-primary));
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
 	font-weight: 500;
 }
 .item-name {
@@ -514,8 +514,8 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .item-tag {
 	flex-shrink: 0;
 	font-size: 10.5px;
-	color: var(--da-muted, var(--da-muted));
-	background: var(--da-surface-soft, var(--da-surface-soft));
+	color: var(--da-muted);
+	background: var(--da-surface-soft);
 	border-radius: var(--da-radius-sm, 4px);
 	padding: 1px 4px;
 }
@@ -528,17 +528,17 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	margin: 0 0 8px;
 	font-size: 12px;
 	line-height: 1.45;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 }
 .chip-dropdown-empty__cta {
 	display: inline-flex;
 	align-items: center;
 	min-height: var(--da-control-height-sm, 32px);
 	padding: 4px 10px;
-	border: 1px solid var(--da-primary, var(--da-primary));
+	border: 1px solid var(--da-primary);
 	border-radius: var(--da-radius-sm, 6px);
-	background: var(--da-primary-soft, var(--da-primary-soft));
-	color: var(--da-primary, var(--da-primary));
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
 	font: inherit;
 	font-size: 12px;
 	font-weight: 600;
@@ -551,7 +551,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 
 /* ── Textarea ────────────────────────────────────────────────────────────────── */
 .textarea-wrap {
-	background: var(--da-surface-soft, var(--da-surface-soft));
+	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft, #e4edf5);
 	border-radius: var(--da-radius-md, 12px);
 	overflow: hidden;
@@ -679,7 +679,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	gap: 6px;
 	min-height: var(--da-control-height-md, 40px);
 	padding: 8px 16px;
-	background: var(--da-danger, var(--da-danger));
+	background: var(--da-danger);
 	color: var(--da-on-danger, #fff);
 	border: none;
 	border-radius: 20px;
@@ -782,7 +782,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	font: inherit;
 	font-size: 12px;
 	font-weight: 600;
-	color: var(--da-primary, var(--da-primary));
+	color: var(--da-primary);
 	cursor: pointer;
 	text-decoration: underline;
 }
@@ -795,7 +795,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .input-char-count {
 	margin: 4px 8px 0;
 	font-size: 11px;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 	text-align: right;
 }
 

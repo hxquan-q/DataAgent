@@ -201,7 +201,7 @@ watch(
 	font-weight: 600;
 	letter-spacing: 0.12em;
 	text-transform: uppercase;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 }
 
 .welcome-title {
@@ -222,14 +222,14 @@ watch(
 .welcome-line {
 	max-width: 220px;
 	margin: 0 auto 14px;
-	background: var(--da-line, var(--da-line));
+	background: var(--da-line);
 }
 
 .welcome-desc {
 	margin: 0;
 	font-size: 14px;
 	font-weight: 400;
-	color: var(--da-muted, var(--da-muted));
+	color: var(--da-muted);
 	max-width: 440px;
 	line-height: 1.6;
 	letter-spacing: -0.01em;
@@ -267,7 +267,7 @@ watch(
 
 .preset-chip:hover:not(:disabled) {
 	border-color: color-mix(in srgb, var(--da-primary, #2f84d6) 40%, transparent);
-	background: var(--da-primary-soft, var(--da-primary-soft));
+	background: var(--da-primary-soft);
 	color: var(--da-primary, #2f84d6);
 	box-shadow: var(--da-shadow-md);
 }
@@ -304,10 +304,10 @@ watch(
 	gap: 8px;
 	padding: 8px 12px;
 	border-radius: 10px;
-	border: 1px solid var(--da-line-soft, var(--da-line-soft));
+	border: 1px solid var(--da-line-soft);
 	background: var(--da-surface, #fff);
 	font-size: 13px;
-	color: var(--da-ink, var(--da-ink));
+	color: var(--da-ink);
 	text-align: left;
 }
 .ready-item.ok {
@@ -333,7 +333,7 @@ watch(
 	appearance: none;
 	border: none;
 	background: transparent;
-	color: var(--da-primary, var(--da-primary));
+	color: var(--da-primary);
 	font-size: 12.5px;
 	font-weight: 600;
 	cursor: pointer;
@@ -341,7 +341,7 @@ watch(
 	white-space: nowrap;
 }
 .ready-link:focus-visible {
-	outline: 2px solid var(--da-accent, var(--da-accent));
+	outline: 2px solid var(--da-accent);
 	outline-offset: 2px;
 }
 

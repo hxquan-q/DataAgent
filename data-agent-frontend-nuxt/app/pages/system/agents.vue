@@ -653,16 +653,16 @@ onMounted(() => {
 
 <style scoped>
 .agents-container {
-	background-color: #f8fafc;
+	background-color: var(--da-surface-soft);
 	min-height: 100%;
 }
 
 .text-slate-900 {
-	color: #0f172a;
+	color: var(--da-ink);
 }
 
 .filter-toggle {
-	background-color: #f1f5f9 !important;
+	background-color: var(--da-surface-soft) !important;
 	padding: 4px !important;
 }
 
@@ -671,7 +671,7 @@ onMounted(() => {
 }
 
 .search-field {
-	border-color: #e2e8f0;
+	border-color: var(--da-line-soft);
 }
 
 .agent-name-link {
@@ -684,7 +684,7 @@ onMounted(() => {
 	text-align: left;
 }
 .agent-name-link:hover {
-	color: var(--da-primary, #1e40af);
+	color: var(--da-primary);
 	text-decoration: underline;
 }
 </style>

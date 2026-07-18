@@ -686,37 +686,37 @@ onMounted(fetchConfigs);
 
 <style scoped>
 .model-config-container {
-	background-color: #f8fafc;
+	background-color: var(--da-surface-soft);
 	min-height: 100%;
 }
 
 .text-slate-900 {
-	color: #0f172a;
+	color: var(--da-ink);
 }
 
 .model-item-card {
 	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-	border: 1px solid #e2e8f0 !important;
-	background-color: #ffffff !important;
+	border: 1px solid var(--da-line-soft) !important;
+	background-color: var(--da-surface) !important;
 }
 
 .model-item-card:hover {
-	border-color: #94a3b8 !important;
+	border-color: var(--da-muted) !important;
 	transform: translateY(-2px);
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
 }
 
 .model-item-card.is-active {
-	border-color: #2563eb !important;
-	background-color: #f0f7ff !important;
+	border-color: var(--da-primary) !important;
+	background-color: var(--da-primary-soft) !important;
 }
 
 .border-dashed {
-	border: 2px dashed #e2e8f0 !important;
+	border: 2px dashed var(--da-line-soft) !important;
 }
 
 .v-tabs {
-	border-bottom: 1px solid #e2e8f0;
+	border-bottom: 1px solid var(--da-line-soft);
 }
 
 .v-tab {
@@ -757,7 +757,7 @@ onMounted(fetchConfigs);
 
 /* 分段开关样式优化 */
 .segmented-control {
-	background-color: #f1f5f9 !important;
+	background-color: var(--da-surface-soft) !important;
 	padding: 4px !important;
 	height: 48px !important;
 	border: none !important;
@@ -768,12 +768,12 @@ onMounted(fetchConfigs);
 	height: 40px !important;
 	font-weight: 600 !important;
 	letter-spacing: 0.02em !important;
-	color: #64748b !important;
+	color: var(--da-muted) !important;
 }
 
 .segmented-control .v-btn--selected {
-	background-color: #ffffff !important;
-	color: #0f172a !important;
+	background-color: var(--da-surface) !important;
+	color: var(--da-ink) !important;
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
 }
 </style>

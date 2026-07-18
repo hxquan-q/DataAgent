@@ -546,7 +546,7 @@ async function downloadHtml() {
 .markdown-body :deep(h1),
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
-	color: var(--da-ink, var(--da-ink));
+	color: var(--da-ink);
 }
 .markdown-body :deep(p),
 .markdown-body :deep(li) {

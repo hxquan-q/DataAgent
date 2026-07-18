@@ -342,6 +342,6 @@ onMounted(() => {
 
 
 .avatar-preview {
-	border: 2px solid #e5e7eb;
+	border: 2px solid var(--da-line-soft);
 }
 </style>

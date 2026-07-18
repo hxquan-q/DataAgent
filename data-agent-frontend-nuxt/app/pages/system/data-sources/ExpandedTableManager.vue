@@ -95,7 +95,7 @@ function clearAll() {
 .manage-tables-container {
 	background: white;
 	border-radius: 12px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
 	padding: 24px;
 }

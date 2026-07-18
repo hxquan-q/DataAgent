@@ -568,8 +568,8 @@ onMounted(async () => {
 
 <style scoped>
 .code-block {
-	background-color: #f5f7fa;
-	border: 1px solid #e2e8f0;
+	background-color: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	border-radius: 8px;
 	padding: 12px 16px;
 	overflow-x: auto;
@@ -577,7 +577,7 @@ onMounted(async () => {
 	font-size: 13px;
 	line-height: 1.6;
 	white-space: pre;
-	color: #1e293b;
+	color: var(--da-ink);
 }
 
 .code-block code {
