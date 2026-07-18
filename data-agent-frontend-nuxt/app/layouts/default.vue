@@ -37,7 +37,7 @@
 
 							<div class="agent-switcher-box">
 								<p
-									class="text-caption text-blue-lighten-3 mb-2 font-weight-bold"
+									class="text-caption mb-2 font-weight-bold agent-switcher-label"
 								>
 									当前选择智能体
 								</p>
@@ -52,20 +52,19 @@
 									placeholder="请选择智能体"
 									class="agent-switcher"
 									menu-icon="mdi-chevron-down"
-									theme="dark"
 									:menu-props="{
 										contentClass: 'agent-switcher-menu',
 										offset: [0, 8],
 									}"
-									:list-props="{ bgColor: '#1e293b', theme: 'dark' }"
-									item-color="blue-lighten-2"
+									:list-props="{ bgColor: 'var(--da-surface)', elevation: 2 }"
+									item-color="primary"
 									@update:model-value="handleAgentSwitch"
 								>
 									<template #selection="{ item }">
 										<div
 											class="agent-option agent-option--selection d-flex align-center w-100"
 										>
-											<v-avatar size="24" class="mr-2 border border-white-10">
+											<v-avatar size="24" class="mr-2 border">
 												<v-img
 													v-if="item.raw.avatar"
 													:src="item.raw.avatar"
@@ -75,7 +74,7 @@
 													v-else
 													icon="mdi-robot"
 													size="14"
-													color="blue-lighten-3"
+													color="primary"
 												/>
 											</v-avatar>
 											<div class="agent-option__text">
@@ -102,7 +101,7 @@
 											}"
 										>
 											<template #prepend>
-												<v-avatar size="28" class="mr-2 border border-white-10">
+												<v-avatar size="28" class="mr-2 border">
 													<v-img
 														v-if="item.raw.avatar"
 														:src="item.raw.avatar"
@@ -112,7 +111,7 @@
 														v-else
 														icon="mdi-robot"
 														size="15"
-														color="blue-lighten-3"
+														color="primary"
 													/>
 												</v-avatar>
 											</template>
@@ -128,7 +127,7 @@
 												<v-icon
 													v-if="item.raw.value === selectedAgentId"
 													icon="mdi-check"
-													color="blue-lighten-2"
+													color="primary"
 													size="16"
 												/>
 											</template>
@@ -143,8 +142,7 @@
 							density="compact"
 							nav
 							class="flex-grow-1 pa-2 px-4 custom-scrollbar bg-transparent"
-							theme="dark"
-						>
+													>
 							<v-list-item
 								prepend-icon="mdi-chat-processing-outline"
 								title="数据问答"
@@ -655,6 +653,10 @@ watch(
 <style scoped>
 .border-white-5 {
 	border-color: var(--da-sidebar-line, #e4edf5) !important;
+}
+
+.agent-switcher-label {
+	color: var(--da-sidebar-muted, #64748b);
 }
 
 .brand-subtitle {

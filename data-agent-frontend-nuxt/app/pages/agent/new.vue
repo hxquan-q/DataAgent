@@ -22,8 +22,8 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-arrow-left"
 					@click="goBack"
@@ -31,7 +31,7 @@
 					返回列表
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
