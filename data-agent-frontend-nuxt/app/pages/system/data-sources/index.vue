@@ -18,7 +18,7 @@
 	<section class="page-shell">
 		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
-				<h1 class="text-h4 font-weight-bold mb-1">数据源配置</h1>
+				<h1 class="text-h4 font-weight-bold mb-1 page-title">数据源配置</h1>
 				<p class="text-body-2 text-medium-emphasis">
 					{{
 						agentId

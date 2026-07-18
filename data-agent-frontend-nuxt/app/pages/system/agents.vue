@@ -19,7 +19,7 @@
 		<!-- Header Section -->
 		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
-				<h1 class="text-h5 font-weight-bold mb-1">智能体管理</h1>
+				<h1 class="text-h5 font-weight-bold mb-1 page-title">智能体管理</h1>
 				<p class="text-body-2 text-medium-emphasis">
 					创建和管理您的AI智能体,让数据分析更智能
 				</p>

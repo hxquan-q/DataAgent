@@ -43,6 +43,13 @@
 	background: transparent;
 }
 
+.page-title {
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+}
+
 .page-shell h1,
 .page-shell .text-h4 {
 	letter-spacing: -0.02em;

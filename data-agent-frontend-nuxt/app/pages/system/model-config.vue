@@ -19,7 +19,7 @@
 		<!-- Header Section -->
 		<header class="d-flex align-center justify-space-between mb-5">
 			<div>
-				<h1 class="text-h4 font-weight-bold mb-1">模型服务</h1>
+				<h1 class="text-h4 font-weight-bold mb-1 page-title">模型服务</h1>
 				<p class="text-body-2 text-medium-emphasis">
 					连接 LLM 供应商，支持对话生成与向量检索。
 				</p>

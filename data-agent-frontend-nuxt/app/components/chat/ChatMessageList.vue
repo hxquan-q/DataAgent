@@ -67,18 +67,19 @@
 					<div class="message-wrapper da-msg-enter">
 						<!-- ── User message ─────────────────────────────────── -->
 						<div v-if="message.role === 'user'" class="row user-row">
-							<v-card class="user-card" elevation="1">
+							<v-card class="user-card" elevation="0">
 								<span
 									v-html="escapeHtml(message.content).replace(/\n/g, '<br>')"
 								/>
 							</v-card>
 							<v-avatar
-								color="grey-darken-1"
+								color="primary"
+								variant="tonal"
 								size="32"
 								rounded="lg"
 								class="avatar"
 							>
-								<v-icon size="18" color="white">mdi-account</v-icon>
+								<v-icon size="18" color="primary">mdi-account</v-icon>
 							</v-avatar>
 						</div>
 
@@ -97,7 +98,7 @@
 							<v-card
 								v-if="message.messageType === 'html'"
 								class="ai-card"
-								elevation="1"
+								elevation="0"
 							>
 								<div class="md-body" v-html="sanitizeHtml(message.content)" />
 							</v-card>
@@ -106,7 +107,7 @@
 							<v-card
 								v-else-if="message.messageType === 'result-set'"
 								class="ai-card"
-								elevation="1"
+								elevation="0"
 							>
 								<ChatResultSet
 									:data="safeParseJson(message.content)"
@@ -118,7 +119,7 @@
 							<v-card
 								v-else-if="message.messageType === 'markdown-report'"
 								class="ai-card report-card"
-								elevation="1"
+								elevation="0"
 							>
 								<ChatMarkdownReport :content="message.content" />
 							</v-card>
@@ -128,13 +129,13 @@
 								<v-card
 									v-if="extractReportContent(message.content)"
 									class="ai-card report-card mb-2"
-									elevation="1"
+									elevation="0"
 								>
 									<ChatMarkdownReport
 										:content="extractReportContent(message.content)!"
 									/>
 								</v-card>
-								<v-card class="ai-card timeline-card" elevation="1">
+								<v-card class="ai-card timeline-card" elevation="0">
 									<ChatWorkflowTimeline
 										:node-blocks="safeParseBlocks(message.content)"
 										:completed="true"
@@ -161,7 +162,7 @@
 							</div>
 
 							<!-- Plain AI text (render as markdown) -->
-							<v-card v-else class="ai-card" elevation="1">
+							<v-card v-else class="ai-card" elevation="0">
 								<div class="md-body" v-html="renderMarkdown(message.content)" />
 							</v-card>
 						</div>
@@ -177,7 +178,7 @@
 					<v-avatar color="primary" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
-					<v-card class="ai-card report-card" elevation="1">
+					<v-card class="ai-card report-card" elevation="0">
 						<ChatStreamingReport :content="store.streamingReportContent" />
 					</v-card>
 				</div>
@@ -200,7 +201,7 @@
 					>
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
-					<v-card class="ai-card timeline-card" elevation="1">
+					<v-card class="ai-card timeline-card" elevation="0">
 						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
 					</v-card>
 				</div>
@@ -213,7 +214,7 @@
 					<v-avatar color="primary" size="32" rounded="lg" class="avatar">
 						<v-icon size="18" color="white">mdi-robot</v-icon>
 					</v-avatar>
-					<v-card class="ai-card thinking-card" elevation="1">
+					<v-card class="ai-card thinking-card" elevation="0">
 						<div class="thinking-row" role="status" aria-live="polite">
 							<div class="thinking-dots" aria-hidden="true">
 								<span class="dot" />
