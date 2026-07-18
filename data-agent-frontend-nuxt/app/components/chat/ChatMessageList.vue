@@ -446,10 +446,10 @@ watch(
 }
 
 .messages-inner {
-	padding: 18px 20px 28px;
+	padding: 20px 20px 36px;
 	display: flex;
 	flex-direction: column;
-	gap: 16px;
+	gap: 22px;
 	width: 100%;
 	max-width: min(100%, var(--da-answer-max, 880px));
 	margin: 0 auto;
@@ -604,24 +604,27 @@ watch(
 	}
 }
 
-/* ── Markdown body inside AI card ────────────────────────────────────────────── */
+/* ── Markdown body inside AI card (DEEIX chat-font) ──────────────────────────── */
 .md-body :deep(h1),
 .md-body :deep(h2),
 .md-body :deep(h3) {
-	font-weight: 700;
-	margin: 10px 0 4px;
-	line-height: 1.4;
+	font-family: var(--da-font-display);
+	font-weight: 500;
+	margin: 0.9em 0 0.35em;
+	line-height: 1.3;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
 }
 .md-body :deep(p) {
-	margin-bottom: 6px;
+	margin: 0 0 0.7em;
 }
 .md-body :deep(ul),
 .md-body :deep(ol) {
-	padding-left: 20px;
-	margin-bottom: 5px;
+	padding-left: 1.3em;
+	margin: 0 0 0.7em;
 }
 .md-body :deep(li) {
-	margin-bottom: 2px;
+	margin-bottom: 0.15em;
 }
 .md-body :deep(code:not(pre code)) {
 	background: var(--da-surface-soft);
@@ -795,73 +798,86 @@ watch(
 .chat-status-strip {
 	display: flex;
 	align-items: center;
-	gap: 6px;
+	gap: 8px;
 	flex-wrap: wrap;
-	padding: 8px 12px;
-	max-width: var(--da-chat-max, 960px);
+	padding: 6px 4px 2px;
+	max-width: min(100%, var(--da-answer-max, 880px));
 	width: calc(100% - 40px);
-	margin: 10px auto 0;
+	margin: 8px auto 0;
 	box-sizing: border-box;
-	font-size: 11px;
+	font-size: 11.5px;
 	color: var(--da-muted);
-	background: color-mix(in srgb, var(--da-surface) 88%, var(--da-primary-soft));
-	border: 1px solid var(--da-line-soft);
-	border-radius: 999px;
-	box-shadow: var(--da-shadow-sm);
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
 }
 .chat-status-strip__agent {
 	font-weight: 600;
 	color: var(--da-ink);
+	letter-spacing: -0.01em;
 }
 .chat-status-strip__model {
-	padding: 2px 8px;
-	border-radius: 999px;
-	background: var(--da-primary-soft);
-	color: var(--da-primary);
-	font-weight: 500;
+	padding: 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--da-muted);
+	font-weight: 400;
+}
+.chat-status-strip__model::before {
+	content: '·';
+	margin-right: 8px;
+	color: color-mix(in srgb, var(--da-muted) 55%, transparent);
 }
 .chat-status-strip__live {
-	padding: 2px 8px;
-	border-radius: 999px;
-	background: color-mix(in srgb, var(--da-success) 10%, white);
-	color: var(--da-success);
-	font-weight: 600;
+	padding: 1px 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--da-primary);
+	font-weight: 500;
 }
 
 .chat-status-strip__ready {
 	appearance: none;
 	cursor: pointer;
 	font: inherit;
-	padding: 2px 8px;
-	border-radius: 999px;
-	font-size: 11px;
-	font-weight: 600;
-	background: color-mix(in srgb, var(--da-warning) 12%, white);
+	padding: 1px 0;
+	border-radius: 0;
+	font-size: 11.5px;
+	font-weight: 500;
+	background: transparent;
 	color: var(--da-warning);
-	border: 1px solid color-mix(in srgb, var(--da-warning) 35%, white);
+	border: none;
+	text-decoration: underline;
+	text-underline-offset: 2px;
 }
 .chat-status-strip__ready.ok {
-	background: color-mix(in srgb, var(--da-success) 10%, white);
-	color: var(--da-success);
-	border-color: color-mix(in srgb, var(--da-success) 30%, white);
+	background: transparent;
+	color: var(--da-muted);
+	border: none;
+	text-decoration: none;
+	cursor: default;
 }
 
 .chat-status-strip__switch {
 	appearance: none;
 	margin-left: auto;
-	border: 1px solid var(--da-line-soft);
-	background: var(--da-surface);
+	border: none;
+	background: transparent;
 	color: var(--da-primary);
-	border-radius: 999px;
-	padding: 2px 10px;
+	border-radius: 0;
+	padding: 1px 0;
 	font: inherit;
-	font-size: 11px;
-	font-weight: 600;
+	font-size: 11.5px;
+	font-weight: 500;
 	cursor: pointer;
-	transition: background var(--da-dur-fast) var(--da-ease-out);
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	transition: color var(--da-dur-fast) var(--da-ease-out);
 }
 .chat-status-strip__switch:hover:not(:disabled) {
-	background: var(--da-primary-soft);
+	background: transparent;
+	color: color-mix(in srgb, var(--da-primary) 80%, #000);
 }
 .chat-status-strip__switch:disabled {
 	opacity: var(--da-disabled-opacity);

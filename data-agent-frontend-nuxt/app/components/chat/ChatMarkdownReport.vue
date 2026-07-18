@@ -250,17 +250,17 @@ async function downloadHtml() {
 </script>
 
 <style scoped>
- .markdown-report {
+.markdown-report {
 	background: var(--da-surface);
 }
 
-/* ── Header ──────────────────────────────────────────────────────────────────── */
+/* ── Header (quiet chrome — answer content is primary) ───────────────────────── */
 .report-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 8px 12px;
-	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface-soft));
+	padding: 8px 14px;
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
 	border-bottom: 1px solid var(--da-line-soft);
 	flex-wrap: wrap;
 	gap: 6px;
@@ -268,15 +268,17 @@ async function downloadHtml() {
 .report-title {
 	display: flex;
 	align-items: center;
-	font-size: 13.5px;
-	font-weight: 600;
-	color: var(--da-ink);
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--da-muted);
 	gap: 4px;
 	flex-wrap: wrap;
 	min-width: 0;
 }
 .report-title > span {
 	letter-spacing: -0.01em;
+	color: var(--da-ink);
+	font-weight: 600;
 }
 .report-actions {
 	display: flex;
@@ -316,7 +318,7 @@ async function downloadHtml() {
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .report-body {
-	padding: 8px;
+	padding: 16px 18px 20px;
 }
 .html-iframe {
 	display: block;
@@ -325,38 +327,49 @@ async function downloadHtml() {
 	border: none;
 }
 
-/* ── Markdown body ───────────────────────────────────────────────────────────── */
+/* ── Markdown body (DEEIX chat-font prose) ───────────────────────────────────── */
+.markdown-body {
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	letter-spacing: -0.01em;
+}
 .markdown-body :deep(h1),
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
-	font-weight: 700;
-	margin: 10px 0 4px;
+	font-family: var(--da-font-display);
+	font-weight: 500;
+	margin: 1.1em 0 0.4em;
 	color: var(--da-ink);
+	letter-spacing: -0.02em;
+	line-height: 1.3;
 }
 .markdown-body :deep(h1) {
-	font-size: 16.5px;
+	font-size: 1.35em;
 }
 .markdown-body :deep(h2) {
-	font-size: 15.5px;
+	font-size: 1.2em;
 }
 .markdown-body :deep(h3) {
-	font-size: 15px;
+	font-size: 1.08em;
 }
 .markdown-body :deep(p) {
-	margin-bottom: 8px;
-	line-height: 1.75;
+	margin: 0 0 0.75em;
+	line-height: var(--da-chat-line-height, 1.75);
 	color: var(--da-ink);
-	font-size: 13.5px;
+	font-size: inherit;
 }
 .markdown-body :deep(ul),
 .markdown-body :deep(ol) {
-	padding-left: 22px;
-	margin-bottom: 8px;
+	padding-left: 1.35em;
+	margin: 0 0 0.75em;
 }
 .markdown-body :deep(li) {
-	line-height: 1.7;
-	font-size: 14px;
+	line-height: var(--da-chat-line-height, 1.75);
+	font-size: inherit;
 	color: var(--da-ink);
+	margin-bottom: 0.2em;
 }
 .markdown-body :deep(code:not(pre code)) {
 	background: var(--da-surface-soft);
@@ -463,12 +476,12 @@ async function downloadHtml() {
 }
 .markdown-body :deep(pre.hljs) {
 	margin: 0;
-	padding: 8px;
+	padding: 12px 14px;
 	overflow-x: auto;
 	overflow-y: hidden;
 	background: var(--da-surface-soft);
-	font-size: 11.5px;
-	line-height: 1.4;
+	font-size: 13px;
+	line-height: 1.55;
 	white-space: pre;
 }
 .markdown-body :deep(pre.hljs code) {
