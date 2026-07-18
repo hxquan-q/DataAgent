@@ -276,9 +276,5 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-shell {
-	padding: 24px;
-	max-width: 1200px;
-	margin: 0 auto;
-}
+/* uses global .page-shell from main.css */
 </style>

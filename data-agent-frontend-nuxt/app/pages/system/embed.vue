@@ -220,7 +220,7 @@ watch(selectedAgentId, () => {
 
 		<v-row>
 			<v-col cols="12" md="4">
-				<v-card variant="outlined" class="mb-3">
+				<v-card variant="flat" border class="mb-3 da-paper-card">
 					<v-card-title class="text-subtitle-1">选择智能体</v-card-title>
 					<v-card-text>
 						<v-select
@@ -235,7 +235,7 @@ watch(selectedAgentId, () => {
 					</v-card-text>
 				</v-card>
 
-				<v-card variant="outlined" title="发布令牌（apiKey）">
+				<v-card variant="flat" border title="发布令牌（apiKey）" class="da-paper-card">
 					<v-card-text>
 						<v-text-field
 							:model-value="apiKeyMasked"
@@ -247,10 +247,10 @@ watch(selectedAgentId, () => {
 							@click:append-inner="copy(apiKeyPlain || apiKeyMasked)"
 						/>
 						<div class="d-flex gap-2 mt-2">
-							<v-btn size="small" variant="outlined" @click="generateApiKey">
+							<v-btn size="small" variant="outlined" class="text-none" @click="generateApiKey">
 								{{ apiKeyEnabled ? '重新生成' : '生成令牌' }}
 							</v-btn>
-							<v-btn v-if="apiKeyEnabled" size="small" variant="outlined" color="warning" @click="resetApiKey">
+							<v-btn v-if="apiKeyEnabled" size="small" variant="outlined" color="warning" class="text-none" @click="resetApiKey">
 								轮换
 							</v-btn>
 						</div>
@@ -262,7 +262,7 @@ watch(selectedAgentId, () => {
 			</v-col>
 
 			<v-col cols="12" md="8">
-				<v-card variant="outlined" class="mb-3">
+				<v-card variant="flat" border class="mb-3 da-paper-card">
 					<v-card-title class="text-subtitle-1">嵌入配置</v-card-title>
 					<v-card-text>
 						<v-textarea
@@ -295,13 +295,13 @@ watch(selectedAgentId, () => {
 							</v-col>
 						</v-row>
 						<div class="d-flex gap-2 mt-4">
-							<v-btn color="primary" :loading="saving" @click="save">保存并启用</v-btn>
-							<v-btn v-if="embedded" variant="outlined" color="error" @click="disable">禁用</v-btn>
+							<v-btn color="primary" class="text-none" :loading="saving" @click="save">保存并启用</v-btn>
+							<v-btn v-if="embedded" variant="outlined" color="error" class="text-none" @click="disable">禁用</v-btn>
 						</div>
 					</v-card-text>
 				</v-card>
 
-				<v-card variant="outlined" title="嵌入代码" class="mb-3">
+				<v-card variant="flat" border title="嵌入代码" class="mb-3 da-paper-card">
 					<v-card-text>
 						<v-alert v-if="!apiKeyPlain" type="info" density="compact" class="mb-2 text-caption">
 							需先生成发布令牌以生成嵌入代码（生产环境建议改用 tokenEndpoint 安全模式）。
@@ -313,7 +313,7 @@ watch(selectedAgentId, () => {
 					</v-card-text>
 				</v-card>
 
-				<v-card variant="outlined" title="实时预览">
+				<v-card variant="flat" border class="da-paper-card" title="实时预览">
 					<v-card-text>
 						<v-alert v-if="!apiKeyPlain" type="info" density="compact" class="mb-2 text-caption">
 							生成发布令牌后可预览真实对话。
@@ -338,9 +338,21 @@ watch(selectedAgentId, () => {
 .gap-2 {
 	gap: 8px;
 }
+.da-paper-card {
+	box-shadow: var(--da-shadow-sm) !important;
+	background: var(--da-surface) !important;
+	border-color: var(--da-line-soft) !important;
+	border-radius: var(--da-radius-md) !important;
+}
+.da-paper-card :deep(.v-card-title) {
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	letter-spacing: -0.01em;
+}
 .preview-wrap {
 	border: 1px solid var(--da-line-soft);
 	border-radius: var(--da-radius-md);
+	box-shadow: var(--da-shadow-sm);
 	overflow: hidden;
 	height: 560px;
 	background: var(--da-surface-soft);

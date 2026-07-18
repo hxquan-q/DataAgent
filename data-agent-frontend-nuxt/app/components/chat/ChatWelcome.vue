@@ -239,8 +239,8 @@ watch(
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 8px;
-	margin-top: 22px;
+	gap: 10px;
+	margin-top: 20px;
 	max-width: 560px;
 }
 
