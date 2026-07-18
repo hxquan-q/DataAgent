@@ -438,3 +438,11 @@ button:focus-visible,
 	font-family: var(--da-font-display);
 	letter-spacing: -0.01em;
 }
+
+
+/* Focusable Vuetify buttons in shell */
+.page-shell :deep(.v-btn:focus-visible),
+.base-drawer :deep(.v-btn:focus-visible) {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}

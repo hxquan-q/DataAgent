@@ -817,7 +817,7 @@ onBeforeUnmount(() => {
 	word-break: break-word;
 	background: color-mix(in srgb, var(--embed-primary) 7%, var(--da-surface));
 	border: 1px solid color-mix(in srgb, var(--embed-primary) 14%, var(--da-line-soft));
-	border-radius: 4px 14px 14px 14px;
+	border-radius: var(--da-radius-sm) var(--da-composer-radius) var(--da-composer-radius) var(--da-composer-radius);
 	box-shadow: var(--da-shadow-sm);
 }
 .embed-welcome__text.muted {
@@ -892,7 +892,7 @@ onBeforeUnmount(() => {
 	padding: 10px 14px;
 	background: color-mix(in srgb, var(--embed-primary) 12%, var(--da-surface));
 	border: 1px solid color-mix(in srgb, var(--embed-primary) 18%, var(--da-line-soft));
-	border-radius: 14px 4px 14px 14px;
+	border-radius: var(--da-composer-radius) var(--da-radius-sm) var(--da-composer-radius) var(--da-composer-radius);
 	font-size: 14px;
 	line-height: 1.55;
 	white-space: pre-wrap;

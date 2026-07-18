@@ -80,4 +80,6 @@ cd data-agent-frontend-nuxt && pnpm build
 - 聊天：flat paper bubbles、过程次要化、代码块/报告头/结果操作按钮 token 化
 - Embed 默认主题改 azure，纸感顶栏 + 浮动输入
 - 全局：pill 搜索框、segmented tabs、dialog paper、soft scrollbars、table density
+- header height token · drawer scroll · query evidence paper
+- metric-version diff 列 · markdown table paper · 语义色板 lighten/darken 清理
 - PR：https://github.com/hxquan-q/DataAgent/pull/1 （待用户验收 merge）

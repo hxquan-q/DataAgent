@@ -883,6 +883,8 @@ onMounted(async () => {
 	color: #d4d4d4;
 	padding: 16px;
 	border-radius: var(--da-radius-md);
+	border: 1px solid color-mix(in srgb, var(--da-line) 40%, #1e1e1e);
+	box-shadow: var(--da-shadow-sm);
 	font-family: var(--da-font-mono);
 	font-size: 13px;
 	line-height: 1.6;

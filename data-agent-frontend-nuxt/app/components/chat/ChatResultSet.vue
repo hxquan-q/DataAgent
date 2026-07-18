@@ -487,6 +487,11 @@ function downloadCsv() {
 }
 @media (prefers-reduced-motion: reduce) {
 	.result-pending-dot {
+		animation: none !important;
+		opacity: 0.85;
+	}
+
+	.result-pending-dot {
 		animation: none;
 	}
 }

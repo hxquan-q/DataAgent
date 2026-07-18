@@ -489,7 +489,7 @@ watch(
 	) !important;
 	color: white !important;
 	padding: 10px 14px;
-	border-radius: 18px 18px 6px 18px !important;
+	border-radius: var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) var(--da-radius-sm, 8px) var(--da-composer-radius, 18px) !important;
 	font-size: 13.5px;
 	line-height: 1.55;
 	max-width: min(62%, 560px);
@@ -501,7 +501,7 @@ watch(
 /* ── AI card ─────────────────────────────────────────────────────────────────── */
 .ai-card {
 	padding: 12px 14px;
-	border-radius: 6px 18px 18px 18px !important;
+	border-radius: var(--da-radius-sm, 8px) var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) !important;
 	font-size: 13.5px;
 	line-height: 1.65;
 	max-width: min(82%, 760px);
