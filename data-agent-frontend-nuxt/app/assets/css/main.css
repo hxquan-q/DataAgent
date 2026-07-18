@@ -384,23 +384,33 @@ button:focus-visible,
 
 .page-shell :deep(.v-data-table-header th),
 .page-shell :deep(thead th) {
-	font-size: 12px !important;
-	font-weight: 600 !important;
-	letter-spacing: 0.02em;
+	font-size: 11.5px !important;
+	font-weight: 500 !important;
+	letter-spacing: 0.01em;
 	color: var(--da-muted) !important;
-	background: color-mix(in srgb, var(--da-surface-soft) 80%, var(--da-surface)) !important;
-	border-bottom: 1px solid var(--da-line-soft) !important;
+	background: color-mix(in srgb, var(--da-surface) 94%, var(--da-surface-soft)) !important;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
 }
 
 .page-shell :deep(.v-data-table__td),
 .page-shell :deep(tbody td) {
 	font-size: 13px !important;
-	border-bottom-color: var(--da-line-soft) !important;
+	border-bottom-color: color-mix(in srgb, var(--da-line-soft) 90%, transparent) !important;
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
 }
 
 .page-shell :deep(.v-data-table__tr:hover),
 .page-shell :deep(tbody tr:hover) {
-	background: color-mix(in srgb, var(--da-primary-soft) 40%, transparent) !important;
+	background: color-mix(in srgb, var(--da-muted) 6%, transparent) !important;
+}
+
+/* Soften admin table outer paper */
+.page-shell :deep(.v-data-table) {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	border-radius: var(--da-radius-md) !important;
+	overflow: hidden;
+	box-shadow: var(--da-shadow-sm) !important;
 }
 
 

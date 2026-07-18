@@ -304,11 +304,11 @@ async function confirmDelete() {
 /* ── Wrapper: drives the width transition ────────────────────────────────────── */
 .sidebar-wrapper {
 	position: relative;
-	width: 240px;
-	min-width: 240px;
+	width: 248px;
+	min-width: 248px;
 	transition:
-		width 0.25s ease,
-		min-width 0.25s ease;
+		width var(--da-dur-base, 0.22s) var(--da-ease-out),
+		min-width var(--da-dur-base, 0.22s) var(--da-ease-out);
 	overflow: visible;
 	height: 100%;
 	flex-shrink: 0;
@@ -342,9 +342,9 @@ async function confirmDelete() {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 8px 8px 8px 14px;
-	border-bottom: 1px solid var(--da-line-soft);
-	min-height: 48px;
+	padding: 6px 8px 6px 12px;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 40%, transparent);
+	min-height: 40px;
 	flex-shrink: 0;
 }
 
@@ -557,11 +557,20 @@ async function confirmDelete() {
 .expand-fab {
 	position: absolute;
 	top: 10px;
-	left: 8px;
+	left: 10px;
 	z-index: 10;
-	box-shadow: var(--da-shadow-md) !important;
-	border: 1px solid var(--da-line-soft) !important;
+	width: 32px !important;
+	height: 32px !important;
+	box-shadow: var(--da-shadow-sm) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
+	background: color-mix(in srgb, var(--da-surface) 92%, transparent) !important;
+	backdrop-filter: blur(8px);
+	color: var(--da-muted) !important;
+}
+.expand-fab:hover {
+	color: var(--da-ink) !important;
 	background: var(--da-surface) !important;
+	box-shadow: var(--da-shadow-md) !important;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────────────── */

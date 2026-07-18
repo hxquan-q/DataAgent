@@ -549,11 +549,11 @@ watch(
 	border-color: transparent !important;
 }
 
-/* ── Thinking feedback (WeKnora-like status) ─────────────────────────────────── */
+/* ── Thinking feedback (DEEIX process marker — muted, not a card) ─────────────── */
 .thinking-card {
-	padding: 10px 14px !important;
-	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface)) !important;
-	border: 1px solid color-mix(in srgb, var(--da-primary) 18%, var(--da-line-soft)) !important;
+	padding: 2px 0 4px !important;
+	background: transparent !important;
+	border: none !important;
 	box-shadow: none !important;
 }
 .thinking-row {
@@ -562,7 +562,7 @@ watch(
 	gap: 8px;
 }
 .thinking-label {
-	font-size: 12.5px;
+	font-size: 13px;
 	font-weight: 500;
 	color: var(--da-muted);
 	letter-spacing: -0.01em;
@@ -570,13 +570,13 @@ watch(
 .thinking-dots {
 	display: flex;
 	align-items: center;
-	gap: 5px;
+	gap: 4px;
 	padding: 2px 0;
 }
 .dot {
-	width: 6px;
-	height: 6px;
-	background: var(--da-primary);
+	width: 5px;
+	height: 5px;
+	background: var(--da-muted);
 	border-radius: 50%;
 	animation: dotBounce 1.2s infinite;
 	opacity: 0.55;
