@@ -17,6 +17,7 @@
 - [x] **result-set ghost meta**（结果表工具条 ghost · DEEIX message-meta）
 - [x] **thinking demote + admin table quiet + expand fab**
 - [x] **login quiet + header meta**（DEEIX 居中登录 / 顶栏去 chip）
+- [x] **global nav densify**（侧栏 h-8 导航行 · 弱新建 agent）
 - [ ] **用户验收视觉后 merge PR**（下一门控，需人工）
 
 **冻结**：chat store SSE、graph EventSource、后端。

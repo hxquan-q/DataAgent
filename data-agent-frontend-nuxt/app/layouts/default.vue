@@ -20,7 +20,7 @@
 			<BaseDrawer v-model="drawer" :drawer-width="280">
 				<template #drawer>
 					<div class="d-flex flex-column h-100">
-						<div class="pa-4 border-b border-white-5">
+						<div class="pa-3 border-b border-white-5 brand-block">
 							<div class="d-flex align-center mb-3">
 								<v-avatar color="primary" size="36" class="mr-3 rounded-lg">
 									<v-icon icon="mdi-robot" color="white" size="22" />
@@ -141,7 +141,7 @@
 							v-model:opened="openedGroups"
 							density="compact"
 							nav
-							class="flex-grow-1 pa-2 px-4 custom-scrollbar bg-transparent"
+							class="flex-grow-1 pa-1 px-2 custom-scrollbar bg-transparent"
 													>
 							<v-list-item
 								prepend-icon="mdi-chat-processing-outline"
@@ -666,10 +666,14 @@ watch(
 	color: var(--da-sidebar-muted, #64748b);
 }
 
+.brand-block {
+	padding-bottom: 10px !important;
+}
 .brand-title {
 	color: var(--da-sidebar-ink, #1a2332);
 	font-family: var(--da-font-display);
 	letter-spacing: -0.02em;
+	font-size: 0.95rem;
 }
 
 .app-header-title {
@@ -781,11 +785,20 @@ watch(
 }
 
 .navigation-item {
-	--v-list-item-padding-start: 16px;
-	--v-list-item-min-height: var(--da-table-row-density, 36px);
-	border-radius: var(--da-radius-sm, 8px) !important;
+	--v-list-item-padding-start: 10px;
+	--v-list-item-min-height: 32px;
+	border-radius: 8px !important;
 	color: var(--da-sidebar-ink, #1a2332) !important;
-	margin-inline: 4px;
+	margin-inline: 2px;
+	margin-bottom: 1px !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+}
+
+.navigation-item :deep(.v-list-item-title) {
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	letter-spacing: -0.01em;
 }
 
 .navigation-item:hover {
@@ -793,15 +806,20 @@ watch(
 }
 
 .navigation-item.v-list-item--active {
-	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.14)) !important;
+	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.12)) !important;
 	color: var(--da-sidebar-accent, #2f84d6) !important;
-	box-shadow: inset 3px 0 0 var(--da-sidebar-accent, #2f84d6);
-	font-weight: 600;
+	box-shadow: none;
+	font-weight: 500 !important;
+}
+
+.navigation-item.v-list-item--active :deep(.v-list-item-title) {
+	font-weight: 500 !important;
 }
 
 .navigation-sub-item {
-	--v-list-item-padding-start: 28px;
-	--v-list-item-min-height: var(--da-table-row-density, 36px);
+	--v-list-item-padding-start: 22px;
+	--v-list-item-min-height: 32px;
+	font-size: 13px !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -830,18 +848,18 @@ watch(
 }
 
 .new-agent-item {
-	min-height: 40px !important;
-	background: var(--da-primary-soft, #e8f3fc) !important;
+	min-height: 32px !important;
+	background: transparent !important;
 	color: var(--da-primary, #2f84d6) !important;
-	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
-	box-shadow: var(--da-shadow-sm) !important;
-	border-radius: var(--da-radius-md) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-primary) 22%, transparent) !important;
+	box-shadow: none !important;
+	border-radius: 8px !important;
 	transition: background var(--da-dur-fast) var(--da-ease-out),
-		box-shadow var(--da-dur-fast) var(--da-ease-out);
+		border-color var(--da-dur-fast) var(--da-ease-out);
 }
 .new-agent-item:hover {
-	background: color-mix(in srgb, var(--da-primary-soft) 70%, white) !important;
-	box-shadow: var(--da-shadow-md) !important;
+	background: var(--da-primary-soft, #e8f3fc) !important;
+	box-shadow: none !important;
 }
 
 :deep(.v-list-group__items .v-list-item) {
@@ -849,10 +867,49 @@ watch(
 }
 
 :deep(.flex-grow-1.v-list .v-list-item) {
-	min-height: var(--da-table-row-density, 36px) !important;
+	min-height: 32px !important;
 }
 
 :deep(.v-list-item__spacer) {
-	width: 12px !important;
+	width: 10px !important;
+}
+
+/* Quieter group labels */
+.nav-group-label {
+	font-size: 10.5px !important;
+	letter-spacing: 0.08em !important;
+	min-height: 28px !important;
+	margin-top: 10px !important;
+	opacity: 0.85;
+}
+
+.agent-switcher-box {
+	padding: 0;
+}
+
+.agent-switcher :deep(.v-field) {
+	min-height: 36px !important;
+	box-shadow: none !important;
+	border-radius: 10px !important;
+}
+
+.agent-switcher :deep(.v-field__input) {
+	min-height: 36px !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	font-size: 13px !important;
+}
+
+.agent-option__title {
+	font-weight: 400 !important;
+	font-size: 13px !important;
+}
+
+.agent-option__title--active {
+	font-weight: 500 !important;
+}
+
+.sidebar-footer-sep {
+	border-top: 0.5px solid color-mix(in srgb, var(--da-sidebar-line) 80%, transparent);
 }
 </style>
