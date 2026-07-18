@@ -90,6 +90,20 @@ async function onSubmit() {
 <style scoped>
 .login-page {
 	min-height: 100vh;
-	background: linear-gradient(160deg, var(--da-ink) 0%, var(--da-ink) 50%, var(--da-ink) 100%);
+	padding: 24px;
+	background:
+		radial-gradient(
+			900px 420px at 50% -10%,
+			color-mix(in srgb, var(--da-primary) 22%, transparent),
+			transparent 60%
+		),
+		linear-gradient(165deg, var(--da-surface-soft) 0%, #e8f1f8 48%, var(--da-surface-soft) 100%);
+}
+
+.login-page :deep(.v-card) {
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-lg) !important;
+	box-shadow: var(--da-shadow-lg) !important;
+	background: var(--da-surface) !important;
 }
 </style>
