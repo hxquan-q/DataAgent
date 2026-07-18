@@ -823,6 +823,15 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	text-align: right;
 }
 
+
+@media (max-width: 640px) {
+	.input-area {
+		width: calc(100% - 16px);
+		margin-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+		padding: 10px 12px 12px;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.status-chip,
 	.chip-dropdown-item,

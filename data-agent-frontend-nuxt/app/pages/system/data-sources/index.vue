@@ -187,7 +187,7 @@
 							}}</v-icon>
 						</v-avatar>
 						<div>
-							<div class="font-weight-bold">{{ item.name }}</div>
+							<div class="font-weight-medium text-subtitle-2">{{ item.name }}</div>
 							<div class="text-caption text-medium-emphasis">
 								{{ item.host }}:{{ item.port }}
 							</div>
@@ -217,7 +217,7 @@
 					<v-chip
 						:color="
 							item.testStatus === 'success'
-								? 'blue'
+								? 'primary'
 								: item.testStatus === 'fail'
 									? 'error'
 									: 'default'
@@ -244,7 +244,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							:loading="bindingDatasourceId === item.id"
 							:disabled="activeDatasourceId === item.id"
 							@click="handleBindDatasource(item)"
@@ -255,7 +255,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							:loading="togglingStatusId === item.id"
 							@click="handleToggleStatus(item)"
 						>
@@ -265,7 +265,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							:loading="testingId === item.id"
 							@click="handleTestConnection(item)"
 						>
@@ -275,7 +275,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							@click="openFkDialog(item)"
 						>
 							逻辑外键

@@ -57,13 +57,13 @@
 				<v-btn
 					value="CHAT"
 					variant="flat"
-					class="px-8 text-none font-weight-bold"
+					class="px-8 text-none font-weight-medium"
 					>对话模型</v-btn
 				>
 				<v-btn
 					value="EMBEDDING"
 					variant="flat"
-					class="px-8 text-none font-weight-bold"
+					class="px-8 text-none font-weight-medium"
 					>嵌入模型</v-btn
 				>
 			</v-btn-toggle>
@@ -161,7 +161,7 @@
 												size="x-small"
 												color="primary"
 												variant="flat"
-												class="px-2 font-weight-bold d-inline-flex align-center"
+												class="px-2 font-weight-medium d-inline-flex align-center"
 											>
 												<span class="breathing-dot"></span>
 												默认
@@ -188,7 +188,7 @@
 											variant="outlined"
 											color="primary"
 											size="small"
-											class="text-none font-weight-bold"
+											class="text-none font-weight-medium"
 											style="border-width: 1px"
 											:loading="activatingId === model.id"
 											@click="handleActivate(model)"

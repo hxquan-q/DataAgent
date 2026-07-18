@@ -26,10 +26,10 @@
 									<v-icon icon="mdi-robot" color="white" size="22" />
 								</v-avatar>
 								<div>
-									<div class="text-subtitle-2 font-weight-bold brand-title">
+									<div class="text-subtitle-2 font-weight-medium brand-title">
 										DataAgent
 									</div>
-									<div class="text-caption font-weight-bold brand-subtitle">
+									<div class="text-caption font-weight-medium brand-subtitle">
 										AI DATA WORKSPACE
 									</div>
 								</div>
@@ -37,7 +37,7 @@
 
 							<div class="agent-switcher-box">
 								<p
-									class="text-caption mb-2 font-weight-bold agent-switcher-label"
+									class="text-caption mb-2 font-weight-medium agent-switcher-label"
 								>
 									当前选择智能体
 								</p>
@@ -335,7 +335,7 @@
 										<v-icon icon="mdi-account" size="14" color="primary" />
 									</v-avatar>
 								</template>
-								<v-list-item-title class="text-caption font-weight-bold ms-2">
+								<v-list-item-title class="text-caption font-weight-medium ms-2">
 									{{ authDisplayName }}
 								</v-list-item-title>
 								<template #append>
@@ -668,8 +668,14 @@ watch(
 
 .brand-subtitle {
 	font-size: 10px;
-	letter-spacing: 1px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
 	color: var(--da-sidebar-muted, #64748b);
+}
+
+.brand-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.02em;
 }
 
 .app-header-title {
@@ -687,6 +693,8 @@ watch(
 
 .brand-title {
 	color: var(--da-sidebar-ink, #1a2332);
+	font-family: var(--da-font-display);
+	letter-spacing: -0.02em;
 }
 
 /* rebuild-ui: light paper sidebar brand */
