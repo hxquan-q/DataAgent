@@ -223,7 +223,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">查询证据链详情</span>
+					<span class="text-h6 font-weight-medium dialog-title">查询证据链详情</span>
 					<v-spacer />
 					<v-btn
 						icon="mdi-close"

@@ -431,3 +431,10 @@ button:focus-visible,
 	letter-spacing: -0.01em;
 	color: var(--da-ink);
 }
+
+
+/* Dialog/list title display weight */
+.dialog-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.01em;
+}

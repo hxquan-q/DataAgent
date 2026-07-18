@@ -195,7 +195,7 @@
 		<v-card variant="flat" border class="rounded-lg pa-5">
 			<div class="d-flex align-center mb-3">
 				<v-icon icon="mdi-compare-horizontal" color="primary" class="mr-2" size="22" />
-				<span class="text-subtitle-1 font-weight-bold">口径版本对比</span>
+				<span class="text-subtitle-1 font-weight-medium">口径版本对比</span>
 				<v-chip size="x-small" variant="tonal" color="primary" class="ml-3">
 					Diff
 				</v-chip>
@@ -320,7 +320,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑口径版本' : '添加口径版本'
 					}}</span>
 					<v-spacer />

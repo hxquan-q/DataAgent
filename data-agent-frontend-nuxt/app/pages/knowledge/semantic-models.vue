@@ -200,7 +200,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑语义模型' : '添加语义模型'
 					}}</span>
 					<v-spacer />
@@ -352,7 +352,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">批量导入语义模型</span>
+					<span class="text-h6 font-weight-medium dialog-title">批量导入语义模型</span>
 					<v-spacer />
 					<v-btn
 						icon="mdi-close"

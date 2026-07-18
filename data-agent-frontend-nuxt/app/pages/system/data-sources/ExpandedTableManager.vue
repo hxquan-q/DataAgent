@@ -20,7 +20,7 @@
 			<div class="d-flex align-center justify-space-between mb-4">
 				<div class="d-flex align-center">
 					<v-icon size="20" class="mr-2 text-primary">mdi-table-cog</v-icon>
-					<span class="text-subtitle-1 font-weight-bold">数据表管理</span>
+					<span class="text-subtitle-1 font-weight-medium">数据表管理</span>
 					<span class="text-caption text-medium-emphasis ml-4">
 						已选择 {{ selectedTables.length }} 个表
 					</span>

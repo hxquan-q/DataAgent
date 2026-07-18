@@ -224,7 +224,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑指标' : '添加指标'
 					}}</span>
 					<v-spacer />
@@ -511,7 +511,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">测试指标拼装</span>
+					<span class="text-h6 font-weight-medium dialog-title">测试指标拼装</span>
 					<v-spacer />
 					<v-btn
 						icon="mdi-close"

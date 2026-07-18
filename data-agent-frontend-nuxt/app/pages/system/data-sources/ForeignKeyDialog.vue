@@ -73,7 +73,7 @@
 									</div>
 								</td>
 								<td>
-									<div class="font-weight-bold text-green-darken-2">
+									<div class="font-weight-bold text-success">
 										{{ fk.targetTableName }}
 									</div>
 									<div class="text-caption text-grey">

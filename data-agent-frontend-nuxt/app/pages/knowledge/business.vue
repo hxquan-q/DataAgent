@@ -275,7 +275,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑业务知识' : '添加业务知识'
 					}}</span>
 					<v-spacer />

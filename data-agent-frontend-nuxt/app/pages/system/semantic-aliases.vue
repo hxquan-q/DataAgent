@@ -223,7 +223,7 @@
 		<v-card variant="flat" border class="rounded-lg pa-5">
 			<div class="d-flex align-center mb-3">
 				<v-icon icon="mdi-flask-outline" color="primary" class="mr-2" size="22" />
-				<span class="text-subtitle-1 font-weight-bold">别名测试器</span>
+				<span class="text-subtitle-1 font-weight-medium">别名测试器</span>
 				<v-chip size="x-small" variant="tonal" color="primary" class="ml-3">
 					Playground
 				</v-chip>
@@ -329,7 +329,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑语义别名' : '添加语义别名'
 					}}</span>
 					<v-spacer />

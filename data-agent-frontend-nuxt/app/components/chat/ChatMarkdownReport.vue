@@ -92,7 +92,7 @@
 		<v-dialog v-model="store.showReportFullscreen" fullscreen>
 			<v-card>
 				<v-toolbar density="compact" color="surface" border="b" class="report-fullscreen-toolbar">
-					<v-toolbar-title class="text-body-2 font-weight-bold">
+					<v-toolbar-title class="text-body-2 font-weight-medium">
 						{{
 							store.reportFormat === 'markdown' ? 'Markdown 报告' : 'HTML 报告'
 						}}

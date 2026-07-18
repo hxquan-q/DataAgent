@@ -247,7 +247,7 @@
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑提示词配置' : '添加提示词配置'
 					}}</span>
 					<v-spacer />
@@ -364,7 +364,7 @@
 						class="mr-3"
 						size="26"
 					/>
-					<span class="text-h6 font-weight-bold">设置优先级</span>
+					<span class="text-h6 font-weight-medium dialog-title">设置优先级</span>
 					<v-spacer />
 					<v-btn
 						icon="mdi-close"

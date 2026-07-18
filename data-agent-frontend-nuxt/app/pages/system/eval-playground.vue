@@ -74,7 +74,7 @@
 						<v-col v-for="m in genMetrics" :key="m.label" cols="6" sm="4" md="3">
 							<v-card variant="flat" border class="text-center pa-3 eval-score-card">
 								<div class="text-caption text-medium-emphasis">{{ m.label }}</div>
-								<div class="text-h6 font-weight-bold" :class="scoreColor(m.value)">
+								<div class="text-h6 font-weight-medium dialog-title" :class="scoreColor(m.value)">
 									{{ m.value.toFixed(4) }}
 								</div>
 							</v-card>
@@ -117,7 +117,7 @@
 						<v-col v-for="m in retMetrics" :key="m.label" cols="6" sm="4" md="3">
 							<v-card variant="flat" border class="text-center pa-3 eval-score-card">
 								<div class="text-caption text-medium-emphasis">{{ m.label }}</div>
-								<div class="text-h6 font-weight-bold" :class="scoreColor(m.value)">
+								<div class="text-h6 font-weight-medium dialog-title" :class="scoreColor(m.value)">
 									{{ m.value.toFixed(4) }}
 								</div>
 							</v-card>

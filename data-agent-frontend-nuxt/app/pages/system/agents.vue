@@ -296,7 +296,7 @@
 				<v-card-title class="d-flex align-center justify-space-between px-6 pt-6 pb-4">
 					<div class="d-flex align-center">
 						<v-icon icon="mdi-pencil-circle" color="primary" class="mr-3" size="28" />
-						<span class="text-h6 font-weight-bold">编辑智能体</span>
+						<span class="text-h6 font-weight-medium dialog-title">编辑智能体</span>
 					</div>
 					<v-btn icon="mdi-close" variant="text" size="small" @click="closeEditDialog" />
 				</v-card-title>
@@ -389,7 +389,7 @@
 				<v-card-title class="d-flex align-center justify-space-between px-6 pt-6 pb-4">
 					<div class="d-flex align-center">
 						<v-icon icon="mdi-tag-multiple" color="blue" class="mr-3" size="24" />
-						<span class="text-h6 font-weight-bold">全部标签</span>
+						<span class="text-h6 font-weight-medium dialog-title">全部标签</span>
 					</div>
 					<v-btn icon="mdi-close" variant="text" size="small" @click="tagsDialog = false" />
 				</v-card-title>
