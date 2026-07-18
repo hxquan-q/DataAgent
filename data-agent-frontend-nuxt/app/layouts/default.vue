@@ -316,7 +316,7 @@
 								>
 									<div class="d-flex align-center justify-center gap-2 w-100">
 										<v-icon icon="mdi-plus-box-outline" size="16" rounded />
-										<span class="font-weight-bold text-caption mx-1"
+										<span class="font-weight-medium text-caption mx-1"
 											>新建智能体</span
 										>
 									</div>
@@ -403,7 +403,7 @@
 						size="small"
 						variant="tonal"
 						color="primary"
-						class="font-weight-bold app-header-chip"
+						class="font-weight-medium app-header-chip"
 					>
 						Data Workspace
 					</v-chip>

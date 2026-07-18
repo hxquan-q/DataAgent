@@ -394,14 +394,19 @@ function downloadCsv() {
 	justify-content: center;
 	width: 28px;
 	height: 28px;
-	background: white;
+	background: var(--da-surface);
 	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-sm);
+	border-radius: 999px;
 	cursor: pointer;
-	transition: background 0.15s;
+	color: var(--da-ink);
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out);
 }
 .page-btn:hover:not(:disabled) {
-	background: var(--da-surface-soft);
+	background: var(--da-primary-soft);
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	color: var(--da-primary);
 }
 .page-btn:disabled {
 	opacity: 0.4;

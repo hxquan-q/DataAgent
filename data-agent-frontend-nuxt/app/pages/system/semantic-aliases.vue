@@ -273,7 +273,7 @@
 					<div class="d-flex flex-wrap ga-4 align-center">
 						<div class="d-flex flex-column">
 							<span class="text-caption text-medium-emphasis">命中别名</span>
-							<span class="text-body-1 font-weight-bold">
+							<span class="text-body-1 font-weight-medium">
 								{{ testerResult.aliasText }}
 							</span>
 						</div>

@@ -45,7 +45,7 @@
 
 		<v-alert type="info" variant="tonal" border="start" class="mb-4" density="comfortable">
 			<span class="text-body-2">创建前建议：先</span>
-			<a class="text-primary text-decoration-none font-weight-bold" href="/system/model-config">配置 CHAT 模型</a>
+			<a class="text-primary text-decoration-none font-weight-medium" href="/system/model-config">配置 CHAT 模型</a>
 			<span class="text-body-2">；创建后将引导绑定数据源。</span>
 		</v-alert>
 

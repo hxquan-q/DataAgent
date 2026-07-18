@@ -27,7 +27,7 @@
 			>
 				<div class="d-flex align-center">
 					<v-icon color="primary" class="mr-3">mdi-relation-one-to-many</v-icon>
-					<span class="font-weight-bold"
+					<span class="font-weight-medium"
 						>逻辑外键配置 - {{ datasourceName }}</span
 					>
 				</div>

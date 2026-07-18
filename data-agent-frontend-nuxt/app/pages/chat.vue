@@ -276,4 +276,19 @@ onUnmounted(() => {
 		transition: none;
 	}
 }
+
+@media (max-width: 640px) {
+	.chat-no-agent {
+		padding: 24px 16px;
+	}
+	.chat-no-agent__card {
+		padding: 28px 18px;
+	}
+	.chat-no-agent__actions {
+		flex-direction: column;
+	}
+	.chat-no-agent__btn {
+		width: 100%;
+	}
+}
 </style>
