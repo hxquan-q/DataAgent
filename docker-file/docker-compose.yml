@@ -24,7 +24,8 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: nl2sql_db
     ports:
-      - "3306:3306"
+      # 仅本机回环：公网 0.0.0.0:3306 + root/root 曾导致扫库勒索清空元库（见 docs/dev/INCIDENT_2026-07-18_MYSQL_EXPOSURE_RANSOM.md）
+      - "127.0.0.1:3306:3306"
     # 命名卷：restart/recreate 后保留数据。external 固定卷名，避免 compose 项目前缀空卷。
     volumes:
       - data-agent-mysql-inner-data:/var/lib/mysql

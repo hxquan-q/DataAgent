@@ -44,24 +44,25 @@ ensure_mysql_port() {
     docker compose -f "$COMPOSE" up -d mysql mysql-data postgres-data
   fi
   # 仅当容器未映射 3306 时用 socat（不 recreate mysql）
+  # 强制 127.0.0.1：禁止 0.0.0.0 暴露（2026-07-18 公网扫库勒索事故）
   docker rm -f data-agent-mysql-portfwd >/dev/null 2>&1 || true
   docker run -d --name data-agent-mysql-portfwd --network "$NET" \
-    -p 3306:3306 alpine/socat \
+    -p 127.0.0.1:3306:3306 alpine/socat \
     TCP-LISTEN:3306,fork,reuseaddr TCP:data-agent-mysql-inner:3306 >/dev/null
-  log "ok: socat host:3306 -> data-agent-mysql-inner:3306 (no recreate, data safe)"
+  log "ok: socat 127.0.0.1:3306 -> data-agent-mysql-inner:3306 (no recreate, data safe)"
 }
 
-# 业务模拟库：宿主 IDEA 用 127.0.0.1:3307/5433 访问
+# 业务模拟库：宿主 IDEA 用 127.0.0.1:3307/5433 访问（仅 loopback，勿公网）
 ensure_business_ports() {
   docker compose -f "$COMPOSE" up -d mysql-data postgres-data >/dev/null 2>&1 || true
   docker rm -f data-agent-mysql-data-portfwd data-agent-pg-data-portfwd >/dev/null 2>&1 || true
   docker run -d --name data-agent-mysql-data-portfwd --network "$NET" \
-    -p 3307:3307 alpine/socat \
+    -p 127.0.0.1:3307:3307 alpine/socat \
     TCP-LISTEN:3307,fork,reuseaddr TCP:mysql-data:3306 >/dev/null
   docker run -d --name data-agent-pg-data-portfwd --network "$NET" \
-    -p 5433:5433 alpine/socat \
+    -p 127.0.0.1:5433:5433 alpine/socat \
     TCP-LISTEN:5433,fork,reuseaddr TCP:postgres-data:5432 >/dev/null
-  log "ok: socat host:3307->mysql-data:3306 ; host:5433->postgres-data:5432"
+  log "ok: socat 127.0.0.1:3307->mysql-data:3306 ; 127.0.0.1:5433->postgres-data:5432"
 }
 
 # 可选：写元库 datasource host（默认关闭）
