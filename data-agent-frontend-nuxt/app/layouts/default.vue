@@ -355,7 +355,7 @@
 
 						<v-dialog v-model="pwdDialog" max-width="420">
 							<v-card rounded="lg" class="pa-4">
-								<div class="text-subtitle-1 font-weight-bold mb-3">修改密码</div>
+								<div class="text-subtitle-1 font-weight-medium mb-3 dialog-title">修改密码</div>
 								<v-alert
 									v-if="pwdError"
 									type="error"

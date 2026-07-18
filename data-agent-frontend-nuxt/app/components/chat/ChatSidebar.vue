@@ -163,7 +163,7 @@
 	<!-- Confirm Dialog -->
 	<v-dialog v-model="showDeleteConfirm" max-width="360">
 		<v-card rounded="xl">
-			<v-card-title class="text-subtitle-1 font-weight-bold pa-5 pb-2"
+			<v-card-title class="text-subtitle-1 font-weight-medium pa-5 pb-2 dialog-title"
 				>删除会话</v-card-title
 			>
 			<v-card-text class="px-5 text-body-2 text-medium-emphasis"
