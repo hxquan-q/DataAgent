@@ -275,7 +275,7 @@
 				<v-card-title
 					class="d-flex align-center justify-space-between px-4 pt-4"
 				>
-					<span class="text-h6 font-weight-bold">{{ dialogTitle }}</span>
+					<span class="text-h6 font-weight-medium dialog-title">{{ dialogTitle }}</span>
 					<v-btn
 						icon="mdi-close"
 						variant="text"
@@ -806,5 +806,9 @@ onMounted(fetchConfigs);
 .list-move {
 	transition: none !important;
 }
+}
+.dialog-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.01em;
 }
 </style>

@@ -422,3 +422,12 @@ button:focus-visible,
 	background: var(--da-surface) !important;
 	border-color: var(--da-line-soft) !important;
 }
+
+
+/* Dialog title display */
+.v-dialog .v-card-title {
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	letter-spacing: -0.01em;
+	color: var(--da-ink);
+}

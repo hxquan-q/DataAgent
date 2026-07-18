@@ -17,7 +17,7 @@
 <template>
 	<header class="d-flex align-center justify-space-between mb-5 knowledge-header">
 		<div class="knowledge-header__text">
-			<h1 class="text-h4 font-weight-bold mb-1 knowledge-header__title">{{ title }}</h1>
+			<h1 class="text-h4 mb-1 knowledge-header__title">{{ title }}</h1>
 			<p v-if="resolvedSubtitle" class="text-body-2 knowledge-header__subtitle">
 				{{ resolvedSubtitle }}
 			</p>
