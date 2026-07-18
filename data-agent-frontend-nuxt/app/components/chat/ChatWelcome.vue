@@ -16,37 +16,24 @@
 
 <template>
 	<div class="welcome-wrap">
-		<div class="agent-avatar-wrap da-reveal">
-			<v-avatar
-				:image="store.currentAgentAvatar || undefined"
-				:color="store.currentAgentAvatar ? undefined : 'primary'"
-				size="64"
-				rounded="circle"
-				class="agent-avatar"
-			>
-				<v-icon v-if="!store.currentAgentAvatar" size="32" color="white">
-					mdi-robot-outline
-				</v-icon>
-			</v-avatar>
+		<div class="welcome-title-group da-reveal">
+			<h1 class="welcome-title">
+				{{ greetingLine }}
+			</h1>
+			<span v-if="store.currentAgentName" class="welcome-badge" :title="store.currentAgentDescription || store.currentAgentName">
+				{{ store.currentAgentName }}
+			</span>
 		</div>
 
-		<p class="welcome-kicker da-reveal da-reveal-delay-1">Data Agent</p>
-		<h2 class="welcome-title da-reveal da-reveal-delay-1">
-			您好，我是
-			<span class="agent-name">{{ store.currentAgentName || '数据助手' }}</span>
-		</h2>
-
-		<div class="welcome-line da-hairline da-reveal-delay-2" aria-hidden="true" />
-
-		<p class="welcome-desc da-reveal da-reveal-delay-2">
-			{{
-				store.currentAgentDescription ||
-				'分析表结构、生成 SQL、输出可视化报告——把问题丢给我即可。'
-			}}
+		<p v-if="store.currentAgentDescription" class="welcome-desc da-reveal da-reveal-delay-1">
+			{{ store.currentAgentDescription }}
+		</p>
+		<p v-else class="welcome-desc da-reveal da-reveal-delay-1">
+			分析表结构、生成 SQL、输出可视化报告——把问题丢给我即可。
 		</p>
 
 		<!-- R159: readiness checklist -->
-		<ul v-if="!readyToChat" class="ready-list da-reveal da-reveal-delay-3" aria-label="开始前检查">
+		<ul v-if="!readyToChat" class="ready-list da-reveal da-reveal-delay-2" aria-label="开始前检查">
 			<li class="ready-item" :class="{ ok: hasModel }">
 				<span class="ready-dot" aria-hidden="true" />
 				<span class="ready-text">{{ hasModel ? 'CHAT 模型已就绪' : '需要激活 CHAT 模型' }}</span>
@@ -58,7 +45,7 @@
 				<button v-if="!hasDatasource" type="button" class="ready-link" @click="goDatasource">去绑定</button>
 			</li>
 		</ul>
-		<p v-else class="ready-ok da-reveal da-reveal-delay-3" role="status">已就绪，直接提问或点下方推荐问题。</p>
+		<p v-else class="ready-ok da-reveal da-reveal-delay-2" role="status">已就绪 · 直接提问或点下方推荐</p>
 
 		<div
 			v-if="chips.length"
@@ -97,6 +84,15 @@ const hasDatasource = computed(
 	() => store.allDatasources.length > 0 && !!store.activeDatasource,
 );
 const readyToChat = computed(() => hasModel.value && hasDatasource.value);
+
+/** DEEIX empty: one large greeting line, agent as quiet badge */
+const greetingLine = computed(() => {
+	const hour = new Date().getHours();
+	if (hour < 11) return '早上好，今天想分析什么？';
+	if (hour < 14) return '中午好，有什么可以帮你？';
+	if (hour < 18) return '下午好，从哪个问题开始？';
+	return '晚上好，需要我帮你看数据吗？';
+});
 
 function goModels() {
 	navigateTo('/system/model-config');
@@ -142,7 +138,6 @@ async function ask(question: string) {
 	const agentId = store.currentAgentId;
 	if (!agentId) return;
 	if (!readyToChat.value) {
-		// R184: 点击推荐问题时给出明确路径
 		if (!hasModel.value) {
 			navigateTo('/system/model-config');
 		} else if (!hasDatasource.value) {
@@ -174,83 +169,85 @@ watch(
 </script>
 
 <style scoped>
+/* DEEIX empty: large economist title, no avatar chrome */
 .welcome-wrap {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	padding: 48px 24px 32px;
-	min-height: min(52vh, 420px);
-	max-width: 640px;
+	padding: clamp(48px, 10vh, 96px) 20px 28px;
+	min-height: min(56vh, 480px);
+	max-width: min(100%, var(--da-answer-max, 880px));
 	margin: 0 auto;
+	box-sizing: border-box;
 }
 
-.agent-avatar-wrap {
-	margin-bottom: 16px;
-}
-
-.agent-avatar {
-	box-shadow: var(--da-shadow-md);
-	border: 2px solid color-mix(in srgb, var(--da-primary) 18%, var(--da-surface));
-	box-shadow: var(--da-shadow-md);
-}
-
-.welcome-kicker {
-	margin: 0 0 6px;
-	font-size: 12px;
-	font-weight: 600;
-	letter-spacing: 0.12em;
-	text-transform: uppercase;
-	color: var(--da-muted);
+.welcome-title-group {
+	position: relative;
+	display: inline-flex;
+	max-width: calc(100% - 2rem);
+	justify-content: center;
+	align-items: flex-start;
 }
 
 .welcome-title {
+	margin: 0;
 	font-family: var(--da-font-display);
-	font-size: clamp(26px, 3.6vw, 34px);
+	font-size: clamp(22px, 3.4vw, 32px);
 	font-weight: 500;
-	color: var(--da-ink, #1a2332);
-	margin: 0 0 12px;
-	letter-spacing: -0.03em;
-	line-height: 1.22;
+	line-height: 1.12;
+	letter-spacing: -0.005em;
+	color: var(--da-ink);
+	text-wrap: balance;
 }
 
-.agent-name {
-	color: var(--da-primary, #2f84d6);
+.welcome-badge {
+	position: absolute;
+	left: calc(100% + 6px);
+	top: 2px;
+	max-width: 7.5rem;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	padding: 1px 6px;
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, var(--da-line) 70%, transparent);
+	background: color-mix(in srgb, var(--da-surface) 70%, transparent);
+	color: var(--da-muted);
+	font-family: var(--da-font-sans);
+	font-size: 9px;
 	font-weight: 600;
-}
-
-.welcome-line {
-	max-width: 220px;
-	margin: 0 auto 14px;
-	background: var(--da-line);
+	line-height: 1.4;
+	letter-spacing: 0.02em;
 }
 
 .welcome-desc {
-	margin: 0;
+	margin: 14px 0 0;
+	max-width: 28rem;
 	font-family: var(--da-font-chat, var(--da-font-sans));
-	font-size: 14.5px;
+	font-size: 14px;
 	font-weight: 400;
-	color: var(--da-muted);
-	max-width: 420px;
-	line-height: 1.65;
+	line-height: 1.6;
 	letter-spacing: -0.01em;
+	color: var(--da-muted);
 }
 
 .preset-row {
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: center;
-	gap: 10px;
-	margin-top: 20px;
-	max-width: 560px;
+	gap: 8px;
+	margin-top: 28px;
+	max-width: 36rem;
+	width: 100%;
 }
 
 .preset-chip {
 	appearance: none;
 	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
 	background: color-mix(in srgb, var(--da-surface) 88%, transparent);
-	color: var(--da-ink, #1a2332);
+	color: var(--da-ink);
 	border-radius: 999px;
 	padding: 8px 14px;
 	min-height: 36px;
@@ -259,9 +256,10 @@ watch(
 	line-height: 1.4;
 	cursor: pointer;
 	transition:
-		border-color var(--da-dur-fast, 0.15s) var(--da-ease-out),
-		background var(--da-dur-fast, 0.15s) var(--da-ease-out),
-		box-shadow var(--da-dur-fast, 0.15s) var(--da-ease-out);
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out),
+		box-shadow var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out);
 	box-shadow: var(--da-shadow-sm);
 	text-align: left;
 	max-width: 100%;
@@ -269,14 +267,14 @@ watch(
 }
 
 .preset-chip:hover:not(:disabled) {
-	border-color: color-mix(in srgb, var(--da-primary, #2f84d6) 40%, transparent);
+	border-color: color-mix(in srgb, var(--da-primary) 40%, transparent);
 	background: var(--da-primary-soft);
-	color: var(--da-primary, #2f84d6);
+	color: var(--da-primary);
 	box-shadow: var(--da-shadow-md);
 }
 
 .preset-chip:focus-visible {
-	outline: 2px solid var(--da-ring, #2f84d6);
+	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
 
@@ -285,15 +283,13 @@ watch(
 	cursor: not-allowed;
 }
 
-@media (prefers-reduced-motion: reduce) {
-	.preset-chip {
-		transition: none;
-	}
+.preset-chip--blocked {
+	opacity: 0.7;
 }
 
 .ready-list {
 	list-style: none;
-	margin: 18px 0 0;
+	margin: 22px 0 0;
 	padding: 0;
 	display: flex;
 	flex-direction: column;
@@ -301,6 +297,7 @@ watch(
 	max-width: 360px;
 	width: 100%;
 }
+
 .ready-item {
 	display: flex;
 	align-items: center;
@@ -314,11 +311,13 @@ watch(
 	color: var(--da-ink);
 	text-align: left;
 }
+
 .ready-item.ok {
 	border-color: color-mix(in srgb, var(--da-success) 25%, white);
 	background: color-mix(in srgb, var(--da-success) 8%, white);
 	color: var(--da-success);
 }
+
 .ready-dot {
 	width: 8px;
 	height: 8px;
@@ -326,13 +325,16 @@ watch(
 	background: var(--da-warning);
 	flex-shrink: 0;
 }
+
 .ready-item.ok .ready-dot {
 	background: var(--da-success);
 }
+
 .ready-text {
 	flex: 1;
 	min-width: 0;
 }
+
 .ready-link {
 	appearance: none;
 	border: none;
@@ -344,8 +346,9 @@ watch(
 	padding: 0;
 	white-space: nowrap;
 }
+
 .ready-link:focus-visible {
-	outline: 2px solid var(--da-accent);
+	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
 
@@ -355,5 +358,25 @@ watch(
 	font-weight: 500;
 	color: var(--da-muted);
 	letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+	.welcome-badge {
+		position: static;
+		display: inline-block;
+		margin: 10px auto 0;
+		max-width: 12rem;
+	}
+
+	.welcome-title-group {
+		flex-direction: column;
+		align-items: center;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.preset-chip {
+		transition: none;
+	}
 }
 </style>

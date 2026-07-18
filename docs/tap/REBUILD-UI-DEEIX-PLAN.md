@@ -83,3 +83,5 @@ cd data-agent-frontend-nuxt && pnpm build
 - header height token · drawer scroll · query evidence paper
 - metric-version diff 列 · markdown table paper · 语义色板 lighten/darken 清理
 - PR：https://github.com/hxquan-q/DataAgent/pull/1 （待用户验收 merge）
+
+- R229：Welcome 大标题空态 · 去消息 avatar · 圆形图标发送 · composer shadow 对齐 DEEIX（`docs/tap/R229-deeix-high-impact-visual.md`）

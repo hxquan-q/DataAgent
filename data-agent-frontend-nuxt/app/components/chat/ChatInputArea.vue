@@ -178,19 +178,27 @@
 			</div>
 
 			<div class="action-bar-right">
-				<v-btn
+				<button
 					v-if="!store.isStreaming"
+					type="button"
 					class="send-btn"
 					:disabled="!canSend"
+					aria-label="发送"
+					title="发送"
 					@click="handleSend"
 				>
-					发送
-					<v-icon size="16" class="ml-1">mdi-arrow-right</v-icon>
-				</v-btn>
-				<v-btn v-else class="stop-btn" aria-label="停止生成" @click="handleStop">
-					<v-icon size="16" color="white">mdi-stop</v-icon>
-					停止
-				</v-btn>
+					<v-icon size="18" aria-hidden="true">mdi-arrow-up</v-icon>
+				</button>
+				<button
+					v-else
+					type="button"
+					class="stop-btn"
+					aria-label="停止生成"
+					title="停止生成"
+					@click="handleStop"
+				>
+					<v-icon size="16" aria-hidden="true">mdi-stop</v-icon>
+				</button>
 			</div>
 		</div>
 		<p v-if="sendBlockReason" class="send-block-hint" role="status">
@@ -389,29 +397,27 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 </script>
 
 <style scoped>
-/* DEEIX dock: floating input group over fade */
+/* DEEIX dock: pure floating composer (rounded-3xl / border 0.5 / soft shadow) */
 .input-area {
 	position: relative;
 	flex-shrink: 0;
 	z-index: 5;
-	background: color-mix(in srgb, var(--da-surface) 92%, transparent);
-	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 70%, transparent);
 	border-radius: 24px;
-	padding: 8px 12px 10px;
+	padding: 6px 10px 8px;
 	max-width: min(100%, var(--da-answer-max, 880px));
 	width: calc(100% - 32px);
-	margin: 0 auto 16px;
+	margin: 0 auto 18px;
 	box-sizing: border-box;
-	box-shadow: var(--da-shadow-sm);
-	backdrop-filter: blur(12px);
-	-webkit-backdrop-filter: blur(12px);
+	box-shadow: var(--da-shadow-composer, var(--da-shadow-sm));
 	transition:
 		border-color var(--da-dur-fast) var(--da-ease-out),
 		box-shadow var(--da-dur-fast) var(--da-ease-out),
 		background var(--da-dur-fast) var(--da-ease-out);
 }
 .input-area:focus-within {
-	border-color: color-mix(in srgb, var(--da-line) 80%, var(--da-primary));
+	border-color: color-mix(in srgb, var(--da-line) 85%, transparent);
 	background: var(--da-surface);
 	box-shadow: var(--da-shadow-md);
 }
@@ -577,17 +583,17 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .chat-textarea {
 	display: block;
 	width: 100%;
-	padding: 12px 14px 6px;
+	padding: 10px 14px 4px;
 	background: none;
 	border: none;
 	outline: none;
-	resize: vertical;
+	resize: none;
 	font-family: var(--da-font-chat, var(--da-font-sans));
 	font-size: var(--da-chat-font-size, 15px);
 	line-height: 1.55;
 	color: var(--da-ink);
-	min-height: 56px;
-	max-height: 240px;
+	min-height: 52px;
+	max-height: 220px;
 }
 .chat-textarea::placeholder {
 	color: var(--da-muted);
@@ -623,18 +629,18 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	gap: 3px;
 	padding: 2px 8px;
 	min-height: 28px;
-	background: var(--da-surface-soft);
-	border: 1px solid var(--da-line-soft);
-	border-radius: 999px;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: 8px;
 	font-size: 11.5px;
 	color: var(--da-muted);
 	cursor: pointer;
-	transition: border-color 0.1s, background 0.1s;
+	transition: border-color 0.1s, background 0.1s, color 0.1s;
 	user-select: none;
 }
 .option-chip:hover {
-	border-color: var(--da-accent);
-	color: var(--da-accent);
+	background: var(--da-surface-soft);
+	color: var(--da-ink);
 }
 .option-chip:focus-within {
 	outline: 2px solid var(--da-ring);
@@ -642,7 +648,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 }
 .option-chip.active {
 	background: var(--da-primary-soft);
-	border-color: var(--da-accent);
+	border-color: color-mix(in srgb, var(--da-primary) 22%, transparent);
 	color: var(--da-primary);
 }
 .hidden-checkbox {
@@ -652,67 +658,53 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	height: 0;
 }
 
-/* ── Send button ─────────────────────────────────────────────────────────────── */
-.send-btn {
+/* ── Send / stop · DEEIX circular icon controls ─────────────────────────────── */
+.send-btn,
+.stop-btn {
+	appearance: none;
 	display: inline-flex;
 	align-items: center;
-	gap: 8px;
-	min-height: var(--da-control-height-md, 40px);
-	padding: 8px 18px;
-	background: var(--da-primary, #2f84d6);
-	color: var(--da-on-primary, #fff);
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	min-width: 32px;
+	min-height: 32px;
+	padding: 0;
 	border: none;
-	border-radius: 999px;
-	font-size: 13.5px;
-	font-weight: 600;
+	border-radius: 10px;
 	cursor: pointer;
-	transition: background var(--da-dur-fast, 0.15s) var(--da-ease-out),
-		opacity var(--da-dur-fast, 0.15s),
-		box-shadow var(--da-dur-fast, 0.15s) var(--da-ease-out);
-	white-space: nowrap;
-	box-shadow: 0 6px 16px color-mix(in srgb, var(--da-primary, #2f84d6) 28%, transparent);
+	flex-shrink: 0;
+	transition:
+		background var(--da-dur-fast) var(--da-ease-out),
+		opacity var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out),
+		box-shadow var(--da-dur-fast) var(--da-ease-out);
+}
+.send-btn {
+	background: var(--da-primary);
+	color: var(--da-on-primary);
+	box-shadow: 0 4px 12px color-mix(in srgb, var(--da-primary) 28%, transparent);
 }
 .send-btn:hover:not(:disabled) {
-	background: color-mix(in srgb, var(--da-primary, #2f84d6) 88%, #000);
+	background: color-mix(in srgb, var(--da-primary) 88%, #000);
 }
 .send-btn:disabled {
-	opacity: 0.4;
+	opacity: 0.35;
 	cursor: not-allowed;
+	box-shadow: none;
 }
-.send-btn:focus-visible {
-	outline: 2px solid var(--da-ring, var(--da-primary));
+.send-btn:focus-visible,
+.stop-btn:focus-visible {
+	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
-.send-icon {
-	flex-shrink: 0;
-}
-
-/* ── Stop button ─────────────────────────────────────────────────────────────── */
 .stop-btn {
-	display: inline-flex;
-	align-items: center;
-	gap: 6px;
-	min-height: var(--da-control-height-md, 40px);
-	padding: 8px 16px;
-	background: var(--da-danger);
-	color: var(--da-on-danger, #fff);
-	border: none;
-	border-radius: 999px;
-	font-size: 13.5px;
-	font-weight: 600;
-	cursor: pointer;
-	box-shadow: 0 6px 16px color-mix(in srgb, var(--da-danger) 28%, transparent);
-	transition:
-		background var(--da-dur-fast, 0.15s) var(--da-ease-out),
-		box-shadow var(--da-dur-fast, 0.15s) var(--da-ease-out);
+	background: var(--da-ink);
+	color: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .stop-btn:hover {
-	background: color-mix(in srgb, var(--da-danger) 88%, #000);
-	box-shadow: 0 8px 18px color-mix(in srgb, var(--da-danger) 32%, transparent);
-}
-.stop-btn:focus-visible {
-	outline: 2px solid var(--da-ring, var(--da-primary));
-	outline-offset: 2px;
+	background: color-mix(in srgb, var(--da-ink) 88%, #000);
 }
 
 /* ── Human feedback ──────────────────────────────────────────────────────────── */

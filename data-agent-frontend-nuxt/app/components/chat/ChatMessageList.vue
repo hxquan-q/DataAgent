@@ -65,34 +65,17 @@
 			<div class="messages-inner">
 				<template v-for="message in filteredMessages" :key="message.id">
 					<div class="message-wrapper da-msg-enter">
-						<!-- ── User message ─────────────────────────────────── -->
+						<!-- ── User message (DEEIX: no avatar chrome) ──────── -->
 						<div v-if="message.role === 'user'" class="row user-row">
 							<v-card class="user-card" elevation="0">
 								<span
 									v-html="escapeHtml(message.content).replace(/\n/g, '<br>')"
 								/>
 							</v-card>
-							<v-avatar
-								color="primary"
-								variant="tonal"
-								size="32"
-								rounded="lg"
-								class="avatar"
-							>
-								<v-icon size="18" color="primary">mdi-account</v-icon>
-							</v-avatar>
 						</div>
 
-						<!-- ── AI messages ──────────────────────────────────── -->
+						<!-- ── AI messages (DEEIX open canvas · no avatar) ── -->
 						<div v-else class="row ai-row">
-							<v-avatar
-								color="primary"
-								size="32"
-								rounded="lg"
-								class="avatar"
-							>
-								<v-icon size="18" color="white">mdi-robot</v-icon>
-							</v-avatar>
 
 							<!-- HTML node message -->
 							<v-card
@@ -175,9 +158,6 @@
 					v-if="store.isReportStreaming && store.streamingReportContent"
 					class="row ai-row"
 				>
-					<v-avatar color="primary" size="32" rounded="lg" class="avatar">
-						<v-icon size="18" color="white">mdi-robot</v-icon>
-					</v-avatar>
 					<v-card class="ai-card report-card" elevation="0">
 						<ChatStreamingReport :content="store.streamingReportContent" />
 					</v-card>
@@ -188,19 +168,6 @@
 					v-if="store.isStreaming && store.nodeBlocks.length > 0"
 					class="row ai-row"
 				>
-					<v-avatar
-						color="primary"
-						size="32"
-						rounded="lg"
-						class="avatar"
-						:style="
-							store.isReportStreaming && store.streamingReportContent
-								? 'visibility: hidden'
-								: undefined
-						"
-					>
-						<v-icon size="18" color="white">mdi-robot</v-icon>
-					</v-avatar>
 					<v-card class="ai-card timeline-card" elevation="0">
 						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
 					</v-card>
@@ -211,9 +178,6 @@
 					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
 					class="row ai-row"
 				>
-					<v-avatar color="primary" size="32" rounded="lg" class="avatar">
-						<v-icon size="18" color="white">mdi-robot</v-icon>
-					</v-avatar>
 					<v-card class="ai-card thinking-card" elevation="0">
 						<div class="thinking-row" role="status" aria-live="polite">
 							<div class="thinking-dots" aria-hidden="true">
@@ -446,13 +410,17 @@ watch(
 }
 
 .messages-inner {
-	padding: 20px 20px 36px;
+	padding: 12px 20px 48px;
 	display: flex;
 	flex-direction: column;
-	gap: 22px;
+	gap: 28px;
 	width: 100%;
 	max-width: min(100%, var(--da-answer-max, 880px));
 	margin: 0 auto;
+}
+
+.row.ai-row {
+	width: 100%;
 }
 
 .message-wrapper {
@@ -474,25 +442,19 @@ watch(
 	justify-content: flex-start;
 }
 
-/* ── Avatar ──────────────────────────────────────────────────────────────────── */
-.avatar {
-	flex-shrink: 0;
-	margin-top: 2px;
-}
-
-/* ── User card (DEEIX: muted soft bubble, not primary fill) ─────────────────── */
+/* ── User card (DEEIX: muted soft bubble, no avatar) ────────────────────────── */
 .user-card {
-	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-primary-soft)) !important;
+	background: color-mix(in srgb, var(--da-surface) 70%, var(--da-primary-soft)) !important;
 	color: var(--da-ink) !important;
-	padding: 12px 14px;
-	border-radius: var(--da-composer-radius, 18px) var(--da-composer-radius, 18px) var(--da-radius-sm, 8px) var(--da-composer-radius, 18px) !important;
+	padding: 12px 16px;
+	border-radius: 20px 20px 6px 20px !important;
 	font-family: var(--da-font-chat, var(--da-font-sans));
 	font-size: var(--da-chat-font-size, 15px);
 	font-weight: 400;
 	line-height: var(--da-chat-line-height, 1.75);
-	max-width: min(70%, 640px);
+	max-width: min(78%, 680px);
 	word-break: break-word;
-	border: 1px solid color-mix(in srgb, var(--da-primary) 14%, var(--da-line-soft)) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent) !important;
 	box-shadow: var(--da-shadow-sm) !important;
 	letter-spacing: -0.01em;
 }

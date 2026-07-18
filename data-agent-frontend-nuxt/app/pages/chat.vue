@@ -147,7 +147,7 @@ onUnmounted(() => {
 	background: transparent;
 	border-left: 1px solid var(--da-line-soft);
 }
-/* DEEIX-like soft fade above floating dock */
+/* Soft fade above floating dock — quieter than hard chrome */
 .chat-body::after {
 	content: '';
 	pointer-events: none;
@@ -155,11 +155,12 @@ onUnmounted(() => {
 	left: 0;
 	right: 0;
 	bottom: 0;
-	height: 72px;
+	height: 88px;
 	z-index: 4;
 	background: linear-gradient(
 		to top,
-		color-mix(in srgb, var(--da-surface-soft) 92%, transparent) 0%,
+		color-mix(in srgb, var(--da-surface-soft) 96%, transparent) 0%,
+		color-mix(in srgb, var(--da-surface-soft) 55%, transparent) 42%,
 		transparent 100%
 	);
 }
