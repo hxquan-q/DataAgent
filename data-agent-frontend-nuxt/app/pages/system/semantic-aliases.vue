@@ -128,7 +128,7 @@
 				<template #item.matchType="{ item }">
 					<v-chip
 						:color="
-							item.matchType === 'EXACT' ? 'green-lighten-4' : 'amber-lighten-4'
+							item.matchType === 'EXACT' ? 'success' : 'warning'
 						"
 						variant="flat"
 						size="small"
@@ -177,7 +177,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteModel(item)"
 						>
@@ -220,7 +220,7 @@
 		</v-card>
 
 		<!-- 别名测试器：输入业务黑话 → 实时显示命中的别名映射（调试/校验用） -->
-		<v-card variant="flat" border class="rounded-lg pa-5">
+		<v-card variant="flat" border class="rounded-lg pa-5 da-toolbar">
 			<div class="d-flex align-center mb-3">
 				<v-icon icon="mdi-flask-outline" color="primary" class="mr-2" size="22" />
 				<span class="text-subtitle-1 font-weight-medium">别名测试器</span>
@@ -300,8 +300,8 @@
 							<v-chip
 								:color="
 									testerResult.matchType === 'EXACT'
-										? 'green-lighten-4'
-										: 'amber-lighten-4'
+										? 'success'
+										: 'warning'
 								"
 								variant="flat"
 								size="small"
@@ -560,8 +560,8 @@ function getTargetTypeLabel(type: string): string {
 function getTargetTypeColor(type: string): string {
 	const map: Record<string, string> = {
 		METRIC: 'primary',
-		DIM: 'purple-lighten-4',
-		VER: 'teal-lighten-4',
+		DIM: 'primary',
+		VER: 'info',
 		FILTER: 'warning',
 	};
 	return map[type] || 'grey';

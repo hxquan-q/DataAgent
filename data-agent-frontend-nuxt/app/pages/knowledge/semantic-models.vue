@@ -70,7 +70,7 @@
 				<v-btn
 					v-if="selectedModelIds.length > 0"
 					variant="tonal"
-					color="red-darken-1"
+					color="error"
 					prepend-icon="mdi-delete"
 					class="text-none"
 					@click="batchDeleteModels"
@@ -158,7 +158,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteModel(item)"
 						/>

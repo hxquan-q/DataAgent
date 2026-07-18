@@ -640,10 +640,14 @@ watch(
 }
 .md-body :deep(table) {
 	width: 100%;
-	border-collapse: collapse;
-	margin: 8px 0;
-	display: block;
-	overflow-x: auto;
+	border-collapse: separate;
+	border-spacing: 0;
+	margin: 10px 0;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .md-body :deep(thead) {
 	display: table-header-group;
@@ -656,19 +660,19 @@ watch(
 	border-top: 1px solid var(--da-line);
 }
 .md-body :deep(th) {
-	display: table-cell;
-	background: var(--da-surface-soft);
-	padding: 6px 10px;
-	border: 1px solid var(--da-line-soft);
+	background: color-mix(in srgb, var(--da-surface-soft) 85%, var(--da-primary-soft));
+	color: var(--da-muted);
 	font-weight: 600;
-	font-size: 13px;
+	font-size: 12px;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--da-line-soft);
 	text-align: left;
 }
 .md-body :deep(td) {
-	display: table-cell;
-	padding: 6px 10px;
-	border: 1px solid var(--da-line-soft);
-	font-size: 13px;
+	padding: 7px 10px;
+	border-bottom: 1px solid var(--da-line-soft);
+	font-size: 12.5px;
+	color: var(--da-ink);
 }
 .md-body :deep(tr:nth-child(even)) {
 	background: var(--da-surface-soft);

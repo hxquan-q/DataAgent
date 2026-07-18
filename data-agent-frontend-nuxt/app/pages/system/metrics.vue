@@ -153,7 +153,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="teal-darken-1"
+							color="primary"
 							icon="mdi-flask"
 							@click="openAssembleDialog(item)"
 						>
@@ -171,7 +171,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="purple-darken-1"
+							color="primary"
 							icon="mdi-source-branch"
 							@click="openVersions(item)"
 						>
@@ -180,7 +180,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteModel(item)"
 						>
@@ -507,7 +507,7 @@
 				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-flask"
-						color="teal-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
@@ -570,7 +570,7 @@
 					<v-alert
 						v-if="assembleTarget?.sqlTemplate"
 						variant="tonal"
-						color="amber-lighten-4"
+						color="warning"
 						density="compact"
 						class="mt-4"
 					>
@@ -589,7 +589,7 @@
 						>关闭</v-btn
 					>
 					<v-btn
-						color="teal-darken-2"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						prepend-icon="mdi-content-copy"

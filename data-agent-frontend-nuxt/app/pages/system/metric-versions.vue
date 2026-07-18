@@ -149,7 +149,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteModel(item)"
 						>
@@ -192,7 +192,7 @@
 		</v-card>
 
 		<!-- 口径版本对比：选两个版本并排 diff，直观查看口径差异（杜绝金额歧义） -->
-		<v-card variant="flat" border class="rounded-lg pa-5">
+		<v-card variant="flat" border class="rounded-lg pa-5 da-toolbar">
 			<div class="d-flex align-center mb-3">
 				<v-icon icon="mdi-compare-horizontal" color="primary" class="mr-2" size="22" />
 				<span class="text-subtitle-1 font-weight-medium">口径版本对比</span>
@@ -246,7 +246,7 @@
 							<v-chip
 								v-if="diffLeft.isDefault === 1"
 								size="x-small"
-								color="green-lighten-4"
+								color="success"
 								variant="flat"
 								class="ml-2"
 							>
@@ -266,7 +266,7 @@
 							<v-chip
 								v-if="diffRight.isDefault === 1"
 								size="x-small"
-								color="green-lighten-4"
+								color="success"
 								variant="flat"
 								class="ml-2"
 							>

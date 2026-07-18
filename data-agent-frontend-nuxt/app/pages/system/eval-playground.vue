@@ -22,13 +22,13 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" class="mt-3" border>
-			<v-tabs v-model="tab" color="primary" density="compact">
-				<v-tab value="generation">
+		<v-card variant="flat" class="mt-3 eval-main-card" border>
+			<v-tabs v-model="tab" color="primary" density="compact" class="eval-tabs">
+				<v-tab value="generation" class="text-none">
 					<v-icon start>mdi-file-document-check</v-icon>
 					生成评测（BLEU / ROUGE）
 				</v-tab>
-				<v-tab value="retrieval">
+				<v-tab value="retrieval" class="text-none">
 					<v-icon start>mdi-database-search</v-icon>
 					检索评测（Recall / MRR / NDCG）
 				</v-tab>
@@ -247,6 +247,17 @@ function scoreColor(v: number): string {
 </script>
 
 <style scoped>
+.eval-main-card {
+	box-shadow: var(--da-shadow-sm) !important;
+	border-radius: var(--da-radius-md) !important;
+	overflow: hidden;
+	background: var(--da-surface) !important;
+}
+.eval-tabs :deep(.v-tab) {
+	letter-spacing: 0 !important;
+	font-weight: 600 !important;
+}
+
 .eval-score-card {
 	border-radius: var(--da-radius-md) !important;
 	background: var(--da-surface) !important;

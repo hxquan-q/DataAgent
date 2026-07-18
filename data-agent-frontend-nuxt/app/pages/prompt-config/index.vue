@@ -187,7 +187,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="amber-darken-2"
+							color="warning"
 							icon="mdi-sort-numeric-descending"
 							@click="openPriorityDialog(item)"
 						/>
@@ -205,7 +205,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteConfig(item)"
 						/>

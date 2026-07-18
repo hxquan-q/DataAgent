@@ -337,7 +337,7 @@
 											v-if="mv.version != null"
 											size="x-small"
 											class="ml-2"
-											color="purple-lighten-4"
+											color="primary"
 											variant="flat"
 										>
 											v{{ mv.version }}

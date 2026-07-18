@@ -93,11 +93,11 @@
 					</v-btn>
 					<v-btn value="published" variant="flat" class="px-6 text-none font-weight-medium">
 						已发布
-						<v-chip size="x-small" color="success-lighten-3" class="ml-2">{{ publishedCount }}</v-chip>
+						<v-chip size="x-small" color="success" class="ml-2">{{ publishedCount }}</v-chip>
 					</v-btn>
 					<v-btn value="draft" variant="flat" class="px-6 text-none font-weight-medium">
 						草稿
-						<v-chip size="x-small" color="warning-lighten-3" class="ml-2">{{ draftCount }}</v-chip>
+						<v-chip size="x-small" color="warning" class="ml-2">{{ draftCount }}</v-chip>
 					</v-btn>
 					<v-btn value="offline" variant="flat" class="px-6 text-none font-weight-medium">
 						已下线
@@ -209,7 +209,7 @@
 							icon="mdi-database-cog-outline"
 							variant="text"
 							size="small"
-							color="teal-darken-1"
+							color="primary"
 							@click="goDatasource(item)"
 						>
 							<v-icon size="20" />
@@ -219,7 +219,7 @@
 							icon="mdi-lightning-bolt-outline"
 							variant="text"
 							size="small"
-							color="amber-darken-2"
+							color="warning"
 							@click="goModelConfig"
 						>
 							<v-icon size="20" />

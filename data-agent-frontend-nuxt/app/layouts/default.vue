@@ -327,7 +327,7 @@
 						<div class="pa-2 sidebar-footer-sep">
 							<v-list-item
 								class="rounded-lg navigation-item logout-item"
-								color="red-lighten-2"
+								color="error"
 								@click="openChangePassword"
 							>
 								<template #prepend>
