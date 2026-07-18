@@ -23,7 +23,7 @@
 			<template #actions>
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -263,7 +263,7 @@
 				<v-card-text class="pa-6">
 					<v-form ref="formRef">
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								配置名称 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -276,7 +276,7 @@
 							/>
 						</div>
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								配置描述
 							</p>
 							<v-text-field
@@ -288,7 +288,7 @@
 							/>
 						</div>
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								优化提示词内容 <span class="text-error">*</span>
 							</p>
 							<v-textarea
@@ -304,7 +304,7 @@
 						<v-row>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									优先级
 								</p>
@@ -320,7 +320,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									显示顺序
 								</p>

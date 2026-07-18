@@ -91,7 +91,7 @@
 								title="收藏"
 								@click.stop="handlePin(session)"
 							>
-								<v-icon size="14" :color="session.isPinned ? '#f59e0b' : ''">
+								<v-icon size="14" :color="session.isPinned ? 'warning' : undefined">
 									{{ session.isPinned ? 'mdi-star' : 'mdi-star-outline' }}
 								</v-icon>
 							</v-btn>

@@ -23,7 +23,7 @@
 			<template #actions>
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -243,7 +243,7 @@
 					<template v-else-if="detail">
 						<!-- 原始查询 -->
 						<div class="mb-6">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								用户查询
 							</p>
 							<v-card variant="tonal" color="primary" class="rounded pa-3">
@@ -254,7 +254,7 @@
 						<!-- 基本信息 -->
 						<v-row class="mb-2">
 							<v-col cols="6" md="3">
-								<p class="text-caption text-grey-darken-1 mb-1">状态</p>
+								<p class="text-caption text-medium-emphasis mb-1">状态</p>
 								<v-chip
 									size="small"
 									variant="flat"
@@ -264,26 +264,26 @@
 								</v-chip>
 							</v-col>
 							<v-col cols="6" md="3">
-								<p class="text-caption text-grey-darken-1 mb-1">执行耗时</p>
+								<p class="text-caption text-medium-emphasis mb-1">执行耗时</p>
 								<span class="text-body-2">
 									{{ detail.execTimeMs != null ? `${detail.execTimeMs} ms` : '—' }}
 								</span>
 							</v-col>
 							<v-col cols="6" md="3">
-								<p class="text-caption text-grey-darken-1 mb-1">结果行数</p>
+								<p class="text-caption text-medium-emphasis mb-1">结果行数</p>
 								<span class="text-body-2">
 									{{ detail.rowCount != null ? detail.rowCount : '—' }}
 								</span>
 							</v-col>
 							<v-col cols="6" md="3">
-								<p class="text-caption text-grey-darken-1 mb-1">创建时间</p>
+								<p class="text-caption text-medium-emphasis mb-1">创建时间</p>
 								<span class="text-body-2">{{ formatDateTime(detail.createdTime) }}</span>
 							</v-col>
 						</v-row>
 
 						<!-- Trace ID -->
 						<div v-if="detail.traceId" class="mb-6">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								链路追踪 ID
 							</p>
 							<v-code tag="code" class="d-block pa-3 rounded text-body-2">
@@ -293,7 +293,7 @@
 
 						<!-- 语义对象 -->
 						<div class="mb-6">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								语义对象（Semantic Object）
 							</p>
 							<pre
@@ -305,7 +305,7 @@
 
 						<!-- 生成的 SQL -->
 						<div class="mb-6">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								生成的 SQL
 							</p>
 							<pre
@@ -317,7 +317,7 @@
 
 						<!-- 指标口径版本 -->
 						<div>
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								命中指标口径版本
 							</p>
 							<v-list

@@ -32,12 +32,12 @@
 						:aria-label="dsChipAriaLabel"
 						@click="toggleDsMenu"
 					>
-						<v-icon size="13" :color="store.allDatasources.length ? '#64748b' : '#f59e0b'" aria-hidden="true">mdi-database-outline</v-icon>
+						<v-icon size="13" :color="store.allDatasources.length ? 'grey' : 'warning'" aria-hidden="true">mdi-database-outline</v-icon>
 						<span>{{
 							store.activeDatasource?.name
 								|| (store.allDatasources.length ? '选择数据库' : '未绑定数据源')
 						}}</span>
-						<v-icon size="13" color="#94a3b8" aria-hidden="true">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+						<v-icon size="13" color="grey" aria-hidden="true">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</button>
 					<div
 						v-if="showDsMenu"
@@ -83,12 +83,12 @@
 						:aria-label="modelChipAriaLabel"
 						@click="toggleModelMenu"
 					>
-						<v-icon size="13" :color="store.chatModels.length ? '#3b82f6' : '#f59e0b'" aria-hidden="true">mdi-lightning-bolt</v-icon>
+						<v-icon size="13" :color="store.chatModels.length ? 'primary' : 'warning'" aria-hidden="true">mdi-lightning-bolt</v-icon>
 						<span>{{
 							store.activeModelConfig?.modelName
 								|| (store.chatModels.length ? '选择AI模型' : '未配置模型')
 						}}</span>
-						<v-icon size="13" color="#94a3b8" aria-hidden="true">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+						<v-icon size="13" color="grey" aria-hidden="true">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</button>
 					<div
 						v-if="showModelMenu"

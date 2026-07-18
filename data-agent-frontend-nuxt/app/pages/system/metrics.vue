@@ -23,7 +23,7 @@
 			<template #actions>
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -242,7 +242,7 @@
 						<v-row>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2 d-flex align-center"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2 d-flex align-center"
 								>
 									指标编码 <span class="text-error">*</span>
 									<v-tooltip location="top" max-width="320">
@@ -273,7 +273,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2 d-flex align-center"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2 d-flex align-center"
 								>
 									指标名称 <span class="text-error">*</span>
 									<v-tooltip location="top" max-width="320">
@@ -300,7 +300,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									智能体
 								</p>
@@ -318,7 +318,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									数据源
 								</p>
@@ -336,7 +336,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2 d-flex align-center"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2 d-flex align-center"
 								>
 									来源表 <span class="text-error">*</span>
 									<v-tooltip location="top" max-width="320">
@@ -363,7 +363,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2 d-flex align-center"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2 d-flex align-center"
 								>
 									聚合字段 <span class="text-error">*</span>
 									<v-tooltip location="top" max-width="320">
@@ -390,7 +390,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2 d-flex align-center"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2 d-flex align-center"
 								>
 									聚合函数 <span class="text-error">*</span>
 									<v-tooltip location="top" max-width="320">
@@ -422,7 +422,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									默认时间字段
 								</p>
@@ -436,7 +436,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									SQL 模板（可选）
 								</p>
@@ -451,7 +451,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									指标说明
 								</p>
@@ -466,7 +466,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									状态
 								</p>
@@ -546,21 +546,21 @@
 					/>
 
 					<div class="d-flex flex-wrap ga-2 mb-4">
-						<v-chip size="small" variant="outlined" color="grey-darken-1">
+						<v-chip size="small" variant="outlined" color="grey">
 							aggFunc: <strong class="ml-1">{{ assembleTarget?.aggFunc || '—' }}</strong>
 						</v-chip>
-						<v-chip size="small" variant="outlined" color="grey-darken-1">
+						<v-chip size="small" variant="outlined" color="grey">
 							aggField: <strong class="ml-1">{{ assembleTarget?.aggField || '—' }}</strong>
 						</v-chip>
-						<v-chip size="small" variant="outlined" color="grey-darken-1">
+						<v-chip size="small" variant="outlined" color="grey">
 							sourceTable: <strong class="ml-1">{{ assembleTarget?.sourceTable || '—' }}</strong>
 						</v-chip>
-						<v-chip size="small" variant="outlined" color="grey-darken-1">
+						<v-chip size="small" variant="outlined" color="grey">
 							timeField: <strong class="ml-1">{{ assembleTarget?.defaultTimeField || '—' }}</strong>
 						</v-chip>
 					</div>
 
-					<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+					<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 						受控拼装 SQL（预览）
 					</p>
 					<pre

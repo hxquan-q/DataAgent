@@ -31,7 +31,7 @@
 					:loading="loading"
 					@click="loadAgents"
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 				>
 					刷新
 				</v-btn>
@@ -124,7 +124,7 @@
 				<!-- ID Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.id="{ item }">
-					<span class="text-body-2 font-weight-medium text-grey-darken-2">{{ item.id }}</span>
+					<span class="text-body-2 font-weight-medium text-medium-emphasis">{{ item.id }}</span>
 				</template>
 
 				<!-- Avatar + Name Column -->
@@ -147,7 +147,7 @@
 				<!-- Description Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.description="{ item }">
-					<div class="text-body-2 text-grey-darken-1" style="max-width: 300px;">
+					<div class="text-body-2 text-medium-emphasis" style="max-width: 300px;">
 						{{ item.description || '暂无描述' }}
 					</div>
 				</template>
@@ -192,7 +192,7 @@
 				<!-- Create Time Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.createTime="{ item }">
-					<span class="text-body-2 text-grey-darken-1">{{ formatTime(item.createTime) }}</span>
+					<span class="text-body-2 text-medium-emphasis">{{ formatTime(item.createTime) }}</span>
 				</template>
 
 				<!-- Actions Column -->
@@ -256,7 +256,7 @@
 				<template #no-data>
 					<div class="text-center py-12">
 						<v-icon icon="mdi-robot-outline" size="56" color="grey-lighten-1" class="mb-3" />
-						<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">暂无智能体</h3>
+						<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">暂无智能体</h3>
 						<p class="text-body-2 text-medium-emphasis mb-2" style="max-width: 420px; margin: 0 auto 12px; line-height: 1.6">
 							{{
 								activeFilter === 'all'
@@ -309,7 +309,7 @@
 				<v-card-text class="pa-6">
 					<v-form ref="editFormRef">
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								智能体名称 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -323,7 +323,7 @@
 						</div>
 
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">描述</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">描述</p>
 							<v-textarea
 								v-model="editForm.description"
 								placeholder="请输入智能体描述"
@@ -335,7 +335,7 @@
 						</div>
 
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">分类</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">分类</p>
 							<v-text-field
 								v-model="editForm.category"
 								placeholder="请输入分类"
@@ -346,7 +346,7 @@
 						</div>
 
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">标签 (逗号分隔)</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">标签 (逗号分隔)</p>
 							<v-text-field
 								v-model="editForm.tags"
 								placeholder="例如: 数据分析,智能助手,推荐系统"
@@ -357,7 +357,7 @@
 						</div>
 
 						<div class="mb-2">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">状态</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">状态</p>
 							<v-select
 								v-model="editForm.status"
 								:items="statusOptions"

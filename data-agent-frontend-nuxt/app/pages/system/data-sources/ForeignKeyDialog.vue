@@ -41,7 +41,7 @@
 
 			<v-card-text class="pa-6">
 				<div class="mb-8">
-					<div class="text-overline text-grey-darken-1 mb-2">
+					<div class="text-overline text-medium-emphasis mb-2">
 						已生效的关系列表
 					</div>
 					<v-table
@@ -68,7 +68,7 @@
 								</td>
 								<td class="text-center">
 									<v-icon size="16" color="grey">mdi-link-variant</v-icon>
-									<div class="text-caption font-weight-bold text-grey-darken-2">
+									<div class="text-caption font-weight-bold text-medium-emphasis">
 										{{ fk.relationType }}
 									</div>
 								</td>

@@ -18,7 +18,7 @@
 	<section class="page-shell">
 		<header class="d-flex align-center justify-space-between mb-8">
 			<div>
-				<h1 class="text-h4 font-weight-bold mb-1" style="color: #1565c0">
+				<h1 class="text-h4 font-weight-bold mb-1" style="color: var(--da-primary)">
 					智能体知识库
 				</h1>
 				<p class="text-body-2 text-medium-emphasis">
@@ -28,7 +28,7 @@
 			<div class="d-flex ga-3">
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -86,7 +86,7 @@
 				<div
 					v-show="filterVisible"
 					class="mt-4 pt-4"
-					style="border-top: 1px solid #e2e8f0"
+					style="border-top: 1px solid var(--da-line-soft)"
 				>
 					<div class="d-flex flex-wrap ga-3">
 						<v-select
@@ -268,7 +268,7 @@
 
 			<div
 				class="d-flex align-center justify-end ga-4 px-4 py-4"
-				style="border-top: 1px solid #e2e8f0"
+				style="border-top: 1px solid var(--da-line-soft)"
 			>
 				<v-select
 					:model-value="queryParams.pageSize"
@@ -314,7 +314,7 @@
 				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								知识类型 <span class="text-error">*</span>
 							</p>
 							<v-select
@@ -363,7 +363,7 @@
 						</v-alert>
 
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								知识标题 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -379,7 +379,7 @@
 						<div v-if="knowledgeForm.type === 'DOCUMENT'" class="mb-5">
 							<p
 								v-if="!isEdit"
-								class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+								class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 							>
 								分块策略
 							</p>
@@ -418,7 +418,7 @@
 						>
 							<div class="mb-5">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									问题 <span class="text-error">*</span>
 								</p>
@@ -440,7 +440,7 @@
 							</div>
 							<div class="mb-2">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									答案 <span class="text-error">*</span>
 								</p>

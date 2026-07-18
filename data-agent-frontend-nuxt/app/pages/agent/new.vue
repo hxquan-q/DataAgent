@@ -53,7 +53,7 @@
 		<v-card variant="flat" border class="rounded-lg pa-6">
 			<v-form ref="formRef">
 				<div class="mb-6">
-					<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+					<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 						头像设置
 					</p>
 					<div class="d-flex align-center ga-4 flex-wrap">
@@ -91,7 +91,7 @@
 
 				<v-row>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							智能体名称 <span class="text-error">*</span>
 						</p>
 						<v-text-field
@@ -104,7 +104,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							分类 <span class="text-error">*</span>
 						</p>
 						<v-text-field
@@ -117,7 +117,7 @@
 						/>
 					</v-col>
 					<v-col cols="12">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							描述
 						</p>
 						<v-textarea
@@ -130,7 +130,7 @@
 						/>
 					</v-col>
 					<v-col cols="12">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							智能体 Prompt
 						</p>
 						<v-textarea
@@ -143,7 +143,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							标签 <span class="text-error">*</span>
 						</p>
 						<v-text-field
@@ -156,7 +156,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							状态
 						</p>
 						<v-select
@@ -170,7 +170,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							工作流模式
 						</p>
 						<v-select

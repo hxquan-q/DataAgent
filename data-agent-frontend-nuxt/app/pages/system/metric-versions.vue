@@ -23,7 +23,7 @@
 			<template #actions>
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -338,7 +338,7 @@
 						<v-row>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									版本编码 <span class="text-error">*</span>
 								</p>
@@ -353,7 +353,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									时间字段
 								</p>
@@ -367,7 +367,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									过滤条件（SQL 片段）
 								</p>
@@ -382,7 +382,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									口径说明
 								</p>
@@ -397,7 +397,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									是否默认口径
 								</p>
@@ -414,7 +414,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									状态
 								</p>

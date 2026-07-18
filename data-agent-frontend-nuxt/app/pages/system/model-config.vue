@@ -31,7 +31,7 @@
 					:loading="loading"
 					@click="fetchConfigs"
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 				>
 					刷新
 				</v-btn>
@@ -203,7 +203,7 @@
 											variant="outlined"
 											size="small"
 											class="text-none"
-											style="border-color: #e2e8f0"
+											style="border-color: var(--da-line-soft)"
 											@click="handleTestConnection(model)"
 											:loading="testingId === model.id"
 										>
@@ -217,7 +217,7 @@
 												icon="mdi-pencil-outline"
 												variant="text"
 												size="small"
-												color="grey-darken-1"
+												color="grey"
 												@click="handleEdit(model)"
 											></v-btn>
 											<v-btn
@@ -245,7 +245,7 @@
 								color="grey-lighten-1"
 								class="mb-3"
 							></v-icon>
-							<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">
+							<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">
 								{{ activeTab === 'CHAT' ? '尚未配置对话模型' : '尚未配置嵌入模型' }}
 							</h3>
 							<p class="text-body-2 text-medium-emphasis mb-2 model-empty__desc">

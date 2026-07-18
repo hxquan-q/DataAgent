@@ -23,7 +23,7 @@
 			<template #actions>
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -212,7 +212,7 @@
 							v-if="item.isRecall"
 							size="small"
 							variant="text"
-							color="grey-darken-1"
+							color="grey"
 							icon="mdi-bookmark-off"
 							@click="toggleRecall(item, false)"
 						>
@@ -292,7 +292,7 @@
 				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								业务名词 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -306,7 +306,7 @@
 						</div>
 
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								描述 <span class="text-error">*</span>
 							</p>
 							<v-textarea
@@ -321,7 +321,7 @@
 						</div>
 
 						<div class="mb-2">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								同义词
 							</p>
 							<v-textarea

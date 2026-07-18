@@ -23,7 +23,7 @@
 			<template #actions>
 				<v-btn
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -218,7 +218,7 @@
 						<v-row>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									表名 <span class="text-error">*</span>
 								</p>
@@ -233,7 +233,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									字段名 <span class="text-error">*</span>
 								</p>
@@ -248,7 +248,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									业务名称 <span class="text-error">*</span>
 								</p>
@@ -263,7 +263,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									数据类型 <span class="text-error">*</span>
 								</p>
@@ -278,7 +278,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									同义词
 								</p>
@@ -293,7 +293,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									业务描述
 								</p>
@@ -308,7 +308,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									字段注释
 								</p>

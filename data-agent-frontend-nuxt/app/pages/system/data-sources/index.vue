@@ -33,7 +33,7 @@
 					prepend-icon="mdi-refresh"
 					:loading="loading"
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 					@click="fetchDatasources"
 				>
 					刷新
@@ -323,7 +323,7 @@
 				<template #no-data>
 					<div class="text-center py-12 ds-empty">
 						<v-icon icon="mdi-database-off-outline" size="56" color="grey-lighten-1" class="mb-3" />
-						<h3 class="text-h6 font-weight-medium text-grey-darken-2 mb-2">尚未配置数据源</h3>
+						<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">尚未配置数据源</h3>
 						<p class="text-body-2 text-medium-emphasis mb-2 ds-empty__desc">
 							{{
 								agentId

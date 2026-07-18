@@ -73,7 +73,7 @@
 								/>
 							</v-card>
 							<v-avatar
-								color="grey-darken-2"
+								color="grey-darken-1"
 								size="32"
 								rounded="lg"
 								class="avatar"
