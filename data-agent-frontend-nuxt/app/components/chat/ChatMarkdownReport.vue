@@ -284,7 +284,7 @@ async function downloadHtml() {
 /* ── Format toggle ───────────────────────────────────────────────────────────── */
 .format-toggle {
 	border: 1px solid var(--da-line-soft);
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 	overflow: hidden;
 }
 
@@ -342,7 +342,7 @@ async function downloadHtml() {
 	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
 	padding: 2px 5px;
-	border-radius: 3px;
+	border-radius: var(--da-radius-sm);
 	font-size: 12.5px;
 	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
@@ -462,7 +462,7 @@ async function downloadHtml() {
 /* ── ECharts containers ─────────────────────────────────────────────────────── */
 :deep(.md-echarts) {
 	margin: 10px 0;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 }
 
 /* ── ECharts skeleton placeholder ──────────────────────────────────────────── */
@@ -473,7 +473,7 @@ async function downloadHtml() {
 	gap: 10px;
 	margin: 10px 0;
 	height: 120px;
-	border-radius: 8px;
+	border-radius: var(--da-radius-md);
 	border: 1px dashed var(--da-line);
 	background: linear-gradient(90deg, var(--da-surface-soft) 25%, var(--da-surface-soft) 50%, var(--da-surface-soft) 75%);
 	background-size: 200% 100%;

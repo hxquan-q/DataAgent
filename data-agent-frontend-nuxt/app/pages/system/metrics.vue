@@ -882,7 +882,7 @@ onMounted(async () => {
 	background: #1e1e1e;
 	color: #d4d4d4;
 	padding: 16px;
-	border-radius: 8px;
+	border-radius: var(--da-radius-md);
 	font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
 	font-size: 13px;
 	line-height: 1.6;

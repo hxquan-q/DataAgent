@@ -303,7 +303,7 @@ watch(
 	align-items: center;
 	gap: 8px;
 	padding: 8px 12px;
-	border-radius: 10px;
+	border-radius: var(--da-radius-md);
 	border: 1px solid var(--da-line-soft);
 	background: var(--da-surface, #fff);
 	font-size: 13px;

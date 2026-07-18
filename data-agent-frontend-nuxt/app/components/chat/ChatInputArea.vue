@@ -426,7 +426,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	padding: 4px 10px;
 	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
-	border-radius: 20px;
+	border-radius: 999px;
 	font: inherit;
 	font-size: 12px;
 	color: var(--da-muted);
@@ -687,7 +687,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	background: var(--da-danger);
 	color: var(--da-on-danger, #fff);
 	border: none;
-	border-radius: 20px;
+	border-radius: 999px;
 	font-size: 13.5px;
 	font-weight: 600;
 	cursor: pointer;
@@ -805,7 +805,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .send-block-hint__link:focus-visible {
 	outline: 2px solid var(--da-ring, var(--da-primary));
 	outline-offset: 2px;
-	border-radius: 2px;
+	border-radius: var(--da-radius-sm);
 }
 
 .input-char-count {

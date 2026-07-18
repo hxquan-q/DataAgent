@@ -766,7 +766,7 @@ watch(
 	background: var(--da-sidebar-chip-bg, rgba(47, 132, 214, 0.1));
 	color: var(--da-sidebar-chip-ink, #1e5fa8);
 	padding: 1px 6px;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 	font-size: 9px;
 	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
 }
@@ -811,7 +811,7 @@ watch(
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
 	background: color-mix(in srgb, var(--da-muted, #64748b) 35%, transparent);
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {

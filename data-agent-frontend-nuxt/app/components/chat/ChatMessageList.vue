@@ -623,10 +623,10 @@ watch(
 	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
 	padding: 1px 4px;
-	border-radius: 3px;
+	border-radius: var(--da-radius-sm);
 	font-size: 12.5px;
 	font-family: 'Monaco', 'Menlo', 'Fira Code', monospace;
-	color: #c026a0;
+	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .md-body :deep(blockquote) {
 	border-left: 3px solid var(--da-accent);
@@ -686,7 +686,7 @@ watch(
 .md-body :deep(.code-block-wrapper) {
 	margin: 8px 0;
 	border: 1px solid var(--da-line-soft);
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 	overflow: auto;
 	background: var(--da-surface-soft);
 }
@@ -710,7 +710,7 @@ watch(
 	background: transparent;
 	border: 1px solid var(--da-line);
 	padding: 2px 8px;
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 	font-size: 10px;
 	cursor: pointer;
 	transition: all 0.2s;
@@ -756,7 +756,7 @@ watch(
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
 	background: var(--da-line);
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
 	background: var(--da-muted);

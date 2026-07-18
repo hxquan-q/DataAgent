@@ -657,7 +657,7 @@ watch(
 	background: var(--da-surface-soft);
 	border: 1px solid var(--da-line-soft);
 	padding: 1px 5px;
-	border-radius: 3px;
+	border-radius: var(--da-radius-sm);
 	font-size: 12px;
 	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
@@ -765,7 +765,7 @@ watch(
 /* ── ECharts containers ─────────────────────────────────────────────────────── */
 :deep(.md-echarts) {
 	margin: 8px 0;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 }
 
 /* 过程详情有界，防止长 SQL/JSON 撑满屏 */

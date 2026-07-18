@@ -524,7 +524,7 @@ async function confirmDelete() {
 	font-weight: 600;
 	color: var(--da-primary);
 	cursor: pointer;
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 }
 
 .sidebar-config-link:hover {
