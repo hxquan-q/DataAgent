@@ -9,7 +9,8 @@
 - [x] 每阶段 `pnpm build` + commit + push（S0–S5 + 持续 polish）
 - [x] S6 PR：`rebuild-ui` → `main`（用户仓库）→ https://github.com/hxquan-q/DataAgent/pull/1
 - [x] 持续 polish：header/embed/code/table density/nav/security/dialogs（多轮 push）
-- [x] 停止微 polish 循环（边际收益过低，S0–S5 + 多轮 polish 已交付）
+- [x] 停止微 polish 循环（边际收益过低）
+- [x] **answer-first 对话排版**（DEEIX 消息层级 · `9507101`）
 - [ ] **用户验收视觉后 merge PR**（下一门控，需人工）
 
 **冻结**：chat store SSE、graph EventSource、后端。
