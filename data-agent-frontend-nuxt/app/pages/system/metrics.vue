@@ -43,7 +43,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="searchKeyword"
@@ -118,7 +118,7 @@
 				<template #item.status="{ item }">
 					<div class="d-flex align-center ga-2">
 						<v-chip
-							:color="item.status === 1 ? 'success' : 'grey-lighten-1'"
+							:color="item.status === 1 ? 'success' : 'grey'"
 							variant="flat"
 							size="small"
 							label

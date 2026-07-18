@@ -299,7 +299,7 @@
 
 				<template #expanded-row="{ columns, item }">
 					<tr>
-						<td :colspan="columns.length" class="bg-grey-lighten-5 pa-0">
+						<td :colspan="columns.length" class="bg-primary-soft pa-0">
 							<ExpandedTableManager
 								v-model:selected-tables="selectedTables[item.id!]"
 								:all-tables="tableLists[item.id!] ?? []"
@@ -316,7 +316,7 @@
 				<!-- R152: empty state -->
 				<template #no-data>
 					<div class="text-center py-12 ds-empty">
-						<v-icon icon="mdi-database-off-outline" size="56" color="grey-lighten-1" class="mb-3" />
+						<v-icon icon="mdi-database-off-outline" size="56" color="grey" class="mb-3" />
 						<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">尚未配置数据源</h3>
 						<p class="text-body-2 text-medium-emphasis mb-2 ds-empty__desc">
 							{{

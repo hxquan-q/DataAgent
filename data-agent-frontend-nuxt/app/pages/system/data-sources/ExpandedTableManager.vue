@@ -96,7 +96,7 @@ function clearAll() {
 	background: white;
 	border-radius: var(--da-radius-md);
 	border: 1px solid var(--da-line-soft);
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+	box-shadow: inset 0 1px 0 var(--da-line-soft);
 	padding: 24px;
 }
 

@@ -54,7 +54,7 @@
 		</KnowledgePageHeader>
 
 		<!-- 搜索栏 -->
-		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<v-text-field
 				v-model="searchKeyword"
 				placeholder="请输入关键词搜索业务名词、描述或同义词..."

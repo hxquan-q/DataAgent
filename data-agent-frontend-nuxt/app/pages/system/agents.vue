@@ -89,7 +89,7 @@
 				>
 					<v-btn value="all" variant="flat" class="px-6 text-none font-weight-medium">
 						全部智能体
-						<v-chip size="x-small" color="grey-lighten-3" class="ml-2">{{ agents.length }}</v-chip>
+						<v-chip size="x-small" color="grey" class="ml-2">{{ agents.length }}</v-chip>
 					</v-btn>
 					<v-btn value="published" variant="flat" class="px-6 text-none font-weight-medium">
 						已发布
@@ -101,7 +101,7 @@
 					</v-btn>
 					<v-btn value="offline" variant="flat" class="px-6 text-none font-weight-medium">
 						已下线
-						<v-chip size="x-small" color="grey-lighten-3" class="ml-2">{{ offlineCount }}</v-chip>
+						<v-chip size="x-small" color="grey" class="ml-2">{{ offlineCount }}</v-chip>
 					</v-btn>
 				</v-btn-toggle>
 			</div>
@@ -251,7 +251,7 @@
 				<!-- No Data Slot -->
 				<template #no-data>
 					<div class="text-center py-12 da-empty">
-						<v-icon icon="mdi-robot-outline" size="56" color="grey-lighten-1" class="mb-3" />
+						<v-icon icon="mdi-robot-outline" size="56" color="grey" class="mb-3" />
 						<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">暂无智能体</h3>
 						<p class="text-body-2 text-medium-emphasis mb-2" style="max-width: 420px; margin: 0 auto 12px; line-height: 1.6">
 							{{
@@ -681,7 +681,7 @@ onMounted(() => {
 .agent-name-link:focus-visible {
 	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 }
 
 .agent-name-link {

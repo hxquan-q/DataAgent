@@ -34,7 +34,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-select
 					v-model="filterAgentId"
@@ -160,7 +160,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.feedback === 1 ? 'success' : 'grey-lighten-1'"
+							:color="item.feedback === 1 ? 'success' : 'grey'"
 							icon="mdi-thumb-up-outline"
 							:loading="feedbackIds.has(item.id)"
 							@click="toggleFeedback(item, 1)"
@@ -170,7 +170,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.feedback === 2 ? 'error' : 'grey-lighten-1'"
+							:color="item.feedback === 2 ? 'error' : 'grey'"
 							icon="mdi-thumb-down-outline"
 							:loading="feedbackIds.has(item.id)"
 							@click="toggleFeedback(item, 2)"

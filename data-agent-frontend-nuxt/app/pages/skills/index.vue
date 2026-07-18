@@ -23,7 +23,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-4 pa-4 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-select v-model="filterScope" :items="scopeOptions" item-title="label" item-value="value" label="作用域" density="comfortable" hide-details style="max-width: 200px" clearable @update:model-value="loadSkills" />
 				<v-text-field v-model="filterKeyword" label="搜索名称/描述" density="comfortable" hide-details style="max-width: 280px" append-inner-icon="mdi-magnify" @keyup.enter="loadSkills" @click:append-inner="loadSkills" />

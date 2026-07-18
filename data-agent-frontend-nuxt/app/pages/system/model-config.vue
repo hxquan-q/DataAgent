@@ -239,7 +239,7 @@
 							<v-icon
 								icon="mdi-robot-outline"
 								size="56"
-								color="grey-lighten-1"
+								color="grey"
 								class="mb-3"
 							></v-icon>
 							<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">

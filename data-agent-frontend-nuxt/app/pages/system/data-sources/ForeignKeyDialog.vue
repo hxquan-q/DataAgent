@@ -48,7 +48,7 @@
 						density="comfortable"
 						class="border rounded-lg overflow-hidden"
 					>
-						<thead class="bg-grey-lighten-4">
+						<thead class="bg-primary-soft">
 							<tr>
 								<th class="text-left">主表 (Source)</th>
 								<th class="text-center">关系</th>
@@ -126,7 +126,7 @@
 							/>
 						</v-col>
 						<v-col cols="12" md="2" class="d-flex align-center justify-center">
-							<v-icon color="grey-lighten-1" size="32"
+							<v-icon color="grey" size="32"
 								>mdi-arrow-right-bold</v-icon
 							>
 						</v-col>

@@ -45,7 +45,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-3 pa-3">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-select
 					v-model="selectedAgentId"
@@ -562,9 +562,9 @@ function getTargetTypeColor(type: string): string {
 		METRIC: 'primary',
 		DIM: 'purple-lighten-4',
 		VER: 'teal-lighten-4',
-		FILTER: 'orange-lighten-4',
+		FILTER: 'warning',
 	};
-	return map[type] || 'grey-lighten-3';
+	return map[type] || 'grey';
 }
 
 function getMatchTypeLabel(type: string): string {

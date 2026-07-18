@@ -413,3 +413,12 @@ button:focus-visible,
 .page-shell :deep(.v-alert--variant-tonal) {
 	border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
 }
+
+
+/* Admin filter toolbar paper */
+.page-shell :deep(.da-toolbar),
+.da-toolbar {
+	box-shadow: var(--da-shadow-sm) !important;
+	background: var(--da-surface) !important;
+	border-color: var(--da-line-soft) !important;
+}
