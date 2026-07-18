@@ -786,14 +786,18 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 .slide-up-enter-from, .slide-up-leave-to { transform: translateY(10px); opacity: 0; }
 
 .send-block-hint {
-	margin: 6px 4px 4px;
+	margin: 8px 4px 4px;
+	padding: 8px 12px;
 	font-size: 12px;
-	line-height: 1.4;
+	line-height: 1.45;
 	color: var(--da-warning);
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	flex-wrap: wrap;
+	background: color-mix(in srgb, var(--da-warning) 10%, white);
+	border: 1px solid color-mix(in srgb, var(--da-warning) 28%, white);
+	border-radius: var(--da-radius-md);
 }
 .send-block-hint__link {
 	border: none;

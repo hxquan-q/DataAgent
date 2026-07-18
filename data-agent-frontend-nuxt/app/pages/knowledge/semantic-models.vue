@@ -147,7 +147,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.status === 1 ? 'orange-darken-1' : 'success'"
+							:color="item.status === 1 ? 'warning' : 'success'"
 							:icon="item.status === 1 ? 'mdi-pause-circle' : 'mdi-play-circle'"
 							@click="toggleStatus(item, item.status === 1 ? 0 : 1)"
 						>

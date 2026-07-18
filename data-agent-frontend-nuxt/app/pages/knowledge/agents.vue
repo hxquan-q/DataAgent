@@ -210,7 +210,7 @@
 							v-if="item.embeddingStatus === 'FAILED'"
 							size="small"
 							variant="text"
-							color="orange-darken-1"
+							color="warning"
 							icon="mdi-reload"
 							:loading="
 								item.id !== undefined ? retryLoadingMap[item.id] : false

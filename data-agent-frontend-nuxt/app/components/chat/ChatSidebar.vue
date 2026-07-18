@@ -468,6 +468,11 @@ async function confirmDelete() {
 	flex-direction: column;
 	gap: 4px;
 	align-items: center;
+	margin: 12px 8px;
+	padding: 16px 12px;
+	border: 1px dashed var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
 }
 .empty-sessions__title {
 	margin: 0;
@@ -545,10 +550,12 @@ async function confirmDelete() {
 /* ── Collapsed expand FAB ────────────────────────────────────────────────────── */
 .expand-fab {
 	position: absolute;
-	top: 8px;
-	left: 6px;
+	top: 10px;
+	left: 8px;
 	z-index: 10;
 	box-shadow: var(--da-shadow-md) !important;
+	border: 1px solid var(--da-line-soft) !important;
+	background: var(--da-surface) !important;
 }
 
 /* ── Scrollbar ───────────────────────────────────────────────────────────────── */

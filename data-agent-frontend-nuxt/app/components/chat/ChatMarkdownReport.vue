@@ -547,10 +547,14 @@ async function downloadHtml() {
 }
 .report-hairline {
 	height: 1px;
-	width: 100%;
-	background: linear-gradient(90deg, color-mix(in srgb, var(--da-primary) 35%, transparent) 0%, var(--da-line-soft) 55%, transparent 100%);
-	transform-origin: left center;
-	animation: da-scale-x 0.65s var(--da-ease-out, ease) both;
+	margin: 0;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		color-mix(in srgb, var(--da-primary) 35%, var(--da-line-soft)) 20%,
+		color-mix(in srgb, var(--da-primary) 35%, var(--da-line-soft)) 80%,
+		transparent 100%
+	);
 }
 .report-title span {
 	letter-spacing: -0.01em;

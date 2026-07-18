@@ -43,7 +43,7 @@
 				</v-btn>
 				<v-btn
 					v-if="selectedIds.length > 0"
-					color="orange-darken-1"
+					color="warning"
 					prepend-icon="mdi-pause-circle"
 					class="text-none"
 					elevation="0"
@@ -194,7 +194,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.enabled ? 'orange-darken-1' : 'success'"
+							:color="item.enabled ? 'warning' : 'success'"
 							:icon="item.enabled ? 'mdi-pause-circle' : 'mdi-check-circle'"
 							@click="toggleEnabled(item)"
 						>
