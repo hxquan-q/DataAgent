@@ -15,14 +15,15 @@
  */
 
 <template>
-	<header class="d-flex align-center justify-space-between mb-5 knowledge-header">
+	<header class="d-flex align-center justify-space-between mb-4 knowledge-header">
 		<div class="knowledge-header__text">
-			<h1 class="text-h4 mb-1 knowledge-header__title">{{ title }}</h1>
-			<p v-if="resolvedSubtitle" class="text-body-2 knowledge-header__subtitle">
+			<p v-if="kicker" class="knowledge-header__kicker">{{ kicker }}</p>
+			<h1 class="knowledge-header__title">{{ title }}</h1>
+			<p v-if="resolvedSubtitle" class="knowledge-header__subtitle">
 				{{ resolvedSubtitle }}
 			</p>
 		</div>
-		<div class="d-flex ga-3 knowledge-header__actions">
+		<div class="d-flex ga-2 knowledge-header__actions">
 			<slot name="actions" />
 		</div>
 	</header>
@@ -35,6 +36,8 @@ const props = defineProps<{
 	subtitle?: string;
 	/** Alias used by some system pages (security / eval) */
 	description?: string;
+	/** Optional small uppercase label above title */
+	kicker?: string;
 }>();
 
 const resolvedSubtitle = computed(() => props.subtitle || props.description || '');
@@ -44,6 +47,7 @@ const resolvedSubtitle = computed(() => props.subtitle || props.description || '
 .knowledge-header {
 	gap: 12px;
 	flex-wrap: wrap;
+	align-items: flex-start;
 }
 
 .knowledge-header__text {
@@ -51,20 +55,53 @@ const resolvedSubtitle = computed(() => props.subtitle || props.description || '
 	flex: 1;
 }
 
+.knowledge-header__kicker {
+	margin: 0 0 6px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--da-muted);
+}
+
 .knowledge-header__title {
-	color: var(--da-primary, #2f84d6);
-	letter-spacing: -0.02em;
+	margin: 0 0 6px;
+	color: var(--da-ink);
+	letter-spacing: -0.03em;
 	font-family: var(--da-font-display);
-	font-weight: 500 !important;
+	font-weight: 500;
+	font-size: clamp(1.35rem, 2.2vw, 1.65rem);
+	line-height: 1.25;
 }
 
 .knowledge-header__subtitle {
-	color: var(--da-muted, #64748b);
+	color: var(--da-muted);
 	line-height: 1.55;
 	margin: 0;
+	font-size: 13.5px;
+	max-width: 52ch;
 }
 
 .knowledge-header__actions {
 	flex-wrap: wrap;
+	align-items: center;
+}
+
+.knowledge-header__actions :deep(.v-btn) {
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 500 !important;
+	border-radius: 10px !important;
+	min-height: 34px !important;
+}
+
+.knowledge-header__actions :deep(.v-btn--variant-outlined) {
+	border-color: color-mix(in srgb, var(--da-line) 55%, transparent) !important;
+	color: var(--da-ink) !important;
+}
+
+.knowledge-header__actions :deep(.v-btn--variant-flat.v-btn--color-primary),
+.knowledge-header__actions :deep(.v-btn.bg-primary) {
+	box-shadow: none !important;
 }
 </style>

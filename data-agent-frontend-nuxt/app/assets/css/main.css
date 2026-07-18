@@ -52,9 +52,10 @@
 
 .page-shell h1,
 .page-shell .text-h4 {
-	letter-spacing: -0.02em;
+	letter-spacing: -0.03em;
 	color: var(--da-ink);
-	font-weight: 600;
+	font-family: var(--da-font-display);
+	font-weight: 500;
 }
 
 .page-shell .text-medium-emphasis,
@@ -358,21 +359,27 @@ button:focus-visible,
 
 /* Dialog paper surfaces */
 .v-dialog > .v-overlay__content > .v-card {
-	border: 1px solid var(--da-line-soft) !important;
-	box-shadow: var(--da-shadow-lg) !important;
-	border-radius: var(--da-radius-lg) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
+	box-shadow: var(--da-shadow-md) !important;
+	border-radius: 16px !important;
 	overflow: hidden;
+	background: var(--da-surface) !important;
 }
 
 .v-dialog .v-card-title {
-	letter-spacing: -0.01em;
+	letter-spacing: -0.02em;
 	color: var(--da-ink);
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	font-size: 1.05rem !important;
 }
 
 .v-dialog .v-card-actions .v-btn {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
-	border-radius: 999px !important;
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	font-weight: 500 !important;
 }
 
 
@@ -446,7 +453,10 @@ button:focus-visible,
 /* Dialog/list title display weight */
 .dialog-title {
 	font-family: var(--da-font-display);
-	letter-spacing: -0.01em;
+	letter-spacing: -0.02em;
+	font-weight: 500;
+	font-size: 1.1rem;
+	color: var(--da-ink);
 }
 
 

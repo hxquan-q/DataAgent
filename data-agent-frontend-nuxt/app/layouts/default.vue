@@ -353,36 +353,39 @@
 							</v-list-item>
 						</div>
 
-						<v-dialog v-model="pwdDialog" max-width="420">
-							<v-card rounded="lg" class="pa-4">
-								<div class="text-subtitle-1 font-weight-medium mb-3 dialog-title">修改密码</div>
+						<v-dialog v-model="pwdDialog" max-width="380">
+							<v-card rounded="lg" class="pa-5 pwd-card" elevation="0">
+								<div class="dialog-title mb-1">修改密码</div>
+								<p class="pwd-hint mb-4">使用当前账号修改登录密码</p>
 								<v-alert
 									v-if="pwdError"
 									type="error"
 									variant="tonal"
 									density="compact"
-									class="mb-2"
+									class="mb-3"
 									:text="pwdError"
 								/>
 								<v-text-field
 									v-model="oldPassword"
 									label="原密码"
 									type="password"
-									density="compact"
+									density="comfortable"
 									variant="outlined"
-									class="mb-2"
+									hide-details="auto"
+									class="mb-3"
 								/>
 								<v-text-field
 									v-model="newPassword"
 									label="新密码（≥8位）"
 									type="password"
-									density="compact"
+									density="comfortable"
 									variant="outlined"
-									class="mb-3"
+									hide-details="auto"
+									class="mb-5"
 								/>
 								<div class="d-flex justify-end ga-2">
-									<v-btn variant="text" class="text-none" @click="pwdDialog = false">取消</v-btn>
-									<v-btn color="primary" class="text-none px-5" :loading="pwdLoading" @click="submitChangePassword">
+									<v-btn variant="text" class="text-none pwd-btn" @click="pwdDialog = false">取消</v-btn>
+									<v-btn color="primary" class="text-none px-5 pwd-btn" :loading="pwdLoading" @click="submitChangePassword">
 										确认
 									</v-btn>
 								</div>
@@ -911,5 +914,20 @@ watch(
 
 .sidebar-footer-sep {
 	border-top: 0.5px solid color-mix(in srgb, var(--da-sidebar-line) 80%, transparent);
+}
+
+.pwd-card {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
+	box-shadow: var(--da-shadow-md) !important;
+}
+.pwd-hint {
+	margin: 0;
+	font-size: 12.5px;
+	color: var(--da-muted);
+}
+.pwd-btn {
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	letter-spacing: 0 !important;
 }
 </style>

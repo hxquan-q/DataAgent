@@ -85,6 +85,6 @@ defineEmits<{
 	letter-spacing: -0.01em;
 }
 .da-confirm-card :deep(.v-card-actions .v-btn) {
-	border-radius: 999px;
+	border-radius: 10px;
 }
 </style>
