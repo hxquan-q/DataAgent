@@ -374,3 +374,31 @@ button:focus-visible,
 	letter-spacing: 0 !important;
 	border-radius: 999px !important;
 }
+
+
+/* Data table density (admin lists) */
+.page-shell :deep(.v-data-table),
+.page-shell :deep(.v-table) {
+	background: var(--da-surface) !important;
+}
+
+.page-shell :deep(.v-data-table-header th),
+.page-shell :deep(thead th) {
+	font-size: 12px !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.02em;
+	color: var(--da-muted) !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 80%, var(--da-surface)) !important;
+	border-bottom: 1px solid var(--da-line-soft) !important;
+}
+
+.page-shell :deep(.v-data-table__td),
+.page-shell :deep(tbody td) {
+	font-size: 13px !important;
+	border-bottom-color: var(--da-line-soft) !important;
+}
+
+.page-shell :deep(.v-data-table__tr:hover),
+.page-shell :deep(tbody tr:hover) {
+	background: color-mix(in srgb, var(--da-primary-soft) 40%, transparent) !important;
+}
