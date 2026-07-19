@@ -467,7 +467,14 @@ watch(
 	color: var(--da-ink);
 }
 .process-bubble--done .process-chip {
-	opacity: 0.88;
+	opacity: 0.72;
+	box-shadow: none;
+	background: transparent;
+	border-color: color-mix(in srgb, var(--da-line) 40%, transparent);
+}
+.process-bubble--done .process-chip:hover {
+	opacity: 1;
+	background: var(--da-surface);
 }
 
 .process-chip__dot {

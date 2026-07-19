@@ -17,7 +17,7 @@
 <template>
 	<div class="markdown-report">
 		<!-- Header -->
-		<div class="report-header">
+		<div class="report-header report-header--quiet">
 			<div class="report-title">
 				<v-icon color="primary" size="18" class="mr-2"
 					>mdi-file-document-outline</v-icon
@@ -264,10 +264,15 @@ async function downloadHtml() {
 	border-bottom: none;
 	flex-wrap: wrap;
 	gap: 6px;
-	opacity: 0.72;
+	opacity: 0.55;
+	transition: opacity var(--da-dur-fast) var(--da-ease-out);
 }
-.report-header:hover {
+.report-header:hover,
+.report-header:focus-within {
 	opacity: 1;
+}
+.report-header--quiet .report-title {
+	font-size: 11.5px;
 }
 .report-title {
 	display: flex;

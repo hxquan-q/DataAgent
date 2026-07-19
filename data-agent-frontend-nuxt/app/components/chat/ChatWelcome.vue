@@ -25,15 +25,8 @@
 			</span>
 		</div>
 
-		<p v-if="store.currentAgentDescription" class="welcome-desc da-reveal da-reveal-delay-1">
-			{{ store.currentAgentDescription }}
-		</p>
-		<p v-else class="welcome-desc da-reveal da-reveal-delay-1">
-			分析表结构、生成 SQL、输出可视化报告——把问题丢给我即可。
-		</p>
-
-		<!-- R159: readiness checklist -->
-		<ul v-if="!readyToChat" class="ready-list da-reveal da-reveal-delay-2" aria-label="开始前检查">
+		<!-- DEEIX clean empty: no marketing blurb; checklist only if blocked -->
+		<ul v-if="!readyToChat" class="ready-list da-reveal da-reveal-delay-1" aria-label="开始前检查">
 			<li class="ready-item" :class="{ ok: hasModel }">
 				<span class="ready-dot" aria-hidden="true" />
 				<span class="ready-text">{{ hasModel ? 'CHAT 模型已就绪' : '需要激活 CHAT 模型' }}</span>
@@ -174,9 +167,9 @@ watch(
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	padding: clamp(24px, 6vh, 64px) 16px 16px;
+	padding: clamp(12px, 4vh, 40px) 12px 8px;
 	min-height: 0;
-	max-width: min(100%, var(--da-answer-max, 880px));
+	max-width: min(100%, var(--da-answer-max, 960px));
 	margin: 0 auto;
 	box-sizing: border-box;
 }
@@ -192,7 +185,7 @@ watch(
 .welcome-title {
 	margin: 0;
 	font-family: var(--da-font-display);
-	font-size: clamp(22px, 3.4vw, 32px);
+	font-size: clamp(22px, 3.2vw, 30px);
 	font-weight: 500;
 	line-height: 1.12;
 	letter-spacing: -0.005em;
@@ -236,7 +229,7 @@ watch(
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 8px;
-	margin-top: 20px;
+	margin-top: 18px;
 	max-width: 36rem;
 	width: 100%;
 }
@@ -258,10 +251,9 @@ watch(
 		background var(--da-dur-fast) var(--da-ease-out),
 		box-shadow var(--da-dur-fast) var(--da-ease-out),
 		color var(--da-dur-fast) var(--da-ease-out);
-	box-shadow: var(--da-shadow-sm);
+	box-shadow: none;
 	text-align: left;
 	max-width: 100%;
-	backdrop-filter: blur(6px);
 }
 
 .preset-chip:hover:not(:disabled) {

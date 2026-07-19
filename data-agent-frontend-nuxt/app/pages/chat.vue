@@ -153,22 +153,7 @@ onUnmounted(() => {
 	background: transparent;
 }
 
-.chat-body::after {
-	content: '';
-	pointer-events: none;
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	height: 88px;
-	z-index: 4;
-	background: linear-gradient(
-		to top,
-		color-mix(in srgb, var(--da-surface-soft) 96%, transparent) 0%,
-		color-mix(in srgb, var(--da-surface-soft) 55%, transparent) 42%,
-		transparent 100%
-	);
-}
+/* no bottom fog — keep canvas clean */
 
 /* DEEIX empty stage: title + composer one unit */
 .chat-empty-stage {
@@ -177,7 +162,7 @@ onUnmounted(() => {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	padding: 24px 20px 40px;
+	padding: 16px 20px 28px;
 	overflow: auto;
 }
 

@@ -16,17 +16,6 @@
 
 <template>
 	<div ref="listRef" class="message-list custom-scrollbar">
-		<!-- Live only — model/ds live in composer (DEEIX answer-first) -->
-		<div
-			v-if="store.isStreaming && !showWelcome"
-			class="chat-live"
-			role="status"
-			aria-live="polite"
-			aria-busy="true"
-		>
-			<span class="chat-live__dot" aria-hidden="true" />
-			分析中<span v-if="streamElapsed > 0"> · {{ streamElapsed }}s</span>
-		</div>
 		<!-- Messages (empty canvas owned by chat.vue) -->
 		<template v-if="!showWelcome">
 			<div class="messages-inner">
@@ -74,20 +63,20 @@
 								<ChatMarkdownReport :content="message.content" />
 							</v-card>
 
-							<!-- Answer first · process as tiny bubble (DEEIX) -->
+							<!-- DEEIX: tiny process chip, then open answer -->
 							<template v-else-if="message.messageType === 'timeline'">
-								<div
-									v-if="extractReportContent(message.content)"
-									class="ai-answer report-card mb-2"
-								>
-									<ChatMarkdownReport
-										:content="extractReportContent(message.content)!"
-									/>
-								</div>
-								<div class="process-slot">
+								<div class="process-slot process-slot--above">
 									<ChatWorkflowTimeline
 										:node-blocks="safeParseBlocks(message.content)"
 										:completed="true"
+									/>
+								</div>
+								<div
+									v-if="extractReportContent(message.content)"
+									class="ai-answer report-card"
+								>
+									<ChatMarkdownReport
+										:content="extractReportContent(message.content)!"
 									/>
 								</div>
 							</template>
@@ -119,7 +108,25 @@
 
 				</template>
 
-				<!-- Streaming: answer-first · process chip secondary -->
+				<!-- Streaming: process chip · answer open canvas -->
+				<div
+					v-if="store.isStreaming && store.nodeBlocks.length > 0"
+					class="row ai-row process-row"
+				>
+					<div class="process-slot process-slot--above">
+						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
+					</div>
+				</div>
+				<div
+					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
+					class="row ai-row"
+				>
+					<div class="thinking-chip" role="status" aria-live="polite">
+						<span class="thinking-chip__dot" aria-hidden="true" />
+						<span>分析中</span>
+					</div>
+				</div>
+
 				<div
 					v-if="store.isReportStreaming && store.streamingReportContent"
 					class="row ai-row"
@@ -128,32 +135,13 @@
 						<ChatStreamingReport :content="store.streamingReportContent" />
 					</div>
 				</div>
-
-				<div
-					v-if="store.isStreaming && store.nodeBlocks.length > 0"
-					class="row ai-row process-row"
-				>
-					<div class="process-slot">
-						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
-					</div>
-				</div>
-
-				<div
-					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
-					class="row ai-row"
-				>
-					<div class="thinking-chip" role="status" aria-live="polite">
-						<span class="thinking-chip__dot" aria-hidden="true" />
-						<span>正在分析…</span>
-					</div>
-				</div>
 			</div>
 		</template>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onUnmounted } from 'vue';
+import { ref, computed, watch, nextTick } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
@@ -173,29 +161,6 @@ const TIMELINE_ABSORBED_TYPES = new Set([
 
 const store = useChatStore();
 
-const streamElapsed = ref(0);
-let streamTimer: ReturnType<typeof setInterval> | null = null;
-watch(
-	() => store.isStreaming,
-	(streaming) => {
-		if (streaming) {
-			streamElapsed.value = 0;
-			if (streamTimer) clearInterval(streamTimer);
-			streamTimer = setInterval(() => {
-				streamElapsed.value += 1;
-			}, 1000);
-		} else if (streamTimer) {
-			clearInterval(streamTimer);
-			streamTimer = null;
-		}
-	},
-);
-onUnmounted(() => {
-	if (streamTimer) {
-		clearInterval(streamTimer);
-		streamTimer = null;
-	}
-});
 
 const listRef = ref<HTMLElement | null>(null);
 const { renderECharts } = useEchartsRenderer();
@@ -338,16 +303,14 @@ watch(
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
-	background:
-		radial-gradient(900px 320px at 50% -120px, color-mix(in srgb, var(--da-primary, #2f84d6) 5%, transparent), transparent 65%),
-		var(--da-surface-soft);
+	background: var(--da-surface-soft);
 }
 
 .messages-inner {
 	padding: 16px 24px 56px;
 	display: flex;
 	flex-direction: column;
-	gap: 22px;
+	gap: 18px;
 	width: 100%;
 	max-width: min(100%, var(--da-chat-max, 1080px));
 	margin: 0 auto;
@@ -691,32 +654,6 @@ watch(
 	color: var(--da-danger);
 }
 
-.chat-live {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 6px 20px 0;
-	max-width: min(100%, var(--da-chat-max, 1080px));
-	margin: 0 auto;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--da-muted);
-	box-sizing: border-box;
-}
-.chat-live__dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: var(--da-primary);
-	animation: processPulse 1.2s ease-in-out infinite;
-}
-@keyframes processPulse {
-	0%, 100% { opacity: 0.4; }
-	50% { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-	.chat-live__dot { animation: none; }
-}
 .chat-status-strip {
 
 	display: flex;
@@ -813,32 +750,6 @@ watch(
 }
 
 /* R231 DEEIX: answer open canvas, process demoted */
-.chat-live {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 6px 20px 0;
-	max-width: min(100%, var(--da-chat-max, 1080px));
-	margin: 0 auto;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--da-muted);
-	box-sizing: border-box;
-}
-.chat-live__dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: var(--da-primary);
-	animation: processPulse 1.2s ease-in-out infinite;
-}
-@keyframes processPulse {
-	0%, 100% { opacity: 0.4; }
-	50% { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-	.chat-live__dot { animation: none; }
-}
 .chat-status-strip {
 
 	opacity: 0.92;
@@ -869,32 +780,6 @@ watch(
 }
 
 /* R231 strip: hairline only */
-.chat-live {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 6px 20px 0;
-	max-width: min(100%, var(--da-chat-max, 1080px));
-	margin: 0 auto;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--da-muted);
-	box-sizing: border-box;
-}
-.chat-live__dot {
-	width: 6px;
-	height: 6px;
-	border-radius: 50%;
-	background: var(--da-primary);
-	animation: processPulse 1.2s ease-in-out infinite;
-}
-@keyframes processPulse {
-	0%, 100% { opacity: 0.4; }
-	50% { opacity: 1; }
-}
-@media (prefers-reduced-motion: reduce) {
-	.chat-live__dot { animation: none; }
-}
 .chat-status-strip {
 
 	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 30%, transparent) !important;

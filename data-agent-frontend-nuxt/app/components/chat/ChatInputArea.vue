@@ -104,23 +104,39 @@
 					</div>
 				</div>
 
-				<label class="opt" :class="{ on: store.requestOptions.showSqlResults }" title="显示 SQL 结果">
-					<input v-model="store.requestOptions.showSqlResults" type="checkbox" :disabled="store.isStreaming" class="sr" />
-					SQL
-				</label>
-				<label class="opt" :class="{ on: store.requestOptions.nl2sqlOnly }" title="仅 NL2SQL">
-					<input v-model="store.requestOptions.nl2sqlOnly" type="checkbox" :disabled="store.isStreaming" class="sr" />
-					NL2SQL
-				</label>
-				<label class="opt" :class="{ on: store.requestOptions.humanFeedback }" title="人工反馈">
-					<input
-						v-model="store.requestOptions.humanFeedback"
-						type="checkbox"
-						:disabled="store.requestOptions.humanFeedback || store.isStreaming"
-						class="sr"
-					/>
-					反馈
-				</label>
+				<!-- Advanced options tucked away (clean dock) -->
+				<div class="tool-wrap" @click.stop>
+					<button
+						type="button"
+						class="tool-chip tool-chip--more"
+						:disabled="store.isStreaming"
+						:aria-expanded="showMoreMenu"
+						aria-haspopup="menu"
+						aria-label="更多选项"
+						title="更多选项"
+						@click="showMoreMenu = !showMoreMenu; if (showMoreMenu) { showDsMenu = false; showModelMenu = false; }"
+					>
+						<v-icon size="16" aria-hidden="true">mdi-dots-horizontal</v-icon>
+					</button>
+					<div v-if="showMoreMenu" class="tool-menu tool-menu--opts" role="menu" aria-label="请求选项">
+						<label class="opt-row" role="menuitemcheckbox">
+							<input v-model="store.requestOptions.showSqlResults" type="checkbox" :disabled="store.isStreaming" />
+							<span>显示 SQL 结果</span>
+						</label>
+						<label class="opt-row" role="menuitemcheckbox">
+							<input v-model="store.requestOptions.nl2sqlOnly" type="checkbox" :disabled="store.isStreaming" />
+							<span>仅 NL2SQL</span>
+						</label>
+						<label class="opt-row" role="menuitemcheckbox">
+							<input
+								v-model="store.requestOptions.humanFeedback"
+								type="checkbox"
+								:disabled="store.requestOptions.humanFeedback || store.isStreaming"
+							/>
+							<span>人工反馈</span>
+						</label>
+					</div>
+				</div>
 			</div>
 
 			<div class="composer__send">
@@ -201,6 +217,7 @@ const inputText = ref('');
 const textareaRef = ref<HTMLTextAreaElement | null>(null);
 const showDsMenu = ref(false);
 const showModelMenu = ref(false);
+const showMoreMenu = ref(false);
 
 const canSend = computed(() => {
 	if (!inputText.value.trim()) return false;
@@ -244,14 +261,20 @@ const modelChipAriaLabel = computed(() => {
 function toggleDsMenu() {
 	if (store.isStreaming) return;
 	showDsMenu.value = !showDsMenu.value;
-	if (showDsMenu.value) showModelMenu.value = false;
+	if (showDsMenu.value) {
+		showModelMenu.value = false;
+		showMoreMenu.value = false;
+	}
 }
 
 function toggleModelMenu() {
 	if (store.isStreaming) return;
 	// R149: 无模型时仍打开菜单，展示配置引导
 	showModelMenu.value = !showModelMenu.value;
-	if (showModelMenu.value) showDsMenu.value = false;
+	if (showModelMenu.value) {
+		showDsMenu.value = false;
+		showMoreMenu.value = false;
+	}
 }
 
 function goModelConfig() {
@@ -336,6 +359,7 @@ async function handleStop() {
 function closeMenus() {
 	showDsMenu.value = false;
 	showModelMenu.value = false;
+	showMoreMenu.value = false;
 }
 
 onMounted(() => document.addEventListener('click', closeMenus));
@@ -352,12 +376,12 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	width: calc(100% - 40px);
 	max-width: min(100%, var(--da-chat-max, 1080px));
 	margin: 0 auto 20px;
-	padding: 12px 14px 10px;
+	padding: 10px 12px 8px;
 	box-sizing: border-box;
 	background: var(--da-surface);
-	border: 0.5px solid color-mix(in srgb, var(--da-line) 70%, transparent);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
 	border-radius: var(--da-composer-radius, 26px);
-	box-shadow: var(--da-shadow-composer, var(--da-shadow-sm));
+	box-shadow: 0 1px 2px rgba(15, 35, 55, 0.05);
 	transition:
 		border-color var(--da-dur-fast) var(--da-ease-out),
 		box-shadow var(--da-dur-fast) var(--da-ease-out);
@@ -461,9 +485,13 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	color: var(--da-warning);
 }
 .tool-chip--model {
-	background: var(--da-primary-soft);
-	border-color: color-mix(in srgb, var(--da-primary) 28%, transparent);
+	background: transparent;
+	border-color: color-mix(in srgb, var(--da-line-soft) 95%, transparent);
+	color: var(--da-muted);
+}
+.tool-chip--model:hover:not(:disabled) {
 	color: var(--da-primary);
+	background: var(--da-primary-soft);
 }
 .tool-chip__text {
 	overflow: hidden;
@@ -554,6 +582,34 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	background: var(--da-primary-soft);
 	color: var(--da-primary);
 	border-color: color-mix(in srgb, var(--da-primary) 22%, transparent);
+}
+.tool-chip--more {
+	min-width: 30px;
+	padding: 4px 8px;
+	color: var(--da-muted);
+}
+.tool-menu--opts {
+	min-width: 180px;
+	bottom: calc(100% + 6px);
+	left: auto;
+	right: 0;
+}
+.opt-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 34px;
+	padding: 6px 10px;
+	border-radius: 8px;
+	font-size: 12.5px;
+	color: var(--da-ink);
+	cursor: pointer;
+}
+.opt-row:hover {
+	background: var(--da-primary-soft);
+}
+.opt-row input {
+	accent-color: var(--da-primary);
 }
 .sr {
 	position: absolute;
