@@ -74,23 +74,22 @@
 								<ChatMarkdownReport :content="message.content" />
 							</v-card>
 
-							<!-- Timeline + answer-first report (R210) -->
+							<!-- Answer first · process as tiny bubble (DEEIX) -->
 							<template v-else-if="message.messageType === 'timeline'">
-								<v-card
+								<div
 									v-if="extractReportContent(message.content)"
-									class="ai-card report-card mb-2"
-									elevation="0"
+									class="ai-answer report-card mb-2"
 								>
 									<ChatMarkdownReport
 										:content="extractReportContent(message.content)!"
 									/>
-								</v-card>
-								<v-card class="ai-card timeline-card" elevation="0">
+								</div>
+								<div class="process-slot">
 									<ChatWorkflowTimeline
 										:node-blocks="safeParseBlocks(message.content)"
 										:completed="true"
 									/>
-								</v-card>
+								</div>
 							</template>
 
 							<!-- Warning (user stopped) -->
@@ -120,41 +119,33 @@
 
 				</template>
 
-				<!-- ── Streaming: Report first (R210 answer-first) ── -->
+				<!-- Streaming: answer-first · process chip secondary -->
 				<div
 					v-if="store.isReportStreaming && store.streamingReportContent"
 					class="row ai-row"
 				>
-					<v-card class="ai-card report-card" elevation="0">
+					<div class="ai-answer report-card">
 						<ChatStreamingReport :content="store.streamingReportContent" />
-					</v-card>
+					</div>
 				</div>
 
-				<!-- ── Streaming: Workflow Timeline (secondary) ── -->
 				<div
 					v-if="store.isStreaming && store.nodeBlocks.length > 0"
-					class="row ai-row"
+					class="row ai-row process-row"
 				>
-					<v-card class="ai-card timeline-card" elevation="0">
+					<div class="process-slot">
 						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
-					</v-card>
+					</div>
 				</div>
 
-				<!-- ── Streaming spinner (before first node arrives) ── -->
 				<div
 					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
 					class="row ai-row"
 				>
-					<v-card class="ai-card thinking-card" elevation="0">
-						<div class="thinking-row" role="status" aria-live="polite">
-							<div class="thinking-dots" aria-hidden="true">
-								<span class="dot" />
-								<span class="dot dot--2" />
-								<span class="dot dot--3" />
-							</div>
-							<span class="thinking-label">正在分析…</span>
-						</div>
-					</v-card>
+					<div class="thinking-chip" role="status" aria-live="polite">
+						<span class="thinking-chip__dot" aria-hidden="true" />
+						<span>正在分析…</span>
+					</div>
 				</div>
 			</div>
 		</template>
@@ -353,7 +344,7 @@ watch(
 }
 
 .messages-inner {
-	padding: 12px 20px 48px;
+	padding: 16px 24px 56px;
 	display: flex;
 	flex-direction: column;
 	gap: 22px;
@@ -387,18 +378,18 @@ watch(
 
 /* ── User card (DEEIX: muted soft bubble, no avatar) ────────────────────────── */
 .user-card {
-	background: color-mix(in srgb, var(--da-surface) 70%, var(--da-primary-soft)) !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-primary-soft)) !important;
 	color: var(--da-ink) !important;
-	padding: 12px 16px;
-	border-radius: 20px 20px 6px 20px !important;
+	padding: 10px 14px;
+	border-radius: 18px 18px 6px 18px !important;
 	font-family: var(--da-font-chat, var(--da-font-sans));
 	font-size: var(--da-chat-font-size, 15px);
 	font-weight: 400;
 	line-height: var(--da-chat-line-height, 1.75);
-	max-width: min(78%, 680px);
+	max-width: min(72%, 640px);
 	word-break: break-word;
-	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent) !important;
-	box-shadow: var(--da-shadow-sm) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	box-shadow: none !important;
 	letter-spacing: -0.01em;
 }
 
@@ -913,4 +904,58 @@ watch(
 	min-height: 36px !important;
 	padding: 4px 16px !important;
 }
+
+/* Process as tiny bubble — not a card */
+.process-slot {
+	width: 100%;
+	max-width: min(100%, var(--da-answer-max, 960px));
+	margin-top: 2px;
+}
+.process-row {
+	margin-top: -8px;
+}
+.ai-answer {
+	width: 100%;
+	max-width: min(100%, var(--da-answer-max, 960px));
+	color: var(--da-ink);
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	letter-spacing: -0.01em;
+}
+.thinking-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 28px;
+	padding: 4px 12px 4px 10px;
+	border-radius: 999px;
+	border: 0.5px solid color-mix(in srgb, var(--da-primary) 25%, transparent);
+	background: color-mix(in srgb, var(--da-primary-soft) 70%, var(--da-surface));
+	color: var(--da-muted);
+	font-size: 12.5px;
+	font-weight: 600;
+}
+.thinking-chip__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+@keyframes processPulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.thinking-chip__dot { animation: none; }
+}
+/* Demote legacy timeline-card if any remain */
+.timeline-card {
+	padding: 0 !important;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
 </style>

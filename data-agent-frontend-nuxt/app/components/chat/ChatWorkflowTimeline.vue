@@ -1,122 +1,85 @@
-/*
- * Copyright 2026 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 <template>
 	<div
 		ref="timelineRef"
-		class="workflow-timeline"
-		:class="{ 'is-completed': completed, 'is-open': processOpen }"
+		class="process-bubble"
+		:class="{
+			'process-bubble--done': completed,
+			'process-bubble--live': !completed,
+			'process-bubble--open': processOpen,
+		}"
 	>
-		<!-- R231: single meta row; tree hidden until expanded (DEEIX process demote) -->
+		<!-- DEEIX: one small process chip -->
 		<button
 			type="button"
-			class="process-meta"
+			class="process-chip"
 			:aria-expanded="processOpen ? 'true' : 'false'"
 			@click="processOpen = !processOpen"
 		>
-			<span class="process-meta__left">
-				<span class="process-meta__dot" :class="{ live: !completed }" aria-hidden="true" />
-				<span class="process-meta__label">{{ completed ? '过程' : '分析中' }}</span>
-				<span v-if="timelineSteps.length" class="process-meta__count">
-					{{ doneCount }}/{{ timelineSteps.length }} 步
-				</span>
-				<span v-if="!completed && activeLabel" class="process-meta__active">· {{ activeLabel }}</span>
+			<span class="process-chip__dot" :class="{ live: !completed }" aria-hidden="true" />
+			<span class="process-chip__title">
+				{{ completed ? '过程' : '分析中' }}
 			</span>
-			<span class="process-meta__right">
-				{{ processOpen ? '收起' : '展开' }}
-				<v-icon size="14">{{ processOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+			<span v-if="timelineSteps.length" class="process-chip__meta">
+				{{ doneCount }}/{{ timelineSteps.length }}
 			</span>
+			<span v-if="!completed && activeLabel" class="process-chip__active">
+				{{ activeLabel }}
+			</span>
+			<v-icon size="14" class="process-chip__chevron">
+				{{ processOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+			</v-icon>
 		</button>
 
-		<div v-show="processOpen" class="process-tree">
-		<div class="timeline-title-bar timeline-title-bar--inner">
-			<span class="timeline-summary">节点明细</span>
-			<button type="button" class="toggle-all-btn" @click.stop="toggleAll">
+		<!-- Expanded: tiny step bubbles (not heavy timeline chrome) -->
+		<div v-show="processOpen" class="process-steps" role="list">
+			<button
+				type="button"
+				class="process-steps__toggle"
+				@click.stop="toggleAll"
+			>
 				{{ allExpanded ? '全部折叠' : '全部展开' }}
 			</button>
-		</div>
 
-		<v-timeline density="compact" side="end" truncate-line="both">
-			<v-timeline-item
+			<div
 				v-for="step in timelineSteps"
 				:key="step.nodeName"
-				:dot-color="dotColor(step.status)"
-				:icon="dotIcon(step.status)"
-				size="small"
+				class="step-bubble"
 				:class="{
-					'step-muted': completed && step.status === 'done' && !step.isReport,
+					'step-bubble--done': step.status === 'done',
+					'step-bubble--active': step.status === 'active',
+					'step-bubble--open': step.expanded,
+					'step-bubble--report': step.isReport,
 				}"
+				role="listitem"
 			>
-				<!-- Step header: clickable to toggle -->
-				<div class="step-header" @click="toggleStep(step.nodeName)">
-					<div class="step-header-left">
-						<span class="step-label">{{ step.label }}</span>
-						<span v-if="step.status === 'active'" class="step-badge active">
-							<span class="badge-dot" />进行中
-						</span>
-						<span v-else-if="step.status === 'done'" class="step-badge done"
-							>完成</span
-						>
-					</div>
-					<v-icon size="16" color="grey">
+				<button type="button" class="step-bubble__head" @click="toggleStep(step.nodeName)">
+					<span class="step-bubble__status" aria-hidden="true">
+						<span v-if="step.status === 'done'">✓</span>
+						<span v-else-if="step.status === 'active'" class="step-bubble__pulse" />
+						<span v-else>·</span>
+					</span>
+					<span class="step-bubble__label">{{ step.label }}</span>
+					<span v-if="step.status === 'active'" class="step-bubble__badge">进行中</span>
+					<v-icon size="14" class="step-bubble__chevron">
 						{{ step.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
 					</v-icon>
-				</div>
+				</button>
 
-				<!-- Collapsible content -->
-				<v-expand-transition>
-					<div
-						v-show="step.expanded"
-						class="step-content"
-						:class="{ 'is-muted': step.status === 'done' && !step.isReport }"
-					>
-						<!-- Result Set -->
-						<ChatResultSet
-							v-if="
-								step.block[0]?.textType === 'RESULT_SET' && step.block[0]?.text
-							"
-							:data="safeParseJson(step.block[0].text)"
-							:page-size="10"
-							:pending-report="!completed && !step.isReport"
-						/>
-						<!-- Report node: show brief status, not full content -->
-						<div v-else-if="step.isReport" class="text-body report-brief">
-							<v-icon size="14" color="success" class="mr-1"
-								>mdi-file-chart-outline</v-icon
-							>
-							<span v-if="step.status === 'active'"
-								>正在生成报告，内容在下方实时展示...</span
-							>
-							<span v-else>报告已生成完毕，查看下方报告卡片</span>
-						</div>
-						<!-- Pure code block (all items share same code type) -->
-						<div
-							v-else-if="isPureCodeBlock(step.block)"
-							v-html="renderCode(step.block)"
-						/>
-						<!-- Mixed content: text with possible embedded JSON/code -->
-						<div
-							v-else
-							class="text-body"
-							v-html="renderTextWithJsonDetection(step.block)"
-						/>
+				<div v-show="step.expanded" class="step-bubble__body">
+					<ChatResultSet
+						v-if="step.block[0]?.textType === 'RESULT_SET' && step.block[0]?.text"
+						:data="safeParseJson(step.block[0].text)"
+						:page-size="10"
+						:pending-report="!completed && !step.isReport"
+					/>
+					<div v-else-if="step.isReport" class="step-bubble__brief">
+						<span v-if="step.status === 'active'">报告生成中…内容在下方实时展示</span>
+						<span v-else>报告已生成，见下方答案</span>
 					</div>
-				</v-expand-transition>
-			</v-timeline-item>
-		</v-timeline>
+					<div v-else-if="isPureCodeBlock(step.block)" class="step-bubble__code" v-html="renderCode(step.block)" />
+					<div v-else class="step-bubble__text" v-html="renderTextWithJsonDetection(step.block)" />
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -457,420 +420,101 @@ watch(
 );
 </script>
 
+
 <style scoped>
-.workflow-timeline {
+/* DEEIX process: small chip + mini step bubbles */
+.process-bubble {
 	width: 100%;
+	max-width: min(100%, var(--da-answer-max, 960px));
 }
 
-.workflow-timeline.is-completed {
-	opacity: 0.96;
-}
-
-/* ── Title bar ───────────────────────────────────────────────────────────────── */
-.timeline-title-bar {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 6px;
-	margin-bottom: 4px;
-	padding: 2px 2px;
-	background: transparent;
-	border: none;
-	border-radius: 0;
-}
-
-.timeline-title-group {
-	display: flex;
-	align-items: baseline;
-	flex-wrap: wrap;
-	gap: 6px;
-	min-width: 0;
-}
-
-.timeline-title {
-	font-size: 13px !important;
-	font-weight: 500 !important;
-	color: var(--da-muted) !important;
-	display: flex;
-	align-items: center;
-	line-height: 1.2;
-	letter-spacing: -0.01em;
-	transition: color var(--da-dur-fast) var(--da-ease-out);
-}
-
-.workflow-timeline:not(.is-completed) .timeline-title {
-	color: var(--da-ink) !important;
-}
-
-.workflow-timeline.is-completed .timeline-title {
-	color: var(--da-muted) !important;
-}
-
-.timeline-title-bar:hover .timeline-title {
-	color: var(--da-ink) !important;
-}
-
-.timeline-summary {
-	font-size: 11px;
-	color: color-mix(in srgb, var(--da-muted) 72%, transparent);
-	font-weight: 400;
-	line-height: 1.35;
-}
-
-.timeline-active-hint {
-	color: var(--da-primary);
-}
-
-.toggle-all-btn {
-	font-size: 11px !important;
-	text-transform: none !important;
-	letter-spacing: 0 !important;
-	flex-shrink: 0;
-}
-
-:deep(.step-muted .v-timeline-item__body) {
-	opacity: 0.88;
-}
-
-/* ── Step header ─────────────────────────────────────────────────────────────── */
-.step-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	cursor: pointer;
-	padding: 6px 8px;
-	user-select: none;
-	border-radius: var(--da-radius-sm);
-	transition: background var(--da-dur-fast) var(--da-ease-out);
-}
-.step-header:hover {
-	background: color-mix(in srgb, var(--da-primary-soft) 55%, transparent);
-}
-
-.step-header-left {
-	display: flex;
-	align-items: center;
-	gap: 6px;
-}
-
-.step-label {
-	font-size: 12.5px;
-	font-weight: 500;
-	color: var(--da-muted);
-}
-.step-header:hover .step-label {
-	color: var(--da-ink);
-}
-
-/* ── Badge ───────────────────────────────────────────────────────────────────── */
-.step-badge {
+.process-chip {
+	appearance: none;
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	font-size: 10.5px;
-	padding: 2px 7px;
+	gap: 6px;
+	max-width: 100%;
+	min-height: 28px;
+	padding: 4px 10px 4px 8px;
 	border-radius: 999px;
-}
-
-.step-badge.active {
-	background: var(--da-primary-soft);
-	color: var(--da-primary);
-}
-
-.step-badge.done {
-	background: color-mix(in srgb, var(--da-muted) 10%, white);
-	color: var(--da-muted);
-}
-
-.badge-dot {
-	width: 5px;
-	height: 5px;
-	background: var(--da-primary);
-	border-radius: 50%;
-	animation: dotBlink 1s infinite;
-}
-
-@keyframes dotBlink {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.3;
-	}
-}
-
-/* ── Step content ────────────────────────────────────────────────────────────── */
-.step-content {
-	margin-top: 4px;
-	font-size: 12px;
-	line-height: 1.55;
-	color: var(--da-muted);
-	min-width: 0;
-	overflow: hidden;
-}
-
-.text-body {
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.is-muted .text-body {
-	color: var(--da-muted);
-	font-style: italic;
-}
-
-.report-body {
-	color: var(--da-ink) !important;
-	font-style: normal !important;
-}
-
-.report-brief {
-	display: flex;
-	align-items: center;
-	color: var(--da-muted) !important;
-	font-style: normal !important;
-	font-size: 12px;
-}
-
-:deep(.tl-code) {
-	background: var(--da-surface-soft);
-	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-sm);
-	padding: 6px 8px;
-	font-size: 12.5px;
-	overflow-x: auto;
-	white-space: pre;
-	margin: 4px 0 0;
-}
-
-/* ── Markdown inside step content ────────────────────────────────────────────── */
-.md-body :deep(h1),
-.md-body :deep(h2),
-.md-body :deep(h3) {
-	font-weight: 700;
-	margin: 10px 0 4px;
-}
-.md-body :deep(p) {
-	margin-bottom: 6px;
-}
-.md-body :deep(ul),
-.md-body :deep(ol) {
-	padding-left: 18px;
-	margin-bottom: 6px;
-}
-.md-body :deep(code:not(pre code)) {
-	background: var(--da-surface-soft);
-	border: 1px solid var(--da-line-soft);
-	padding: 1px 5px;
-	border-radius: var(--da-radius-sm);
-	font-size: 12px;
-	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
-}
-.md-body :deep(table) {
-	width: 100%;
-	border-collapse: separate;
-	border-spacing: 0;
-	margin: 10px 0;
-	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-md);
-	overflow: hidden;
-	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	background: color-mix(in srgb, var(--da-surface) 88%, var(--da-surface-soft));
 	box-shadow: var(--da-shadow-sm);
-}
-.md-body :deep(thead) {
-	display: table-header-group;
-}
-.md-body :deep(tbody) {
-	display: table-row-group;
-}
-.md-body :deep(tr) {
-	display: table-row;
-	border-top: 1px solid var(--da-line);
-}
-.md-body :deep(th) {
-	display: table-cell;
-	background: var(--da-surface-soft);
-	padding: 3px 6px;
-	border: 1px solid var(--da-line-soft);
-	font-weight: 600;
-	font-size: 12px;
-}
-.md-body :deep(td) {
-	display: table-cell;
-	padding: 3px 6px;
-	border: 1px solid var(--da-line-soft);
-	font-size: 12px;
-}
-
-/* ── Code block with header ─────────────────────────────────────────────────── */
-.md-body :deep(.code-block-wrapper) {
-	margin: 8px 0;
-	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-md);
-	overflow: auto;
-	background: var(--da-surface);
-	box-shadow: var(--da-shadow-sm);
-}
-.md-body :deep(.code-block-header) {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface-soft));
-	padding: 6px 10px;
-	border-bottom: 1px solid var(--da-line-soft);
-	font-size: 11px;
-}
-.md-body :deep(.code-language) {
 	color: var(--da-muted);
-	font-weight: 600;
-	font-family: var(--da-font-mono);
-	font-size: 10px;
-	text-transform: uppercase;
-}
-.md-body :deep(.code-copy-button) {
-	background: var(--da-surface);
-	border: 1px solid var(--da-line-soft);
-	padding: 2px 10px;
-	border-radius: 999px;
-	font-size: 10px;
-	font-weight: 600;
-	cursor: pointer;
-	transition: background var(--da-dur-fast) var(--da-ease-out),
-		border-color var(--da-dur-fast) var(--da-ease-out);
-	color: var(--da-ink);
-}
-.md-body :deep(.code-copy-button:hover) {
-	background: var(--da-primary-soft);
-	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
-	color: var(--da-primary);
-}
-.md-body :deep(.code-copy-button.copied) {
-	background: var(--da-success);
-	border-color: var(--da-success);
-	color: var(--da-on-primary, #fff);
-}
-.md-body :deep(pre.hljs) {
-	margin: 0;
-	padding: 8px 10px;
-	overflow-x: auto;
-	overflow-y: hidden;
-	background: var(--da-surface-soft);
-	font-size: 11px;
-	line-height: 1.35;
-	white-space: pre;
-}
-.md-body :deep(pre.hljs code) {
-	display: block;
-	padding: 0;
-	margin: 0;
-	background: transparent;
-	border: none;
-	font-family: var(--da-font-mono);
-	color: inherit;
-	white-space: pre;
-	min-width: max-content;
-}
-
-/* ── ECharts containers ─────────────────────────────────────────────────────── */
-:deep(.md-echarts) {
-	margin: 8px 0;
-	border-radius: var(--da-radius-sm);
-}
-
-/* 过程详情有界，防止长 SQL/JSON 撑满屏 */
-.step-content {
-	max-height: 96px;
-	overflow: auto;
-}
-.workflow-timeline.is-completed {
-	opacity: 0.95;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.badge-dot {
-		animation: none !important;
-		opacity: 0.85;
-	}
-
-	* {
-		transition: none !important;
-		animation: none !important;
-	}
-}
-
-/* R231: process as one meta row */
-.process-meta {
-	appearance: none;
-	width: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 12px;
-	padding: 6px 2px;
-	border: none;
-	background: transparent;
-	cursor: pointer;
 	font: inherit;
-	color: var(--da-muted);
-	border-radius: 8px;
+	font-size: 12.5px;
+	font-weight: 500;
+	line-height: 1.2;
+	cursor: pointer;
 	text-align: left;
+	transition:
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
 }
-.process-meta:hover {
+.process-chip:hover {
 	color: var(--da-ink);
-	background: color-mix(in srgb, var(--da-surface-soft) 80%, transparent);
+	border-color: color-mix(in srgb, var(--da-line) 80%, transparent);
+	background: var(--da-surface);
 }
-.process-meta:focus-visible {
+.process-chip:focus-visible {
 	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
-.process-meta__left {
-	display: flex;
-	align-items: center;
-	flex-wrap: wrap;
-	gap: 6px;
-	min-width: 0;
-	font-size: 12.5px;
+
+.process-bubble--live .process-chip {
+	border-color: color-mix(in srgb, var(--da-primary) 28%, transparent);
+	color: var(--da-ink);
 }
-.process-meta__dot {
+.process-bubble--done .process-chip {
+	opacity: 0.88;
+}
+
+.process-chip__dot {
 	width: 6px;
 	height: 6px;
 	border-radius: 50%;
 	background: var(--da-success);
 	flex-shrink: 0;
 }
-.process-meta__dot.live {
+.process-chip__dot.live {
 	background: var(--da-primary);
 	animation: processPulse 1.2s ease-in-out infinite;
 }
-.process-meta__label {
+.process-chip__title {
 	font-weight: 600;
 	color: inherit;
-}
-.process-meta__count,
-.process-meta__active {
-	font-weight: 400;
-	opacity: 0.9;
-}
-.process-meta__right {
-	display: inline-flex;
-	align-items: center;
-	gap: 2px;
-	font-size: 12px;
-	font-weight: 600;
-	color: var(--da-primary);
 	flex-shrink: 0;
 }
-.process-tree {
-	margin-top: 4px;
-	padding-top: 4px;
-	border-top: 0.5px dashed color-mix(in srgb, var(--da-line) 50%, transparent);
+.process-chip__meta {
+	font-weight: 400;
+	opacity: 0.85;
+	flex-shrink: 0;
 }
-.timeline-title-bar--inner {
-	margin-bottom: 2px;
+.process-chip__active {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	opacity: 0.8;
+	font-weight: 400;
 }
-.toggle-all-btn {
+.process-chip__chevron {
+	margin-left: 2px;
+	opacity: 0.7;
+	flex-shrink: 0;
+}
+
+.process-steps {
+	margin-top: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding-left: 2px;
+}
+.process-steps__toggle {
 	appearance: none;
+	align-self: flex-start;
 	border: none;
 	background: transparent;
 	color: var(--da-muted);
@@ -878,18 +522,128 @@ watch(
 	font-size: 11.5px;
 	font-weight: 600;
 	cursor: pointer;
-	padding: 2px 6px;
-	border-radius: 6px;
+	padding: 0 2px 2px;
 }
-.toggle-all-btn:hover {
+.process-steps__toggle:hover {
 	color: var(--da-primary);
-	background: var(--da-primary-soft);
 }
+
+.step-bubble {
+	border-radius: 12px;
+	border: 0.5px solid color-mix(in srgb, var(--da-line-soft) 90%, transparent);
+	background: color-mix(in srgb, var(--da-surface) 70%, var(--da-surface-soft));
+	overflow: hidden;
+	transition: border-color var(--da-dur-fast) var(--da-ease-out), background var(--da-dur-fast) var(--da-ease-out);
+}
+.step-bubble--active {
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface));
+}
+.step-bubble--done {
+	opacity: 0.92;
+}
+.step-bubble--open {
+	background: var(--da-surface);
+}
+
+.step-bubble__head {
+	appearance: none;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 32px;
+	padding: 6px 10px;
+	border: none;
+	background: transparent;
+	color: var(--da-muted);
+	font: inherit;
+	font-size: 12.5px;
+	cursor: pointer;
+	text-align: left;
+}
+.step-bubble__head:hover {
+	color: var(--da-ink);
+}
+.step-bubble--active .step-bubble__head {
+	color: var(--da-ink);
+}
+.step-bubble__status {
+	width: 14px;
+	height: 14px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 11px;
+	font-weight: 700;
+	color: var(--da-success);
+	flex-shrink: 0;
+}
+.step-bubble--active .step-bubble__status {
+	color: var(--da-primary);
+}
+.step-bubble__pulse {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+.step-bubble__label {
+	flex: 1;
+	min-width: 0;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.step-bubble__badge {
+	font-size: 10.5px;
+	font-weight: 600;
+	color: var(--da-primary);
+	background: color-mix(in srgb, var(--da-primary-soft) 80%, transparent);
+	border-radius: 999px;
+	padding: 1px 6px;
+	flex-shrink: 0;
+}
+.step-bubble__chevron {
+	opacity: 0.65;
+	flex-shrink: 0;
+}
+
+.step-bubble__body {
+	padding: 0 10px 10px 32px;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--da-ink);
+}
+.step-bubble__brief {
+	color: var(--da-muted);
+	font-size: 12.5px;
+}
+.step-bubble__text :deep(p) {
+	margin: 0 0 6px;
+}
+.step-bubble__code :deep(pre.tl-code),
+.step-bubble__body :deep(pre.tl-code) {
+	margin: 0;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--da-surface-soft) 90%, #0f172a);
+	font-size: 11.5px;
+	overflow: auto;
+	max-height: 220px;
+}
+
 @keyframes processPulse {
-	0%, 100% { opacity: 0.45; }
+	0%, 100% { opacity: 0.4; }
 	50% { opacity: 1; }
 }
+
 @media (prefers-reduced-motion: reduce) {
-	.process-meta__dot.live { animation: none; }
+	.process-chip__dot.live,
+	.step-bubble__pulse {
+		animation: none;
+	}
 }
 </style>
