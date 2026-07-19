@@ -54,4 +54,6 @@ cd data-agent-frontend-nuxt && pnpm build
 | C 布局 | done | workspace 272 rail · admin 返回问答 pill |
 | D 聊天 | done | 空态同宽 · 消息列对齐 composer · welcome 紧凑 |
 | E 管理 | done | page-shell / da-empty 既有 primitive 延续 |
-| F 收尾 | in_progress | build + 截图验收 |
+| D 聊天 | done | composer InputGroup 重写 · 状态条 live-only |
+| E 管理 | partial | page-shell 既有；持续密度对齐 |
+| F 收尾 | in_progress | 截图回归 + embed 对齐 |

@@ -16,46 +16,16 @@
 
 <template>
 	<div ref="listRef" class="message-list custom-scrollbar">
-		<!-- R6: compact context strip when chatting -->
+		<!-- Live only — model/ds live in composer (DEEIX answer-first) -->
 		<div
-			v-if="store.currentAgentName && !showWelcome"
-			class="chat-status-strip"
+			v-if="store.isStreaming && !showWelcome"
+			class="chat-live"
 			role="status"
-			:aria-busy="store.isStreaming ? 'true' : 'false'"
+			aria-live="polite"
+			aria-busy="true"
 		>
-			<span class="chat-status-strip__agent">{{ store.currentAgentName }}</span>
-			<span v-if="store.activeChatModel || store.activeModelConfig?.modelName" class="chat-status-strip__model">
-				{{ store.activeModelConfig?.modelName || store.activeChatModel }}
-			</span>
-			<button
-				type="button"
-				class="chat-status-strip__ready"
-				:class="{ ok: stripHasModel }"
-				:title="stripHasModel ? 'CHAT 模型就绪' : '点击配置 CHAT 模型'"
-				@click="goModels"
-			>
-				模型
-			</button>
-			<button
-				type="button"
-				class="chat-status-strip__ready"
-				:class="{ ok: stripHasDs }"
-				:title="stripHasDs ? '数据源就绪' : '点击绑定数据源'"
-				@click="goDatasource"
-			>
-				数据源
-			</button>
-			<span v-if="store.isStreaming" class="chat-status-strip__live">
-				分析中<span v-if="streamElapsed > 0"> · {{ streamElapsed }}s</span>
-			</span>
-			<button
-				type="button"
-				class="chat-status-strip__switch"
-				:disabled="store.isStreaming"
-				@click="goSwitchAgent"
-			>
-				切换智能体
-			</button>
+			<span class="chat-live__dot" aria-hidden="true" />
+			分析中<span v-if="streamElapsed > 0"> · {{ streamElapsed }}s</span>
 		</div>
 		<!-- Messages (empty canvas owned by chat.vue) -->
 		<template v-if="!showWelcome">
@@ -212,21 +182,6 @@ const TIMELINE_ABSORBED_TYPES = new Set([
 
 const store = useChatStore();
 
-function goModels() {
-	navigateTo('/system/model-config');
-}
-function goDatasource() {
-	const id = store.currentAgentId;
-	if (id) {
-		navigateTo({ path: '/system/data-sources', query: { agentId: String(id) } });
-	} else {
-		navigateTo('/system/data-sources');
-	}
-}
-function goSwitchAgent() {
-	navigateTo('/system/agents');
-}
-
 const streamElapsed = ref(0);
 let streamTimer: ReturnType<typeof setInterval> | null = null;
 watch(
@@ -250,14 +205,6 @@ onUnmounted(() => {
 		streamTimer = null;
 	}
 });
-
-const stripHasModel = computed(
-	() => store.chatModels.length > 0 && !!store.activeModelConfig,
-);
-const stripHasDs = computed(
-	() => store.allDatasources.length > 0 && !!store.activeDatasource,
-);
-
 
 const listRef = ref<HTMLElement | null>(null);
 const { renderECharts } = useEchartsRenderer();
@@ -753,7 +700,34 @@ watch(
 	color: var(--da-danger);
 }
 
+.chat-live {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 20px 0;
+	max-width: min(100%, var(--da-chat-max, 1080px));
+	margin: 0 auto;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--da-muted);
+	box-sizing: border-box;
+}
+.chat-live__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+@keyframes processPulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.chat-live__dot { animation: none; }
+}
 .chat-status-strip {
+
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -848,7 +822,34 @@ watch(
 }
 
 /* R231 DEEIX: answer open canvas, process demoted */
+.chat-live {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 20px 0;
+	max-width: min(100%, var(--da-chat-max, 1080px));
+	margin: 0 auto;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--da-muted);
+	box-sizing: border-box;
+}
+.chat-live__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+@keyframes processPulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.chat-live__dot { animation: none; }
+}
 .chat-status-strip {
+
 	opacity: 0.92;
 	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 35%, transparent) !important;
 	background: transparent !important;
@@ -877,7 +878,34 @@ watch(
 }
 
 /* R231 strip: hairline only */
+.chat-live {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 20px 0;
+	max-width: min(100%, var(--da-chat-max, 1080px));
+	margin: 0 auto;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--da-muted);
+	box-sizing: border-box;
+}
+.chat-live__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+@keyframes processPulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.chat-live__dot { animation: none; }
+}
 .chat-status-strip {
+
 	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 30%, transparent) !important;
 	background: transparent !important;
 	backdrop-filter: none !important;
