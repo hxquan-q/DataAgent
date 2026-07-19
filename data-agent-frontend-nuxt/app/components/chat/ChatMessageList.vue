@@ -843,4 +843,24 @@ watch(
 	box-shadow: none !important;
 }
 
+
+@media (max-width: 768px) {
+	.messages-inner {
+		padding: 12px 14px calc(24px + var(--da-safe-bottom, 0px));
+		gap: 14px;
+	}
+	.user-card {
+		max-width: min(88%, 100%) !important;
+		padding: 10px 12px !important;
+		font-size: 15px !important;
+	}
+	.ai-card,
+	.ai-answer {
+		max-width: 100% !important;
+		font-size: 15px;
+	}
+	.process-slot {
+		max-width: 100%;
+	}
+}
 </style>

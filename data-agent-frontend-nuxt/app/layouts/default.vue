@@ -428,6 +428,11 @@ import { useAuthStore } from '~/stores/auth';
 
 const { dialogState, handleGlobalConfirm } = useConfirm();
 const drawer = ref(true);
+function applyAdminMobile() {
+	if (typeof window === 'undefined') return;
+	if (window.matchMedia('(max-width: 768px)').matches) drawer.value = false;
+}
+
 const router = useRouter();
 const route = useRoute();
 const authStore = useAuthStore();
@@ -441,6 +446,12 @@ const pwdLoading = ref(false);
 const pwdError = ref('');
 // 默认都展开
 const openedGroups = ref(['knowledge', 'system']);
+onMounted(() => {
+	applyAdminMobile();
+	window.matchMedia('(max-width: 768px)').addEventListener?.('change', (e) => {
+		if (e.matches) drawer.value = false;
+	});
+});
 
 function openChangePassword() {
 	pwdError.value = '';
@@ -571,6 +582,9 @@ function goChatWorkspace() {
 }
 
 function navigateToPath(path: string) {
+	if (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) {
+		drawer.value = false;
+	}
 	if (path === '/agent/new') {
 		if (route.path !== path) router.push({ path });
 		return;

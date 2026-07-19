@@ -315,6 +315,47 @@ button:focus-visible,
 	}
 }
 
+/* ── Mobile product shell ───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+	.page-shell,
+	.page-shell.v-container,
+	.v-container.page-shell {
+		padding: 14px 14px calc(20px + var(--da-safe-bottom)) !important;
+		max-width: 100% !important;
+	}
+
+	.page-shell :deep(.v-data-table),
+	.page-shell :deep(.v-table) {
+		font-size: 12.5px;
+	}
+
+	.page-shell :deep(.v-btn) {
+		min-height: 36px !important;
+	}
+
+	/* knowledge header stack */
+	.knowledge-header {
+		flex-direction: column !important;
+		align-items: stretch !important;
+	}
+	.knowledge-header__actions {
+		width: 100%;
+	}
+	.knowledge-header__actions :deep(.v-btn) {
+		flex: 1;
+	}
+}
+
+@media (max-width: 480px) {
+	html {
+		-webkit-text-size-adjust: 100%;
+	}
+	body {
+		overscroll-behavior-y: none;
+	}
+}
+
+
 @media (prefers-reduced-motion: reduce) {
 	.page-enter-active,
 	.page-leave-active {

@@ -1384,4 +1384,17 @@ onBeforeUnmount(() => {
 	0%, 100% { opacity: 0.4; transform: scale(0.9); }
 	50% { opacity: 1; transform: scale(1.15); }
 }
+
+@media (max-width: 768px) {
+	.embed-chat {
+		height: 100dvh;
+		padding-bottom: env(safe-area-inset-bottom, 0px);
+	}
+	.embed-chat__input {
+		padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+	}
+	.input-shell__field {
+		font-size: 16px;
+	}
+}
 </style>

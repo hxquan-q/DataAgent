@@ -350,6 +350,20 @@ watch(
 	letter-spacing: -0.01em;
 }
 
+@media (max-width: 768px) {
+	.welcome-title {
+		font-size: clamp(20px, 6vw, 26px);
+	}
+	.preset-row {
+		margin-top: 14px;
+		gap: 6px;
+	}
+	.preset-chip {
+		padding: 7px 12px;
+		min-height: 34px;
+		font-size: 12.5px;
+	}
+}
 @media (max-width: 640px) {
 	.welcome-badge {
 		position: static;

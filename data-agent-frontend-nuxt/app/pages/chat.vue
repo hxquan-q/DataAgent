@@ -138,6 +138,27 @@ onUnmounted(() => {
 	overflow: hidden;
 	background: transparent;
 }
+@media (max-width: 768px) {
+	.chat-page {
+		/* fill workspace-main under mobile bar */
+		min-height: 0;
+		flex: 1;
+	}
+	.chat-empty-stage {
+		padding: 12px 12px calc(16px + var(--da-safe-bottom, 0px));
+	}
+	.chat-empty-stage__inner {
+		width: 100%;
+	}
+	.chat-no-agent__card {
+		width: min(100%, 420px);
+		padding: 20px 16px;
+	}
+	.chat-body {
+		flex: 1;
+		min-height: 0;
+	}
+}
 
 .chat-page--empty {
 	background: var(--da-surface-soft);

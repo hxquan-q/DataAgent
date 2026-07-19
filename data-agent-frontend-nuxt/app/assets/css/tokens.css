@@ -69,6 +69,11 @@
 	--da-table-row-density: 32px;
 	--da-chat-max: 1080px;
 	--da-composer-radius: 26px;
+	--da-bp-mobile: 768px;
+	--da-safe-top: env(safe-area-inset-top, 0px);
+	--da-safe-bottom: env(safe-area-inset-bottom, 0px);
+	--da-safe-left: env(safe-area-inset-left, 0px);
+	--da-safe-right: env(safe-area-inset-right, 0px);
 	--da-rail-width: 272px;
 	--da-admin-rail-width: 272px;
 

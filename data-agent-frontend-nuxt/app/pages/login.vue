@@ -171,4 +171,15 @@ async function onSubmit() {
 	font-size: 12px;
 	color: color-mix(in srgb, var(--da-muted) 85%, transparent);
 }
+
+@media (max-width: 480px) {
+	.login-page {
+		padding: 20px 12px;
+		padding-bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+	}
+	.login-shell {
+		padding: 22px 18px 18px;
+		max-width: 100%;
+	}
+}
 </style>

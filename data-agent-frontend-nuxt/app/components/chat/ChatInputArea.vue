@@ -739,17 +739,37 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	color: var(--da-on-primary);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
 	.composer {
-		width: calc(100% - 20px);
-		margin-bottom: 12px;
-		padding: 10px 10px 8px;
+		width: calc(100% - 16px);
+		margin: 0 auto calc(10px + var(--da-safe-bottom, 0px));
+		padding: 8px 10px 8px;
+		border-radius: 20px;
+	}
+	.composer__textarea {
+		min-height: 40px;
+		font-size: 16px; /* prevent iOS zoom */
 	}
 	.tool-chip__text {
-		max-width: 72px;
+		max-width: 64px;
 	}
-	.opt {
+	.tool-chip {
+		min-height: 32px;
+		padding: 4px 8px;
+	}
+	.send,
+	.stop {
+		width: 40px;
+		height: 40px;
+	}
+	/* hide model/ds text on very narrow — keep icons via text truncation already */
+}
+@media (max-width: 400px) {
+	.tool-chip__text {
 		display: none;
+	}
+	.tool-chip {
+		padding: 4px 8px;
 	}
 }
 

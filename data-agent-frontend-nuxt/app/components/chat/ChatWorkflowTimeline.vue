@@ -647,6 +647,16 @@ watch(
 	50% { opacity: 1; }
 }
 
+@media (max-width: 768px) {
+	.process-chip {
+		max-width: 100%;
+		font-size: 12px;
+	}
+	.step-bubble__body {
+		padding-left: 12px;
+		padding-right: 8px;
+	}
+}
 @media (prefers-reduced-motion: reduce) {
 	.process-chip__dot.live,
 	.step-bubble__pulse {

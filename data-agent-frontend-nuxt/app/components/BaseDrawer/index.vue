@@ -140,4 +140,39 @@ const cssVars = computed(() => ({
 	transition: none !important;
 }
 }
+
+@media (max-width: 768px) {
+	.base-drawer__left {
+		position: fixed;
+		inset: 0 auto 0 0;
+		z-index: 50;
+		width: min(86vw, 300px) !important;
+		max-width: 300px;
+		height: 100%;
+		max-height: 100dvh;
+		transform: translateX(0);
+		transition: transform var(--da-dur-base) var(--da-ease-out);
+		box-shadow: var(--da-shadow-lg);
+		padding-top: var(--da-safe-top, 0px);
+		padding-bottom: var(--da-safe-bottom, 0px);
+	}
+	.base-drawer__left--closed {
+		width: min(86vw, 300px) !important;
+		transform: translateX(-105%);
+		pointer-events: none;
+	}
+	.base-drawer__right {
+		width: 100%;
+		min-width: 0;
+	}
+	.base-drawer__header {
+		height: calc(var(--da-header-height, 48px) + var(--da-safe-top, 0px));
+		padding-top: var(--da-safe-top, 0px);
+		padding-left: 8px;
+		padding-right: 8px;
+	}
+	.base-drawer__content {
+		padding-bottom: var(--da-safe-bottom, 0px);
+	}
+}
 </style>

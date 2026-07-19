@@ -128,8 +128,41 @@
 			</aside>
 
 			<main class="workspace-main">
+				<header class="ws-mobile-bar" aria-label="移动端导航">
+					<button
+						type="button"
+						class="ws-icon-btn"
+						title="打开菜单"
+						aria-label="打开侧栏"
+						@click="store.chatSidebarCollapsed = false"
+					>
+						<v-icon size="20">mdi-menu</v-icon>
+					</button>
+					<button type="button" class="ws-mobile-bar__title" @click="goChatHome">
+						{{ store.currentAgentName || 'DataAgent' }}
+					</button>
+					<button
+						type="button"
+						class="ws-icon-btn"
+						title="新会话"
+						aria-label="新会话"
+						:disabled="!selectedAgentId"
+						@click="handleCreateNewSession"
+					>
+						<v-icon size="20">mdi-plus</v-icon>
+					</button>
+				</header>
 				<slot />
 			</main>
+
+			<!-- mobile scrim when rail open -->
+			<button
+				v-show="!store.chatSidebarCollapsed"
+				type="button"
+				class="ws-scrim"
+				aria-label="关闭侧栏"
+				@click="store.chatSidebarCollapsed = true"
+			/>
 		</div>
 
 		<ConfirmDialog
@@ -255,7 +288,28 @@ function syncSelectedFromRoute() {
 	}
 }
 
+const isMobile = ref(false);
+let mq: MediaQueryList | null = null;
+
+function applyMobileLayout() {
+	if (typeof window === 'undefined') return;
+	isMobile.value = window.matchMedia('(max-width: 768px)').matches;
+	if (isMobile.value) {
+		store.chatSidebarCollapsed = true;
+	}
+}
+
+function onMqChange(e: MediaQueryListEvent) {
+	isMobile.value = e.matches;
+	if (e.matches) store.chatSidebarCollapsed = true;
+}
+
 onMounted(async () => {
+	applyMobileLayout();
+	if (typeof window !== 'undefined') {
+		mq = window.matchMedia('(max-width: 768px)');
+		mq.addEventListener?.('change', onMqChange);
+	}
 	await loadAgents();
 	syncSelectedFromRoute();
 	// Seed /chat with first agent when missing
@@ -271,12 +325,24 @@ onMounted(async () => {
 	}
 });
 
+onUnmounted(() => {
+	mq?.removeEventListener?.('change', onMqChange);
+});
+
 watch(
 	() => route.fullPath,
 	() => {
 		syncSelectedFromRoute();
 	},
 );
+
+watch(
+	() => store.currentSession?.id,
+	() => {
+		if (isMobile.value) store.chatSidebarCollapsed = true;
+	},
+);
+
 </script>
 
 <style scoped>
@@ -573,4 +639,100 @@ watch(
 		transition: none !important;
 	}
 }
+
+/* Mobile: rail as overlay drawer */
+.ws-mobile-bar {
+	display: none;
+}
+.ws-scrim {
+	display: none;
+}
+
+@media (max-width: 768px) {
+	.workspace-rail {
+		position: fixed;
+		inset: 0 auto 0 0;
+		z-index: 40;
+		width: min(86vw, 300px);
+		min-width: 0;
+		height: 100%;
+		max-height: 100dvh;
+		transition: transform var(--da-dur-base) var(--da-ease-out);
+		transform: translateX(0);
+	}
+	.workspace-rail--collapsed {
+		width: min(86vw, 300px);
+		min-width: 0;
+		transform: translateX(-105%);
+		pointer-events: none;
+	}
+	.workspace-rail__panel {
+		width: 100%;
+		height: 100%;
+		max-height: 100dvh;
+		padding-top: var(--da-safe-top, 0px);
+		padding-bottom: var(--da-safe-bottom, 0px);
+		box-shadow: var(--da-shadow-lg);
+		background: var(--da-surface);
+		opacity: 1 !important;
+		pointer-events: auto;
+	}
+	.workspace-rail--collapsed .workspace-rail__panel {
+		opacity: 1 !important;
+	}
+	.ws-expand-fab {
+		display: none !important;
+	}
+	.workspace-main {
+		width: 100%;
+		min-width: 0;
+		min-height: 100dvh;
+		height: 100dvh;
+		display: flex;
+		flex-direction: column;
+	}
+	.ws-mobile-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 8px;
+		flex-shrink: 0;
+		height: calc(48px + var(--da-safe-top, 0px));
+		padding: var(--da-safe-top, 0px) 8px 0;
+		background: color-mix(in srgb, var(--da-surface) 92%, transparent);
+		border-bottom: 0.5px solid var(--da-line-soft);
+		backdrop-filter: blur(10px);
+		z-index: 5;
+	}
+	.ws-mobile-bar__title {
+		appearance: none;
+		border: none;
+		background: transparent;
+		flex: 1;
+		min-width: 0;
+		font-family: var(--da-font-display);
+		font-size: 0.95rem;
+		font-weight: 500;
+		letter-spacing: -0.02em;
+		color: var(--da-ink);
+		text-align: center;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+		cursor: pointer;
+		padding: 0 4px;
+	}
+	.ws-scrim {
+		display: block;
+		position: fixed;
+		inset: 0;
+		z-index: 35;
+		border: none;
+		padding: 0;
+		margin: 0;
+		background: var(--da-overlay, rgba(15, 35, 55, 0.4));
+		cursor: pointer;
+	}
+}
+
 </style>
