@@ -348,7 +348,7 @@ watch(
 	display: flex;
 	flex-direction: column;
 	background:
-		radial-gradient(1000px 380px at 50% -100px, color-mix(in srgb, var(--da-primary, #2f84d6) 8%, transparent), transparent 62%),
+		radial-gradient(900px 320px at 50% -120px, color-mix(in srgb, var(--da-primary, #2f84d6) 5%, transparent), transparent 65%),
 		var(--da-surface-soft);
 }
 
@@ -356,7 +356,7 @@ watch(
 	padding: 12px 20px 48px;
 	display: flex;
 	flex-direction: column;
-	gap: 28px;
+	gap: 22px;
 	width: 100%;
 	max-width: min(100%, var(--da-chat-max, 1080px));
 	margin: 0 auto;

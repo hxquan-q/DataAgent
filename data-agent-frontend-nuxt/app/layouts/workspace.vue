@@ -388,23 +388,21 @@ watch(
 
 .ws-new {
 	appearance: none;
-	margin: 4px 10px 8px;
+	margin: 4px 12px 8px;
 	min-height: 34px;
 	border-radius: 10px;
-	border: none;
-	background: var(--da-primary);
-	color: var(--da-on-primary);
+	border: 1px solid color-mix(in srgb, var(--da-primary) 28%, transparent);
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
 	font: inherit;
 	font-size: 13px;
 	font-weight: 600;
-	letter-spacing: 0;
+	letter-spacing: -0.01em;
 	cursor: pointer;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	flex-shrink: 0;
-	box-shadow: 0 6px 14px color-mix(in srgb, var(--da-primary) 22%, transparent);
-	transition: background var(--da-dur-fast) var(--da-ease-out);
+	transition: background var(--da-dur-fast) var(--da-ease-out), border-color var(--da-dur-fast) var(--da-ease-out);
 }
 
 .ws-new:hover:not(:disabled) {
@@ -491,15 +489,17 @@ watch(
 
 .ws-footer__admin {
 	appearance: none;
-	border: 0.5px solid color-mix(in srgb, var(--da-primary) 22%, transparent);
-	background: transparent;
-	color: var(--da-primary);
-	border-radius: 8px;
+	width: 100%;
 	min-height: 32px;
+	border-radius: 8px;
+	border: 1px solid color-mix(in srgb, var(--da-line) 50%, transparent);
+	background: var(--da-surface);
+	color: var(--da-ink);
 	font: inherit;
 	font-size: 12.5px;
 	font-weight: 600;
 	cursor: pointer;
+	text-align: center;
 	transition: background var(--da-dur-fast) var(--da-ease-out);
 }
 

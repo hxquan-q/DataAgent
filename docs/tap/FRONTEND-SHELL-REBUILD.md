@@ -69,5 +69,7 @@ cd data-agent-frontend-nuxt && pnpm build
 | 06785f2 | D 消息区 chrome 次要化 |
 | 9100996 | E/F 管理壳 + embed send |
 | b834afc | 发送流截图验收 |
+| ee3eb9a | 管理 rail 品牌 + 登录纸卡 + 会话密度 |
+| (latest) | workspace CTA 克制化 · 消息列间距 · 终态截图 |
 
 后端：`BACKEND-API-CHANGE-LOG.md` 仍为空（未改接口）。
