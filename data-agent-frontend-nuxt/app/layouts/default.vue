@@ -19,19 +19,17 @@
 		<v-main>
 			<BaseDrawer v-model="drawer" :drawer-width="280">
 				<template #drawer>
-					<div class="d-flex flex-column h-100">
-						<div class="pa-3 border-b border-white-5 brand-block">
-							<div class="d-flex align-center justify-space-between mb-2 brand-row">
-								<div class="text-subtitle-2 font-weight-medium brand-title">管理后台</div>
+					<div class="d-flex flex-column h-100 admin-rail">
+						<div class="brand-block">
+							<div class="brand-row">
+								<button type="button" class="brand-title" @click="goChatWorkspace">DataAgent</button>
+								<span class="brand-pill">管理</span>
 							</div>
 
 							<div class="agent-switcher-box">
-								<p
-									class="text-caption mb-2 font-weight-medium agent-switcher-label"
-								>
-									当前智能体
-								</p>
+								<label class="agent-switcher-label" for="admin-agent-select">智能体上下文</label>
 								<v-select
+									id="admin-agent-select"
 									v-model="selectedAgentId"
 									:items="agentOptions"
 									item-title="title"
@@ -39,7 +37,7 @@
 									variant="outlined"
 									density="compact"
 									hide-details
-									placeholder="请选择智能体"
+									placeholder="选择智能体"
 									class="agent-switcher"
 									menu-icon="mdi-chevron-down"
 									:menu-props="{
@@ -649,6 +647,65 @@ watch(
 </script>
 
 <style scoped>
+
+.admin-rail {
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface));
+}
+.brand-block {
+	padding: 12px 12px 10px !important;
+	border-bottom: 1px solid var(--da-sidebar-line) !important;
+}
+.brand-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+.brand-title {
+	appearance: none;
+	border: none;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+	font-family: var(--da-font-display);
+	font-size: 0.95rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-sidebar-ink, #1a2332);
+	cursor: pointer;
+	text-align: left;
+}
+.brand-title:hover {
+	color: var(--da-primary);
+}
+.brand-title:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+.brand-pill {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--da-primary);
+	background: var(--da-primary-soft);
+	border: 1px solid color-mix(in srgb, var(--da-primary) 22%, transparent);
+	border-radius: 999px;
+	padding: 2px 8px;
+}
+.agent-switcher-box {
+	margin: 0;
+}
+.agent-switcher-label {
+	display: block;
+	margin: 0 0 6px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	color: var(--da-sidebar-muted, #64748b);
+}
 .admin-app {
 	background: var(--da-surface-soft) !important;
 }

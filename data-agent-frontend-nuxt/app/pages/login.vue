@@ -104,8 +104,12 @@ async function onSubmit() {
 
 .login-shell {
 	width: 100%;
-	max-width: 360px;
-	padding: 8px 8px 0;
+	max-width: 380px;
+	padding: 28px 28px 24px;
+	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	border-radius: var(--da-radius-lg, 18px);
+	box-shadow: var(--da-shadow-md);
 }
 
 .login-brand {

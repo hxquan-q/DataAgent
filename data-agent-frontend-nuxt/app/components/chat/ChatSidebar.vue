@@ -626,6 +626,25 @@ async function confirmDelete() {
 	min-width: 0 !important;
 	height: 100%;
 }
+
+.sidebar-wrapper.is-workspace .session-item {
+	min-height: 30px;
+	padding: 3px 8px;
+	border-radius: 8px;
+}
+.sidebar-wrapper.is-workspace .session-item-title {
+	font-size: 12.5px;
+}
+.sidebar-wrapper.is-workspace .session-item-time {
+	display: none;
+}
+.sidebar-wrapper.is-workspace .session-group-label--ws {
+	padding: 8px 10px 4px;
+	font-size: 10px;
+	letter-spacing: 0.08em;
+	color: color-mix(in srgb, var(--da-muted) 90%, transparent);
+}
+
 .sidebar-wrapper.is-workspace .chat-sidebar {
 	width: 100% !important;
 	border-right: none;
