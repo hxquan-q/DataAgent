@@ -72,8 +72,9 @@ public class GraphController {
 			@RequestParam(value = "rejectedPlan", required = false) boolean rejectedPlan,
 			@RequestParam(value = "nl2sqlOnly", required = false) boolean nl2sqlOnly, ServerHttpResponse response) {
 		// 设置 SSE 相关 HTTP 头，确保浏览器正确处理事件流
-		response.getHeaders().add("Cache-Control", "no-cache");
+		response.getHeaders().add("Cache-Control", "no-cache, no-transform");
 		response.getHeaders().add("Connection", "keep-alive");
+		response.getHeaders().add("X-Accel-Buffering", "no");
 		response.getHeaders().add("Access-Control-Allow-Origin", "*");
 
 		// 创建单播 Sink，用于在工作流执行过程中推送事件

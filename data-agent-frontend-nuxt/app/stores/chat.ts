@@ -32,7 +32,6 @@ import modelConfigService, {
 import datasourceService, {
 	type Datasource as BaseDatasource,
 } from '~/services/datasource/index';
-import { withAccessToken } from '~/utils/authToken';
 
 export type Datasource = BaseDatasource & { isActive?: boolean };
 
@@ -97,7 +96,7 @@ export const useChatStore = defineStore('chat', () => {
 	const activeModelConfig = ref<ModelConfig | null>(null);
 
 	// ── SSE session stream refs (not reactive) ──────────────────────────────────
-	let sessionEventSource: EventSource | null = null;
+	let sessionStreamClose: (() => void) | null = null;
 	let sessionReconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	let isStoreActive = true;
 
@@ -114,46 +113,64 @@ export const useChatStore = defineStore('chat', () => {
 			clearTimeout(sessionReconnectTimer);
 			sessionReconnectTimer = null;
 		}
-		if (sessionEventSource) sessionEventSource.close();
+		if (sessionStreamClose) {
+			sessionStreamClose();
+			sessionStreamClose = null;
+		}
 
-		const source = new EventSource(
-			withAccessToken(`/api/agent/${agentId}/sessions/stream`),
-		);
-		source.addEventListener('title-updated', (event) => {
-			try {
-				const data = JSON.parse((event as MessageEvent<string>).data) as {
-					sessionId: string;
-					title: string;
-				};
-				const target = sessions.value.find((s) => s.id === data.sessionId);
-				if (target) {
-					target.title = data.title;
-					target.editingTitle = data.title;
-				}
-				if (currentSession.value?.id === data.sessionId)
-					currentSession.value.title = data.title;
-			} catch {
-				/* ignore */
-			}
+		// fetch SSE — Bearer header, no EventSource reconnect thrash
+		import('~/utils/sse').then(({ openSseStream }) => {
+			if (!isStoreActive) return;
+			sessionStreamClose = openSseStream(
+				`/api/agent/${agentId}/sessions/stream`,
+				{
+					onMessage: (msg) => {
+						if (msg.event !== 'title-updated' || !msg.data) return;
+						try {
+							const data = JSON.parse(msg.data) as {
+								sessionId: string;
+								title: string;
+							};
+							const target = sessions.value.find((s) => s.id === data.sessionId);
+							if (target) {
+								target.title = data.title;
+								target.editingTitle = data.title;
+							}
+							if (currentSession.value?.id === data.sessionId)
+								currentSession.value.title = data.title;
+						} catch {
+							/* ignore */
+						}
+					},
+					onError: () => {
+						sessionStreamClose = null;
+						if (isStoreActive) {
+							sessionReconnectTimer = setTimeout(
+								() => connectSessionStream(agentId),
+								4000,
+							);
+						}
+					},
+					onDone: () => {
+						sessionStreamClose = null;
+						if (isStoreActive) {
+							sessionReconnectTimer = setTimeout(
+								() => connectSessionStream(agentId),
+								4000,
+							);
+						}
+					},
+				},
+			);
 		});
-		source.onerror = () => {
-			source.close();
-			sessionEventSource = null;
-			if (isStoreActive)
-				sessionReconnectTimer = setTimeout(
-					() => connectSessionStream(agentId),
-					3000,
-				);
-		};
-		sessionEventSource = source;
 	}
 
 	function disconnectSessionStream() {
 		isStoreActive = false;
 		if (sessionReconnectTimer) clearTimeout(sessionReconnectTimer);
-		if (sessionEventSource) {
-			sessionEventSource.close();
-			sessionEventSource = null;
+		if (sessionStreamClose) {
+			sessionStreamClose();
+			sessionStreamClose = null;
 		}
 	}
 
@@ -333,6 +350,12 @@ export const useChatStore = defineStore('chat', () => {
 	function mapStreamErrorMessage(error: Error): string {
 		const raw = (error?.message || '').trim();
 		if (!raw) return '请求失败，请检查网络连接并重试。';
+		if (/Stream connection failed/i.test(raw)) {
+			return '流式连接中断，请重试。若反复失败请检查登录状态与后端服务。';
+		}
+		if (/未认证|登录已过期|401/i.test(raw)) {
+			return '登录已过期，请重新登录后再试。';
+		}
 		if (/CHAT model|未配置或未激活 CHAT|No active CHAT/i.test(raw)) {
 			return '未配置或未激活对话模型，请到「模型服务」添加并激活 CHAT 模型。';
 		}

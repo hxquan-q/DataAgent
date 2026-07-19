@@ -13,7 +13,7 @@ import type { ResultData } from '~/services/resultSet/index';
  * - 主答案：markdown-it + echarts + 打字机
  * - 中间 Graph 节点：可折叠「分析过程」树（默认收起）
  * - 欢迎气泡 / 建议问题 / 主题色
- * 通信与鉴权：postMessage token + EventSource SSE（不变）
+ * 通信与鉴权：postMessage token + fetch SSE
  */
 definePageMeta({ layout: false });
 
@@ -100,7 +100,7 @@ function toggleSteps(i: number) {
 const userHasScrolledUp = ref(false);
 
 const listRef = ref<HTMLDivElement | null>(null);
-let activeES: EventSource | null = null;
+let activeESClose: (() => void) | null = null;
 let lastTypedLen = 0;
 let ignoreScroll = false;
 
@@ -403,39 +403,60 @@ async function send(preset?: string) {
 		threadId: sessionId.value,
 		token: token.value,
 	});
-	const es = new EventSource(`/api/embed/public/${agentId.value}/chat?${params.toString()}`);
-	activeES = es;
-	es.onmessage = (event) => {
-		try {
-			const node = JSON.parse(event.data) as {
-				nodeName: string;
-				text: string;
-				textType?: string;
-			};
-			if (!node.text) return;
-			const last = liveBlocks.value[liveBlocks.value.length - 1];
-			if (last && last.nodeName === node.nodeName) {
-				last.text += node.text;
-				if (node.textType) last.textType = node.textType;
-			} else {
-				liveBlocks.value.push({
-					nodeName: node.nodeName,
-					text: node.text,
-					textType: node.textType,
-				});
+	const { openSseStream } = await import('~/utils/sse');
+	const streamUrl = `/api/embed/public/${agentId.value}/chat?${params.toString()}`;
+	const closeStream = openSseStream(streamUrl, {
+		headers: token.value ? { Authorization: `Bearer ${token.value}` } : {},
+		onMessage: async (msg) => {
+			if (msg.event === 'complete') {
+				finishStream(closeStream, false);
+				return;
 			}
-		} catch {
-			/* ignore */
-		}
-	};
-	const onComplete = () => finishStream(es, false);
-	const onError = () => finishStream(es, true);
-	es.addEventListener('complete', onComplete);
-	es.addEventListener('error', onError);
+			if (msg.event === 'error') {
+				finishStream(closeStream, true);
+				return;
+			}
+			if (!msg.data) return;
+			try {
+				const node = JSON.parse(msg.data) as {
+					nodeName: string;
+					text: string;
+					textType?: string;
+					complete?: boolean;
+					error?: boolean;
+				};
+				if (node.complete) {
+					finishStream(closeStream, false);
+					return;
+				}
+				if (node.error) {
+					finishStream(closeStream, true);
+					return;
+				}
+				if (!node.text) return;
+				const last = liveBlocks.value[liveBlocks.value.length - 1];
+				if (last && last.nodeName === node.nodeName) {
+					last.text += node.text;
+					if (node.textType) last.textType = node.textType;
+				} else {
+					liveBlocks.value.push({
+						nodeName: node.nodeName,
+						text: node.text,
+						textType: node.textType,
+					});
+				}
+			} catch {
+				/* ignore */
+			}
+		},
+		onError: async () => finishStream(closeStream, true),
+		onDone: async () => finishStream(closeStream, false),
+	});
+	activeESClose = closeStream;
 	sendLock = false;
 }
 
-function finishStream(es: EventSource, fromError: boolean) {
+function finishStream(closeFn: (() => void) | null, fromError: boolean) {
 	if (streamFinished) return;
 	const hadContent = liveBlocks.value.length > 0;
 	streamFinished = true;
@@ -452,11 +473,11 @@ function finishStream(es: EventSource, fromError: boolean) {
 	}
 	liveBlocks.value = [];
 	try {
-		es.close();
+		closeFn?.();
 	} catch {
 		/* ignore */
 	}
-	if (activeES === es) activeES = null;
+	if (activeESClose === closeFn) activeESClose = null;
 	if (fromError && !hadContent) {
 		messages.value.push({ role: 'assistant', content: '⚠️ 流式连接失败，请检查令牌、代理或后端日志后重试。' });
 	}
@@ -465,7 +486,7 @@ function finishStream(es: EventSource, fromError: boolean) {
 }
 
 function stop() {
-	const es = activeES;
+	const es = activeESClose;
 	if (es) {
 		finishStream(es, false);
 	} else {
@@ -526,7 +547,7 @@ onMounted(async () => {
 });
 
 onBeforeUnmount(() => {
-	activeES?.close();
+	activeESClose?.();
 	window.removeEventListener('message', onHostMessage);
 });
 </script>

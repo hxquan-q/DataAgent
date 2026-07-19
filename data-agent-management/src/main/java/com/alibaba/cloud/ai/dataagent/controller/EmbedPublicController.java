@@ -115,8 +115,9 @@ public class EmbedPublicController {
 		String sessionToken = headerToken != null && !headerToken.isBlank() ? headerToken : queryToken;
 		embedService.verifySession(sessionToken, agentId);
 
-		response.getHeaders().add("Cache-Control", "no-cache");
+		response.getHeaders().add("Cache-Control", "no-cache, no-transform");
 		response.getHeaders().add("Connection", "keep-alive");
+		response.getHeaders().add("X-Accel-Buffering", "no");
 		response.getHeaders().add("Referrer-Policy", "no-referrer");
 
 		Sinks.Many<ServerSentEvent<GraphNodeResponse>> sink = Sinks.many().unicast().onBackpressureBuffer();
