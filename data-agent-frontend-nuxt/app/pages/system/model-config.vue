@@ -15,7 +15,7 @@
  */
 
 <template>
-	<v-container fluid class="page-shell model-config-container">
+	<section class="page-shell model-config-container">
 		<KnowledgePageHeader
 			title="模型服务"
 			subtitle="连接 LLM 供应商，支持对话生成与向量检索。"
@@ -398,7 +398,7 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-	</v-container>
+	</section>
 </template>
 
 <script setup lang="ts">

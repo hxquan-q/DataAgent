@@ -69,6 +69,8 @@
 	--da-table-row-density: 32px;
 	--da-chat-max: 1080px;
 	--da-composer-radius: 26px;
+	--da-rail-width: 272px;
+	--da-admin-rail-width: 272px;
 
 	/* ── Radius & shadow (softer DEEIX elevation) ───────────────────────────── */
 	--da-radius-sm: 8px;

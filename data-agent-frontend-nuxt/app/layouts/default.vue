@@ -17,7 +17,7 @@
 <template>
 	<v-app id="app" class="admin-app">
 		<v-main>
-			<BaseDrawer v-model="drawer" :drawer-width="280">
+			<BaseDrawer v-model="drawer" :drawer-width="272">
 				<template #drawer>
 					<div class="d-flex flex-column h-100 admin-rail">
 						<div class="brand-block">
@@ -154,6 +154,15 @@
 								color="primary"
 								title="提示词配置"
 								@click="navigateToPath('/prompt-config')"
+							/>
+
+							<v-list-item
+								prepend-icon="mdi-puzzle-outline"
+								:active="isActive('/skills')"
+								class="rounded-lg mb-1 navigation-item"
+								color="primary"
+								title="技能管理"
+								@click="navigateToPath('/skills')"
 							/>
 
 							<v-list-group value="knowledge">
@@ -479,9 +488,11 @@ const routeTitleMap: Record<string, string> = {
 	'/chat': '数据问答',
 	'/dashboard': '数据看板',
 	'/prompt-config': '提示词配置',
+	'/skills': '技能管理',
 	'/knowledge/business': '业务知识配置',
 	'/knowledge/agents': '智能体知识库',
 	'/knowledge/semantic-models': '语义模型配置',
+	'/system/agents': '智能体管理',
 	'/system/data-sources': '数据连接',
 	'/system/model-config': '模型配置',
 	'/system/metrics': '指标配置',
@@ -493,6 +504,7 @@ const routeTitleMap: Record<string, string> = {
 	'/system/embed': '网页嵌入',
 	'/system/settings': '通用设置',
 	'/agent/new': '新建智能体',
+	'/agent': '智能体工作台',
 };
 
 const agentOptions = computed(() => agents.value);

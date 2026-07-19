@@ -15,7 +15,7 @@
  */
 
 <template>
-	<v-container fluid class="page-shell agents-container">
+	<section class="page-shell agents-container">
 		<KnowledgePageHeader
 			title="智能体管理"
 			subtitle="创建、配置与发布问数智能体，管理绑定数据源与运行参数。"
@@ -420,7 +420,7 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-	</v-container>
+	</section>
 </template>
 
 <script setup lang="ts">

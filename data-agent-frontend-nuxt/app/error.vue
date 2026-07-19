@@ -91,13 +91,7 @@ const handleBack = () => clearError({ redirect: '/' });
 	align-items: center;
 	justify-content: center;
 	padding: 24px;
-	background:
-		radial-gradient(
-			900px 420px at 50% -10%,
-			color-mix(in srgb, var(--da-primary) 16%, transparent),
-			transparent 60%
-		),
-		linear-gradient(160deg, var(--da-surface-soft) 0%, #e8f1f8 50%, var(--da-surface-soft) 100%);
+	background: var(--da-surface-soft);
 }
 
 .error-card {
@@ -108,7 +102,7 @@ const handleBack = () => clearError({ redirect: '/' });
 	background: var(--da-surface);
 	border: 1px solid var(--da-line-soft);
 	border-radius: var(--da-radius-lg);
-	box-shadow: var(--da-shadow-lg);
+	box-shadow: var(--da-shadow-md);
 }
 
 .error-icon-wrap {

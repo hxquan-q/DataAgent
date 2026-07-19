@@ -23,16 +23,27 @@
 <style>
 .page-enter-active,
 .page-leave-active {
-  transition: all 0.3s ease-out;
+  transition: opacity var(--da-dur-base) var(--da-ease-out), transform var(--da-dur-base) var(--da-ease-out);
 }
 
 .page-enter-from {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(8px);
 }
 
 .page-leave-to {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-6px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-active,
+  .page-leave-active {
+    transition: none;
+  }
+  .page-enter-from,
+  .page-leave-to {
+    transform: none;
+  }
 }
 </style>

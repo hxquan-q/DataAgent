@@ -107,20 +107,21 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
- .streaming-report {
-	background: var(--da-surface);
+.streaming-report {
+	background: transparent;
 }
 
 .report-header {
 	display: flex;
 	align-items: center;
-	padding: 8px 12px;
-	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface-soft));
-	border-bottom: 1px solid var(--da-line-soft);
-	font-size: 12.5px;
+	padding: 2px 0 8px;
+	background: transparent;
+	border-bottom: none;
+	font-size: 12px;
 	font-weight: 600;
-	color: var(--da-ink);
+	color: var(--da-muted);
 	gap: 6px;
+	opacity: 0.85;
 }
 
 .typing-indicator {

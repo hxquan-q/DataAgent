@@ -566,3 +566,132 @@ button:focus-visible,
 	box-shadow: none !important;
 	text-transform: none !important;
 }
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Coordinated product shell (rebuild) — shared primitives
+   Keep components thin; put shared chrome here.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* v-container used as page-shell should not double-pad */
+.page-shell.v-container,
+.v-container.page-shell {
+	max-width: 1280px !important;
+	padding: 20px 24px 32px !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+/* Segmented / filter pills (admin) */
+.page-shell :deep(.v-btn-toggle),
+.page-shell :deep(.v-slide-group) {
+	border-radius: 999px;
+}
+
+.page-shell :deep(.v-btn-toggle .v-btn) {
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 500 !important;
+	border-radius: 999px !important;
+}
+
+/* Soft paper toolbar row */
+.da-toolbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 14px;
+}
+
+/* Primary pill action */
+.da-btn-primary {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 34px;
+	padding: 0 14px;
+	border: none;
+	border-radius: 999px;
+	background: var(--da-primary);
+	color: var(--da-on-primary);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	cursor: pointer;
+	text-decoration: none;
+}
+.da-btn-primary:hover {
+	background: color-mix(in srgb, var(--da-primary) 90%, #000);
+}
+.da-btn-ghost {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 34px;
+	padding: 0 14px;
+	border: 1px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	border-radius: 999px;
+	background: var(--da-surface);
+	color: var(--da-ink);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+}
+.da-btn-ghost:hover {
+	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent);
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
+}
+
+/* Paper card utility */
+.da-paper {
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	box-shadow: var(--da-shadow-sm);
+}
+
+/* Quiet dialogs */
+.v-overlay__content > .v-card {
+	border: 1px solid var(--da-line-soft) !important;
+	border-radius: var(--da-radius-md) !important;
+	box-shadow: var(--da-shadow-md) !important;
+}
+
+/* Soft scrollbars product-wide */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in srgb, var(--da-muted) 35%, transparent) transparent;
+}
+*::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--da-muted) 35%, transparent);
+	border-radius: 999px;
+}
+
+/* Admin main content fill */
+.base-drawer__content,
+.v-main {
+	background: var(--da-surface-soft);
+}
+
+/* Search field pill */
+.page-shell :deep(.v-text-field .v-field) {
+	border-radius: 999px !important;
+}
+.page-shell :deep(.v-textarea .v-field),
+.page-shell :deep(.v-select .v-field),
+.page-shell :deep(.v-autocomplete .v-field) {
+	border-radius: 10px !important;
+}

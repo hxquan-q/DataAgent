@@ -80,3 +80,15 @@ cd data-agent-frontend-nuxt && pnpm build
 - `pnpm build` ✅（nitro node-server）
 - Playwright 路由 smoke：/chat · /system/agents · model-config · eval · security · embed · 无 pageerror
 - 后端 API 变更台账：空（未改接口）
+
+
+## 全部协调重构（本轮）
+
+统一产品壳层语言，跨布局/聊天/管理/登录/错误/embed：
+
+1. **Global primitives**（`main.css`）：page-shell + v-container 对齐、`.da-btn-*`、`.da-paper`、dialog/scroll、search pill
+2. **Token**：`--da-rail-width` / `--da-admin-rail-width`
+3. **Admin**：agents/model-config/embed 改 `section.page-shell`；技能管理导航入口；title map 补全
+4. **Chat**：streaming report open-canvas 对齐 markdown report
+5. **App/Error**：克制动效 + 纸感错误页
+6. **后端**：仍冻结

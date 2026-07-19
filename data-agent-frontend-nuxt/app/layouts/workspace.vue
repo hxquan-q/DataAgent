@@ -294,8 +294,8 @@ watch(
 
 .workspace-rail {
 	position: relative;
-	width: 272px;
-	min-width: 272px;
+	width: var(--da-rail-width, 272px);
+	min-width: var(--da-rail-width, 272px);
 	height: 100%;
 	flex-shrink: 0;
 	transition:
@@ -311,7 +311,7 @@ watch(
 .workspace-rail__panel {
 	display: flex;
 	flex-direction: column;
-	width: 272px;
+	width: var(--da-rail-width, 272px);
 	height: 100%;
 	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface));
 	border-right: 1px solid var(--da-line-soft);
