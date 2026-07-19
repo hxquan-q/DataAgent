@@ -78,9 +78,9 @@ export default defineNuxtConfig({
 			},
 		},
 	},
-	// /路由重定向到/create-agent
+	// Product home = chat workspace (DEEIX-style); admin via workspace footer
 	routeRules: {
-		'/': { redirect: '/agent/new' },
+		'/': { redirect: '/chat' },
 		// 代理所有 /api/** 的请求到 Java 后端（Nuxt 服务端转发，浏览器仍同源）
 		// 公网访问 3000/3301 时，/api 仍转到本机 IDEA 8065
 		'/api/**': { proxy: 'http://127.0.0.1:8065/api/**' },

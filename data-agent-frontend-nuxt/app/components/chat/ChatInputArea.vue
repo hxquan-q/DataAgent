@@ -354,7 +354,6 @@ function autoResize() {
 async function handleSend() {
 	const query = inputText.value.trim();
 	if (!query) return;
-	if (!store.currentSession) return;
 	if (store.isStreaming) return;
 	if (!store.chatModels.length || !store.activeModelConfig) {
 		// R149: 无可用模型时阻断发送，引导配置
@@ -373,6 +372,11 @@ async function handleSend() {
 	});
 
 	try {
+		// Empty canvas may have no session yet (DEEIX first message)
+		if (!store.currentSession && store.currentAgentId) {
+			await store.createNewSession(store.currentAgentId);
+		}
+		if (!store.currentSession) return;
 		await store.sendMessage(query);
 	} catch (e) {
 		console.error('发送失败', e);
@@ -404,11 +408,11 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	z-index: 5;
 	background: var(--da-surface);
 	border: 0.5px solid color-mix(in srgb, var(--da-line) 70%, transparent);
-	border-radius: 24px;
-	padding: 6px 10px 8px;
-	max-width: min(100%, var(--da-answer-max, 880px));
-	width: calc(100% - 32px);
-	margin: 0 auto 18px;
+	border-radius: var(--da-composer-radius, 24px);
+	padding: 10px 12px 10px;
+	max-width: min(100%, var(--da-chat-max, 960px));
+	width: calc(100% - 40px);
+	margin: 0 auto 20px;
 	box-sizing: border-box;
 	box-shadow: var(--da-shadow-composer, var(--da-shadow-sm));
 	transition:
@@ -850,5 +854,27 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	.slide-up-leave-to {
 		transform: none;
 	}
+}
+
+/* R231: closer to DEEIX InputGroup pure surface */
+.input-area {
+	background: #fff !important;
+}
+.status-chip {
+	border-color: transparent !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 80%, transparent) !important;
+}
+.status-chip--model {
+	background: color-mix(in srgb, var(--da-primary) 8%, transparent) !important;
+}
+.option-chip {
+	border: none !important;
+	background: transparent !important;
+	color: var(--da-muted) !important;
+	opacity: 0.9;
+}
+.option-chip.active {
+	color: var(--da-primary) !important;
+	background: color-mix(in srgb, var(--da-primary) 8%, transparent) !important;
 }
 </style>

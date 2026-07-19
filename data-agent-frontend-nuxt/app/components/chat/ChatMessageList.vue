@@ -57,11 +57,8 @@
 				切换智能体
 			</button>
 		</div>
-		<!-- Empty: no session, or session with no messages yet -->
-		<ChatWelcome v-if="showWelcome" />
-
-		<!-- Messages -->
-		<template v-else>
+		<!-- Messages (empty canvas owned by chat.vue) -->
+		<template v-if="!showWelcome">
 			<div class="messages-inner">
 				<template v-for="message in filteredMessages" :key="message.id">
 					<div class="message-wrapper da-msg-enter">
@@ -202,7 +199,6 @@ import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
 import { useChatStore } from '~/stores/chat';
 import type { ResultData } from '~/services/resultSet/index';
 import type { ChatMessage } from '~/services/chat/index';
-import ChatWelcome from './ChatWelcome.vue';
 import ChatResultSet from './ChatResultSet.vue';
 import ChatMarkdownReport from './ChatMarkdownReport.vue';
 import ChatWorkflowTimeline from './ChatWorkflowTimeline.vue';
@@ -481,17 +477,17 @@ watch(
 	box-shadow: none !important;
 }
 
-/* Report card: artifact paper (elevated vs open answer) */
+/* Report: open canvas answer (DEEIX) — no heavy paper card */
 .report-card {
 	max-width: 100% !important;
 	padding: 0 !important;
 	flex: 1;
 	min-width: 0;
-	background: var(--da-surface) !important;
-	border: 1px solid color-mix(in srgb, var(--da-primary) 24%, var(--da-line-soft)) !important;
-	box-shadow: var(--da-shadow-md) !important;
-	overflow: hidden;
-	border-radius: var(--da-radius-md) !important;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	overflow: visible;
+	border-radius: 0 !important;
 }
 
 /* Timeline card: process secondary (DEEIX hierarchy) */
@@ -849,5 +845,44 @@ watch(
 .chat-status-strip__ready:focus-visible {
 	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
+}
+
+/* R231 DEEIX: answer open canvas, process demoted */
+.chat-status-strip {
+	opacity: 0.92;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 35%, transparent) !important;
+	background: transparent !important;
+	backdrop-filter: none !important;
+}
+.report-card {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+.timeline-card {
+	border: 0.5px dashed color-mix(in srgb, var(--da-line) 55%, transparent) !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, transparent) !important;
+	box-shadow: none !important;
+	opacity: 0.92;
+}
+.ai-card {
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+.user-card {
+	border: none !important;
+	box-shadow: none !important;
+}
+
+/* R231 strip: hairline only */
+.chat-status-strip {
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 30%, transparent) !important;
+	background: transparent !important;
+	backdrop-filter: none !important;
+	box-shadow: none !important;
+	min-height: 36px !important;
+	padding: 4px 16px !important;
 }
 </style>

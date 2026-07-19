@@ -251,7 +251,7 @@ async function downloadHtml() {
 
 <style scoped>
 .markdown-report {
-	background: var(--da-surface);
+	background: transparent;
 }
 
 /* ── Header (quiet chrome — answer content is primary) ───────────────────────── */
@@ -259,11 +259,12 @@ async function downloadHtml() {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 8px 14px;
-	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
-	border-bottom: 1px solid var(--da-line-soft);
+	padding: 4px 0 8px;
+	background: transparent;
+	border-bottom: none;
 	flex-wrap: wrap;
 	gap: 6px;
+	opacity: 0.9;
 }
 .report-title {
 	display: flex;
@@ -560,7 +561,15 @@ async function downloadHtml() {
 	background: var(--da-surface);
 }
 .report-header {
-	background: linear-gradient(180deg, var(--da-primary-soft) 0%, var(--da-surface) 100%);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 4px 0 8px;
+	background: transparent;
+	border-bottom: none;
+	flex-wrap: wrap;
+	gap: 6px;
+	opacity: 0.9;
 }
 .report-hairline {
 	height: 1px;
@@ -604,7 +613,15 @@ async function downloadHtml() {
 	height: 28px !important;
 }
 .report-header {
-	min-height: 30px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 4px 0 8px;
+	background: transparent;
+	border-bottom: none;
+	flex-wrap: wrap;
+	gap: 6px;
+	opacity: 0.9;
 }
 
 .report-fullscreen-toolbar {
@@ -616,5 +633,14 @@ async function downloadHtml() {
 	overflow-y: auto;
 	padding: 20px 22px;
 	background: var(--da-surface-soft);
+}
+
+/* R231: demote report chrome */
+.report-hairline { display: none !important; }
+.report-title > span { font-weight: 500 !important; color: var(--da-muted) !important; }
+.report-action-btn {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
 }
 </style>

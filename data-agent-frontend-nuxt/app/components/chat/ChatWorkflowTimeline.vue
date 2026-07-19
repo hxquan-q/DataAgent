@@ -18,46 +18,35 @@
 	<div
 		ref="timelineRef"
 		class="workflow-timeline"
-		:class="{ 'is-completed': completed }"
+		:class="{ 'is-completed': completed, 'is-open': processOpen }"
 	>
-		<!-- Title + global toggle (WeKnora-style: process secondary to answer) -->
-		<div class="timeline-title-bar">
-			<div class="timeline-title-group">
-				<v-card-title class="timeline-title pa-0">
-					<v-icon
-						size="18"
-						:color="completed ? 'success' : 'blue'"
-						class="mr-1"
-					>
-						{{
-							completed
-								? 'mdi-check-decagram-outline'
-								: 'mdi-rocket-launch-outline'
-						}}
-					</v-icon>
-					{{ completed ? '过程详情（可展开）' : '任务进行中' }}
-				</v-card-title>
-				<span v-if="timelineSteps.length" class="timeline-summary">
+		<!-- R231: single meta row; tree hidden until expanded (DEEIX process demote) -->
+		<button
+			type="button"
+			class="process-meta"
+			:aria-expanded="processOpen ? 'true' : 'false'"
+			@click="processOpen = !processOpen"
+		>
+			<span class="process-meta__left">
+				<span class="process-meta__dot" :class="{ live: !completed }" aria-hidden="true" />
+				<span class="process-meta__label">{{ completed ? '过程' : '分析中' }}</span>
+				<span v-if="timelineSteps.length" class="process-meta__count">
 					{{ doneCount }}/{{ timelineSteps.length }} 步
-					<span v-if="activeLabel" class="timeline-active-hint"
-						>· {{ activeLabel }}</span
-					>
 				</span>
-			</div>
-			<v-btn
-				variant="outlined"
-				size="x-small"
-				color="grey"
-				class="toggle-all-btn"
-				:prepend-icon="
-					allExpanded
-						? 'mdi-unfold-less-horizontal'
-						: 'mdi-unfold-more-horizontal'
-				"
-				@click="toggleAll"
-			>
-				{{ allExpanded ? '折叠过程' : '展开过程' }}
-			</v-btn>
+				<span v-if="!completed && activeLabel" class="process-meta__active">· {{ activeLabel }}</span>
+			</span>
+			<span class="process-meta__right">
+				{{ processOpen ? '收起' : '展开' }}
+				<v-icon size="14">{{ processOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+			</span>
+		</button>
+
+		<div v-show="processOpen" class="process-tree">
+		<div class="timeline-title-bar timeline-title-bar--inner">
+			<span class="timeline-summary">节点明细</span>
+			<button type="button" class="toggle-all-btn" @click.stop="toggleAll">
+				{{ allExpanded ? '全部折叠' : '全部展开' }}
+			</button>
 		</div>
 
 		<v-timeline density="compact" side="end" truncate-line="both">
@@ -128,6 +117,7 @@
 				</v-expand-transition>
 			</v-timeline-item>
 		</v-timeline>
+		</div>
 	</div>
 </template>
 
@@ -150,6 +140,8 @@ const props = withDefaults(
 );
 
 const expandedSteps = ref<Record<string, boolean>>({});
+// R231: process tree collapsed by default
+const processOpen = ref(false);
 
 const allExpanded = computed(() => {
 	const steps = timelineSteps.value;
@@ -805,5 +797,99 @@ watch(
 		transition: none !important;
 		animation: none !important;
 	}
+}
+
+/* R231: process as one meta row */
+.process-meta {
+	appearance: none;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	padding: 6px 2px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+	font: inherit;
+	color: var(--da-muted);
+	border-radius: 8px;
+	text-align: left;
+}
+.process-meta:hover {
+	color: var(--da-ink);
+	background: color-mix(in srgb, var(--da-surface-soft) 80%, transparent);
+}
+.process-meta:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+.process-meta__left {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+	min-width: 0;
+	font-size: 12.5px;
+}
+.process-meta__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-success);
+	flex-shrink: 0;
+}
+.process-meta__dot.live {
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+.process-meta__label {
+	font-weight: 600;
+	color: inherit;
+}
+.process-meta__count,
+.process-meta__active {
+	font-weight: 400;
+	opacity: 0.9;
+}
+.process-meta__right {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+	font-size: 12px;
+	font-weight: 600;
+	color: var(--da-primary);
+	flex-shrink: 0;
+}
+.process-tree {
+	margin-top: 4px;
+	padding-top: 4px;
+	border-top: 0.5px dashed color-mix(in srgb, var(--da-line) 50%, transparent);
+}
+.timeline-title-bar--inner {
+	margin-bottom: 2px;
+}
+.toggle-all-btn {
+	appearance: none;
+	border: none;
+	background: transparent;
+	color: var(--da-muted);
+	font: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 2px 6px;
+	border-radius: 6px;
+}
+.toggle-all-btn:hover {
+	color: var(--da-primary);
+	background: var(--da-primary-soft);
+}
+@keyframes processPulse {
+	0%, 100% { opacity: 0.45; }
+	50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.process-meta__dot.live { animation: none; }
 }
 </style>

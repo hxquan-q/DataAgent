@@ -17,12 +17,14 @@
 <template>
 	<div
 		class="sidebar-wrapper"
-		:class="{ collapsed: store.chatSidebarCollapsed }"
+		:class="{
+			collapsed: !isWorkspace && store.chatSidebarCollapsed,
+			'is-workspace': isWorkspace,
+		}"
 	>
-		<!-- Expanded panel -->
 		<div class="chat-sidebar">
-			<!-- Header -->
-			<div class="sidebar-header">
+			<!-- Standalone mode keeps its own chrome; workspace embeds list only -->
+			<div v-if="!isWorkspace" class="sidebar-header">
 				<div class="sidebar-header__text">
 					<span class="sidebar-title">历史会话</span>
 					<span v-if="store.currentAgentName" class="sidebar-agent">{{ store.currentAgentName }}</span>
@@ -39,10 +41,10 @@
 					<v-icon size="18">mdi-chevron-left</v-icon>
 				</v-btn>
 			</div>
+			<div v-else class="session-group-label session-group-label--ws">最近任务</div>
 
-			<!-- Session List -->
 			<div class="session-list custom-scrollbar">
-				<div class="session-group-label">最近任务</div>
+				<div v-if="!isWorkspace" class="session-group-label">最近任务</div>
 
 				<div
 					v-for="session in store.sessions"
@@ -112,12 +114,13 @@
 
 				<div v-if="store.sessions.length === 0" class="empty-sessions empty-sessions--hint">
 					<p class="empty-sessions__title">暂无历史会话</p>
-					<p class="empty-sessions__desc">在下方输入问题开始，或点击「新会话」。</p>
+					<p class="empty-sessions__desc">
+						{{ isWorkspace ? '点击上方「新会话」或直接提问。' : '在下方输入问题开始，或点击「新会话」。' }}
+					</p>
 				</div>
 			</div>
 
-			<!-- Bottom: New Session + config links (R160) -->
-			<div class="sidebar-bottom">
+			<div v-if="!isWorkspace" class="sidebar-bottom">
 				<v-btn
 					block
 					variant="outlined"
@@ -145,8 +148,8 @@
 			</div>
 		</div>
 
-		<!-- Collapsed FAB: floats at top-left of chat area -->
 		<v-btn
+			v-if="!isWorkspace"
 			v-show="store.chatSidebarCollapsed"
 			icon
 			variant="tonal"
@@ -160,7 +163,6 @@
 		</v-btn>
 	</div>
 
-	<!-- Confirm Dialog -->
 	<v-dialog v-model="showDeleteConfirm" max-width="360">
 		<v-card rounded="xl">
 			<v-card-title class="text-subtitle-1 font-weight-medium pa-5 pb-2 dialog-title"
@@ -192,10 +194,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useChatStore, type ExtendedChatSession } from '~/stores/chat';
 import type { ChatSession } from '~/services/chat/index';
 
+const props = withDefaults(
+	defineProps<{
+		/** workspace = embedded in single rail (no second chrome) */
+		variant?: 'standalone' | 'workspace';
+	}>(),
+	{ variant: 'standalone' },
+);
+
+const isWorkspace = computed(() => props.variant === 'workspace');
 const store = useChatStore();
 
 function goModels() {
@@ -607,5 +618,21 @@ async function confirmDelete() {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	max-width: 160px;
+}
+
+/* Embedded in workspace rail — full height list only */
+.sidebar-wrapper.is-workspace {
+	width: 100% !important;
+	min-width: 0 !important;
+	height: 100%;
+}
+.sidebar-wrapper.is-workspace .chat-sidebar {
+	width: 100% !important;
+	border-right: none;
+	background: transparent;
+}
+.session-group-label--ws {
+	padding-top: 2px;
+	flex-shrink: 0;
 }
 </style>

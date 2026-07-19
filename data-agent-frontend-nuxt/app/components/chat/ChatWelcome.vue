@@ -379,4 +379,36 @@ watch(
 		transition: none;
 	}
 }
+
+/* R231: empty under DEEIX empty stage — less card chrome */
+.ready-item {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
+	padding: 4px 0 !important;
+	justify-content: center;
+}
+.ready-list {
+	align-items: center;
+}
+.preset-chip {
+	box-shadow: none !important;
+	border-color: color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	background: transparent !important;
+}
+.preset-chip:hover:not(:disabled) {
+	box-shadow: none !important;
+}
+
+/* R231: DEEIX empty = title first; soft-pedal rest */
+.welcome-desc {
+	display: none;
+}
+.ready-list {
+	display: none;
+}
+.ready-ok {
+	margin-top: 10px !important;
+	font-size: 12px !important;
+}
 </style>

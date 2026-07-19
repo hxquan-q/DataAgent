@@ -21,25 +21,15 @@
 				<template #drawer>
 					<div class="d-flex flex-column h-100">
 						<div class="pa-3 border-b border-white-5 brand-block">
-							<div class="d-flex align-center mb-3">
-								<v-avatar color="primary" size="36" class="mr-3 rounded-lg">
-									<v-icon icon="mdi-robot" color="white" size="22" />
-								</v-avatar>
-								<div>
-									<div class="text-subtitle-2 font-weight-medium brand-title">
-										DataAgent
-									</div>
-									<div class="text-caption font-weight-medium brand-subtitle">
-										AI DATA WORKSPACE
-									</div>
-								</div>
+							<div class="d-flex align-center justify-space-between mb-2 brand-row">
+								<div class="text-subtitle-2 font-weight-medium brand-title">管理后台</div>
 							</div>
 
 							<div class="agent-switcher-box">
 								<p
 									class="text-caption mb-2 font-weight-medium agent-switcher-label"
 								>
-									当前选择智能体
+									当前智能体
 								</p>
 								<v-select
 									v-model="selectedAgentId"
@@ -402,7 +392,9 @@
 						{{ currentRouteTitle }}
 					</div>
 					<v-spacer />
-					<span class="app-header-meta">Data Workspace</span>
+					<button type="button" class="header-back-chat" @click="goChatWorkspace">
+						返回问答
+					</button>
 				</template>
 
 				<slot />
@@ -557,6 +549,15 @@ function applyAgentToCurrentRoute(agentId: number, replace = false) {
 	} else {
 		router.push(target);
 	}
+}
+
+function goChatWorkspace() {
+	const id = selectedAgentId.value;
+	if (id) {
+		router.push({ path: '/chat', query: { agentId: String(id) } });
+		return;
+	}
+	router.push('/chat');
 }
 
 function navigateToPath(path: string) {
@@ -929,5 +930,30 @@ watch(
 	border-radius: 10px !important;
 	min-height: 36px !important;
 	letter-spacing: 0 !important;
+}
+
+.header-back-chat {
+	appearance: none;
+	border: 0.5px solid color-mix(in srgb, var(--da-primary) 28%, transparent);
+	background: transparent;
+	color: var(--da-primary);
+	border-radius: 999px;
+	min-height: 30px;
+	padding: 0 12px;
+	font: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
+	letter-spacing: 0;
+}
+.header-back-chat:hover {
+	background: var(--da-primary-soft);
+}
+.header-back-chat:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+.brand-row {
+	min-height: 28px;
 }
 </style>
