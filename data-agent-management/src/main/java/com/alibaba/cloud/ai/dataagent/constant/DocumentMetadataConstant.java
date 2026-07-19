@@ -15,41 +15,45 @@
  */
 package com.alibaba.cloud.ai.dataagent.constant;
 
-// Document中metadata中存储的key
+/**
+ * 文档元数据（Metadata）键名常量。
+ * <p>
+ * 定义存储在向量库文档 Metadata 中的标准键名，用于标识列信息、表信息、 知识 ID、业务术语等元数据。
+ */
 public final class DocumentMetadataConstant {
 
 	private DocumentMetadataConstant() {
 
 	}
 
-	// column
+	/** 列名称 */
 	public static final String COLUMN = "column";
 
-	// table
+	/** 表名称 */
 	public static final String TABLE = "table";
 
-	// name
+	/** 通用名称字段 */
 	public static final String NAME = "name";
 
-	// tableName
+	/** 表名（完整路径） */
 	public static final String TABLE_NAME = "tableName";
 
-	// vectorType
+	/** 向量化类型 */
 	public static final String VECTOR_TYPE = "vectorType";
 
-	// knowledgeId
+	/** 智能体知识 ID */
 	public static final String DB_AGENT_KNOWLEDGE_ID = "agentKnowledgeId";
 
-	// FAQ/DOCUMENT/QA
+	/** 知识具体类型（FAQ / DOCUMENT / QA） */
 	public static final String CONCRETE_AGENT_KNOWLEDGE_TYPE = "concreteAgentKnowledgeType";
 
-	// 智能体的知识
+	/** 标识该文档为智能体知识内容 */
 	public static final String AGENT_KNOWLEDGE = "agentKnowledge";
 
-	// businessTerm
+	/** 业务术语 */
 	public static final String BUSINESS_TERM = "businessTerm";
 
-	// businessTermId
+	/** 业务术语 ID */
 	public static final String DB_BUSINESS_TERM_ID = "businessTermId";
 
 }

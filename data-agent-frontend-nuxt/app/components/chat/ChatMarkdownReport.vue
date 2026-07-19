@@ -16,79 +16,16 @@
 
 <template>
 	<div class="markdown-report">
-		<!-- Header -->
-		<div class="report-header">
-			<div class="report-title">
-				<v-icon color="primary" size="18" class="mr-2"
-					>mdi-file-document-outline</v-icon
-				>
-				<span>报告已生成</span>
-				<v-btn-toggle
-					v-model="format"
-					mandatory
-					density="compact"
-					class="format-toggle ml-3"
-				>
-					<v-btn value="markdown" size="x-small" variant="text" class="fmt-btn"
-						>Markdown</v-btn
-					>
-					<v-btn value="html" size="x-small" variant="text" class="fmt-btn"
-						>HTML</v-btn
-					>
-				</v-btn-toggle>
-			</div>
-			<div class="report-actions">
-				<v-btn
-					size="x-small"
-					variant="outlined"
-					prepend-icon="mdi-download"
-					title="下载 MD"
-					@click="downloadMd"
-				>
-					MD
-				</v-btn>
-				<v-btn
-					size="x-small"
-					variant="outlined"
-					color="success"
-					prepend-icon="mdi-download"
-					title="下载 HTML"
-					@click="downloadHtml"
-				>
-					HTML
-				</v-btn>
-				<v-btn
-					size="x-small"
-					variant="outlined"
-					color="primary"
-					icon="mdi-fullscreen"
-					title="全屏查看"
-					@click="store.openReportFullscreen(content)"
-				/>
-			</div>
-		</div>
-
-		<!-- Body -->
-		<div ref="reportBodyRef" class="report-body">
-			<div
-				v-if="format === 'markdown'"
-				class="markdown-body"
-				v-html="renderedContent"
-			/>
-			<iframe
-				v-else
-				ref="htmlIframeRef"
-				class="html-iframe"
-				sandbox="allow-scripts"
-				title="HTML报告预览"
-			/>
+		<!-- MD only — no chrome -->
+		<div ref="reportBodyRef" class="report-body report-body--bare">
+			<div class="markdown-body" v-html="renderedContent" />
 		</div>
 
 		<!-- Fullscreen dialog -->
 		<v-dialog v-model="store.showReportFullscreen" fullscreen>
 			<v-card>
-				<v-toolbar density="compact" color="white" border="b">
-					<v-toolbar-title class="text-body-2 font-weight-bold">
+				<v-toolbar density="compact" color="surface" border="b" class="report-fullscreen-toolbar">
+					<v-toolbar-title class="text-body-2 font-weight-medium">
 						{{
 							store.reportFormat === 'markdown' ? 'Markdown 报告' : 'HTML 报告'
 						}}
@@ -120,7 +57,7 @@
 					</v-btn>
 				</v-toolbar>
 				<v-card-text
-					style="height: calc(100vh - 64px); overflow-y: auto; padding: 24px"
+					class="report-fullscreen-body"
 				>
 					<div
 						v-if="store.reportFormat === 'markdown'"
@@ -144,6 +81,7 @@
 import { ref, computed, watch, nextTick } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
+import { transformTableTagsInHtml } from '~/utils/tableTag';
 import { buildReportHtml } from '~/utils/report-html-template';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
 import { useChatStore } from '~/stores/chat';
@@ -158,10 +96,16 @@ const { renderECharts } = useEchartsRenderer();
 
 function renderMarkdown(md: string): string {
 	if (!md) return '';
-	return DOMPurify.sanitize(renderMarkdownContent(md), {
-		ADD_TAGS: ['div'],
-		ADD_ATTR: ['style', 'class', 'data-echarts-config'],
-	});
+	// 1) markdown → HTML（html:false，标记 [table::xxx] 作为纯文本保留在文本节点中）
+	// 2) 将文本节点中的 [table::tableName] 转为 <span class="table-tag">（表名已转义）
+	// 3) DOMPurify 消毒（默认允许 span + class，table-tag 可通过）
+	return DOMPurify.sanitize(
+		transformTableTagsInHtml(renderMarkdownContent(md)),
+		{
+			ADD_TAGS: ['div'],
+			ADD_ATTR: ['style', 'class', 'data-echarts-config'],
+		},
+	);
 }
 
 function loadHtmlToIframe(
@@ -171,7 +115,7 @@ function loadHtmlToIframe(
 	if (!iframe) return;
 	if (!markdownContent) {
 		iframe.srcdoc =
-			'<html><body style="padding:20px;color:#666;">暂无报告内容</body></html>';
+			'<html><body style="padding:16px;color:var(--da-muted);">暂无报告内容</body></html>';
 		return;
 	}
 	const html = buildReportHtml(markdownContent);
@@ -240,32 +184,54 @@ async function downloadHtml() {
 
 <style scoped>
 .markdown-report {
-	background: white;
+	background: transparent;
 }
 
-/* ── Header ──────────────────────────────────────────────────────────────────── */
+/* ── Header (quiet chrome — answer content is primary) ───────────────────────── */
 .report-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 10px 14px;
-	background: #f8fafc;
-	border-bottom: 1px solid #e8edf2;
+	padding: 0 0 6px;
+	background: transparent;
+	border-bottom: none;
 	flex-wrap: wrap;
-	gap: 8px;
+	gap: 6px;
+	opacity: 0.55;
+	transition: opacity var(--da-dur-fast) var(--da-ease-out);
+}
+.report-header:hover,
+.report-header:focus-within {
+	opacity: 1;
+}
+.report-header--quiet .report-title {
+	font-size: 11.5px;
 }
 .report-title {
 	display: flex;
 	align-items: center;
-	font-size: 13.5px;
+	font-size: 12.5px;
+	font-weight: 500;
+	color: var(--da-muted);
+	gap: 4px;
+	flex-wrap: wrap;
+	min-width: 0;
+}
+.report-title > span {
+	letter-spacing: -0.01em;
+	color: var(--da-ink);
 	font-weight: 600;
-	color: #1e293b;
-	gap: 0;
 }
 .report-actions {
 	display: flex;
 	align-items: center;
 	gap: 6px;
+	flex-wrap: wrap;
+}
+.report-action-btn {
+	border-radius: 999px !important;
+	letter-spacing: 0 !important;
+	min-height: 28px !important;
 }
 
 .report-actions :deep(.v-btn) {
@@ -275,20 +241,26 @@ async function downloadHtml() {
 
 /* ── Format toggle ───────────────────────────────────────────────────────────── */
 .format-toggle {
-	border: 1px solid #e2e8f0;
-	border-radius: 6px;
+	border: 1px solid var(--da-line-soft);
+	border-radius: 999px;
 	overflow: hidden;
+	background: var(--da-surface-soft);
+	padding: 2px;
 }
 
 .fmt-btn {
 	text-transform: none !important;
 	letter-spacing: 0 !important;
 	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	border-radius: 999px !important;
+	min-height: 28px !important;
 }
+
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .report-body {
-	padding: 16px;
+	padding: 4px 0 8px;
 }
 .html-iframe {
 	display: block;
@@ -297,53 +269,68 @@ async function downloadHtml() {
 	border: none;
 }
 
-/* ── Markdown body ───────────────────────────────────────────────────────────── */
+/* ── Markdown body (DEEIX chat-font prose) ───────────────────────────────────── */
+.markdown-body {
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	letter-spacing: -0.01em;
+}
 .markdown-body :deep(h1),
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
-	font-weight: 700;
-	margin: 14px 0 6px;
-	color: #0f172a;
+	font-family: var(--da-font-display);
+	font-weight: 500;
+	margin: 1.1em 0 0.4em;
+	color: var(--da-ink);
+	letter-spacing: -0.02em;
+	line-height: 1.3;
 }
 .markdown-body :deep(h1) {
-	font-size: 20px;
+	font-size: 1.35em;
 }
 .markdown-body :deep(h2) {
-	font-size: 17px;
+	font-size: 1.2em;
 }
 .markdown-body :deep(h3) {
-	font-size: 15px;
+	font-size: 1.08em;
 }
 .markdown-body :deep(p) {
-	margin-bottom: 10px;
-	line-height: 1.75;
-	color: #374151;
-	font-size: 14px;
+	margin: 0 0 0.75em;
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	font-size: inherit;
 }
 .markdown-body :deep(ul),
 .markdown-body :deep(ol) {
-	padding-left: 22px;
-	margin-bottom: 10px;
+	padding-left: 1.35em;
+	margin: 0 0 0.75em;
 }
 .markdown-body :deep(li) {
-	line-height: 1.7;
-	font-size: 14px;
-	color: #374151;
+	line-height: var(--da-chat-line-height, 1.75);
+	font-size: inherit;
+	color: var(--da-ink);
+	margin-bottom: 0.2em;
 }
 .markdown-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
-	border: 1px solid #e1e4e8;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	padding: 2px 5px;
-	border-radius: 3px;
+	border-radius: var(--da-radius-sm);
 	font-size: 12.5px;
-	color: #e83e8c;
+	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .markdown-body :deep(table) {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 	margin: 10px 0;
-	display: block;
-	overflow-x: auto;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .markdown-body :deep(thead) {
 	display: table-header-group;
@@ -353,86 +340,90 @@ async function downloadHtml() {
 }
 .markdown-body :deep(tr) {
 	display: table-row;
-	border-top: 1px solid #c6cbd1;
+	border-top: 1px solid var(--da-line);
 }
 .markdown-body :deep(th) {
 	display: table-cell;
-	background: #f1f5f9;
-	padding: 8px 12px;
-	border: 1px solid #e2e8f0;
+	background: var(--da-surface-soft);
+	padding: 5px 8px;
+	border: 1px solid var(--da-line-soft);
 	font-weight: 600;
 	font-size: 13px;
 	text-align: left;
 }
 .markdown-body :deep(td) {
 	display: table-cell;
-	padding: 8px 12px;
-	border: 1px solid #e8edf2;
+	padding: 6px 10px;
+	border: 1px solid var(--da-line-soft);
 	font-size: 13px;
 }
 .markdown-body :deep(tr:nth-child(even) td) {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 }
 .markdown-body :deep(blockquote) {
-	border-left: 3px solid #3b82f6;
+	border-left: 3px solid var(--da-accent);
 	padding: 8px 14px;
 	margin-left: 0;
-	background: #eff6ff;
+	background: var(--da-primary-soft);
 	border-radius: 0 6px 6px 0;
-	color: #374151;
+	color: var(--da-ink);
 }
 
 /* ── Code block with header ─────────────────────────────────────────────────── */
 .markdown-body :deep(.code-block-wrapper) {
 	margin: 10px 0;
-	border: 1px solid #e1e4e8;
-	border-radius: 6px;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
 	overflow: auto;
-	background: #f6f8fa;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .markdown-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: #f6f8fa;
-	padding: 6px 10px;
-	border-bottom: 1px solid #e1e4e8;
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface-soft));
+	padding: 7px 12px;
+	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
 .markdown-body :deep(.code-language) {
-	color: #6a737d;
+	color: var(--da-muted);
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	font-size: 10px;
 	text-transform: uppercase;
 }
 .markdown-body :deep(.code-copy-button) {
-	background: transparent;
-	border: 1px solid #d1d5da;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
 	padding: 3px 10px;
-	border-radius: 4px;
+	border-radius: 999px;
 	font-size: 10px;
+	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s;
-	color: #24292e;
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out);
+	color: var(--da-ink);
 }
 .markdown-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
-	border-color: #c6cbd1;
+	background: var(--da-primary-soft);
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	color: var(--da-primary);
 }
 .markdown-body :deep(.code-copy-button.copied) {
-	background: #28a745;
-	border-color: #28a745;
-	color: white;
+	background: var(--da-success);
+	border-color: var(--da-success);
+	color: var(--da-on-primary, #fff);
 }
 .markdown-body :deep(pre.hljs) {
 	margin: 0;
-	padding: 10px;
+	padding: 12px 14px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: #f6f8fa;
-	font-size: 12px;
-	line-height: 1.4;
+	background: var(--da-surface-soft);
+	font-size: 13px;
+	line-height: 1.55;
 	white-space: pre;
 }
 .markdown-body :deep(pre.hljs code) {
@@ -441,7 +432,7 @@ async function downloadHtml() {
 	margin: 0;
 	background: transparent;
 	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	color: inherit;
 	white-space: pre;
 	min-width: max-content;
@@ -450,7 +441,7 @@ async function downloadHtml() {
 /* ── ECharts containers ─────────────────────────────────────────────────────── */
 :deep(.md-echarts) {
 	margin: 10px 0;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 }
 
 /* ── ECharts skeleton placeholder ──────────────────────────────────────────── */
@@ -461,17 +452,26 @@ async function downloadHtml() {
 	gap: 10px;
 	margin: 10px 0;
 	height: 120px;
-	border-radius: 8px;
-	border: 1px dashed #cbd5e1;
-	background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
+	border-radius: var(--da-radius-md);
+	border: 1px dashed var(--da-line);
+	background: linear-gradient(90deg, var(--da-surface-soft) 25%, var(--da-surface-soft) 50%, var(--da-surface-soft) 75%);
 	background-size: 200% 100%;
 	animation: skeletonShimmer 1.6s ease-in-out infinite;
-	color: #94a3b8;
+	color: var(--da-muted);
 	font-size: 13px;
 }
 :deep(.md-echarts-skeleton-icon) {
-	font-size: 22px;
-	animation: spinPulse 1.6s ease-in-out infinite;
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--da-line);
+	border-top-color: var(--da-accent);
+	border-radius: 50%;
+	animation: skeletonSpin 0.8s linear infinite;
+}
+@keyframes skeletonSpin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 :deep(.md-echarts-skeleton-text) {
 	font-weight: 500;
@@ -495,5 +495,93 @@ async function downloadHtml() {
 		opacity: 0.5;
 		transform: scale(0.9);
 	}
+}
+
+/* Arceage-inspired header accent */
+.markdown-report {
+	background: var(--da-surface);
+}
+.report-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 4px 0 8px;
+	background: transparent;
+	border-bottom: none;
+	flex-wrap: wrap;
+	gap: 6px;
+	opacity: 0.9;
+}
+.report-hairline {
+	height: 1px;
+	margin: 0;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		color-mix(in srgb, var(--da-primary) 35%, var(--da-line-soft)) 20%,
+		color-mix(in srgb, var(--da-primary) 35%, var(--da-line-soft)) 80%,
+		transparent 100%
+	);
+}
+.report-title span {
+	letter-spacing: -0.01em;
+	font-weight: 600;
+}
+.report-body {
+	/* keep existing; soft top pad via hairline separation */
+}
+
+@media (prefers-reduced-motion: reduce) {
+	* {
+		animation: none !important;
+	}
+}
+
+/* R8 tokens */
+.markdown-body :deep(h1),
+.markdown-body :deep(h2),
+.markdown-body :deep(h3) {
+	color: var(--da-ink);
+}
+.markdown-body :deep(p),
+.markdown-body :deep(li) {
+	color: var(--da-ink);
+	letter-spacing: -0.01em;
+}
+
+.report-actions :deep(.v-btn) {
+	min-width: 28px !important;
+	height: 28px !important;
+}
+.report-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 4px 0 8px;
+	background: transparent;
+	border-bottom: none;
+	flex-wrap: wrap;
+	gap: 6px;
+	opacity: 0.9;
+}
+
+.report-fullscreen-toolbar {
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface)) !important;
+	border-bottom: 1px solid var(--da-line-soft) !important;
+}
+.report-fullscreen-body {
+	height: calc(100vh - 64px);
+	overflow-y: auto;
+	padding: 20px 22px;
+	background: var(--da-surface-soft);
+}
+
+/* R231: demote report chrome */
+.report-hairline { display: none !important; }
+.report-title > span { font-weight: 500 !important; color: var(--da-muted) !important; }
+.report-action-btn {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
 }
 </style>

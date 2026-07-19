@@ -1,17 +1,28 @@
+# ===== Build =====
 target/
+.flattened-pom.xml
+**/checkstyle-report.xml
 
-### IntelliJ IDEA ###
+# ===== Node / Nuxt =====
+**/node_modules
+data-agent-frontend-nuxt/dist
+data-agent-frontend-nuxt/dist/
+data-agent-frontend-nuxt/.output/
+data-agent-frontend-nuxt/.nuxt/
+
+# ===== IDE / OS =====
 .idea/*
 **/.idea/*
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/LocalCodeIndex/
 *.iws
 *.iml
 *.ipr
-
-### Eclipse ###
+.vscode/
+.DS_Store
 .apt_generated
 .classpath
 .factorypath
@@ -20,45 +31,42 @@ target/
 .springBeans
 .sts4-cache
 
-### VS Code ###
-.vscode/
-
-### Mac OS ###
-.DS_Store
-
-### .env files contain local environment variables ###
+# ===== Env / secrets =====
 .env
+.java-version
+docs/.db.env
+docs/data/
 
-# Maven ignore
-.flattened-pom.xml
-
-# node_modules
-**/node_modules
-
-
-# windows os
-/extensions/
-/h2-data/
-
-# checkstyle report files
-**/checkstyle-report.xml
-**/logs/*
-
-# SpecStory files - ignore entire .specstory directory
-.specstory/
-.specstory/.what-is-this.md
-.specstory/history/*
-
-# MCP configuration files
-modified_mcp_config.json
-.cursorindexingignore
-
-# ignore code copilot local index
-.idea/LocalCodeIndex/
-
+# ===== Runtime / local data (never core) =====
 uploads/*
 vectorstore/*
-.java-version
+**/vectorstore/
+logs/
+log/
+**/logs/*
+backups/
+data/
+h2-data/
+/extensions/
 
-# spring-ai-alibaba source
+# ===== Agent / tool local state =====
+.agent/
+.agents/
+.cursor/
+.codex/
+.claude/
+.ccg/
+.serena/
+.zcode/
+.m2-local/
+.specstory/
+.cursorindexingignore
+modified_mcp_config.json
+CLAUDE.md
+AGENTS.md
+
+# ===== Machine-local paths =====
+**/rebel.xml
+
+# ===== Vendor / third-party source dumps =====
 spring-ai-alibaba-1.1.0.0/

@@ -20,24 +20,36 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 数据库列信息业务对象。
+ * <p>
+ * 描述数据库表中单列的元数据信息，包括列名、所属表名、数据类型、 是否为主键、是否非空，以及采样数据等。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ColumnInfoBO {
 
+	/** 列名称 */
 	private String name;
 
+	/** 所属表名 */
 	private String tableName;
 
+	/** 列描述/注释 */
 	private String description;
 
+	/** 列数据类型 */
 	private String type;
 
+	/** 是否为主键 */
 	private boolean primary;
 
+	/** 是否非空 */
 	private boolean notnull;
 
+	/** 采样数据（JSON 字符串） */
 	private String samples;
 
 }

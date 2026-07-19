@@ -16,19 +16,14 @@
 
 <template>
 	<section class="page-shell">
-		<header class="d-flex align-center justify-space-between mb-8">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1" style="color: #1565c0">
-					智能体知识库
-				</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					维护智能体专属知识资源，支持文档上传、问答配置与向量召回。
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+		<KnowledgePageHeader
+			title="智能体知识库"
+			subtitle="维护智能体专属知识资源，支持文档上传、问答配置与向量召回。"
+		>
+			<template #actions>
 				<v-btn
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -37,16 +32,18 @@
 					刷新
 				</v-btn>
 				<v-btn
-					:color="filterVisible ? 'blue-darken-1' : 'blue-grey-lighten-1'"
+					:color="filterVisible ? 'primary' : undefined"
+					:variant="filterVisible ? 'flat' : 'outlined'"
 					prepend-icon="mdi-filter-variant"
 					class="text-none px-6"
 					elevation="0"
+					style="border-color: var(--da-line-soft)"
 					@click="toggleFilter"
 				>
 					筛选
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -54,10 +51,10 @@
 				>
 					添加知识
 				</v-btn>
-			</div>
-		</header>
+			</template>
+		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="queryParams.title"
@@ -74,7 +71,7 @@
 				/>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -86,7 +83,7 @@
 				<div
 					v-show="filterVisible"
 					class="mt-4 pt-4"
-					style="border-top: 1px solid #e2e8f0"
+					style="border-top: 1px solid var(--da-line-soft)"
 				>
 					<div class="d-flex flex-wrap ga-3">
 						<v-select
@@ -191,7 +188,7 @@
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.isRecall="{ item }">
 					<v-chip
-						:color="item.isRecall ? 'blue-darken-1' : 'grey'"
+						:color="item.isRecall ? 'primary' : 'grey'"
 						size="small"
 						variant="tonal"
 					>
@@ -205,7 +202,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-cog"
 							@click="editKnowledge(item)"
 						/>
@@ -213,7 +210,7 @@
 							v-if="item.embeddingStatus === 'FAILED'"
 							size="small"
 							variant="text"
-							color="orange-darken-1"
+							color="warning"
 							icon="mdi-reload"
 							:loading="
 								item.id !== undefined ? retryLoadingMap[item.id] : false
@@ -223,7 +220,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.isRecall ? 'grey-darken-1' : 'blue-darken-1'"
+							:color="item.isRecall ? 'grey' : 'primary'"
 							:icon="item.isRecall ? 'mdi-bookmark-off' : 'mdi-bookmark-plus'"
 							@click="toggleStatus(item)"
 						>
@@ -234,7 +231,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteKnowledge(item)"
 						/>
@@ -242,19 +239,14 @@
 				</template>
 
 				<template #no-data>
-					<div class="d-flex flex-column align-center py-12">
-						<v-icon
-							icon="mdi-brain"
-							size="64"
-							color="blue-lighten-3"
-							class="mb-4"
-						/>
-						<p class="text-body-1 text-medium-emphasis mb-2">暂无智能体知识</p>
-						<p class="text-body-2 text-disabled mb-6">
-							点击「添加知识」为智能体补充知识资源
-						</p>
+					<div class="d-flex flex-column align-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-brain" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无智能体知识</h3>
+						<p class="da-empty__desc">点击「添加知识」为智能体补充知识资源</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -268,7 +260,7 @@
 
 			<div
 				class="d-flex align-center justify-end ga-4 px-4 py-4"
-				style="border-top: 1px solid #e2e8f0"
+				style="border-top: 1px solid var(--da-line-soft)"
 			>
 				<v-select
 					:model-value="queryParams.pageSize"
@@ -283,7 +275,7 @@
 					:model-value="queryParams.pageNum"
 					:length="totalPages"
 					density="comfortable"
-					color="blue-darken-2"
+					color="primary"
 					@update:model-value="handleCurrentChange"
 				/>
 			</div>
@@ -291,14 +283,14 @@
 
 		<v-dialog v-model="dialogVisible" max-width="820" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑知识' : '添加新知识'
 					}}</span>
 					<v-spacer />
@@ -311,10 +303,10 @@
 				</v-card-title>
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								知识类型 <span class="text-error">*</span>
 							</p>
 							<v-select
@@ -363,7 +355,7 @@
 						</v-alert>
 
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								知识标题 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -379,7 +371,7 @@
 						<div v-if="knowledgeForm.type === 'DOCUMENT'" class="mb-5">
 							<p
 								v-if="!isEdit"
-								class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+								class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 							>
 								分块策略
 							</p>
@@ -418,7 +410,7 @@
 						>
 							<div class="mb-5">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									问题 <span class="text-error">*</span>
 								</p>
@@ -440,7 +432,7 @@
 							</div>
 							<div class="mb-2">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									答案 <span class="text-error">*</span>
 								</p>
@@ -470,7 +462,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -665,11 +657,11 @@ function getTypeLabel(type?: string) {
 function getTypeColor(type?: string) {
 	switch (type) {
 		case 'DOCUMENT':
-			return 'blue-darken-1';
+			return 'primary';
 		case 'QA':
-			return 'indigo';
+			return 'primary';
 		case 'FAQ':
-			return 'cyan-darken-1';
+			return 'info';
 		default:
 			return 'grey';
 	}
@@ -680,7 +672,7 @@ function getEmbeddingStatusColor(status?: string) {
 		case 'COMPLETED':
 			return 'success';
 		case 'PROCESSING':
-			return 'blue-darken-1';
+			return 'primary';
 		case 'FAILED':
 			return 'error';
 		case 'PENDING':

@@ -22,21 +22,36 @@ import lombok.extern.slf4j.Slf4j;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
+ * 语义一致性校验分发器，根据语义一致性校验结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>校验通过：进入 SQL 执行节点</li>
+ * <li>校验未通过：返回 SQL 生成节点重新生成</li>
+ * </ul>
+ * </p>
+ *
  * @author zhangshenghang
  */
 @Slf4j
 public class SemanticConsistenceDispatcher implements EdgeAction {
 
+	/**
+	 * 根据语义一致性校验结果决定下一个节点。
+	 * @param state 工作流全局状态，包含语义一致性校验结果
+	 * @return 下一个节点名称：{@value SQL_EXECUTE_NODE} 或 {@value SQL_GENERATE_NODE}
+	 */
 	@Override
 	public String apply(OverAllState state) {
 		Boolean validate = (Boolean) state.value(SEMANTIC_CONSISTENCY_NODE_OUTPUT).orElse(false);
 		log.info("语义一致性校验结果: {}，跳转节点配置", validate);
 		if (validate) {
-			log.info("语义一致性校验通过，跳转到SQL运行节点。");
+			log.info("语义一致性校验通过，跳转到 SQL 执行节点。");
 			return SQL_EXECUTE_NODE;
 		}
 		else {
-			log.info("语义一致性校验未通过，跳转到SQL生成节点。");
+			log.info("语义一致性校验未通过，跳转到 SQL 生成节点。");
 			return SQL_GENERATE_NODE;
 		}
 	}

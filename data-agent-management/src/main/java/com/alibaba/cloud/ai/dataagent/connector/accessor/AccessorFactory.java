@@ -25,26 +25,52 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 访问器工厂，根据数据库配置和类型管理获取对应的数据访问器实现。
+ * <p>
+ * Spring 启动时自动注入所有 {@link Accessor} 实现并注册。
+ * </p>
+ *
  * @author vlsmb
  * @since 2025/9/27
  */
 @Component
 public class AccessorFactory {
 
+	/** 访问器映射表，键为访问器类型 */
+	private final Map<String, Accessor> accessorMap = new ConcurrentHashMap<>();
+
+	/**
+	 * 构造函数，由 Spring 自动注入所有访问器实现并注册。
+	 * @param accessors 所有访问器实现列表
+	 */
 	public AccessorFactory(List<Accessor> accessors) {
 		accessors.forEach(this::register);
 	}
 
-	private final Map<String, Accessor> accessorMap = new ConcurrentHashMap<>();
-
+	/**
+	 * 注册一个数据访问器。
+	 * @param accessor 待注册的访问器
+	 */
 	public void register(Accessor accessor) {
 		accessorMap.put(accessor.getAccessorType(), accessor);
 	}
 
+	/**
+	 * 判断指定类型的访问器是否已注册。
+	 * @param type 数据源类型
+	 * @return 是否已注册
+	 */
 	public boolean isRegistered(String type) {
 		return accessorMap.containsKey(type);
 	}
 
+	/**
+	 * 根据数据库配置获取对应的访问器。
+	 * @param dbConfig 数据库配置信息
+	 * @return 对应的访问器
+	 * @throws IllegalArgumentException 数据库配置为空
+	 * @throws IllegalStateException 未找到匹配的方言访问器
+	 */
 	public Accessor getAccessorByDbConfig(DbConfigBO dbConfig) {
 		if (dbConfig == null) {
 			throw new IllegalArgumentException("dbConfig cannot be null");
@@ -58,6 +84,12 @@ public class AccessorFactory {
 		return getAccessorByDbTypeEnum(typeEnum);
 	}
 
+	/**
+	 * 根据数据源类型枚举获取对应的访问器。
+	 * @param typeEnum 数据源类型枚举
+	 * @return 对应的访问器
+	 * @throws IllegalStateException 未找到匹配的访问器
+	 */
 	// todo: 写一层缓存
 	public Accessor getAccessorByDbTypeEnum(BizDataSourceTypeEnum typeEnum) {
 		return accessorMap.values()
@@ -67,6 +99,11 @@ public class AccessorFactory {
 			.orElseThrow(() -> new IllegalStateException("no accessor registered for dialect: " + typeEnum));
 	}
 
+	/**
+	 * 根据类型名称获取对应的访问器。
+	 * @param type 访问器类型名称
+	 * @return 对应的访问器，未找到返回 null
+	 */
 	public Accessor getAccessorByType(String type) {
 		return accessorMap.get(type);
 	}

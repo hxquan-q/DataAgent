@@ -20,25 +20,28 @@
 		max-width="400"
 		@update:model-value="$emit('update:modelValue', $event)"
 	>
-		<v-card :prepend-icon="prependIcon" :title="title">
+		<v-card rounded="lg" class="da-confirm-card" :prepend-icon="prependIcon" :title="title">
 			<v-card-text style="white-space: pre-line">{{ message }}</v-card-text>
-			<v-card-actions>
+			<v-card-actions class="px-4 pb-4">
 				<v-spacer></v-spacer>
 				<v-btn
-					text="取消"
-					variant="plain"
+					class="text-none"
+					variant="text"
 					@click="$emit('update:modelValue', false)"
-				></v-btn>
-				<!-- 子组件传入事件 -->
+				>
+					取消
+				</v-btn>
 				<v-btn
 					color="primary"
-					:text="confirmText"
-					variant="tonal"
+					class="text-none px-5"
+					variant="flat"
 					@click="
 						$emit('confirm');
 						$emit('update:modelValue', false);
 					"
-				></v-btn>
+				>
+					{{ confirmText }}
+				</v-btn>
 			</v-card-actions>
 		</v-card>
 	</v-dialog>
@@ -74,3 +77,14 @@ defineEmits<{
 	confirm: [];
 }>();
 </script>
+
+<style scoped>
+.da-confirm-card :deep(.v-card-title) {
+	font-family: var(--da-font-display);
+	font-weight: 500;
+	letter-spacing: -0.01em;
+}
+.da-confirm-card :deep(.v-card-actions .v-btn) {
+	border-radius: 10px;
+}
+</style>

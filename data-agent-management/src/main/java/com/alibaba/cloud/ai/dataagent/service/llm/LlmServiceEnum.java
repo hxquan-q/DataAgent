@@ -15,8 +15,14 @@
  */
 package com.alibaba.cloud.ai.dataagent.service.llm;
 
+/**
+ * LLM 服务类型枚举，区分阻塞式调用和流式调用两种模式。
+ */
 public enum LlmServiceEnum {
 
-	BLOCK, STREAM
+	/** 阻塞式调用模式，等待完整响应后返回 */
+	BLOCK,
+	/** 流式调用模式，逐步返回响应内容 */
+	STREAM
 
 }

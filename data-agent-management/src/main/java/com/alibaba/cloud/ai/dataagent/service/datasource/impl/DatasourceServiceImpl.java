@@ -47,53 +47,91 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 // todo: 检查Mapper的返回值，判断是否执行成功（或者对Mapper进行AOP）
+/**
+ * 数据源管理服务实现类，提供数据源增删改查、连接测试、表与字段查询、 逻辑外键管理等功能的完整实现。
+ *
+ * <p>
+ * 通过 {@link DatasourceTypeHandlerRegistry} 实现多数据库类型适配， 通过 {@link AccessorFactory} 和
+ * {@link DBConnectionPoolFactory} 管理数据库访问器与连接池。
+ * </p>
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class DatasourceServiceImpl implements DatasourceService {
 
+	/** 数据源数据访问层 */
 	private final DatasourceMapper datasourceMapper;
 
+	/** Agent 数据源关联数据访问层 */
 	private final AgentDatasourceMapper agentDatasourceMapper;
 
+	/** 逻辑外键数据访问层 */
 	private final LogicalRelationMapper logicalRelationMapper;
 
+	/** 数据库连接池工厂 */
 	private final DBConnectionPoolFactory poolFactory;
 
+	/** 数据库访问器工厂 */
 	private final AccessorFactory accessorFactory;
 
+	/** 数据源类型处理器注册中心 */
 	private final DatasourceTypeHandlerRegistry datasourceTypeHandlerRegistry;
 
+	/**
+	 * 获取全部数据源列表。
+	 * @return 数据源列表
+	 */
 	@Override
 	public List<Datasource> getAllDatasource() {
 		return datasourceMapper.selectAll();
 	}
 
+	/**
+	 * 根据状态获取数据源列表。
+	 * @param status 数据源状态
+	 * @return 符合状态的数据源列表
+	 */
 	@Override
 	public List<Datasource> getDatasourceByStatus(String status) {
 		return datasourceMapper.selectByStatus(status);
 	}
 
+	/**
+	 * 根据类型获取数据源列表。
+	 * @param type 数据源类型
+	 * @return 符合类型的数据源列表
+	 */
 	@Override
 	public List<Datasource> getDatasourceByType(String type) {
 		return datasourceMapper.selectByType(type);
 	}
 
+	/**
+	 * 根据主键 ID 获取数据源详情。
+	 * @param id 数据源主键 ID
+	 * @return 数据源对象，不存在时返回 null
+	 */
 	@Override
 	public Datasource getDatasourceById(Integer id) {
 		return datasourceMapper.selectById(id);
 	}
 
+	/**
+	 * 创建数据源，通过类型处理器生成连接 URL 并设置默认状态值。
+	 * @param datasource 待创建的数据源对象
+	 * @return 创建后的数据源对象
+	 */
 	@Override
 	public Datasource createDatasource(Datasource datasource) {
-		// Generate connection URL
+		// 通过类型处理器生成连接 URL
 		DatasourceTypeHandler handler = datasourceTypeHandlerRegistry.getRequired(datasource.getType());
 		String connectionUrl = handler.resolveConnectionUrl(datasource);
 		if (StringUtils.isNotBlank(connectionUrl)) {
 			datasource.setConnectionUrl(connectionUrl);
 		}
 
-		// Set default values
+		// 设置默认值
 		if (datasource.getStatus() == null) {
 			datasource.setStatus("active");
 		}
@@ -113,9 +151,15 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return datasource;
 	}
 
+	/**
+	 * 更新数据源，重新生成连接 URL 并在密码为空时保留原密码。
+	 * @param id 数据源主键 ID
+	 * @param datasource 待更新的数据源对象
+	 * @return 更新后的数据源对象
+	 */
 	@Override
 	public Datasource updateDatasource(Integer id, Datasource datasource) {
-		// Regenerate connection URL
+		// 重新生成连接 URL
 		DatasourceTypeHandler handler = datasourceTypeHandlerRegistry.getRequired(datasource.getType());
 		String connectionUrl = handler.resolveConnectionUrl(datasource);
 		if (StringUtils.isNotBlank(connectionUrl)) {
@@ -143,21 +187,35 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return datasource;
 	}
 
+	/**
+	 * 删除数据源，先清理与 Agent 的关联关系，再删除数据源记录。
+	 * @param id 数据源主键 ID
+	 */
 	@Override
 	@Transactional
 	public void deleteDatasource(Integer id) {
-		// First, delete the associations
+		// 先删除与 Agent 的关联关系
 		agentDatasourceMapper.deleteAllByDatasourceId(id);
 
-		// Then, delete the data source
+		// 再删除数据源本身
 		datasourceMapper.deleteById(id);
 	}
 
+	/**
+	 * 更新数据源的测试状态。
+	 * @param id 数据源主键 ID
+	 * @param testStatus 测试状态（success、failed、unknown）
+	 */
 	@Override
 	public void updateTestStatus(Integer id, String testStatus) {
 		datasourceMapper.updateTestStatusById(id, testStatus);
 	}
 
+	/**
+	 * 测试数据源连接是否可用，并更新测试状态。
+	 * @param id 数据源主键 ID
+	 * @return 连接是否成功
+	 */
 	@Override
 	public boolean testConnection(Integer id) {
 		Datasource datasource = getDatasourceById(id);
@@ -165,10 +223,10 @@ public class DatasourceServiceImpl implements DatasourceService {
 			return false;
 		}
 		try {
-			// ping测试
+			// 执行 ping 连接测试
 			boolean connectionSuccess = realConnectionTest(datasource);
 			log.info(datasource.getName() + " test connection result: " + connectionSuccess);
-			// Update test status
+			// 根据测试结果更新测试状态
 			updateTestStatus(id, connectionSuccess ? "success" : "failed");
 
 			return connectionSuccess;
@@ -181,10 +239,12 @@ public class DatasourceServiceImpl implements DatasourceService {
 	}
 
 	/**
-	 * Actual connection test method
+	 * 实际的连接测试方法，通过连接池执行 ping 操作。
+	 * @param datasource 数据源实体
+	 * @return 连接是否成功
 	 */
 	private boolean realConnectionTest(Datasource datasource) {
-		// Convert Datasource to DbConfig
+		// 将数据源转换为数据库配置
 		DbConfigBO config = new DbConfigBO();
 		DatasourceTypeHandler handler = datasourceTypeHandlerRegistry.getRequired(datasource.getType());
 		String originalUrl = handler.resolveConnectionUrl(datasource);
@@ -196,6 +256,7 @@ public class DatasourceServiceImpl implements DatasourceService {
 		config.setUsername(datasource.getUsername());
 		config.setPassword(datasource.getPassword());
 
+		// 通过连接池执行 ping 测试
 		DBConnectionPool pool = poolFactory.getPoolByType(datasource.getType());
 		if (pool == null) {
 			return false;
@@ -206,13 +267,17 @@ public class DatasourceServiceImpl implements DatasourceService {
 
 	}
 
+	/**
+	 * 获取与 Agent 关联的数据源列表（已废弃，请使用 AgentDatasourceService）。
+	 * @param agentId Agent 主键 ID
+	 * @return Agent 关联的数据源列表
+	 */
 	@Override
 	@Deprecated
 	public List<AgentDatasource> getAgentDatasource(Long agentId) {
 		List<AgentDatasource> adentDatasources = agentDatasourceMapper.selectByAgentIdWithDatasource(agentId);
 
-		// Manually fill in the data source information (since MyBatis Plus does not
-		// directly support complex join query result mapping)
+		// 手动填充数据源信息（因为 MyBatis Plus 不直接支持复杂的关联查询结果映射）
 		for (AgentDatasource agentDatasource : adentDatasources) {
 			if (agentDatasource.getDatasourceId() != null) {
 				Datasource datasource = datasourceMapper.selectById(agentDatasource.getDatasourceId());
@@ -223,32 +288,38 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return adentDatasources;
 	}
 
+	/**
+	 * 获取数据源的表列表。
+	 * @param datasourceId 数据源主键 ID
+	 * @return 排序后的表名列表
+	 * @throws Exception 查询过程中发生异常时抛出
+	 */
 	@Override
 	public List<String> getDatasourceTables(Integer datasourceId) throws Exception {
 		log.info("Getting tables for datasource: {}", datasourceId);
 
-		// Get data source information
+		// 获取数据源信息
 		Datasource datasource = this.getDatasourceById(datasourceId);
 		if (datasource == null) {
 			throw new RuntimeException("Datasource not found with id: " + datasourceId);
 		}
 
-		// Create database configuration
+		// 创建数据库配置
 		DbConfigBO dbConfig = getDbConfig(datasource);
 
-		// Create query parameters
+		// 创建查询参数
 		DbQueryParameter queryParam = DbQueryParameter.from(dbConfig);
 
-		// 提取schema名称
+		// 提取 schema 名称
 		DatasourceTypeHandler handler = datasourceTypeHandlerRegistry.getRequired(datasource.getType());
 		String schemaName = handler.extractSchemaName(datasource);
 		queryParam.setSchema(schemaName);
 
-		// Query table list
+		// 查询表列表
 		Accessor dbAccessor = accessorFactory.getAccessorByDbConfig(dbConfig);
 		List<TableInfoBO> tableInfoList = dbAccessor.showTables(dbConfig, queryParam);
 
-		// Extract table names
+		// 提取并排序表名
 		List<String> tableNames = tableInfoList.stream()
 			.map(TableInfoBO::getName)
 			.filter(name -> name != null && !name.trim().isEmpty())
@@ -259,12 +330,24 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return tableNames;
 	}
 
+	/**
+	 * 根据数据源实体构建数据库配置对象。
+	 * @param datasource 数据源实体
+	 * @return 数据库配置对象
+	 */
 	@Override
 	public DbConfigBO getDbConfig(Datasource datasource) {
 		DatasourceTypeHandler handler = datasourceTypeHandlerRegistry.getRequired(datasource.getType());
 		return handler.toDbConfig(datasource);
 	}
 
+	/**
+	 * 获取数据源表的字段列表。
+	 * @param datasourceId 数据源主键 ID
+	 * @param tableName 表名
+	 * @return 排序后的字段名列表
+	 * @throws Exception 查询过程中发生异常时抛出
+	 */
 	@Override
 	public List<String> getTableColumns(Integer datasourceId, String tableName) throws Exception {
 		log.info("Getting columns for table: {} in datasource: {}", tableName, datasourceId);
@@ -281,7 +364,7 @@ public class DatasourceServiceImpl implements DatasourceService {
 		// 创建查询参数
 		DbQueryParameter queryParam = DbQueryParameter.from(dbConfig);
 
-		// 提取schema名称
+		// 提取 schema 名称
 		DatasourceTypeHandler handler = datasourceTypeHandlerRegistry.getRequired(datasource.getType());
 		String schemaName = handler.extractSchemaName(datasource);
 		queryParam.setSchema(schemaName);
@@ -289,7 +372,7 @@ public class DatasourceServiceImpl implements DatasourceService {
 
 		// 查询字段列表
 		Accessor dbAccessor = accessorFactory.getAccessorByDbConfig(dbConfig);
-		List<ColumnInfoBO> columnInfoList = dbAccessor.showColumns(dbConfig, queryParam); // 提取字段名称
+		List<ColumnInfoBO> columnInfoList = dbAccessor.showColumns(dbConfig, queryParam); // 提取并排序字段名
 		List<String> columnNames = columnInfoList.stream()
 			.map(ColumnInfoBO::getName)
 			.filter(name -> name != null && !name.trim().isEmpty())
@@ -300,12 +383,23 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return columnNames;
 	}
 
+	/**
+	 * 获取数据源的逻辑外键列表。
+	 * @param datasourceId 数据源主键 ID
+	 * @return 逻辑外键列表
+	 */
 	@Override
 	public List<LogicalRelation> getLogicalRelations(Integer datasourceId) {
 		log.info("Getting logical relations for datasource: {}", datasourceId);
 		return logicalRelationMapper.selectByDatasourceId(datasourceId);
 	}
 
+	/**
+	 * 添加逻辑外键，会先检查是否已存在相同的外键关系。
+	 * @param datasourceId 数据源主键 ID
+	 * @param logicalRelation 待添加的逻辑外键对象
+	 * @return 添加后的逻辑外键对象
+	 */
 	@Override
 	public LogicalRelation addLogicalRelation(Integer datasourceId, LogicalRelation logicalRelation) {
 		log.info("Adding logical relation for datasource: {}", datasourceId);
@@ -329,6 +423,13 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return logicalRelation;
 	}
 
+	/**
+	 * 更新逻辑外键，验证外键存在且归属正确后再更新。
+	 * @param datasourceId 数据源主键 ID
+	 * @param logicalRelationId 逻辑外键主键 ID
+	 * @param logicalRelation 待更新的逻辑外键对象
+	 * @return 更新后的逻辑外键对象
+	 */
 	@Override
 	public LogicalRelation updateLogicalRelation(Integer datasourceId, Integer logicalRelationId,
 			LogicalRelation logicalRelation) {
@@ -360,6 +461,11 @@ public class DatasourceServiceImpl implements DatasourceService {
 		return logicalRelationMapper.selectById(logicalRelationId);
 	}
 
+	/**
+	 * 删除逻辑外键，验证外键归属正确后再删除。
+	 * @param datasourceId 数据源主键 ID
+	 * @param logicalRelationId 逻辑外键主键 ID
+	 */
 	@Override
 	public void deleteLogicalRelation(Integer datasourceId, Integer logicalRelationId) {
 		log.info("Deleting logical relation: {} for datasource: {}", logicalRelationId, datasourceId);
@@ -383,6 +489,12 @@ public class DatasourceServiceImpl implements DatasourceService {
 		log.info("Logical relation deleted successfully: {}", logicalRelationId);
 	}
 
+	/**
+	 * 批量保存逻辑外键，删除不在传入列表中的旧记录，对传入列表去重后执行插入或更新。
+	 * @param datasourceId 数据源主键 ID
+	 * @param logicalRelations 待保存的逻辑外键列表
+	 * @return 保存后的逻辑外键列表
+	 */
 	@Override
 	@Transactional
 	public List<LogicalRelation> saveLogicalRelations(Integer datasourceId, List<LogicalRelation> logicalRelations) {

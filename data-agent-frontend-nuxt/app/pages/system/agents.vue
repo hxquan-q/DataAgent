@@ -15,28 +15,24 @@
  */
 
 <template>
-	<v-container fluid class="pa-8 agents-container">
-		<!-- Header Section -->
-		<header class="d-flex align-center justify-space-between mb-8">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">智能体管理</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					创建和管理您的AI智能体,让数据分析更智能
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+	<section class="page-shell agents-container">
+		<KnowledgePageHeader
+			title="智能体管理"
+			subtitle="创建、配置与发布问数智能体，管理绑定数据源与运行参数。"
+		>
+			<template #actions>
 				<v-btn
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
-					@click="loadAgents"
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
+					@click="loadAgents"
 				>
 					刷新
 				</v-btn>
 				<v-btn
-					color="black"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -44,11 +40,29 @@
 				>
 					新建智能体
 				</v-btn>
+			</template>
+		</KnowledgePageHeader>
+
+		
+		<!-- R181: global chat model readiness -->
+		<v-alert
+			v-if="modelReady === false"
+			type="warning"
+			variant="tonal"
+			border="start"
+			class="mb-4"
+			density="comfortable"
+		>
+			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
+				<span class="text-body-2">尚未激活对话模型，数据问答将无法生成回答。</span>
+				<v-btn size="small" color="warning" variant="flat" class="text-none" @click="goModelConfig">
+					去配置模型
+				</v-btn>
 			</div>
-		</header>
+		</v-alert>
 
 		<!-- Filter and Search Section -->
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 agents-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="searchKeyword"
@@ -69,25 +83,25 @@
 					mandatory
 					rounded="pill"
 					color="primary"
-					class="filter-toggle"
+					class="filter-toggle segmented-toggle"
 					density="comfortable"
 					variant="flat"
 				>
 					<v-btn value="all" variant="flat" class="px-6 text-none font-weight-medium">
 						全部智能体
-						<v-chip size="x-small" color="grey-lighten-3" class="ml-2">{{ agents.length }}</v-chip>
+						<v-chip size="x-small" color="grey" class="ml-2">{{ agents.length }}</v-chip>
 					</v-btn>
 					<v-btn value="published" variant="flat" class="px-6 text-none font-weight-medium">
 						已发布
-						<v-chip size="x-small" color="success-lighten-3" class="ml-2">{{ publishedCount }}</v-chip>
+						<v-chip size="x-small" color="success" class="ml-2">{{ publishedCount }}</v-chip>
 					</v-btn>
 					<v-btn value="draft" variant="flat" class="px-6 text-none font-weight-medium">
 						草稿
-						<v-chip size="x-small" color="warning-lighten-3" class="ml-2">{{ draftCount }}</v-chip>
+						<v-chip size="x-small" color="warning" class="ml-2">{{ draftCount }}</v-chip>
 					</v-btn>
 					<v-btn value="offline" variant="flat" class="px-6 text-none font-weight-medium">
 						已下线
-						<v-chip size="x-small" color="grey-lighten-3" class="ml-2">{{ offlineCount }}</v-chip>
+						<v-chip size="x-small" color="grey" class="ml-2">{{ offlineCount }}</v-chip>
 					</v-btn>
 				</v-btn-toggle>
 			</div>
@@ -106,7 +120,7 @@
 				<!-- ID Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.id="{ item }">
-					<span class="text-body-2 font-weight-medium text-grey-darken-2">{{ item.id }}</span>
+					<span class="text-body-2 font-weight-medium text-medium-emphasis">{{ item.id }}</span>
 				</template>
 
 				<!-- Avatar + Name Column -->
@@ -118,7 +132,9 @@
 							<span v-else class="text-caption">{{ getInitials(item.name) }}</span>
 						</v-avatar>
 						<div>
-							<div class="text-subtitle-2 font-weight-bold">{{ item.name }}</div>
+							<button type="button" class="agent-name-link text-subtitle-2 font-weight-bold" @click="goChat(item)">
+								{{ item.name }}
+							</button>
 							<div class="text-caption text-medium-emphasis">{{ item.category || '未分类' }}</div>
 						</div>
 					</div>
@@ -127,7 +143,7 @@
 				<!-- Description Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.description="{ item }">
-					<div class="text-body-2 text-grey-darken-1" style="max-width: 300px;">
+					<div class="text-body-2 text-medium-emphasis" style="max-width: 300px;">
 						{{ item.description || '暂无描述' }}
 					</div>
 				</template>
@@ -141,7 +157,7 @@
 								v-for="(tag, index) in parseTags(item.tags).slice(0, 4)"
 								:key="index"
 								size="small"
-								color="blue"
+								color="primary"
 								variant="tonal"
 							>
 								{{ tag }}
@@ -172,18 +188,48 @@
 				<!-- Create Time Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.createTime="{ item }">
-					<span class="text-body-2 text-grey-darken-1">{{ formatTime(item.createTime) }}</span>
+					<span class="text-body-2 text-medium-emphasis">{{ formatTime(item.createTime) }}</span>
 				</template>
 
 				<!-- Actions Column -->
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.actions="{ item }">
-					<div class="d-flex ga-1">
+					<div class="d-flex ga-1 justify-center flex-wrap">
+						<v-btn
+							icon="mdi-message-text-outline"
+							variant="text"
+							size="small"
+							color="primary"
+							@click="goChat(item)"
+						>
+							<v-icon size="20" />
+							<v-tooltip activator="parent" location="top">数据问答</v-tooltip>
+						</v-btn>
+						<v-btn
+							icon="mdi-database-cog-outline"
+							variant="text"
+							size="small"
+							color="primary"
+							@click="goDatasource(item)"
+						>
+							<v-icon size="20" />
+							<v-tooltip activator="parent" location="top">配置数据源</v-tooltip>
+						</v-btn>
+						<v-btn
+							icon="mdi-lightning-bolt-outline"
+							variant="text"
+							size="small"
+							color="warning"
+							@click="goModelConfig"
+						>
+							<v-icon size="20" />
+							<v-tooltip activator="parent" location="top">模型配置</v-tooltip>
+						</v-btn>
 						<v-btn
 							icon="mdi-pencil-outline"
 							variant="text"
 							size="small"
-							color="blue-darken-1"
+							color="primary"
 							@click="handleEdit(item)"
 						>
 							<v-icon size="20" />
@@ -204,21 +250,38 @@
 
 				<!-- No Data Slot -->
 				<template #no-data>
-					<div class="text-center py-16">
-						<v-icon icon="mdi-robot-confused-outline" size="64" color="grey-lighten-2" class="mb-4" />
-						<h3 class="text-h6 font-weight-medium text-grey-darken-1">暂无智能体</h3>
-						<p class="text-body-2 text-grey mb-6">
-							{{ activeFilter === 'all' ? '您还没有创建任何智能体' : '该分类下暂无智能体' }}
+					<div class="text-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-robot-outline" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无智能体</h3>
+						<p class="da-empty__desc">
+							{{
+								activeFilter === 'all'
+									? '创建智能体后，可绑定数据源并进入数据问答。建议先配置 CHAT 模型，再新建智能体。'
+									: '该分类下暂无智能体，可切换「全部」查看或新建。'
+							}}
 						</p>
-						<v-btn
-							v-if="activeFilter === 'all'"
-							color="black"
-							variant="flat"
-							prepend-icon="mdi-plus"
-							@click="goToCreateAgent"
-						>
-							新建智能体
-						</v-btn>
+						<div class="d-flex justify-center ga-2 flex-wrap">
+							<v-btn
+								v-if="activeFilter === 'all'"
+								color="primary"
+								variant="flat"
+								class="text-none"
+								prepend-icon="mdi-plus"
+								@click="goToCreateAgent"
+							>
+								新建智能体
+							</v-btn>
+							<v-btn
+								variant="outlined"
+								class="text-none"
+								prepend-icon="mdi-lightning-bolt-outline"
+								@click="goModelConfig"
+							>
+								配置模型
+							</v-btn>
+						</div>
 					</div>
 				</template>
 
@@ -234,8 +297,8 @@
 			<v-card rounded="lg">
 				<v-card-title class="d-flex align-center justify-space-between px-6 pt-6 pb-4">
 					<div class="d-flex align-center">
-						<v-icon icon="mdi-pencil-circle" color="blue-darken-1" class="mr-3" size="28" />
-						<span class="text-h6 font-weight-bold">编辑智能体</span>
+						<v-icon icon="mdi-pencil-circle" color="primary" class="mr-3" size="28" />
+						<span class="text-h6 font-weight-medium dialog-title">编辑智能体</span>
 					</div>
 					<v-btn icon="mdi-close" variant="text" size="small" @click="closeEditDialog" />
 				</v-card-title>
@@ -244,7 +307,7 @@
 				<v-card-text class="pa-6">
 					<v-form ref="editFormRef">
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								智能体名称 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -258,7 +321,7 @@
 						</div>
 
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">描述</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">描述</p>
 							<v-textarea
 								v-model="editForm.description"
 								placeholder="请输入智能体描述"
@@ -270,7 +333,7 @@
 						</div>
 
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">分类</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">分类</p>
 							<v-text-field
 								v-model="editForm.category"
 								placeholder="请输入分类"
@@ -281,7 +344,7 @@
 						</div>
 
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">标签 (逗号分隔)</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">标签 (逗号分隔)</p>
 							<v-text-field
 								v-model="editForm.tags"
 								placeholder="例如: 数据分析,智能助手,推荐系统"
@@ -292,7 +355,7 @@
 						</div>
 
 						<div class="mb-2">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">状态</p>
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">状态</p>
 							<v-select
 								v-model="editForm.status"
 								:items="statusOptions"
@@ -310,7 +373,7 @@
 				<v-card-actions class="pa-4 d-flex justify-end ga-2">
 					<v-btn variant="outlined" class="text-none px-6" @click="closeEditDialog">取消</v-btn>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -327,8 +390,8 @@
 			<v-card rounded="lg">
 				<v-card-title class="d-flex align-center justify-space-between px-6 pt-6 pb-4">
 					<div class="d-flex align-center">
-						<v-icon icon="mdi-tag-multiple" color="blue" class="mr-3" size="24" />
-						<span class="text-h6 font-weight-bold">全部标签</span>
+						<v-icon icon="mdi-tag-multiple" color="primary" class="mr-3" size="24" />
+						<span class="text-h6 font-weight-medium dialog-title">全部标签</span>
 					</div>
 					<v-btn icon="mdi-close" variant="text" size="small" @click="tagsDialog = false" />
 				</v-card-title>
@@ -340,7 +403,7 @@
 							v-for="(tag, index) in currentTags"
 							:key="index"
 							size="default"
-							color="blue"
+							color="primary"
 							variant="tonal"
 						>
 							{{ tag }}
@@ -357,11 +420,12 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-	</v-container>
+	</section>
 </template>
 
 <script setup lang="ts">
 import type { Agent } from '~/services/agent/index';
+import modelConfigService from '~/services/modelConfig/index';
 import agentService from '~/services/agent/index';
 import { useCrudPage } from '~/composables/useCrudPage/index';
 
@@ -370,6 +434,7 @@ const { showConfirm } = useConfirm();
 const router = useRouter();
 
 // ——— 额外状态 ———
+const modelReady = ref<boolean | null>(null);
 const activeFilter = ref<'all' | 'published' | 'draft' | 'offline'>('all');
 const searchKeyword = ref('');
 const tagsDialog = ref(false);
@@ -417,7 +482,7 @@ const headers = [
 	{ title: '标签', key: 'tags', width: '220px', sortable: false },
 	{ title: '状态', key: 'status', width: '100px', sortable: false },
 	{ title: '创建时间', key: 'createTime', width: '170px', sortable: false },
-	{ title: '操作', key: 'actions', width: '120px', sortable: false, align: 'center' as const },
+	{ title: '操作', key: 'actions', width: '220px', sortable: false, align: 'center' as const },
 ];
 
 const statusOptions = [
@@ -448,6 +513,36 @@ const filteredAgents = computed(() => {
 });
 
 function goToCreateAgent() { router.push('/agent/new'); }
+
+function goChat(agent: Agent) {
+	if (!agent?.id) return;
+	// R164: 草稿也可问答，但提示建议发布
+	if (agent.status === 'draft') {
+		$tip('该智能体为草稿状态，仍可问答；发布后更易在列表中识别为可用。', {
+			icon: 'mdi-information',
+			color: 'info',
+		});
+	}
+	navigateTo({ path: '/chat', query: { agentId: String(agent.id) } });
+}
+
+function goDatasource(agent: Agent) {
+	if (!agent?.id) return;
+	navigateTo({ path: '/system/data-sources', query: { agentId: String(agent.id) } });
+}
+
+async function loadModelReady() {
+	try {
+		const r = await modelConfigService.checkReady();
+		modelReady.value = !!r?.chatModelReady;
+	} catch {
+		modelReady.value = null;
+	}
+}
+
+function goModelConfig() {
+	navigateTo('/system/model-config');
+}
 
 function handleEdit(agent: Agent) {
 	editingId.value = agent.id;
@@ -548,29 +643,65 @@ const formatTime = (time?: Date | string) => {
 	return date.toLocaleString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 };
 
-onMounted(() => { loadAgents(); });
+onMounted(() => {
+	void loadModelReady();
+	loadAgents();
+});
 </script>
 
 <style scoped>
 .agents-container {
-	background-color: #f8fafc;
+	background: transparent;
 	min-height: 100%;
 }
 
-.text-slate-900 {
-	color: #0f172a;
+
+
+.agents-toolbar {
+	box-shadow: none !important;
+	background: transparent !important;
+	border: none !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
 }
 
 .filter-toggle {
-	background-color: #f1f5f9 !important;
-	padding: 4px !important;
+	background-color: color-mix(in srgb, var(--da-surface-soft) 80%, var(--da-surface)) !important;
+	padding: 3px !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	border-radius: 10px !important;
 }
 
 .filter-toggle .v-btn {
 	text-transform: none !important;
+	letter-spacing: 0 !important;
+	border-radius: 8px !important;
+	font-weight: 500 !important;
+	min-height: 30px !important;
+	font-size: 13px !important;
 }
 
 .search-field {
-	border-color: #e2e8f0;
+	border-color: var(--da-line-soft);
+}
+
+.agent-name-link:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+	border-radius: var(--da-radius-sm);
+}
+
+.agent-name-link {
+	appearance: none;
+	border: none;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	cursor: pointer;
+	text-align: left;
+}
+.agent-name-link:hover {
+	color: var(--da-primary);
+	text-decoration: underline;
 }
 </style>

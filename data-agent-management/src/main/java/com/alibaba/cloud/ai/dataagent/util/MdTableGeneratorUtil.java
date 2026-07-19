@@ -20,12 +20,21 @@ import com.alibaba.cloud.ai.dataagent.bo.schema.ResultSetBO;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Markdown 表格生成工具类。
+ * <p>
+ * 将二维数组或结构化的 {@link ResultSetBO} 转换为 Markdown 表格字符串，用于在聊天或报告场景中展示查询结果。
+ * </p>
+ */
 public class MdTableGeneratorUtil {
 
 	/**
-	 * Convert two-dimensional array to Markdown table
-	 * @param resultArr two-dimensional array
-	 * @return Markdown table string
+	 * 将二维数组转换为 Markdown 表格字符串。
+	 * <p>
+	 * 第一行作为表头，其后跟随分隔行和数据行。
+	 * </p>
+	 * @param resultArr 二维数组，第一行为表头
+	 * @return Markdown 表格字符串；入参为空时返回空字符串
 	 */
 	public static String generateTable(String[][] resultArr) {
 		if (resultArr == null || resultArr.length == 0) {
@@ -34,17 +43,17 @@ public class MdTableGeneratorUtil {
 
 		StringBuilder sb = new StringBuilder();
 
-		// Header
+		// 表头行
 		sb.append("| ");
 		for (String col : resultArr[0]) {
 			sb.append(col).append(" | ");
 		}
 		sb.append("\n");
 
-		// Separator line
+		// 表头与数据之间的分隔行
 		sb.append("|---".repeat(resultArr[0].length)).append("|\n");
 
-		// Data rows
+		// 数据行
 		for (int i = 1; i < resultArr.length; i++) {
 			sb.append("| ");
 			for (String cell : resultArr[i]) {
@@ -57,19 +66,22 @@ public class MdTableGeneratorUtil {
 	}
 
 	/**
-	 * Convert ResultSetBO to Markdown table
-	 * @param resultSetBO structured data
-	 * @return Markdown table string
+	 * 将结构化的 {@link ResultSetBO} 转换为 Markdown 表格字符串。
+	 * @param resultSetBO 结构化数据，包含列名和数据行
+	 * @return Markdown 表格字符串
 	 */
 	public static String generateTable(ResultSetBO resultSetBO) {
 		List<String> column = resultSetBO.getColumn();
 		List<Map<String, String>> data = resultSetBO.getData();
 
+		// 构造二维数组：首行为表头，其余为数据行
 		String[][] resultArr = new String[data.size() + 1][column.size()];
 		int idxR = 0;
 
+		// 第一行写入列名
 		resultArr[idxR++] = column.toArray(new String[0]);
 
+		// 依次填充每行数据
 		for (Map<String, String> kv : data) {
 			String[] row = new String[column.size()];
 			int idxC = 0;

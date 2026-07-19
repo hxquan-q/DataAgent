@@ -13,6 +13,9 @@ CREATE TABLE IF NOT EXISTS agent (
     category VARCHAR(100) COMMENT '分类',
     admin_id BIGINT COMMENT '管理员ID',
     tags TEXT COMMENT '标签，逗号分隔',
+    workflow_mode VARCHAR(20) DEFAULT 'nl2sql' COMMENT '工作流模式：nl2sql-自由生成SQL，semantic-语义层受控拼装(NL2Semantic2SQL)',
+    embed_enabled TINYINT DEFAULT 0 COMMENT '是否启用网页嵌入：0-禁用，1-启用',
+    embed_config TEXT COMMENT '网页嵌入配置JSON：allowedOrigins/welcomeMessage/primaryColor等',
     create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     PRIMARY KEY (id),
@@ -268,3 +271,146 @@ CREATE TABLE IF NOT EXISTS `model_config` (
     `proxy_password` varchar(255) DEFAULT NULL COMMENT '代理密码（可选）',
     PRIMARY KEY (`id`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Agent 技能表
+CREATE TABLE IF NOT EXISTS skill (
+  id INT NOT NULL AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL COMMENT '技能名称',
+  description VARCHAR(512) COMMENT '技能描述（何时用）',
+  scope VARCHAR(32) NOT NULL COMMENT '作用域：report/sql/python 等',
+  triggers VARCHAR(512) COMMENT '触发关键词，逗号分隔，可空',
+  content TEXT NOT NULL COMMENT '技能正文/指令',
+  params_json TEXT COMMENT '预留参数 JSON',
+  enabled TINYINT DEFAULT 1 COMMENT '0-禁用 1-启用',
+  priority INT DEFAULT 0 COMMENT '优先级，大的先注入',
+  display_order INT DEFAULT 0 COMMENT '显示顺序',
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  INDEX idx_scope_enabled (scope, enabled)
+) ENGINE = InnoDB COMMENT = 'Agent 技能表';
+
+-- Agent-技能绑定表
+CREATE TABLE IF NOT EXISTS agent_skill (
+  id INT NOT NULL AUTO_INCREMENT,
+  agent_id INT NOT NULL COMMENT '智能体ID（类型对齐 agent.id）',
+  skill_id INT NOT NULL COMMENT '技能ID',
+  enabled TINYINT DEFAULT 1 COMMENT '0-禁用 1-启用',
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_agent_skill (agent_id, skill_id),
+  INDEX idx_agent (agent_id)
+) ENGINE = InnoDB COMMENT = 'Agent-技能 绑定表';
+
+-- ====================== v0.2 语义层（NL2Semantic2SQL）======================
+-- 指标定义表（指标层核心，LLM 从中选择而非生成 SQL）
+CREATE TABLE IF NOT EXISTS metric (
+  id INT NOT NULL AUTO_INCREMENT,
+  metric_code VARCHAR(100) NOT NULL COMMENT '指标编码，全局唯一',
+  metric_name VARCHAR(200) NOT NULL COMMENT '指标中文名（候选列表展示）',
+  agent_id INT NOT NULL COMMENT '智能体ID',
+  datasource_id INT NOT NULL COMMENT '数据源ID（多源路由）',
+  source_table VARCHAR(200) NOT NULL COMMENT '来源表（SQL拼装目标）',
+  agg_field VARCHAR(200) COMMENT '聚合字段',
+  agg_func VARCHAR(50) COMMENT '聚合函数 SUM/COUNT/AVG/MAX/MIN',
+  default_time_field VARCHAR(200) COMMENT '默认时间字段',
+  sql_template TEXT COMMENT 'SQL模板（复杂指标可选，覆盖默认拼装）',
+  description TEXT COMMENT '指标说明',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '0停用 1启用',
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_metric_code (metric_code),
+  INDEX idx_metric_agent_ds (agent_id, datasource_id),
+  FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE,
+  FOREIGN KEY (datasource_id) REFERENCES datasource(id) ON DELETE CASCADE
+) ENGINE = InnoDB COMMENT = '指标定义表（NL2Semantic2SQL 核心）';
+
+-- 指标口径版本表（同指标多口径，杜绝金额歧义）
+CREATE TABLE IF NOT EXISTS metric_version (
+  id INT NOT NULL AUTO_INCREMENT,
+  metric_id INT NOT NULL COMMENT '指标ID',
+  ver_code VARCHAR(100) NOT NULL COMMENT '口径版本编码',
+  time_field VARCHAR(200) COMMENT '时间字段（覆盖指标默认）',
+  filter_condition TEXT COMMENT '过滤条件（JSON片段）',
+  is_default TINYINT NOT NULL DEFAULT 0 COMMENT '是否默认口径 0否1是',
+  description TEXT COMMENT '口径说明（自然语言，反问展示用）',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '0停用 1启用',
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  updated_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_metric_ver (metric_id, ver_code),
+  FOREIGN KEY (metric_id) REFERENCES metric(id) ON DELETE CASCADE
+) ENGINE = InnoDB COMMENT = '指标口径版本表';
+
+-- 语义别名映射表（业务黑话→结构化code）
+CREATE TABLE IF NOT EXISTS semantic_alias (
+  id INT NOT NULL AUTO_INCREMENT,
+  agent_id INT NOT NULL COMMENT '智能体ID',
+  alias_text VARCHAR(255) NOT NULL COMMENT '用户说法/业务黑话',
+  target_type VARCHAR(20) NOT NULL COMMENT '目标类型 METRIC/DIM/VER/FILTER',
+  target_code VARCHAR(100) NOT NULL COMMENT '映射目标code',
+  match_type VARCHAR(20) NOT NULL DEFAULT 'EXACT' COMMENT '匹配类型 EXACT/FUZZY',
+  priority INT NOT NULL DEFAULT 0 COMMENT '优先级（高胜出，解决多匹配）',
+  status TINYINT NOT NULL DEFAULT 1 COMMENT '0停用 1启用',
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (id),
+  INDEX idx_alias_agent_text (agent_id, alias_text),
+  FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE
+) ENGINE = InnoDB COMMENT = '语义别名映射表';
+
+-- 查询日志+证据链表（可回放）
+CREATE TABLE IF NOT EXISTS query_log (
+  id INT NOT NULL AUTO_INCREMENT,
+  session_id VARCHAR(64) COMMENT '会话ID',
+  agent_id INT COMMENT '智能体ID',
+  datasource_id INT COMMENT '数据源ID',
+  user_query TEXT NOT NULL COMMENT '用户原始问题',
+  semantic_object JSON COMMENT '语义对象快照（证据链）',
+  generated_sql TEXT COMMENT '受控拼装SQL',
+  metric_versions JSON COMMENT '使用的口径版本',
+  exec_time_ms INT COMMENT '执行耗时(ms)',
+  row_count INT COMMENT '返回行数',
+  status VARCHAR(20) COMMENT 'SUCCESS/FAIL/CLARIFY',
+  feedback TINYINT DEFAULT 0 COMMENT '反馈 0无 1赞 2踩',
+  trace_id VARCHAR(64) COMMENT 'Langfuse trace关联',
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (id),
+  INDEX idx_querylog_session (session_id),
+  INDEX idx_querylog_agent_time (agent_id, created_time)
+) ENGINE = InnoDB COMMENT = '查询日志+证据链表';
+
+-- SQL样例训练库表（vanna三库反哺）
+CREATE TABLE IF NOT EXISTS sql_example (
+  id INT NOT NULL AUTO_INCREMENT,
+  agent_id INT COMMENT '智能体ID',
+  datasource_id INT COMMENT '数据源ID',
+  question TEXT NOT NULL COMMENT '问题',
+  sql_text TEXT NOT NULL COMMENT '成功SQL',
+  dialect VARCHAR(50) COMMENT '数据库方言',
+  sql_hash VARCHAR(64) NOT NULL COMMENT '去重指纹',
+  source VARCHAR(20) NOT NULL DEFAULT 'AUTO' COMMENT '来源 AUTO自动反哺/MANUAL人工',
+  reviewed TINYINT NOT NULL DEFAULT 0 COMMENT '是否人工审核 0否1是',
+  created_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_sqlexample_hash (agent_id, sql_hash),
+  FOREIGN KEY (agent_id) REFERENCES agent(id) ON DELETE CASCADE
+) ENGINE = InnoDB COMMENT = 'SQL样例训练库表';
+
+-- v0.2 语义层：agent 表增 workflow_mode 列（已存在则忽略，依赖 sql.init.continue-on-error=true）
+ALTER TABLE agent ADD COLUMN workflow_mode VARCHAR(20) DEFAULT 'nl2sql'
+  COMMENT '工作流模式：nl2sql-自由生成SQL，semantic-语义层受控拼装(NL2Semantic2SQL)';
+
+-- 平台管理员（管理端登录）
+CREATE TABLE IF NOT EXISTS admin_user (
+  id            BIGINT NOT NULL AUTO_INCREMENT,
+  username      VARCHAR(64)  NOT NULL COMMENT '登录名',
+  password_hash VARCHAR(100) NOT NULL COMMENT 'BCrypt 密码哈希',
+  display_name  VARCHAR(64)  NULL COMMENT '显示名',
+  status        TINYINT      NOT NULL DEFAULT 1 COMMENT '1=启用 0=禁用',
+  last_login_at TIMESTAMP    NULL COMMENT '最近登录时间',
+  create_time   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  update_time   TIMESTAMP    DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (id),
+  UNIQUE KEY uk_admin_username (username)
+) ENGINE=InnoDB COMMENT='平台管理员';

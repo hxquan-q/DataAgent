@@ -20,14 +20,26 @@ import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
+/**
+ * 语义模型 Mapper，操作 {@code semantic_model} 表。
+ * <p>
+ * 管理数据源字段的语义层信息（业务名、同义词、业务描述、列注释、状态），支持按智能体/数据源查询、 关键词检索、启用/禁用及增删改。
+ * </p>
+ */
 @Mapper
 public interface SemanticModelMapper {
 
+	/**
+	 * 查询全部语义模型，按创建时间倒序返回。
+	 * @return 语义模型列表
+	 */
 	@Select("SELECT * FROM semantic_model ORDER BY created_time DESC")
 	List<SemanticModel> selectAll();
 
 	/**
-	 * Query semantic model list by agent ID
+	 * 根据智能体 ID 查询语义模型列表，按创建时间倒序返回。
+	 * @param agentId 智能体 ID
+	 * @return 语义模型列表
 	 */
 	@Select("""
 			SELECT * FROM semantic_model
@@ -37,7 +49,9 @@ public interface SemanticModelMapper {
 	List<SemanticModel> selectByAgentId(@Param("agentId") Long agentId);
 
 	/**
-	 * Query by id
+	 * 根据主键查询语义模型。
+	 * @param id 语义模型 ID
+	 * @return 语义模型；不存在返回 {@code null}
 	 */
 	@Select("""
 			SELECT * FROM semantic_model
@@ -46,7 +60,9 @@ public interface SemanticModelMapper {
 	SemanticModel selectById(@Param("id") Long id);
 
 	/**
-	 * Search semantic models by keyword
+	 * 按关键词检索语义模型（匹配列名、业务名、业务描述、同义词），按创建时间倒序返回。
+	 * @param keyword 关键词
+	 * @return 匹配的语义模型列表
 	 */
 	@Select("""
 			SELECT * FROM semantic_model
@@ -59,7 +75,9 @@ public interface SemanticModelMapper {
 	List<SemanticModel> searchByKeyword(@Param("keyword") String keyword);
 
 	/**
-	 * Batch enable fields
+	 * 启用指定语义模型字段（将 {@code status} 置为 1）。
+	 * @param id 语义模型 ID
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE semantic_model
@@ -69,7 +87,9 @@ public interface SemanticModelMapper {
 	int enableById(@Param("id") Long id);
 
 	/**
-	 * Batch disable fields
+	 * 禁用指定语义模型字段（将 {@code status} 置为 0）。
+	 * @param id 语义模型 ID
+	 * @return 受影响行数
 	 */
 	@Update("""
 			UPDATE semantic_model
@@ -79,7 +99,9 @@ public interface SemanticModelMapper {
 	int disableById(@Param("id") Long id);
 
 	/**
-	 * Query semantic models by agent ID and enabled status
+	 * 根据智能体 ID 查询已启用（{@code status != 0}）的语义模型列表，按创建时间倒序返回。
+	 * @param agentId 智能体 ID
+	 * @return 已启用的语义模型列表
 	 */
 	@Select("""
 			SELECT * FROM semantic_model
@@ -89,6 +111,11 @@ public interface SemanticModelMapper {
 			""")
 	List<SemanticModel> selectEnabledByAgentId(@Param("agentId") Long agentId);
 
+	/**
+	 * 新增语义模型，并将自增主键回填到入参对象的 {@code id} 字段。
+	 * @param model 语义模型实体
+	 * @return 受影响行数
+	 */
 	@Insert("""
 			INSERT INTO semantic_model
 			(agent_id, datasource_id, table_name, column_name, business_name, synonyms, business_description, column_comment, data_type, created_time, updated_time, status)
@@ -98,6 +125,11 @@ public interface SemanticModelMapper {
 	@Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
 	int insert(SemanticModel model);
 
+	/**
+	 * 根据主键动态更新语义模型（仅更新非空字段），并刷新 {@code updated_time}。
+	 * @param model 语义模型实体（需携带 {@code id}）
+	 * @return 受影响行数
+	 */
 	@Update("""
 			<script>
 			UPDATE semantic_model
@@ -119,6 +151,11 @@ public interface SemanticModelMapper {
 			""")
 	int updateById(SemanticModel model);
 
+	/**
+	 * 根据主键物理删除语义模型。
+	 * @param id 语义模型 ID
+	 * @return 受影响行数
+	 */
 	@Delete("""
 			DELETE FROM semantic_model
 			WHERE id = #{id}
@@ -126,7 +163,10 @@ public interface SemanticModelMapper {
 	int deleteById(@Param("id") Long id);
 
 	/**
-	 * Query semantic models by datasource ID, status and table names
+	 * 根据数据源 ID、启用状态与表名集合查询语义模型，按创建时间倒序返回。
+	 * @param datasourceId 数据源 ID
+	 * @param tableNames 表名集合
+	 * @return 匹配的语义模型列表
 	 */
 	@Select("""
 			<script>
@@ -144,7 +184,11 @@ public interface SemanticModelMapper {
 			@Param("tableNames") List<String> tableNames);
 
 	/**
-	 * Query semantic model based on agentId, tableName, and columnName
+	 * 根据智能体 ID、表名与列名查询单条语义模型（至多一条）。
+	 * @param agentId 智能体 ID
+	 * @param tableName 表名
+	 * @param columnName 列名
+	 * @return 语义模型；不存在返回 {@code null}
 	 */
 	@Select("""
 			SELECT * FROM semantic_model

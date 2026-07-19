@@ -39,19 +39,33 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.PASSWORD_ERROR_
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.SUCCESS;
 
 /**
- * Hive JDBC connection pool implementation.
+ * Hive JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用 HiveServer2 JDBC 驱动（org.apache.hive.jdbc.HiveDriver）。 自定义了 Hive
+ * 专用的连接池参数（如 SELECT 1 心跳检测、更长的最大等待时间 60 秒等）， 并重写了 ping 方法通过执行 SELECT 1 测试连接可用性。
+ * </p>
  */
 @Slf4j
 @Service("hiveJdbcConnectionPool")
 public class HiveJdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/** Hive JDBC 驱动类名 */
 	private static final String DRIVER = "org.apache.hive.jdbc.HiveDriver";
 
+	/**
+	 * 获取 Hive JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return DRIVER;
 	}
 
+	/**
+	 * 将 Hive SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 		if (sqlState == null) {
@@ -78,16 +92,36 @@ public class HiveJdbcConnectionPool extends AbstractDBConnectionPool {
 		}
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 Hive 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.HIVE.getTypeName().equals(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return Hive 连接池类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return "Hive_JDBC_Pool";
 	}
 
+	/**
+	 * 创建 Hive 专用的 Druid 数据源。
+	 * <p>
+	 * 自定义配置包括：SELECT 1 心跳检测、更长的最大等待时间（60 秒）、空闲连接最小可回收时间（5 分钟）等。
+	 * </p>
+	 * @param url Hive 连接 URL
+	 * @param username 用户名
+	 * @param password 密码
+	 * @return 创建好的数据源实例
+	 * @throws Exception 数据源创建异常
+	 */
 	@Override
 	public DataSource createdDataSource(String url, String username, String password) throws Exception {
 		log.info("Creating Hive DataSource with custom configuration");
@@ -96,18 +130,34 @@ public class HiveJdbcConnectionPool extends AbstractDBConnectionPool {
 		return DruidDataSourceFactory.createDataSource(props);
 	}
 
+	/**
+	 * Hive Druid 数据源配置属性封装类。
+	 */
 	private static final class HiveDruidProperties {
 
+		/** JDBC 驱动类名 */
 		private final String driver;
 
+		/** 数据库连接 URL */
 		private final String url;
 
+		/** 用户名 */
 		private final String username;
 
+		/** 密码 */
 		private final String password;
 
+		/** Druid 过滤器配置 */
 		private final String filters;
 
+		/**
+		 * 构造配置属性。
+		 * @param driver 驱动类名
+		 * @param url 连接 URL
+		 * @param username 用户名
+		 * @param password 密码
+		 * @param filters 过滤器配置
+		 */
 		private HiveDruidProperties(String driver, String url, String username, String password, String filters) {
 			this.driver = driver;
 			this.url = url;
@@ -116,6 +166,10 @@ public class HiveJdbcConnectionPool extends AbstractDBConnectionPool {
 			this.filters = filters;
 		}
 
+		/**
+		 * 将配置属性转换为 Druid 属性 Map。
+		 * @return Druid 配置属性 Map
+		 */
 		private Map<String, String> toMap() {
 			Map<String, String> props = new HashMap<>();
 			props.put(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, this.driver);
@@ -138,6 +192,14 @@ public class HiveJdbcConnectionPool extends AbstractDBConnectionPool {
 
 	}
 
+	/**
+	 * 测试 Hive 数据库连接是否有效。
+	 * <p>
+	 * 通过从连接池获取连接并执行 SELECT 1 来验证连接可用性。
+	 * </p>
+	 * @param config 数据库配置信息
+	 * @return 连接测试结果错误码
+	 */
 	@Override
 	public ErrorCodeEnum ping(DbConfigBO config) {
 		log.info("Hive ping method called, url: {}", config.getUrl());

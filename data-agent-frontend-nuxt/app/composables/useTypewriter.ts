@@ -17,31 +17,37 @@
 import { ref, onBeforeUnmount } from 'vue';
 
 /**
- * Typewriter effect composable - simulates character-by-character streaming
- * similar to ChatGPT / DeepSeek rendering style.
- *
- * Strategy:
- *   - Maintain a queue of pending characters to display
- *   - Each animation frame, flush up to CHARS_PER_FRAME characters
- *   - This decouples the SSE arrival rate from the visual render rate,
- *     giving a smooth typewriter feel without blocking the main thread.
+ * Typewriter effect — adaptive chars/frame so long reports don't feel stuck.
+ * Small chunks: ~3–8 chars/frame; backlog large: flush faster up to 64/frame.
+ * Stream complete should still call flush().
  */
 
-// Characters to consume per animation frame.
-// ~60fps × 3 chars = ~180 chars/s — comfortable reading pace like ChatGPT.
-const CHARS_PER_FRAME = 3;
+const isCoarse =
+	typeof window !== 'undefined' &&
+	(window.matchMedia('(max-width: 768px)').matches ||
+		window.matchMedia('(pointer: coarse)').matches);
+// Mobile: catch up hard so UI stays interactive
+const BASE_CHARS = isCoarse ? 48 : 20;
+const MAX_CHARS = isCoarse ? 160 : 64;
 
 export function useTypewriter() {
-	/** The text currently shown to the user */
 	const displayedText = ref('');
 
-	/** Internal queue: how many source characters have been "enqueued" */
 	let enqueuedLength = 0;
-	/** Full source text (always grows, never shrinks during a stream) */
 	let sourceText = '';
-
 	let rafId: number | null = null;
 	let isActive = true;
+
+	function charsThisFrame(): number {
+		const backlog = enqueuedLength - displayedText.value.length;
+		if (backlog <= 0) return BASE_CHARS;
+		// catch up when SSE/report dumps large chunks (root cause of "慢")
+		if (backlog > 2000) return MAX_CHARS;
+		if (backlog > 800) return 40;
+		if (backlog > 300) return 24;
+		if (backlog > 100) return 20;
+		return BASE_CHARS;
+	}
 
 	function tick() {
 		rafId = null;
@@ -51,11 +57,10 @@ export function useTypewriter() {
 		const target = enqueuedLength;
 
 		if (current < target) {
-			const end = Math.min(current + CHARS_PER_FRAME, target);
+			const end = Math.min(current + charsThisFrame(), target);
 			displayedText.value = sourceText.slice(0, end);
 		}
 
-		// Keep ticking if there's still text to display
 		if (displayedText.value.length < enqueuedLength) {
 			rafId = requestAnimationFrame(tick);
 		}
@@ -67,19 +72,12 @@ export function useTypewriter() {
 		}
 	}
 
-	/**
-	 * Append new text chunk to the typewriter queue.
-	 * Call this every time a new SSE chunk arrives.
-	 */
 	function append(chunk: string) {
 		sourceText += chunk;
 		enqueuedLength = sourceText.length;
 		scheduleTick();
 	}
 
-	/**
-	 * Reset the typewriter to empty state (e.g. when starting a new stream).
-	 */
 	function reset() {
 		if (rafId) {
 			cancelAnimationFrame(rafId);
@@ -90,9 +88,6 @@ export function useTypewriter() {
 		displayedText.value = '';
 	}
 
-	/**
-	 * Flush all remaining queued text immediately (e.g. on stream complete).
-	 */
 	function flush() {
 		if (rafId) {
 			cancelAnimationFrame(rafId);

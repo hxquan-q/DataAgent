@@ -24,15 +24,18 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * 简单的 MultipartFile 实现，用于将字节数组包装为 MultipartFile
+ * 字节数组 MultipartFile 实现，用于将字节数组包装为 {@link MultipartFile} 对象。
  */
 @AllArgsConstructor
 public class ByteArrayMultipartFile implements MultipartFile {
 
+	/** 文件内容字节数组 */
 	private final byte[] content;
 
+	/** 文件名 */
 	private final String filename;
 
+	/** 内容类型 */
 	private final String contentType;
 
 	@Override

@@ -26,18 +26,26 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Composition root for the Docker-backed code executor.
+ * Docker 代码执行器工厂的组合根，负责解析 Docker 主机、创建客户端并确保镜像可用。
  */
 @Component
 @RequiredArgsConstructor
 public class DockerExecutorFactory {
 
+	/** Docker 主机解析器 */
 	private final DockerHostResolver hostResolver;
 
+	/** Docker 客户端工厂 */
 	private final DockerClientFactory clientFactory;
 
+	/** Docker 镜像管理器 */
 	private final DockerImageManager imageManager;
 
+	/**
+	 * 创建基于 Docker 的代码执行器服务实例。
+	 * @param properties 代码执行器配置属性
+	 * @return Docker 代码执行器服务
+	 */
 	public DockerCodePoolExecutorService create(CodeExecutorProperties properties) {
 		List<String> candidateHosts = hostResolver.candidates(properties.getHost(), System.getProperty("os.name"));
 		DockerConnection connection = clientFactory.connect(candidateHosts);

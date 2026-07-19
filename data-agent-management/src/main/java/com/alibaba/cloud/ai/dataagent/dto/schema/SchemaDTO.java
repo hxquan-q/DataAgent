@@ -19,18 +19,30 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 数据库 Schema 信息 DTO
+ *
+ * <p>
+ * 描述一个数据源的完整结构信息，包括数据源名称、描述、表数量、表列表和外键关系。 主要用于向大模型传递数据库结构上下文。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 public class SchemaDTO {
 
+	/** 数据源名称 */
 	private String name;
 
+	/** 数据源描述 */
 	private String description;
 
+	/** 表数量 */
 	private Integer tableCount;
 
+	/** 表列表 */
 	private List<TableDTO> table;
 
+	/** 外键关系列表 */
 	private List<String> foreignKeys;
 
 	@Override

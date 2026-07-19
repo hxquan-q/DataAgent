@@ -18,6 +18,13 @@ package com.alibaba.cloud.ai.dataagent.dto.search;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * 智能体知识检索请求 DTO
+ *
+ * <p>
+ * 封装基于智能体的向量知识库检索参数，包括智能体ID、文档向量类型、 相似度阈值、查询内容和返回数量。
+ * </p>
+ */
 @Data
 @Builder
 public class AgentSearchRequest implements java.io.Serializable {
@@ -25,15 +32,20 @@ public class AgentSearchRequest implements java.io.Serializable {
 	@java.io.Serial
 	private static final long serialVersionUID = 1L;
 
+	/** 智能体ID */
 	private String agentId;
 
+	/** 文档向量类型 */
 	private String docVectorType;
 
+	/** 相似度阈值（默认 0.2） */
 	@Builder.Default
 	private Double similarityThreshold = 0.2;
 
+	/** 查询内容 */
 	private String query;
 
+	/** 返回结果数量上限 */
 	private Integer topK;
 
 }

@@ -38,9 +38,9 @@ const echartsPlugin = (md: MarkdownIt) => {
 				const height = 400;
 				return `<div style="width:${width};height:${height}px" class="md-echarts" data-echarts-config="${escaped}"></div>`;
 			} else if (code.length > 0) {
-				// Chart code is still being streamed — show a skeleton placeholder
-				return `<div class="md-echarts-skeleton">
-					<span class="md-echarts-skeleton-icon">⏳</span>
+				// Chart code is still being streamed — CSS spinner, no emoji
+				return `<div class="md-echarts-skeleton" role="status" aria-live="polite">
+					<span class="md-echarts-skeleton-icon" aria-hidden="true"></span>
 					<span class="md-echarts-skeleton-text">图表生成中...</span>
 				</div>`;
 			} else {

@@ -1,0 +1,40 @@
+# IDEA / 宿主本地开发 profile（Docker 只跑 MySQL 元库 + 模拟库）
+# 启动：--spring.profiles.active=local 或 IDEA DataAgent-local + JRebel
+# 文档：docs/dev/HYBRID_HOTDEPLOY.md
+#
+# 前置：
+#   bash scripts/dev-hybrid.sh up   # 停 Docker 前后端、portfwd、:3301 代理
+#   元库 127.0.0.1:3306/nl2sql_db；业务模拟 127.0.0.1:3307 与 :5433
+# 数据安全：sql.init=never — IDEA Restart/JRebel 不写元库
+
+server:
+  port: 8065
+
+spring:
+  datasource:
+    url: ${DATA_AGENT_DATASOURCE_URL:jdbc:mysql://127.0.0.1:3306/nl2sql_db?useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=Asia/Shanghai}
+    username: ${DATA_AGENT_DATASOURCE_USERNAME:root}
+    password: ${DATA_AGENT_DATASOURCE_PASSWORD:root}
+  # 硬约束：本地永不自动建表/灌数
+  sql:
+    init:
+      mode: never
+  ai:
+    alibaba:
+      data-agent:
+        # 本地性能：降 SQL 重试；关 SQL 结果后置图表 LLM（报告仍可出 echarts）
+        max-sql-retry-count: 3
+        enable-sql-result-chart: false
+        enrich-sql-result-timeout: 2000
+        # R149: 无依赖 SQL 波次并发（取舍：跳过逐步语义校验换墙钟）
+        enable-concurrent-steps: true
+
+# embed 开发默认密钥（生产必须改）
+# spring.ai.alibaba.data-agent.embed.token-hmac-key 继承 application.yml
+
+# 管理端登录 local 默认（仅开发；生产务必用 env 覆盖）
+spring.ai.alibaba.data-agent.admin:
+  username: admin
+  password: admin123
+  jwt-secret: local-dev-jwt-secret-change-me-32b
+  bootstrap-enabled: true

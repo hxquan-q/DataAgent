@@ -22,6 +22,8 @@ import com.alibaba.cloud.ai.dataagent.enums.BizDataSourceTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**
+ * H2 数据库访问器，支持 H2 内嵌数据库的元数据查询和 SQL 执行。
+ *
  * @author HunterPorter
  * @author <a href="mailto:zongpeng_hzp@163.com">HunterPorter</a>
  */
@@ -29,18 +31,26 @@ import org.springframework.stereotype.Service;
 @Service("h2Accessor")
 public class H2DBAccessor extends AbstractAccessor {
 
+	/** 访问器类型标识 */
 	private final static String ACCESSOR_TYPE = "H2_Accessor";
 
+	/**
+	 * 构造函数，注入 DDL 工厂和连接池工厂。
+	 * @param ddlFactory DDL 执行器工厂
+	 * @param poolFactory 连接池工厂
+	 */
 	protected H2DBAccessor(DdlFactory ddlFactory, DBConnectionPoolFactory poolFactory) {
 
 		super(ddlFactory, poolFactory.getPoolByDbType(BizDataSourceTypeEnum.H2.getTypeName()));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String getAccessorType() {
 		return ACCESSOR_TYPE;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.H2.getTypeName().equalsIgnoreCase(type);

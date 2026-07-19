@@ -25,16 +25,32 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.PASSWORD_ERROR_
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.DATABASE_NOT_EXIST_42000;
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.OTHERS;
 
+/**
+ * Oracle JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用 Oracle JDBC 驱动（oracle.jdbc.OracleDriver），支持连接测试（ping）和错误码映射。
+ * </p>
+ */
 @Service("oracleJdbcConnectionPool")
 public class OracleJdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/** Oracle JDBC 驱动类名 */
 	private final static String DRIVER = "oracle.jdbc.OracleDriver";
 
+	/**
+	 * 获取 Oracle JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return DRIVER;
 	}
 
+	/**
+	 * 将 Oracle SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 
@@ -51,11 +67,20 @@ public class OracleJdbcConnectionPool extends AbstractDBConnectionPool {
 		};
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 Oracle 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.ORACLE.getTypeName().equals(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return Oracle 类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return BizDataSourceTypeEnum.ORACLE.getTypeName();

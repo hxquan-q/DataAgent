@@ -16,47 +16,28 @@
 
 <template>
 	<div ref="listRef" class="message-list custom-scrollbar">
-		<!-- Welcome state when no session -->
-		<ChatWelcome v-if="!store.currentSession" />
-
-		<!-- Messages -->
-		<template v-else>
+		<!-- Messages (empty canvas owned by chat.vue) -->
+		<template v-if="!showWelcome">
 			<div class="messages-inner">
 				<template v-for="message in filteredMessages" :key="message.id">
-					<div class="message-wrapper">
-						<!-- ── User message ─────────────────────────────────── -->
+					<div class="message-wrapper da-msg-enter">
+						<!-- ── User message (DEEIX: no avatar chrome) ──────── -->
 						<div v-if="message.role === 'user'" class="row user-row">
-							<v-card class="user-card" elevation="1">
+							<v-card class="user-card" elevation="0">
 								<span
 									v-html="escapeHtml(message.content).replace(/\n/g, '<br>')"
 								/>
 							</v-card>
-							<v-avatar
-								color="grey-darken-2"
-								size="34"
-								rounded="lg"
-								class="avatar"
-							>
-								<v-icon size="18" color="white">mdi-account</v-icon>
-							</v-avatar>
 						</div>
 
-						<!-- ── AI messages ──────────────────────────────────── -->
+						<!-- ── AI messages (DEEIX open canvas · no avatar) ── -->
 						<div v-else class="row ai-row">
-							<v-avatar
-								color="blue-darken-3"
-								size="34"
-								rounded="lg"
-								class="avatar"
-							>
-								<v-icon size="18" color="white">mdi-robot</v-icon>
-							</v-avatar>
 
 							<!-- HTML node message -->
 							<v-card
 								v-if="message.messageType === 'html'"
 								class="ai-card"
-								elevation="1"
+								elevation="0"
 							>
 								<div class="md-body" v-html="sanitizeHtml(message.content)" />
 							</v-card>
@@ -65,7 +46,7 @@
 							<v-card
 								v-else-if="message.messageType === 'result-set'"
 								class="ai-card"
-								elevation="1"
+								elevation="0"
 							>
 								<ChatResultSet
 									:data="safeParseJson(message.content)"
@@ -77,22 +58,28 @@
 							<v-card
 								v-else-if="message.messageType === 'markdown-report'"
 								class="ai-card report-card"
-								elevation="1"
+								elevation="0"
 							>
 								<ChatMarkdownReport :content="message.content" />
 							</v-card>
 
-							<!-- Timeline -->
-							<v-card
-								v-else-if="message.messageType === 'timeline'"
-								class="ai-card timeline-card"
-								elevation="1"
-							>
-								<ChatWorkflowTimeline
-									:node-blocks="safeParseBlocks(message.content)"
-									:completed="true"
+							<!-- Answer only: pure MD (process hidden) -->
+							<template v-else-if="message.messageType === 'timeline'">
+								<div
+									v-if="extractReportContent(message.content)"
+									class="ai-answer report-card"
+								>
+									<ChatMarkdownReport
+										:content="extractReportContent(message.content)!"
+									/>
+								</div>
+								<!-- no report text: fall back to plain assistant text from blocks -->
+								<div
+									v-else
+									class="ai-answer md-body"
+									v-html="renderMarkdown(fallbackTimelineText(message.content))"
 								/>
-							</v-card>
+							</template>
 
 							<!-- Warning (user stopped) -->
 							<div
@@ -113,82 +100,29 @@
 							</div>
 
 							<!-- Plain AI text (render as markdown) -->
-							<v-card v-else class="ai-card" elevation="1">
+							<v-card v-else class="ai-card" elevation="0">
 								<div class="md-body" v-html="renderMarkdown(message.content)" />
 							</v-card>
 						</div>
 					</div>
 
-					<!-- ── Report card below completed timeline ────────── -->
-					<div
-						v-if="
-							message.messageType === 'timeline' &&
-							extractReportContent(message.content)
-						"
-						class="message-wrapper"
-					>
-						<div class="row ai-row">
-							<v-avatar
-								color="blue-darken-3"
-								size="34"
-								rounded="lg"
-								class="avatar"
-								style="visibility: hidden"
-							/>
-							<v-card class="ai-card report-card" elevation="1">
-								<ChatMarkdownReport
-									:content="extractReportContent(message.content)!"
-								/>
-							</v-card>
-						</div>
-					</div>
 				</template>
 
-				<!-- ── Streaming: Workflow Timeline ──────────────────── -->
+				<!-- Streaming: status until text arrives, then MD -->
 				<div
-					v-if="store.isStreaming && store.nodeBlocks.length > 0"
+					v-if="store.isStreaming && !liveAnswerText"
 					class="row ai-row"
 				>
-					<v-avatar color="blue-darken-3" size="34" rounded="lg" class="avatar">
-						<v-icon size="18" color="white">mdi-robot</v-icon>
-					</v-avatar>
-					<v-card class="ai-card timeline-card" elevation="1">
-						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
-					</v-card>
+					<div class="thinking-chip" role="status" aria-live="polite">
+						<span class="thinking-chip__dot" aria-hidden="true" />
+						<span>生成中…</span>
+					</div>
 				</div>
 
-				<!-- ── Streaming: Report card below timeline ─────────── -->
-				<div
-					v-if="store.isReportStreaming && store.streamingReportContent"
-					class="row ai-row"
-				>
-					<v-avatar
-						color="blue-darken-3"
-						size="34"
-						rounded="lg"
-						class="avatar"
-						style="visibility: hidden"
-					/>
-					<v-card class="ai-card report-card" elevation="1">
-						<ChatStreamingReport :content="store.streamingReportContent" />
-					</v-card>
-				</div>
-
-				<!-- ── Streaming spinner (before first node arrives) ── -->
-				<div
-					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
-					class="row ai-row"
-				>
-					<v-avatar color="blue-darken-3" size="34" rounded="lg" class="avatar">
-						<v-icon size="18" color="white">mdi-robot</v-icon>
-					</v-avatar>
-					<v-card class="ai-card" elevation="1">
-						<div class="thinking-dots">
-							<span class="dot" />
-							<span class="dot dot--2" />
-							<span class="dot dot--3" />
-						</div>
-					</v-card>
+				<div v-if="liveAnswerText" class="row ai-row">
+					<div class="ai-answer report-card">
+						<ChatStreamingReport :content="liveAnswerText" />
+					</div>
 				</div>
 			</div>
 		</template>
@@ -203,21 +137,51 @@ import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
 import { useChatStore } from '~/stores/chat';
 import type { ResultData } from '~/services/resultSet/index';
 import type { ChatMessage } from '~/services/chat/index';
-import ChatWelcome from './ChatWelcome.vue';
 import ChatResultSet from './ChatResultSet.vue';
 import ChatMarkdownReport from './ChatMarkdownReport.vue';
-import ChatWorkflowTimeline from './ChatWorkflowTimeline.vue';
 import ChatStreamingReport from './ChatStreamingReport.vue';
 
+// Do NOT absorb markdown-report — it is the primary answer surface
 const TIMELINE_ABSORBED_TYPES = new Set([
 	'result-set',
-	'markdown-report',
 	'html',
 ]);
 
 const store = useChatStore();
+
+
 const listRef = ref<HTMLElement | null>(null);
 const { renderECharts } = useEchartsRenderer();
+
+// Welcome when idle empty (session may already exist after loadSessions)
+const showWelcome = computed(
+	() =>
+		!store.isStreaming &&
+		!store.isReportStreaming &&
+		(!store.currentSession || store.currentMessages.length === 0),
+);
+
+/** Live answer while streaming: report first, else process TEXT lines */
+const liveAnswerText = computed(() => {
+	const report = store.streamingReportContent || '';
+	if (report) return report;
+	const blocks = store.nodeBlocks || [];
+	const lines: string[] = [];
+	const nl = String.fromCharCode(10);
+	for (const block of blocks) {
+		for (const node of block || []) {
+			if (!node?.text) continue;
+			const tt = String(node.textType || '').toUpperCase();
+			if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
+			const s = String(node.text).trim();
+			if (!s || s.length > 4000) continue;
+			if (/^报告生成中/.test(s) && s.length < 80) continue;
+			if ((s.startsWith('{') || s.startsWith('[')) && s.length < 120) continue;
+			lines.push(s);
+		}
+	}
+	return lines.slice(-8).join(nl + nl);
+});
 
 const filteredMessages = computed<ChatMessage[]>(() => {
 	const msgs = store.currentMessages;
@@ -282,20 +246,76 @@ function safeParseBlocks(content: string) {
 	}
 }
 
+
+function fallbackTimelineText(timelineJson: string): string {
+	try {
+		const blocks = JSON.parse(timelineJson) as import('~/services/graph/index').GraphNodeResponse[][];
+		const parts: string[] = [];
+		for (const block of blocks) {
+			for (const node of block || []) {
+				if (!node?.text) continue;
+				const tt = String(node.textType || '').toUpperCase();
+				if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
+				const s = String(node.text).trim();
+				if (!s || s.length > 8000) continue;
+				if (/^报告生成中/.test(s) && s.length < 80) continue;
+				if ((s.startsWith('{') || s.startsWith('[')) && s.length < 200) continue;
+				parts.push(s);
+			}
+		}
+		const text = parts.join('\n\n').trim();
+		return (
+			text ||
+			'未生成分析报告。请提问与数据相关的问题。'
+		);
+	} catch {
+		return '未生成分析报告。请提问与数据相关的问题。';
+	}
+}
+
 function extractReportContent(timelineJson: string): string | null {
 	try {
 		const blocks = JSON.parse(
 			timelineJson,
 		) as import('~/services/graph/index').GraphNodeResponse[][];
+		let best: string | null = null;
 		for (const block of blocks) {
-			if (
-				block[0]?.nodeName === 'ReportGeneratorNode' &&
-				block[0]?.textType === 'MARK_DOWN' &&
-				block[0]?.text
-			) {
-				return block[0].text;
+			for (const node of block || []) {
+				if (!node?.text) continue;
+				const name = String(node.nodeName || '');
+				const tt = String(node.textType || '').toUpperCase();
+				const text = String(node.text);
+				// Prefer explicit report nodes
+				if (name === 'ReportGeneratorNode') {
+					// skip transient brief status
+					if (/^报告生成中/.test(text) && text.length < 80) continue;
+					if (
+						tt === 'MARK_DOWN' ||
+						tt === 'MARKDOWN' ||
+						tt === 'MD' ||
+						tt === 'HTML' ||
+						tt === 'TEXT' ||
+						!tt ||
+						text.length > 80
+					) {
+						// longest wins
+						if (!best || text.length > best.length) best = text;
+					}
+				}
 			}
 		}
+		if (best) return best;
+		// Fallback: longest TEXT/MARKDOWN blob in timeline (non code)
+		for (const block of blocks) {
+			for (const node of block || []) {
+				if (!node?.text) continue;
+				const tt = String(node.textType || '').toUpperCase();
+				if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
+				const text = String(node.text).trim();
+				if (text.length > 120 && (!best || text.length > best.length)) best = text;
+			}
+		}
+		return best;
 	} catch {
 		/* ignore */
 	}
@@ -308,35 +328,48 @@ function escapeHtml(text: string): string {
 	return div.innerHTML;
 }
 
-let scrollRafId: number | null = null;
-function scrollToBottom() {
-	if (scrollRafId) cancelAnimationFrame(scrollRafId);
-	scrollRafId = requestAnimationFrame(() => {
-		if (listRef.value) listRef.value.scrollTop = listRef.value.scrollHeight;
-		scrollRafId = null;
-	});
+const isMobileUi =
+	typeof window !== 'undefined' &&
+	(window.matchMedia('(max-width: 768px)').matches ||
+		window.matchMedia('(pointer: coarse)').matches);
+
+let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+function scrollToBottom(force = false) {
+	const delay = force ? 0 : isMobileUi && store.isStreaming ? 200 : 50;
+	if (scrollTimer && !force) return;
+	if (scrollTimer) clearTimeout(scrollTimer);
+	scrollTimer = setTimeout(() => {
+		scrollTimer = null;
+		const el = listRef.value;
+		if (!el) return;
+		const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
+		if (!force && dist > 120) return;
+		el.scrollTop = el.scrollHeight;
+	}, delay);
 }
 
 watch(
 	() => store.currentMessages.length,
 	() => {
-		scrollToBottom();
-		nextTick(() => renderECharts(listRef.value));
+		scrollToBottom(true);
+		if (!store.isStreaming) {
+			nextTick(() => renderECharts(listRef.value));
+		}
 	},
 );
 watch(
-	() => store.nodeBlocks,
+	() => store.nodeBlocks.length,
 	() => scrollToBottom(),
-	{ deep: true },
 );
 watch(
-	() => store.streamingReportContent,
+	() => store.streamingReportContent.length,
 	() => scrollToBottom(),
 );
 watch(
 	() => store.isStreaming,
 	(v) => {
-		if (v) scrollToBottom();
+		if (v) scrollToBottom(true);
+		else nextTick(() => renderECharts(listRef.value));
 	},
 );
 </script>
@@ -348,21 +381,32 @@ watch(
 	overflow-y: auto;
 	display: flex;
 	flex-direction: column;
+	background: var(--da-surface-soft);
 }
 
 .messages-inner {
-	padding: 24px 32px;
+	padding: 16px 24px 56px;
 	display: flex;
 	flex-direction: column;
-	gap: 20px;
+	gap: 18px;
 	width: 100%;
+	max-width: min(100%, var(--da-chat-max, 1080px));
+	margin: 0 auto;
+}
+
+.row.ai-row {
+	width: 100%;
+}
+
+.message-wrapper {
+	/* enter animation via .da-msg-enter */
 }
 
 /* ── Row (shared by user + AI) ───────────────────────────────────────────────── */
 .row {
 	display: flex;
 	align-items: flex-start;
-	gap: 10px;
+	gap: 6px;
 }
 
 .user-row {
@@ -373,65 +417,106 @@ watch(
 	justify-content: flex-start;
 }
 
-/* ── Avatar ──────────────────────────────────────────────────────────────────── */
-.avatar {
-	flex-shrink: 0;
-	margin-top: 2px;
-}
-
-/* ── User card ───────────────────────────────────────────────────────────────── */
+/* ── User card (DEEIX: muted soft bubble, no avatar) ────────────────────────── */
 .user-card {
-	background: #3b82f6 !important;
-	color: white !important;
-	padding: 10px 16px;
-	border-radius: 16px 16px 4px 16px !important;
-	font-size: 14px;
-	line-height: 1.65;
-	max-width: 60%;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-primary-soft)) !important;
+	color: var(--da-ink) !important;
+	padding: 10px 14px;
+	border-radius: 18px 18px 6px 18px !important;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	font-weight: 400;
+	line-height: var(--da-chat-line-height, 1.75);
+	max-width: min(72%, 640px);
 	word-break: break-word;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	box-shadow: none !important;
+	letter-spacing: -0.01em;
 }
 
-/* ── AI card ─────────────────────────────────────────────────────────────────── */
+/* ── AI card (DEEIX answer-first: open canvas, minimal chrome) ─────────────── */
 .ai-card {
-	padding: 12px 16px;
-	border-radius: 4px 16px 16px 16px !important;
-	font-size: 14px;
-	line-height: 1.7;
-	max-width: 75%;
+	padding: 4px 2px 8px;
+	border-radius: 0 !important;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	font-weight: 400;
+	line-height: var(--da-chat-line-height, 1.75);
+	max-width: min(100%, var(--da-answer-max, 960px));
 	word-break: break-word;
-	color: #1e293b;
-	background: #fff !important;
+	color: var(--da-ink, #1a2332);
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	letter-spacing: -0.01em;
 }
 
-/* Report card: full width like markdown content */
+.ai-card:hover {
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+
+/* Report: open canvas answer (DEEIX) — no heavy paper card */
 .report-card {
 	max-width: 100% !important;
 	padding: 0 !important;
 	flex: 1;
 	min-width: 0;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	overflow: visible;
+	border-radius: 0 !important;
 }
 
-/* Timeline card: full width, let timeline handle its own padding */
+/* Timeline card: process secondary (DEEIX hierarchy) */
 .timeline-card {
-	padding: 12px 14px;
+	padding: 4px 2px 6px !important;
 	max-width: 100% !important;
 	flex: 1;
 	min-width: 0;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+	border-radius: 0 !important;
+	opacity: 0.92;
+}
+.timeline-card:hover {
+	opacity: 1;
+	border-color: transparent !important;
 }
 
-/* ── Thinking dots ───────────────────────────────────────────────────────────── */
+/* ── Thinking feedback (DEEIX process marker — muted, not a card) ─────────────── */
+.thinking-card {
+	padding: 2px 0 4px !important;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+.thinking-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.thinking-label {
+	font-size: 13px;
+	font-weight: 500;
+	color: var(--da-muted);
+	letter-spacing: -0.01em;
+}
 .thinking-dots {
 	display: flex;
 	align-items: center;
-	gap: 5px;
-	padding: 4px 2px;
+	gap: 4px;
+	padding: 2px 0;
 }
 .dot {
-	width: 7px;
-	height: 7px;
-	background: #94a3b8;
+	width: 5px;
+	height: 5px;
+	background: var(--da-muted);
 	border-radius: 50%;
 	animation: dotBounce 1.2s infinite;
+	opacity: 0.55;
 }
 .dot--2 {
 	animation-delay: 0.2s;
@@ -449,47 +534,60 @@ watch(
 		transform: translateY(-5px);
 	}
 }
+@media (prefers-reduced-motion: reduce) {
+	.dot {
+		animation: none;
+		opacity: 0.7;
+	}
+}
 
-/* ── Markdown body inside AI card ────────────────────────────────────────────── */
+/* ── Markdown body inside AI card (DEEIX chat-font) ──────────────────────────── */
 .md-body :deep(h1),
 .md-body :deep(h2),
 .md-body :deep(h3) {
-	font-weight: 700;
-	margin: 12px 0 5px;
-	line-height: 1.4;
+	font-family: var(--da-font-display);
+	font-weight: 500;
+	margin: 0.9em 0 0.35em;
+	line-height: 1.3;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
 }
 .md-body :deep(p) {
-	margin-bottom: 7px;
+	margin: 0 0 0.7em;
 }
 .md-body :deep(ul),
 .md-body :deep(ol) {
-	padding-left: 20px;
-	margin-bottom: 7px;
+	padding-left: 1.3em;
+	margin: 0 0 0.7em;
 }
 .md-body :deep(li) {
-	margin-bottom: 3px;
+	margin-bottom: 0.15em;
 }
 .md-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
-	border: 1px solid #e1e4e8;
-	padding: 2px 6px;
-	border-radius: 3px;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
+	padding: 1px 4px;
+	border-radius: var(--da-radius-sm);
 	font-size: 12.5px;
-	font-family: 'Monaco', 'Menlo', 'Fira Code', monospace;
-	color: #e83e8c;
+	font-family: var(--da-font-mono);
+	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .md-body :deep(blockquote) {
-	border-left: 3px solid #3b82f6;
+	border-left: 3px solid var(--da-accent);
 	padding-left: 12px;
-	color: #64748b;
-	margin: 6px 0;
+	color: var(--da-muted);
+	margin: 4px 0;
 }
 .md-body :deep(table) {
 	width: 100%;
-	border-collapse: collapse;
-	margin: 8px 0;
-	display: block;
-	overflow-x: auto;
+	border-collapse: separate;
+	border-spacing: 0;
+	margin: 10px 0;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .md-body :deep(thead) {
 	display: table-header-group;
@@ -499,34 +597,34 @@ watch(
 }
 .md-body :deep(tr) {
 	display: table-row;
-	border-top: 1px solid #c6cbd1;
+	border-top: 1px solid var(--da-line);
 }
 .md-body :deep(th) {
-	display: table-cell;
-	background: #f1f5f9;
-	padding: 7px 12px;
-	border: 1px solid #e2e8f0;
+	background: color-mix(in srgb, var(--da-surface-soft) 85%, var(--da-primary-soft));
+	color: var(--da-muted);
 	font-weight: 600;
-	font-size: 13px;
+	font-size: 12px;
+	padding: 8px 10px;
+	border-bottom: 1px solid var(--da-line-soft);
 	text-align: left;
 }
 .md-body :deep(td) {
-	display: table-cell;
-	padding: 7px 12px;
-	border: 1px solid #e2e8f0;
-	font-size: 13px;
+	padding: 7px 10px;
+	border-bottom: 1px solid var(--da-line-soft);
+	font-size: 12.5px;
+	color: var(--da-ink);
 }
 .md-body :deep(tr:nth-child(even)) {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 }
 .md-body :deep(a) {
-	color: #2563eb;
+	color: var(--da-primary);
 	text-decoration: underline;
 }
 .md-body :deep(hr) {
 	border: none;
-	border-top: 1px solid #e2e8f0;
-	margin: 12px 0;
+	border-top: 1px solid var(--da-line-soft);
+	margin: 8px 0;
 }
 .md-body :deep(strong) {
 	font-weight: 700;
@@ -534,54 +632,54 @@ watch(
 
 /* ── Code block with header ─────────────────────────────────────────────────── */
 .md-body :deep(.code-block-wrapper) {
-	margin: 10px 0;
-	border: 1px solid #e1e4e8;
-	border-radius: 6px;
+	margin: 8px 0;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-sm);
 	overflow: auto;
-	background: #f6f8fa;
+	background: var(--da-surface-soft);
 }
 .md-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: #f6f8fa;
-	padding: 6px 10px;
-	border-bottom: 1px solid #e1e4e8;
+	background: var(--da-surface-soft);
+	padding: 3px 6px;
+	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
 .md-body :deep(.code-language) {
-	color: #6a737d;
+	color: var(--da-muted);
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
-	font-size: 10px;
+	font-family: var(--da-font-mono);
+	font-size: 9.5px;
 	text-transform: uppercase;
 }
 .md-body :deep(.code-copy-button) {
 	background: transparent;
-	border: 1px solid #d1d5da;
-	padding: 3px 10px;
-	border-radius: 4px;
+	border: 1px solid var(--da-line);
+	padding: 2px 8px;
+	border-radius: var(--da-radius-sm);
 	font-size: 10px;
 	cursor: pointer;
 	transition: all 0.2s;
-	color: #24292e;
+	color: var(--da-ink);
 }
 .md-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
-	border-color: #c6cbd1;
+	background: var(--da-surface-soft);
+	border-color: var(--da-line);
 }
 .md-body :deep(.code-copy-button.copied) {
-	background: #28a745;
-	border-color: #28a745;
+	background: var(--da-success);
+	border-color: var(--da-success);
 	color: white;
 }
 .md-body :deep(pre.hljs) {
 	margin: 0;
-	padding: 10px;
+	padding: 8px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: #f6f8fa;
-	font-size: 12px;
+	background: var(--da-surface-soft);
+	font-size: 11.5px;
 	line-height: 1.4;
 	white-space: pre;
 }
@@ -591,7 +689,7 @@ watch(
 	margin: 0;
 	background: transparent;
 	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	color: inherit;
 	white-space: pre;
 	min-width: max-content;
@@ -605,32 +703,257 @@ watch(
 	background: transparent;
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
-	background: #cbd5e1;
-	border-radius: 4px;
+	background: var(--da-line);
+	border-radius: var(--da-radius-sm);
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-	background: #94a3b8;
+	background: var(--da-muted);
 }
 
 /* ── Status banners (warning / error) ────────────────────────────────────────── */
 .status-banner {
 	display: flex;
 	align-items: center;
-	padding: 10px 14px;
-	border-radius: 8px;
-	font-size: 13.5px;
+	padding: 8px 12px;
+	border-radius: var(--da-radius-sm);
+	font-size: 13px;
 	font-weight: 500;
 	line-height: 1.5;
 	max-width: 75%;
 }
 .status-banner--warning {
-	background: #fffbeb;
-	border: 1px solid #fcd34d;
-	color: #92400e;
+	background: color-mix(in srgb, var(--da-warning) 10%, white);
+	border: 1px solid color-mix(in srgb, var(--da-warning) 40%, white);
+	color: var(--da-warning);
 }
 .status-banner--error {
-	background: #fef2f2;
-	border: 1px solid #fca5a5;
-	color: #991b1b;
+	background: color-mix(in srgb, var(--da-danger) 8%, white);
+	border: 1px solid color-mix(in srgb, var(--da-danger) 35%, white);
+	color: var(--da-danger);
+}
+
+.chat-status-strip {
+
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	padding: 6px 4px 2px;
+	max-width: min(100%, var(--da-answer-max, 960px));
+	width: calc(100% - 40px);
+	margin: 8px auto 0;
+	box-sizing: border-box;
+	font-size: 11.5px;
+	color: var(--da-muted);
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	box-shadow: none;
+}
+.chat-status-strip__agent {
+	font-weight: 600;
+	color: var(--da-ink);
+	letter-spacing: -0.01em;
+}
+.chat-status-strip__model {
+	padding: 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--da-muted);
+	font-weight: 400;
+}
+.chat-status-strip__model::before {
+	content: '·';
+	margin-right: 8px;
+	color: color-mix(in srgb, var(--da-muted) 55%, transparent);
+}
+.chat-status-strip__live {
+	padding: 1px 0;
+	border-radius: 0;
+	background: transparent;
+	color: var(--da-primary);
+	font-weight: 500;
+}
+
+.chat-status-strip__ready {
+	appearance: none;
+	cursor: pointer;
+	font: inherit;
+	padding: 1px 0;
+	border-radius: 0;
+	font-size: 11.5px;
+	font-weight: 500;
+	background: transparent;
+	color: var(--da-warning);
+	border: none;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+}
+.chat-status-strip__ready.ok {
+	background: transparent;
+	color: var(--da-muted);
+	border: none;
+	text-decoration: none;
+	cursor: default;
+}
+
+.chat-status-strip__switch {
+	appearance: none;
+	margin-left: auto;
+	border: none;
+	background: transparent;
+	color: var(--da-primary);
+	border-radius: 0;
+	padding: 1px 0;
+	font: inherit;
+	font-size: 11.5px;
+	font-weight: 500;
+	cursor: pointer;
+	text-decoration: underline;
+	text-underline-offset: 2px;
+	transition: color var(--da-dur-fast) var(--da-ease-out);
+}
+.chat-status-strip__switch:hover:not(:disabled) {
+	background: transparent;
+	color: color-mix(in srgb, var(--da-primary) 80%, #000);
+}
+.chat-status-strip__switch:disabled {
+	opacity: var(--da-disabled-opacity);
+	cursor: not-allowed;
+}
+.chat-status-strip__switch:focus-visible,
+.chat-status-strip__ready:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+
+/* R231 DEEIX: answer open canvas, process demoted */
+.chat-status-strip {
+
+	opacity: 0.92;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 35%, transparent) !important;
+	background: transparent !important;
+	backdrop-filter: none !important;
+}
+.report-card {
+	border: none !important;
+	box-shadow: none !important;
+	background: transparent !important;
+	padding-left: 0 !important;
+	padding-right: 0 !important;
+}
+.timeline-card {
+	border: 0.5px dashed color-mix(in srgb, var(--da-line) 55%, transparent) !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, transparent) !important;
+	box-shadow: none !important;
+	opacity: 0.92;
+}
+.ai-card {
+	border-color: transparent !important;
+	box-shadow: none !important;
+}
+.user-card {
+	border: none !important;
+	box-shadow: none !important;
+}
+
+/* R231 strip: hairline only */
+.chat-status-strip {
+
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 30%, transparent) !important;
+	background: transparent !important;
+	backdrop-filter: none !important;
+	box-shadow: none !important;
+	min-height: 36px !important;
+	padding: 4px 16px !important;
+}
+
+/* Process as tiny bubble — not a card */
+.process-slot {
+	width: 100%;
+	max-width: min(100%, var(--da-answer-max, 960px));
+	margin-top: 2px;
+}
+.process-row {
+	margin-top: -8px;
+}
+.ai-answer {
+	width: 100%;
+	max-width: min(100%, var(--da-answer-max, 960px));
+	color: var(--da-ink);
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	letter-spacing: -0.01em;
+}
+.thinking-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	min-height: 28px;
+	padding: 4px 12px 4px 10px;
+	border-radius: 999px;
+	border: 0.5px solid color-mix(in srgb, var(--da-primary) 25%, transparent);
+	background: color-mix(in srgb, var(--da-primary-soft) 70%, var(--da-surface));
+	color: var(--da-muted);
+	font-size: 12.5px;
+	font-weight: 600;
+}
+.thinking-chip__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+@keyframes processPulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.thinking-chip__dot { animation: none; }
+}
+/* Demote legacy timeline-card if any remain */
+.timeline-card {
+	padding: 0 !important;
+	background: transparent !important;
+	border: none !important;
+	box-shadow: none !important;
+}
+
+
+@media (max-width: 768px) {
+	.messages-inner {
+		padding: 12px 14px calc(24px + var(--da-safe-bottom, 0px));
+		gap: 14px;
+	}
+	.user-card {
+		max-width: min(88%, 100%) !important;
+		padding: 10px 12px !important;
+		font-size: 15px !important;
+	}
+	.ai-card,
+	.ai-answer {
+		max-width: 100% !important;
+		font-size: 15px;
+	}
+	.process-slot {
+		max-width: 100%;
+	}
+}
+
+.ai-answer .markdown-body,
+.ai-answer :deep(.markdown-body) {
+	font-size: 15px;
+	line-height: 1.75;
+}
+.ai-answer :deep(.report-body) {
+	padding: 0 !important;
+}
+/* hide leftover report chrome if any */
+.ai-answer :deep(.report-header),
+.ai-answer :deep(.report-hairline),
+.ai-answer :deep(.report-actions) {
+	display: none !important;
 }
 </style>

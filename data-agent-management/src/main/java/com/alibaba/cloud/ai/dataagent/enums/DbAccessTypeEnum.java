@@ -20,24 +20,43 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.Arrays;
 import java.util.Optional;
 
+/**
+ * 数据库访问类型枚举。
+ * <p>
+ * 定义系统支持的数据库访问方式，包括 JDBC 连接、SDK 接入、数据 API、函数计算 HTTP 以及内存模式。
+ */
 public enum DbAccessTypeEnum {
 
+	/** 通过 JDBC 驱动访问 */
 	JDBC("jdbc"),
 
+	/** 通过 SDK 访问 */
 	SDK("sdk"),
 
+	/** 通过数据 API 访问 */
 	DATA_API("data-api"),
 
+	/** 通过函数计算 HTTP 接口访问 */
 	FC_HTTP("fc-http"),
 
+	/** 内存模式访问（无真实数据库） */
 	MEMORY("in-memory");
 
 	private String code;
 
+	/**
+	 * 构造数据库访问类型枚举。
+	 * @param code 访问类型编码标识
+	 */
 	DbAccessTypeEnum(String code) {
 		this.code = code;
 	}
 
+	/**
+	 * 根据编码获取对应的访问类型枚举。
+	 * @param code 访问类型编码标识
+	 * @return 匹配的枚举实例，编码为空或未匹配时返回 {@code null}
+	 */
 	public static DbAccessTypeEnum of(String code) {
 		if (StringUtils.isBlank(code)) {
 			return null;
@@ -50,6 +69,10 @@ public enum DbAccessTypeEnum {
 		return any.orElse(null);
 	}
 
+	/**
+	 * 获取访问类型编码标识。
+	 * @return 访问类型编码
+	 */
 	public String getCode() {
 		return code;
 	}

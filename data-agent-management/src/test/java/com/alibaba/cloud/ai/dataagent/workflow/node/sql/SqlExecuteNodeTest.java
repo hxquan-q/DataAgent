@@ -92,11 +92,15 @@ class SqlExecuteNodeTest {
 	@Mock
 	private Accessor accessor;
 
+	@Mock
+	private com.alibaba.cloud.ai.dataagent.service.chart.ChartRenderService chartRenderService;
+
 	private SqlExecuteNode sqlExecuteNode;
 
 	@BeforeEach
 	void setUp() {
-		sqlExecuteNode = new SqlExecuteNode(databaseUtil, nl2SqlService, llmService, properties, jsonParseUtil);
+		sqlExecuteNode = new SqlExecuteNode(databaseUtil, nl2SqlService, llmService, properties, jsonParseUtil,
+				chartRenderService);
 	}
 
 	private OverAllState createTestState() {

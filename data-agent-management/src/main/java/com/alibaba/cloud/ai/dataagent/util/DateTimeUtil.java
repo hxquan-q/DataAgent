@@ -28,110 +28,172 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * 中文日期时间表达式解析工具类。
+ * <p>
+ * 将自然语言中的中文日期/时间表达式（如"去年3月"、"近30天"、"本月最后一周"、"今年第12周"等） 解析为具体的日期区间或日期描述，供查询改写、报表生成等场景使用。
+ * </p>
+ * <p>
+ * 解析流程：通过预定义的正则表达式匹配表达式类别，再调用对应的处理方法计算具体日期， 最终拼接为"原始表达式=解析结果"形式的说明文本。
+ * </p>
+ */
 public class DateTimeUtil {
 
+	/** 精确年月日表达式：如 "2024年03月15日" */
 	public static final Pattern SPECIFIC_YEAR_MONTH_DAY_PATTERN = Pattern.compile("\\d{4}年\\d{2}月\\d{2}日");
 
+	/** 相对年+月日表达式：如 "去年03月15日" */
 	public static final Pattern GENERAL_YEAR_MONTH_DAY_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)(\\d{2}月\\d{2}日)");
 
+	/** 相对月+日表达式：如 "本月15日" */
 	public static final Pattern GENERAL_MONTH_DAY_PATTERN = Pattern.compile("(本月|上月|上上月|下月)(\\d{2}日)");
 
+	/** 相对日表达式：如 "今天"、"昨天"、"上月今天" */
 	public static final Pattern GENERAL_DAY_PATTERN = Pattern.compile("(今天|昨天|前天|明天|后天|上月今天|上上月今天)");
 
+	/** 本周第 N 天表达式：如 "本周第3天" */
 	public static final Pattern WEEK_DAY_PATTERN = Pattern.compile("本周第(\\d)天");
 
+	/** 相对月最后一天表达式：如 "本月最后一天" */
 	public static final Pattern GENERAL_MONTH_LAST_DAY_PATTERN = Pattern.compile("(本月|上月)最后一天");
 
+	/** 相对年月最后一天表达式：如 "今年03月最后一天" */
 	public static final Pattern GENERAL_YEAR_MONTH_LAST_DAY_PATTERN = Pattern.compile("(今年)(\\d{2})月最后一天");
 
+	/** 相对周星期表达式：如 "本周星期一"、"上周星期三" */
 	public static final Pattern GENERAL_WEEK_SPECIFIC_DAY_PATTERN = Pattern.compile("(本周|上周|上上周|下周|下下周)星期(\\d)");
 
+	/** 精确年月表达式：如 "2024年03月" */
 	public static final Pattern SPECIFIC_YEAR_MONTH_PATTERN = Pattern.compile("\\d{4}年\\d{2}月");
 
+	/** 相对年月表达式：如 "去年03月" */
 	public static final Pattern GENERAL_YEAR_MONTH_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)(\\d{2}月)");
 
+	/** 相对月表达式：如 "本月"、"上上月"、"去年本月" */
 	public static final Pattern GENERAL_MONTH_PATTERN = Pattern.compile("(本月|上月|上上月|下月|去年本月)");
 
+	/** 精确年表达式：如 "2024年" */
 	public static final Pattern SPECIFIC_YEAR_PATTERN = Pattern.compile("(\\d{4})年");
 
+	/** 相对年表达式：如 "今年"、"前年" */
 	public static final Pattern GENERAL_YEAR_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)");
 
+	/** 精确年季度表达式：如 "2024年第1季度" */
 	public static final Pattern SPECIFIC_YEAR_QUARTER_PATTERN = Pattern.compile("\\d{4}年第\\d季度");
 
+	/** 相对年季度表达式：如 "去年第1季度" */
 	public static final Pattern GENERAL_YEAR_QUARTER_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)(第\\d季度)");
 
+	/** 相对季度表达式：如 "本季度"、"上季度" */
 	public static final Pattern GENERAL_QUARTER_PATTERN = Pattern.compile("(本季度|上季度|下季度|去年本季度)");
 
+	/** 相对周表达式：如 "本周"、"上上周" */
 	public static final Pattern GENERAL_WEEK_PATTERN = Pattern.compile("(本周|上周|上上周|下周|下下周)");
 
+	/** 精确年周表达式：如 "2024年第12周" */
 	public static final Pattern SPECIFIC_YEAR_WEEK_PATTERN = Pattern.compile("(\\d{4})年第(\\d{2})周");
 
+	/** 精确年月周表达式：如 "2024年03月第2周" */
 	public static final Pattern SPECIFIC_YEAR_MONTH_WEEK_PATTERN = Pattern.compile("(\\d{4})年(\\d{2})月第(\\d)周");
 
+	/** 相对年周表达式：如 "今年第12周" */
 	public static final Pattern GENERAL_YEAR_WEEK_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)第(\\d{2})周");
 
+	/** 相对月周表达式：如 "本月第2周" */
 	public static final Pattern GENERAL_MONTH_WEEK_PATTERN = Pattern.compile("(本月|上月)第(\\d)周");
 
+	/** 相对年月周表达式：如 "去年03月第2周" */
 	public static final Pattern GENERAL_YEAR_MONTH_WEEK_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)(\\d{2})月第(\\d)周");
 
+	/** 精确年月最后一周表达式：如 "2024年03月最后一周" */
 	public static final Pattern SPECIFIC_YEAR_MONTH_LAST_WEEK_PATTERN = Pattern.compile("(\\d{4})年(\\d{2})月最后一周");
 
+	/** 相对月最后一周表达式：如 "本月最后一周" */
 	public static final Pattern GENERAL_MONTH_LAST_WEEK_PATTERN = Pattern.compile("(本月|上月|上上月)最后一周");
 
+	/** 精确年月完整周表达式：如 "2024年03月第2个完整周" */
 	public static final Pattern SPECIFIC_YEAR_MONTH_COMPLETE_WEEK_PATTERN = Pattern
 		.compile("(\\d{4})年(\\d{2})月第(\\d)个完整周");
 
+	/** 相对年完整周表达式：如 "今年第12个完整周" */
 	public static final Pattern GENERAL_YEAR_COMPLETE_WEEK_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)第(\\d{2})个完整周");
 
+	/** 精确年完整周表达式：如 "2024年第12个完整周" */
 	public static final Pattern SPECIFIC_YEAR_COMPLETE_WEEK_PATTERN = Pattern.compile("(\\d{4})年第(\\d{2})个完整周");
 
+	/** 相对年月完整周表达式：如 "今年03月第2个完整周" */
 	public static final Pattern GENERAL_YEAR_MONTH_COMPLETE_WEEK_PATTERN = Pattern
 		.compile("(今年|去年|前年|明年|后年)(\\d{2})月第(\\d)个完整周");
 
+	/** 相对月完整周表达式：如 "本月第2个完整周" */
 	public static final Pattern GENERAL_MONTH_COMPLETE_WEEK_PATTERN = Pattern.compile("(本月|上月)第(\\d)个完整周");
 
+	/** 相对月最后一个完整周表达式：如 "本月最后一个完整周" */
 	public static final Pattern GENERAL_MONTH_LAST_COMPLETE_WEEK_PATTERN = Pattern.compile("(本月|上月|上上月)最后一个完整周");
 
+	/** 近 N 年表达式：如 "近3年" */
 	public static final Pattern RECENT_N_YEAR_PATTERN = Pattern.compile("近(\\d+)年");
 
+	/** 近 N 个月表达式：如 "近6个月" */
 	public static final Pattern RECENT_N_MONTH_PATTERN = Pattern.compile("近(\\d+)个月");
 
+	/** 近 N 周表达式：如 "近4周" */
 	public static final Pattern RECENT_N_WEEK_PATTERN = Pattern.compile("近(\\d+)周");
 
+	/** 近 N 天表达式：如 "近30天" */
 	public static final Pattern RECENT_N_DAY_PATTERN = Pattern.compile("近(\\d+)天");
 
+	/** 近 N 个完整年表达式：如 "近3个完整年" */
 	public static final Pattern RECENT_N_COMPLETE_YEAR_PATTERN = Pattern.compile("近(\\d+)个完整年");
 
+	/** 近 N 个完整季度表达式：如 "近2个完整季度" */
 	public static final Pattern RECENT_N_COMPLETE_QUARTER_PATTERN = Pattern.compile("近(\\d+)个完整季度");
 
+	/** 近 N 个完整月表达式：如 "近6个完整月" */
 	public static final Pattern RECENT_N_COMPLETE_MONTH_PATTERN = Pattern.compile("近(\\d+)个完整月");
 
+	/** 近 N 个完整周表达式：如 "近4个完整周" */
 	public static final Pattern RECENT_N_COMPLETE_WEEK_PATTERN = Pattern.compile("近(\\d+)个完整周");
 
+	/** 不包含今天的近 N 天表达式：如 "不包含今天的近7天" */
 	public static final Pattern RECENT_N_DAY_WITHOUT_TODAY_PATTERN = Pattern.compile("不包含今天的近(\\d+)天");
 
+	/** 包含当前季度的近 N 个季度表达式：如 "包含当前季度的近4个季度" */
 	public static final Pattern RECENT_N_QUARTER_WITH_CURRENT_PATTERN = Pattern.compile("包含当前季度的近(\\d+)个季度");
 
+	/** 精确年上下半年表达式：如 "2024年上半年" */
 	public static final Pattern SPECIFIC_YEAR_HALF_YEAR_PATTERN = Pattern.compile("(\\d{4})年(上|下)半年");
 
+	/** 相对年上下半年表达式：如 "今年下半年" */
 	public static final Pattern GENERAL_YEAR_HALF_YEAR_PATTERN = Pattern.compile("(今年|去年|前年|明年|后年)(上|下)半年");
 
+	/** 上下半年表达式：如 "上半年"、"下半年" */
 	public static final Pattern HALF_YEAR_PATTERN = Pattern.compile("(上|下)半年");
 
+	/**
+	 * 构造日期时间说明，包含当前日期信息和各表达式的解析结果。
+	 * <p>
+	 * 返回文本格式：第一行为"今天是…"的当前日期说明，后续逐行列出"原始表达式=解析结果"。
+	 * </p>
+	 * @param expressions 待解析的中文日期表达式列表
+	 * @return 包含当前日期说明和各表达式解析结果的文本
+	 */
 	public static String buildDateTimeComment(List<String> expressions) {
 		LocalDate now = LocalDate.now();
-		// Get year, month, day
+		// 获取当前年、月、日
 		int year = now.getYear();
 		int month = now.getMonthValue();
 		int day = now.getDayOfMonth();
 
-		// Get current year's quarter
+		// 获取当前年份对应的季度
 		int quarter = now.get(IsoFields.QUARTER_OF_YEAR);
 
 		String todayComment = String.format("今天是%d年%02d月%02d日，是%d年的第%d季度", year, month, day, year, quarter);
 
+		// 解析每个表达式得到说明列表
 		List<String> dateTimeCommentList = buildDateExpressions(expressions, now);
 
+		// 拼接当前日期说明与各表达式解析结果
 		StringBuilder finalExpression = new StringBuilder();
 		finalExpression.append(todayComment).append("\n");
 		finalExpression.append("需要计算的时间是：\n");
@@ -139,6 +201,15 @@ public class DateTimeUtil {
 		return finalExpression.toString();
 	}
 
+	/**
+	 * 将多个中文日期表达式逐一解析为"原始表达式=解析结果"形式的说明文本。
+	 * <p>
+	 * 内部按预定义的正则表达式依次匹配各类表达式，并调用对应的解析方法计算具体日期。
+	 * </p>
+	 * @param expressions 待解析的中文日期表达式列表
+	 * @param now 当前日期，作为相对计算的基准
+	 * @return 解析结果说明列表，每项格式为"原始表达式=解析结果"
+	 */
 	public static List<String> buildDateExpressions(List<String> expressions, LocalDate now) {
 		List<String> dateTimeCommentList = new ArrayList<>();
 		for (String expression : expressions) {
@@ -506,9 +577,17 @@ public class DateTimeUtil {
 		return dateTimeCommentList;
 	}
 
+	/**
+	 * 将相对年份表达式（今年/去年/前年/明年/后年）解析为具体的年份描述。
+	 * @param now 当前日期，作为相对计算的基准
+	 * @param yearEx 相对年份表达式
+	 * @param applyDomainLogic 是否应用领域特定逻辑（保留参数，用于扩展）
+	 * @return 具体年份描述，如 "2024年"
+	 */
 	public static String getYearEx(LocalDate now, String yearEx, boolean applyDomainLogic) {
 		String comment = "";
 		int year = 0;
+		// 依据相对表达式计算具体年份
 		if (yearEx.equals("今年")) {
 			year = now.getYear();
 		}
@@ -530,9 +609,16 @@ public class DateTimeUtil {
 		return comment;
 	}
 
+	/**
+	 * 将相对月份表达式（本月/上月/上上月/下月/去年本月）解析为具体的年月描述。
+	 * @param now 当前日期，作为相对计算的基准
+	 * @param monthEx 相对月份表达式
+	 * @return 具体年月描述，格式为 "yyyy年MM月"
+	 */
 	public static String getMonthEx(LocalDate now, String monthEx) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月");
 		String comment = "";
+		// 依据相对表达式在当前年月基础上进行偏移
 		if (monthEx.equals("本月")) {
 			comment = formatter.format(YearMonth.from(now));
 		}
@@ -551,10 +637,17 @@ public class DateTimeUtil {
 		return comment;
 	}
 
+	/**
+	 * 将相对日期表达式（今天/昨天/前天/明天/后天/上月今天/上上月今天）解析为具体日期描述。
+	 * @param now 当前日期，作为相对计算的基准
+	 * @param dayEx 相对日期表达式
+	 * @return 具体日期描述，格式为 "yyyy年MM月dd日"；解析异常时返回空字符串
+	 */
 	public static String getDayEx(LocalDate now, String dayEx) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy年MM月dd日");
 		String comment = "";
 		try {
+			// 依据相对表达式计算具体日期
 			if (dayEx.equals("今天")) {
 				comment = formatter.format(now);
 			}
@@ -578,6 +671,7 @@ public class DateTimeUtil {
 			}
 		}
 		catch (Exception e) {
+			// 例如上月不存在今天（如 1月31日的上月今天）时，打印堆栈并返回空串
 			e.printStackTrace();
 		}
 		return comment;

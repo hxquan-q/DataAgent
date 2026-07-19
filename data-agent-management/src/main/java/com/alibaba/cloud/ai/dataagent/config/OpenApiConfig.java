@@ -22,17 +22,28 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * OpenAPI/Swagger 配置。
+ * OpenAPI / Swagger 文档配置。
+ * <p>
+ * 定义 API 文档元信息并按包路径分组，启动后访问 {@code http://localhost:8065/swagger-ui.html} 查看接口文档。
+ * </p>
  */
 @Configuration
 public class OpenApiConfig {
 
+	/**
+	 * 定义 OpenAPI 文档基本信息（标题、描述、版本）。
+	 * @return OpenAPI 元信息
+	 */
 	@Bean
 	public OpenAPI dataAgentOpenApi() {
 		return new OpenAPI()
 			.info(new Info().title("DataAgent Backend API").description("DataAgent 后端接口文档").version("v1"));
 	}
 
+	/**
+	 * 定义 API 分组：扫描 controller 包下 {@code /api/**} 路径的接口。
+	 * @return 分组配置
+	 */
 	@Bean
 	public GroupedOpenApi dataAgentApiGroup() {
 		return GroupedOpenApi.builder()

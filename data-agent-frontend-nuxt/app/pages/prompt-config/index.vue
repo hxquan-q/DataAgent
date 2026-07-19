@@ -22,8 +22,8 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -33,7 +33,7 @@
 				</v-btn>
 				<v-btn
 					v-if="selectedIds.length > 0"
-					color="blue-darken-1"
+					color="primary"
 					prepend-icon="mdi-check-circle"
 					class="text-none"
 					elevation="0"
@@ -43,7 +43,7 @@
 				</v-btn>
 				<v-btn
 					v-if="selectedIds.length > 0"
-					color="orange-darken-1"
+					color="warning"
 					prepend-icon="mdi-pause-circle"
 					class="text-none"
 					elevation="0"
@@ -52,7 +52,7 @@
 					批量禁用
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -63,7 +63,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-select
 					v-model="selectedAgentId"
@@ -102,7 +102,7 @@
 				/>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -180,21 +180,21 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editConfig(item)"
 						/>
 						<v-btn
 							size="small"
 							variant="text"
-							color="amber-darken-2"
+							color="warning"
 							icon="mdi-sort-numeric-descending"
 							@click="openPriorityDialog(item)"
 						/>
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.enabled ? 'orange-darken-1' : 'success'"
+							:color="item.enabled ? 'warning' : 'success'"
 							:icon="item.enabled ? 'mdi-pause-circle' : 'mdi-check-circle'"
 							@click="toggleEnabled(item)"
 						>
@@ -205,7 +205,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteConfig(item)"
 						/>
@@ -213,19 +213,14 @@
 				</template>
 
 				<template #no-data>
-					<div class="d-flex flex-column align-center py-12">
-						<v-icon
-							icon="mdi-text-box-edit-outline"
-							size="64"
-							color="blue-lighten-3"
-							class="mb-4"
-						/>
-						<p class="text-body-1 text-medium-emphasis mb-2">暂无提示词配置</p>
-						<p class="text-body-2 text-disabled mb-6">
-							点击「添加配置」开始创建增强提示词
-						</p>
+					<div class="d-flex flex-column align-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-text-box-edit-outline" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无提示词配置</h3>
+						<p class="da-empty__desc">点击「添加配置」开始创建增强提示词</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -240,14 +235,14 @@
 
 		<v-dialog v-model="dialogVisible" max-width="760" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑提示词配置' : '添加提示词配置'
 					}}</span>
 					<v-spacer />
@@ -263,7 +258,7 @@
 				<v-card-text class="pa-6">
 					<v-form ref="formRef">
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								配置名称 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -276,7 +271,7 @@
 							/>
 						</div>
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								配置描述
 							</p>
 							<v-text-field
@@ -288,7 +283,7 @@
 							/>
 						</div>
 						<div class="mb-4">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								优化提示词内容 <span class="text-error">*</span>
 							</p>
 							<v-textarea
@@ -304,7 +299,7 @@
 						<v-row>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									优先级
 								</p>
@@ -320,7 +315,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									显示顺序
 								</p>
@@ -343,7 +338,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -360,11 +355,11 @@
 				<v-card-title class="d-flex align-center pa-6 pb-4">
 					<v-icon
 						icon="mdi-sort-numeric-descending"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="26"
 					/>
-					<span class="text-h6 font-weight-bold">设置优先级</span>
+					<span class="text-h6 font-weight-medium dialog-title">设置优先级</span>
 					<v-spacer />
 					<v-btn
 						icon="mdi-close"
@@ -394,7 +389,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none"
 						elevation="0"
 						@click="updatePriority"

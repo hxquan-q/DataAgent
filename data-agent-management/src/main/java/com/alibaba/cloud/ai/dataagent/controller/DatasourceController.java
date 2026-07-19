@@ -45,7 +45,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
-// todo: 不要吞掉所有异常，可以直接抛出，写一个Advice拦截异常并做日志
+// TODO 不要吞掉所有异常，建议使用全局 Advice 拦截并记录日志
+/**
+ * 数据源管理控制器。
+ * <p>
+ * 管理数据源的增删改查、连接测试、表/字段获取， 以及逻辑外键（Logical Relation）的配置，用于补充数据库物理外键无法覆盖的关联关系。
+ * </p>
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/datasource")

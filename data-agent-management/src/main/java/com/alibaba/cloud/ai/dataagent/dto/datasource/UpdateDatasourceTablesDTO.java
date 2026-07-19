@@ -20,12 +20,21 @@ import lombok.Data;
 
 import java.util.List;
 
+/**
+ * 更新数据源表列表 DTO
+ *
+ * <p>
+ * 用于更新指定数据源下选中的表列表。
+ * </p>
+ */
 @Data
 public class UpdateDatasourceTablesDTO {
 
+	/** 数据源ID */
 	@NotNull(message = "datasourceId cannot be null")
 	private Integer datasourceId;
 
+	/** 选中的表名列表 */
 	private List<String> tables;
 
 }

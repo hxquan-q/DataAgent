@@ -1,11 +1,11 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -56,6 +56,13 @@ public class SemanticTextSplitter extends TextSplitter {
 	 */
 	private static final Pattern SENTENCE_PATTERN = Pattern.compile("([^。！？；.!?;\\n]+[。！？；.!?;]?|[^。！？；.!?;\\n]*\\n)");
 
+	/**
+	 * 将文本按语义进行切分。
+	 * <p>
+	 * 处理流程：提取句子 -> 构建滑动窗口上下文 -> 批量计算 Embedding -> 基于"语义相似度突变"和"最大长度限制"双重约束合并句子为块。
+	 * @param text 待切分的原始文本
+	 * @return 切分后的文本块列表
+	 */
 	@Override
 	public List<String> splitText(String text) {
 		if (text == null || text.trim().isEmpty()) {
@@ -151,6 +158,11 @@ public class SemanticTextSplitter extends TextSplitter {
 		return chunks;
 	}
 
+	/**
+	 * 判断字符串是否包含中文字符（用于决定拼接时是否加空格）。
+	 * @param str 待判断的字符串
+	 * @return 包含汉字返回 {@code true}
+	 */
 	// 简单的中文判断，用于决定拼接时加不加空格
 	private boolean isChinese(String str) {
 		return str.codePoints()
@@ -202,7 +214,11 @@ public class SemanticTextSplitter extends TextSplitter {
 	}
 
 	/**
-	 * 批量 Embedding (带容错)
+	 * 批量计算文本的 Embedding 向量（带异常容错）。
+	 * <p>
+	 * 按批次大小分批调用嵌入模型，单批失败时填充零向量以保证维度对齐。
+	 * @param texts 待计算的文本列表
+	 * @return 每段文本对应的 Embedding 向量列表
 	 */
 	private List<float[]> batchEmbed(List<String> texts) {
 		// 获取向量维度的占位符
@@ -230,6 +246,12 @@ public class SemanticTextSplitter extends TextSplitter {
 		return allEmbeddings;
 	}
 
+	/**
+	 * 计算两个向量的余弦相似度。
+	 * @param vec1 向量 1
+	 * @param vec2 向量 2
+	 * @return 余弦相似度值，范围 [-1, 1]，零向量返回 0.0
+	 */
 	private double cosineSimilarity(float[] vec1, float[] vec2) {
 		if (vec1 == null || vec2 == null || vec1.length != vec2.length)
 			return 0.0;
@@ -245,7 +267,9 @@ public class SemanticTextSplitter extends TextSplitter {
 	}
 
 	/**
-	 * 保底策略：如果单个句子本身就超长，还是得硬切
+	 * 保底策略：单个句子本身超长时，按最大长度硬切分。
+	 * @param text 超长的文本
+	 * @return 切分后的文本块列表
 	 */
 	private List<String> splitLargeChunk(String text) {
 		List<String> result = new ArrayList<>();

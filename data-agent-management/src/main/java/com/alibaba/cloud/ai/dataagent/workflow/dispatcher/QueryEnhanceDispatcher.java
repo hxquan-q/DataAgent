@@ -26,36 +26,49 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.SCHEMA_RECALL_NOD
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
- * 根据查询增强结果决定下一个节点的分发器
+ * 查询增强分发器，根据查询增强节点的结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>查询增强结果为空或字段缺失：结束流程</li>
+ * <li>结果有效（规范化查询和扩展查询均非空）：进入 Schema 召回节点</li>
+ * </ul>
+ * </p>
  */
 @Slf4j
 public class QueryEnhanceDispatcher implements EdgeAction {
 
+	/**
+	 * 根据查询增强结果决定下一个节点。
+	 * @param state 工作流全局状态，包含查询增强结果
+	 * @return 下一个节点名称：{@value SCHEMA_RECALL_NODE} 或 {@code END}
+	 * @throws Exception 读取状态时可能抛出的异常
+	 */
 	@Override
 	public String apply(OverAllState state) throws Exception {
-		// 获取查询处理结果
+		// 获取查询增强结果
 		QueryEnhanceOutputDTO queryProcessOutput = StateUtil.getObjectValue(state, QUERY_ENHANCE_NODE_OUTPUT,
 				QueryEnhanceOutputDTO.class);
 
-		// 检查查询处理结果是否为空
+		// 检查查询增强结果是否为空
 		if (queryProcessOutput == null) {
-			log.warn("Query process output is null, ending conversation");
+			log.warn("查询增强结果为空，结束流程");
 			return END;
 		}
 
-		// 检查各个字段是否为空
+		// 检查各字段是否为空
 		boolean isCanonicalQueryEmpty = queryProcessOutput.getCanonicalQuery() == null
 				|| queryProcessOutput.getCanonicalQuery().trim().isEmpty();
 		boolean isExpandedQueriesEmpty = queryProcessOutput.getExpandedQueries() == null
 				|| queryProcessOutput.getExpandedQueries().isEmpty();
 
 		if (isCanonicalQueryEmpty || isExpandedQueriesEmpty) {
-			log.warn("Query process output contains empty fields - canonicalQuery: {}, expandedQueries: {}",
-					isCanonicalQueryEmpty, isExpandedQueriesEmpty);
+			log.warn("查询增强结果字段为空 - 规范化查询为空: {}, 扩展查询为空: {}", isCanonicalQueryEmpty, isExpandedQueriesEmpty);
 			return END;
 		}
 		else {
-			log.info("Query process output is valid, proceeding to schema recall");
+			log.info("查询增强结果有效，进入 Schema 召回节点");
 			return SCHEMA_RECALL_NODE;
 		}
 	}

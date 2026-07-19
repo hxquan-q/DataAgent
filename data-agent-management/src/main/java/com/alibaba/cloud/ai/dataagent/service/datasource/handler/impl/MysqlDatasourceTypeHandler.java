@@ -22,14 +22,26 @@ import org.springframework.stereotype.Component;
 
 import java.util.Locale;
 
+/**
+ * MySQL 数据源类型处理器，负责构建 MySQL JDBC 连接 URL 并规范化连接测试 URL。
+ */
 @Component
 public class MysqlDatasourceTypeHandler implements DatasourceTypeHandler {
 
+	/**
+	 * 返回 MySQL 数据源类型名称。
+	 * @return MySQL 类型名称
+	 */
 	@Override
 	public String typeName() {
 		return BizDataSourceTypeEnum.MYSQL.getTypeName();
 	}
 
+	/**
+	 * 构建 MySQL JDBC 连接 URL，包含字符编码、时区等参数。
+	 * @param datasource 数据源实体
+	 * @return MySQL JDBC 连接 URL
+	 */
 	@Override
 	public String buildConnectionUrl(Datasource datasource) {
 		if (!hasRequiredConnectionFields(datasource)) {
@@ -40,20 +52,35 @@ public class MysqlDatasourceTypeHandler implements DatasourceTypeHandler {
 				datasource.getHost(), datasource.getPort(), datasource.getDatabaseName());
 	}
 
+	/**
+	 * 规范化连接测试 URL，确保包含时区和 SSL 参数。
+	 * @param datasource 数据源实体
+	 * @param url 待规范化的 URL
+	 * @return 规范化后的 URL
+	 */
 	@Override
 	public String normalizeTestUrl(Datasource datasource, String url) {
 		String updated = url;
 		String lowerUrl = updated.toLowerCase(Locale.ROOT);
+		// 确保包含时区参数
 		if (!lowerUrl.contains("servertimezone=")) {
 			updated = appendParam(updated, "serverTimezone", "Asia/Shanghai");
 			lowerUrl = updated.toLowerCase(Locale.ROOT);
 		}
+		// 确保包含 SSL 参数
 		if (!lowerUrl.contains("usessl=")) {
 			updated = appendParam(updated, "useSSL", "false");
 		}
 		return updated;
 	}
 
+	/**
+	 * 向 URL 追加查询参数。
+	 * @param url 原始 URL
+	 * @param key 参数名
+	 * @param value 参数值
+	 * @return 追加参数后的 URL
+	 */
 	private String appendParam(String url, String key, String value) {
 		return url + (url.contains("?") ? "&" : "?") + key + "=" + value;
 	}

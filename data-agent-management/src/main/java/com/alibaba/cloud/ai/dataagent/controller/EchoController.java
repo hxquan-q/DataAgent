@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * 心跳检测控制器，用于健康检查。
+ *
  * @author yingzi
  * @since 2025/9/16
  */
@@ -28,7 +30,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class EchoController {
 
 	/**
-	 * 心跳检测
+	 * 心跳检测接口，返回 "ok" 表示服务存活。
+	 * @return 固定字符串 "ok"
 	 */
 	@GetMapping("ok")
 	public String ok() {

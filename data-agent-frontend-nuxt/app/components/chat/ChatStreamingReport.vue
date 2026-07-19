@@ -16,34 +16,26 @@
 
 <template>
 	<div class="streaming-report">
-		<div class="report-header">
-			<v-icon color="primary" size="18" class="mr-2"
-				>mdi-file-document-edit-outline</v-icon
-			>
-			<span>正在生成报告...</span>
-			<span class="typing-indicator">
-				<span class="typing-dot" />
-				<span class="typing-dot typing-dot--2" />
-				<span class="typing-dot typing-dot--3" />
-			</span>
-		</div>
-		<div ref="bodyRef" class="report-body">
+		<div ref="bodyRef" class="report-body report-body--bare">
 			<div class="markdown-body streaming" v-html="renderedHtml" />
 		</div>
 	</div>
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, nextTick, onBeforeUnmount } from 'vue';
+import { ref, watch, nextTick, onBeforeUnmount } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
+import { transformTableTagsInHtml } from '~/utils/tableTag';
 import { useTypewriter } from '~/composables/useTypewriter';
 import { useEchartsRenderer } from '~/composables/useEchartsRenderer';
+import { useChatStore } from '~/stores/chat';
 
 const props = defineProps<{ content: string }>();
 const bodyRef = ref<HTMLElement | null>(null);
 
-const { displayedText, append, reset } = useTypewriter();
+const { displayedText, append, reset, flush } = useTypewriter();
+const store = useChatStore();
 const { renderECharts } = useEchartsRenderer();
 
 // Track what we've already fed to the typewriter
@@ -75,52 +67,113 @@ const SANITIZE_OPTIONS = {
 	ADD_ATTR: ['style', 'class', 'data-echarts-config'],
 };
 
-const renderedHtml = computed(() => {
-	const text = displayedText.value;
-	if (!text) return '';
-	return DOMPurify.sanitize(
-		renderMarkdownContent(text),
+// Throttled markdown: mobile cannot afford md+DOMPurify every typewriter frame.
+const isMobile =
+	typeof window !== 'undefined' &&
+	(window.matchMedia('(max-width: 768px)').matches ||
+		window.matchMedia('(pointer: coarse)').matches);
+const RENDER_MS = isMobile ? 320 : 140;
+
+const renderedHtml = ref('');
+let renderTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingText = '';
+
+function paintMarkdown(text: string, _force = false) {
+	if (!text) {
+		renderedHtml.value = '';
+		return;
+	}
+	// Always MD — throttle via scheduleRender so mobile stays responsive
+	renderedHtml.value = DOMPurify.sanitize(
+		transformTableTagsInHtml(renderMarkdownContent(text)),
 		SANITIZE_OPTIONS,
 	) as string;
-});
+}
 
-// After each render, try to initialize any completed echarts blocks
+function scheduleRender(text: string) {
+	pendingText = text;
+	if (renderTimer) return;
+	renderTimer = setTimeout(() => {
+		renderTimer = null;
+		paintMarkdown(pendingText, true);
+	}, RENDER_MS);
+}
+
+watch(
+	displayedText,
+	(text) => {
+		scheduleRender(text || '');
+	},
+	{ immediate: true },
+);
+
+// Stream end: flush typewriter + full markdown once
+watch(
+	() => store.isReportStreaming,
+	(isStreaming) => {
+		if (isStreaming) return;
+		flush();
+		if (renderTimer) {
+			clearTimeout(renderTimer);
+			renderTimer = null;
+		}
+		paintMarkdown(displayedText.value || props.content || '', true);
+		nextTick(() => renderECharts(bodyRef.value));
+	},
+	{ flush: 'sync' },
+);
+
+// ECharts only after full paint / sparse while desktop streaming
+let echartsTimer: ReturnType<typeof setTimeout> | null = null;
 watch(renderedHtml, () => {
-	nextTick(() => renderECharts(bodyRef.value));
+	if (isMobile && store.isReportStreaming) return;
+	if (echartsTimer) return;
+	echartsTimer = setTimeout(() => {
+		echartsTimer = null;
+		nextTick(() => renderECharts(bodyRef.value));
+	}, isMobile ? 400 : 200);
 });
 
 onBeforeUnmount(() => {
 	lastFedLength = 0;
+	if (renderTimer) clearTimeout(renderTimer);
+	if (echartsTimer) clearTimeout(echartsTimer);
 });
 </script>
 
 <style scoped>
+.report-body--bare {
+	padding: 0 !important;
+}
+
 .streaming-report {
-	background: white;
+	background: transparent;
 }
 
 .report-header {
 	display: flex;
 	align-items: center;
-	padding: 10px 14px;
-	background: #f8fafc;
-	border-bottom: 1px solid #e8edf2;
-	font-size: 13.5px;
+	padding: 2px 0 8px;
+	background: transparent;
+	border-bottom: none;
+	font-size: 12px;
 	font-weight: 600;
-	color: #1e293b;
+	color: var(--da-muted);
+	gap: 6px;
+	opacity: 0.85;
 }
 
 .typing-indicator {
 	display: inline-flex;
 	align-items: center;
-	gap: 3px;
-	margin-left: 8px;
+	gap: 2px;
+	margin-left: 4px;
 }
 
 .typing-dot {
-	width: 4px;
-	height: 4px;
-	background: #3b82f6;
+	width: 3px;
+	height: 3px;
+	background: var(--da-accent);
 	border-radius: 50%;
 	animation: typingBounce 1.2s infinite;
 }
@@ -144,7 +197,7 @@ onBeforeUnmount(() => {
 }
 
 .report-body {
-	padding: 16px;
+	padding: 8px;
 	position: relative;
 }
 
@@ -152,13 +205,25 @@ onBeforeUnmount(() => {
  * Markdown renders block elements (p, h, li), so we target the last child.
  * The dot stays inline at the end of the last line of text.
  */
+.stream-plain {
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	background: transparent;
+	border: none;
+}
 .markdown-body.streaming :deep(> :last-child::after) {
 	content: '';
 	display: inline-block;
-	width: 6px;
-	height: 6px;
+	width: 5px;
+	height: 5px;
 	border-radius: 50%;
-	background: #3b82f6;
+	background: var(--da-accent);
 	margin-left: 3px;
 	vertical-align: middle;
 	animation: cursorDotBlink 0.7s step-end infinite;
@@ -178,48 +243,52 @@ onBeforeUnmount(() => {
 .markdown-body :deep(h2),
 .markdown-body :deep(h3) {
 	font-weight: 700;
-	margin: 14px 0 6px;
-	color: #0f172a;
+	margin: 10px 0 4px;
+	color: var(--da-ink);
 }
 .markdown-body :deep(h1) {
-	font-size: 20px;
+	font-size: 18px;
 }
 .markdown-body :deep(h2) {
-	font-size: 17px;
+	font-size: 16px;
 }
 .markdown-body :deep(h3) {
-	font-size: 15px;
+	font-size: 14.5px;
 }
 .markdown-body :deep(p) {
-	margin-bottom: 10px;
-	line-height: 1.75;
-	color: #374151;
-	font-size: 14px;
+	margin-bottom: 8px;
+	line-height: 1.65;
+	color: var(--da-ink);
+	font-size: 13.5px;
 }
 .markdown-body :deep(ul),
 .markdown-body :deep(ol) {
 	padding-left: 22px;
-	margin-bottom: 10px;
+	margin-bottom: 8px;
 }
 .markdown-body :deep(li) {
 	line-height: 1.7;
 	font-size: 14px;
-	color: #374151;
+	color: var(--da-ink);
 }
 .markdown-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
-	border: 1px solid #e1e4e8;
+	background: var(--da-surface-soft);
+	border: 1px solid var(--da-line-soft);
 	padding: 2px 5px;
-	border-radius: 3px;
+	border-radius: var(--da-radius-sm);
 	font-size: 12.5px;
-	color: #e83e8c;
+	color: color-mix(in srgb, var(--da-primary) 55%, #be185d);
 }
 .markdown-body :deep(table) {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
 	margin: 10px 0;
-	display: block;
-	overflow-x: auto;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .markdown-body :deep(thead) {
 	display: table-header-group;
@@ -229,13 +298,13 @@ onBeforeUnmount(() => {
 }
 .markdown-body :deep(tr) {
 	display: table-row;
-	border-top: 1px solid #c6cbd1;
+	border-top: 1px solid var(--da-line);
 }
 .markdown-body :deep(th) {
 	display: table-cell;
-	background: #f1f5f9;
+	background: var(--da-surface-soft);
 	padding: 8px 12px;
-	border: 1px solid #e2e8f0;
+	border: 1px solid var(--da-line-soft);
 	font-weight: 600;
 	font-size: 13px;
 	text-align: left;
@@ -243,71 +312,75 @@ onBeforeUnmount(() => {
 .markdown-body :deep(td) {
 	display: table-cell;
 	padding: 8px 12px;
-	border: 1px solid #e8edf2;
+	border: 1px solid var(--da-line-soft);
 	font-size: 13px;
 }
 .markdown-body :deep(tr:nth-child(even) td) {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 }
 .markdown-body :deep(blockquote) {
-	border-left: 3px solid #3b82f6;
+	border-left: 3px solid var(--da-accent);
 	padding: 8px 14px;
 	margin-left: 0;
-	background: #eff6ff;
+	background: var(--da-primary-soft);
 	border-radius: 0 6px 6px 0;
-	color: #374151;
+	color: var(--da-ink);
 }
 
 /* ── Code block with header ─────────────────────────────────────────────────── */
 .markdown-body :deep(.code-block-wrapper) {
 	margin: 10px 0;
-	border: 1px solid #e1e4e8;
-	border-radius: 6px;
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
 	overflow: auto;
-	background: #f6f8fa;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .markdown-body :deep(.code-block-header) {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	background: #f6f8fa;
-	padding: 6px 10px;
-	border-bottom: 1px solid #e1e4e8;
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface-soft));
+	padding: 7px 12px;
+	border-bottom: 1px solid var(--da-line-soft);
 	font-size: 11px;
 }
 .markdown-body :deep(.code-language) {
-	color: #6a737d;
+	color: var(--da-muted);
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	font-size: 10px;
 	text-transform: uppercase;
 }
 .markdown-body :deep(.code-copy-button) {
-	background: transparent;
-	border: 1px solid #d1d5da;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
 	padding: 3px 10px;
-	border-radius: 4px;
+	border-radius: 999px;
 	font-size: 10px;
+	font-weight: 600;
 	cursor: pointer;
-	transition: all 0.2s;
-	color: #24292e;
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out);
+	color: var(--da-ink);
 }
 .markdown-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
-	border-color: #c6cbd1;
+	background: var(--da-primary-soft);
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	color: var(--da-primary);
 }
 .markdown-body :deep(.code-copy-button.copied) {
-	background: #28a745;
-	border-color: #28a745;
-	color: white;
+	background: var(--da-success);
+	border-color: var(--da-success);
+	color: var(--da-on-primary, #fff);
 }
 .markdown-body :deep(pre.hljs) {
 	margin: 0;
-	padding: 10px;
+	padding: 8px;
 	overflow-x: auto;
 	overflow-y: hidden;
-	background: #f6f8fa;
-	font-size: 12px;
+	background: var(--da-surface-soft);
+	font-size: 11.5px;
 	line-height: 1.4;
 	white-space: pre;
 }
@@ -317,7 +390,7 @@ onBeforeUnmount(() => {
 	margin: 0;
 	background: transparent;
 	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
+	font-family: var(--da-font-mono);
 	color: inherit;
 	white-space: pre;
 	min-width: max-content;
@@ -326,7 +399,7 @@ onBeforeUnmount(() => {
 /* ── ECharts containers ─────────────────────────────────────────────────────── */
 :deep(.md-echarts) {
 	margin: 10px 0;
-	border-radius: 6px;
+	border-radius: var(--da-radius-sm);
 }
 
 /* ── ECharts skeleton placeholder (while streaming) ────────────────────────── */
@@ -337,17 +410,26 @@ onBeforeUnmount(() => {
 	gap: 10px;
 	margin: 10px 0;
 	height: 120px;
-	border-radius: 8px;
-	border: 1px dashed #cbd5e1;
-	background: linear-gradient(90deg, #f8fafc 25%, #f1f5f9 50%, #f8fafc 75%);
+	border-radius: var(--da-radius-md);
+	border: 1px dashed var(--da-line);
+	background: linear-gradient(90deg, var(--da-surface-soft) 25%, var(--da-surface-soft) 50%, var(--da-surface-soft) 75%);
 	background-size: 200% 100%;
 	animation: skeletonShimmer 1.6s ease-in-out infinite;
-	color: #94a3b8;
+	color: var(--da-muted);
 	font-size: 13px;
 }
 :deep(.md-echarts-skeleton-icon) {
-	font-size: 22px;
-	animation: spinPulse 1.6s ease-in-out infinite;
+	width: 16px;
+	height: 16px;
+	border: 2px solid var(--da-line);
+	border-top-color: var(--da-accent);
+	border-radius: 50%;
+	animation: skeletonSpin 0.8s linear infinite;
+}
+@keyframes skeletonSpin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 :deep(.md-echarts-skeleton-text) {
 	font-weight: 500;
@@ -370,6 +452,50 @@ onBeforeUnmount(() => {
 	50% {
 		opacity: 0.5;
 		transform: scale(0.9);
+	}
+}
+
+/* design tokens + reduced motion (R2) */
+.report-header {
+	background: var(--da-surface-soft);
+	border-bottom-color: var(--da-line-soft);
+	color: var(--da-ink);
+}
+.typing-dot {
+	background: var(--da-accent);
+}
+.stream-plain {
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	background: transparent;
+	border: none;
+}
+.markdown-body.streaming :deep(> :last-child::after) {
+	background: var(--da-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+	.typing-dot,
+	.stream-plain {
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	background: transparent;
+	border: none;
+}
+.markdown-body.streaming :deep(> :last-child::after) {
+		animation: none !important;
+		opacity: 0.85;
 	}
 }
 </style>

@@ -87,4 +87,14 @@ class StreamContextTest {
 		assertEquals(TextType.TEXT, ctx.getTextType());
 	}
 
+	@Test
+	void appendOutput_respectsMaxCollectedChars() {
+		StreamContext ctx = new StreamContext();
+		String chunk = "x".repeat(10_000);
+		for (int i = 0; i < 10; i++) {
+			ctx.appendOutput(chunk);
+		}
+		assertEquals(50_000, ctx.getCollectedOutput().length());
+	}
+
 }

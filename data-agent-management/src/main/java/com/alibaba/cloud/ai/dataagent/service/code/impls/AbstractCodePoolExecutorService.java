@@ -49,34 +49,34 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 
 	private final AtomicBoolean closed = new AtomicBoolean();
 
-	// Record core container status
+	// 记录核心容器状态
 	protected final ConcurrentHashMap<String, CodePoolExecutorService.State> coreContainerState;
 
-	// Record temporary container status
+	// 记录临时容器状态
 	protected final ConcurrentHashMap<String, CodePoolExecutorService.State> tempContainerState;
 
-	// Record Future for temporary container destruction
+	// 记录临时容器销毁的 Future
 	protected final ConcurrentHashMap<String, Future<?>> tempContainerRemoveFuture;
 
-	// Task queue (temporarily store tasks when containers are full)
+	// 任务队列（容器满时暂存任务）
 	protected final ArrayBlockingQueue<FutureTask<CodePoolExecutorService.TaskResponse>> taskQueue;
 
-	// Ready core containers
+	// 就绪的核心容器
 	protected final ArrayBlockingQueue<String> readyCoreContainer;
 
-	// Ready temporary containers
+	// 就绪的临时容器
 	protected final ArrayBlockingQueue<String> readyTempContainer;
 
-	// Current number of core containers
+	// 当前核心容器数量
 	protected final AtomicInteger currentCoreContainerSize;
 
-	// Current number of temporary containers
+	// 当前临时容器数量
 	protected final AtomicInteger currentTempContainerSize;
 
-	// Thread pool, running temporarily stored tasks
+	// 线程池，运行暂存的任务
 	protected final ExecutorService consumerThreadPool;
 
-	// Configuration properties
+	// 配置属性
 	protected final CodeExecutorProperties properties;
 
 	public AbstractCodePoolExecutorService(CodeExecutorProperties properties) {
@@ -134,9 +134,9 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 	protected abstract void removeContainer(String containerId) throws Exception;
 
 	protected void shutdownPool() throws Exception {
-		// Shutdown thread pool
+		// 关闭线程池
 		this.consumerThreadPool.shutdownNow();
-		// Stop and delete all containers
+		// 停止并删除所有容器
 		this.tempContainerState.keySet().forEach(id -> this.removeContainerAndState(id, false, true));
 		this.coreContainerState.keySet().forEach(id -> this.removeContainerAndState(id, true, true));
 		this.tempContainerState.clear();
@@ -189,7 +189,7 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 		}
 	}
 
-	// Create thread to delete temporary containers
+	// 创建线程删除临时容器
 	private Future<?> registerRemoveTempContainer(String containerId) {
 		return consumerThreadPool.submit(() -> {
 			try {
@@ -207,7 +207,7 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 		});
 	}
 
-	// Use core container
+	// 使用核心容器执行任务
 	private TaskResponse useCoreContainer(String containerId, TaskRequest request) {
 		try {
 			// Execute task
@@ -233,7 +233,7 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 		}
 	}
 
-	// Use temporary container
+	// 使用临时容器执行任务
 	private TaskResponse useTempContainer(String containerId, TaskRequest request) {
 		try {
 			Future<?> future = this.tempContainerRemoveFuture.remove(containerId);
@@ -271,7 +271,7 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 		}
 	}
 
-	// Create and use core container
+	// 创建并使用核心容器
 	private TaskResponse createAndUseCoreContainer(TaskRequest request) {
 		String containerId;
 		try {
@@ -287,7 +287,7 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 		return this.useCoreContainer(containerId, request);
 	}
 
-	// Create and use temporary container
+	// 创建并使用临时容器
 	private TaskResponse createAndUseTempContainer(TaskRequest request) {
 		String containerId;
 		try {
@@ -317,7 +317,7 @@ public abstract class AbstractCodePoolExecutorService implements CodePoolExecuto
 		return ft.get();
 	}
 
-	// Run tasks in task queue if any
+	// 如果任务队列中有任务则取出执行
 	private void popTaskQueue() {
 		FutureTask<CodePoolExecutorService.TaskResponse> future = this.taskQueue.poll();
 		if (future == null) {

@@ -33,6 +33,13 @@
             <artifactId>mybatis-spring-boot-starter</artifactId>
         </dependency>
 
+        <!-- SQL AST 只读护栏（#17）：解析 SQL 拦截 DDL/DML，防止自愈改坏业务库 -->
+        <dependency>
+            <groupId>com.github.jsqlparser</groupId>
+            <artifactId>jsqlparser</artifactId>
+            <version>5.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.springframework.ai</groupId>
             <artifactId>spring-ai-starter-mcp-server-webflux</artifactId>
@@ -287,6 +294,28 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
 
+        <!-- 管理端管理员登录鉴权（WebFlux Security + JWT） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.12.6</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.12.6</version>
+            <scope>runtime</scope>
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -363,26 +392,22 @@
             <groupId>com.github.docker-java</groupId>
             <artifactId>docker-java-transport-zerodep</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
 
     </dependencies>
+    <!-- 仅保留 Central。原先 spring-milestones + aliyun + central 三源并行查 metadata，
+         repo.spring.io 常超时，IDEA Maven 导入表现为「长时间无进度」。
+         当前依赖均为正式版，Central 已足够；本机加速请用仓库根 maven-settings-local.xml 镜像。 -->
     <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-        </repository>
-        <repository>
-            <id>aliyun-releases</id>
-            <name>Aliyun Releases</name>
-            <url>https://maven.aliyun.com/nexus/content/repositories/releases</url>
-        </repository>
         <repository>
             <id>maven-central</id>
             <name>Maven Central</name>
             <url>https://repo1.maven.org/maven2</url>
+            <releases><enabled>true</enabled></releases>
+            <snapshots><enabled>false</enabled></snapshots>
         </repository>
     </repositories>
 
@@ -398,6 +423,10 @@
                         <exclude>**/excel/**/*.class</exclude>
                         <exclude>**/*.xlsx</exclude>
                         <exclude>**/*.xls</exclude>
+                        <!-- jsqlparser 的 JavaCC 生成类（如 CCJSqlParserTokenManager）含超大方法，
+                             触发 JaCoCo ASM MethodTooLargeException 导致插桩崩溃；排除其插桩。
+                             该库为第三方依赖，无需本项目统计覆盖率。 -->
+                        <exclude>net/sf/jsqlparser/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>

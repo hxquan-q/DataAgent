@@ -24,11 +24,19 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 // TODO 后续需改造 AgentKnowledgeResourceManager 使用该类获取对应的 TextSplitter，然后前端提供页面让用户选择不同的切割方式
+/**
+ * 文本分割器工厂，根据类型字符串获取对应的 {@link TextSplitter} 实例。
+ *
+ * <p>
+ * 通过 Spring 注入所有 TextSplitter 实现，以类型名称为键建立映射，支持 token、recursive 等分割方式。
+ * </p>
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TextSplitterFactory {
 
+	/** 以类型名称为键的分割器映射 */
 	private final Map<String, TextSplitter> splitterMap;
 
 	/**

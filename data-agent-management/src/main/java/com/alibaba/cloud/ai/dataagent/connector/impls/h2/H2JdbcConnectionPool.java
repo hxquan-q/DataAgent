@@ -25,14 +25,29 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.DATASOURCE_CONN
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.OTHERS;
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.PASSWORD_ERROR_28000;
 
+/**
+ * H2 JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用 H2 数据库驱动（org.h2.Driver），支持连接测试（ping）和错误码映射。 H2 为内嵌数据库，支持空密码连接。
+ * </p>
+ */
 @Service("h2JdbcConnectionPool")
 public class H2JdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/**
+	 * 获取 H2 JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return "org.h2.Driver";
 	}
 
+	/**
+	 * 将 H2 SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 		ErrorCodeEnum ret = ErrorCodeEnum.fromCode(sqlState);
@@ -47,11 +62,20 @@ public class H2JdbcConnectionPool extends AbstractDBConnectionPool {
 		};
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 H2 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.H2.getTypeName().equals(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return H2 类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return BizDataSourceTypeEnum.H2.getTypeName();

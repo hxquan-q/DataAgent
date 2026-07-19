@@ -20,6 +20,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 意图识别输出 DTO
+ *
+ * <p>
+ * 对应模板 intent-recognition.txt 的输出结果，用于标识用户输入的意图分类。
+ * </p>
+ */
 // 对应 模板intent-recognition.txt的输出
 @Data
 @NoArgsConstructor

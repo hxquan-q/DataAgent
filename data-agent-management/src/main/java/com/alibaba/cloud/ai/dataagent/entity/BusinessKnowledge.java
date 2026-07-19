@@ -25,7 +25,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Business Knowledge Management Entity Class
+ * 业务知识管理实体类
+ *
+ * <p>
+ * 存储业务术语及其描述、同义词等知识信息，用于在 NL2SQL 场景中辅助大模型理解业务语义。 业务知识可关联到特定智能体，并支持向量化处理。
+ * </p>
  */
 @Data
 @NoArgsConstructor
@@ -33,32 +37,40 @@ import java.time.LocalDateTime;
 @Builder
 public class BusinessKnowledge {
 
+	/** 主键ID */
 	private Long id;
 
-	private String businessTerm; // Business term
+	/** 业务术语 */
+	private String businessTerm;
 
-	private String description; // Description
+	/** 业务术语描述 */
+	private String description;
 
-	private String synonyms; // Synonyms, comma-separated
+	/** 同义词，多个以逗号分隔 */
+	private String synonyms;
 
+	/** 是否召回（0-不召回，1-召回） */
 	@Builder.Default
-	private Integer isRecall = 1; // Whether to recall (0: not recall, 1: recall)
+	private Integer isRecall = 1;
 
-	private Long agentId; // Associated agent ID
+	/** 关联的智能体ID */
+	private Long agentId;
 
+	/** 创建时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime createdTime;
 
+	/** 更新时间 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private LocalDateTime updatedTime;
 
-	// 向量化状态：PENDING待处理，PROCESSING处理中，COMPLETED已完成，FAILED失败
+	/** 向量化状态：PENDING-待处理，PROCESSING-处理中，COMPLETED-已完成，FAILED-失败 */
 	private EmbeddingStatus embeddingStatus;
 
-	// 操作失败的错误信息
+	/** 操作失败的错误信息 */
 	private String errorMsg;
 
-	// 0=未删除, 1=已删除
+	/** 逻辑删除标志（0-未删除，1-已删除） */
 	@Builder.Default
 	private Integer isDeleted = 0;
 

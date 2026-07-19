@@ -24,10 +24,19 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 
+/**
+ * 智能体知识对象转换器。
+ * <p>
+ * 负责在持久化实体（AgentKnowledge）、数据传输对象（CreateKnowledgeDTO） 和视图对象（AgentKnowledgeVO）之间进行双向转换。
+ */
 @Component
 public class AgentKnowledgeConverter {
 
-	// toVo
+	/**
+	 * 将持久化实体转换为视图对象。
+	 * @param po 持久化实体
+	 * @return 视图对象
+	 */
 	public AgentKnowledgeVO toVo(AgentKnowledge po) {
 		AgentKnowledgeVO vo = new AgentKnowledgeVO();
 		vo.setId(po.getId());
@@ -45,8 +54,15 @@ public class AgentKnowledgeConverter {
 		return vo;
 	}
 
+	/**
+	 * 根据创建 DTO 和存储路径构建持久化实体。
+	 * <p>
+	 * 设置默认值（召回状态、未删除、待处理、资源未清理），并处理文件上传信息。
+	 * @param createKnowledgeDto 知识创建 DTO
+	 * @param storagePath 文件存储路径
+	 * @return 新建的持久化实体
+	 */
 	public AgentKnowledge toEntityForCreate(CreateKnowledgeDTO createKnowledgeDto, String storagePath) {
-		// 创建AgentKnowledge对象
 		AgentKnowledge knowledge = new AgentKnowledge();
 		knowledge.setAgentId(createKnowledgeDto.getAgentId());
 		knowledge.setTitle(createKnowledgeDto.getTitle());
@@ -71,7 +87,7 @@ public class AgentKnowledgeConverter {
 			knowledge.setFileType(createKnowledgeDto.getFile().getContentType());
 		}
 
-		// 设置分块策略类型，默认值为token
+		// 设置分块策略类型，默认值为 token
 		String splitterType = createKnowledgeDto.getSplitterType();
 		if (splitterType == null || splitterType.isBlank()) {
 			splitterType = "token";

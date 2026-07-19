@@ -21,73 +21,56 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
+/**
+ * 用户提示词配置实体类
+ *
+ * <p>
+ * 存储用户自定义的提示词（Prompt）配置，可关联到特定智能体或作为全局配置使用。 支持按类型、优先级、展示顺序进行管理。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UserPromptConfig {
 
-	/**
-	 * Configuration ID
-	 */
+	/** 配置ID */
 	private String id;
 
-	/**
-	 * Configuration name
-	 */
+	/** 配置名称 */
 	private String name;
 
-	/**
-	 * Prompt type (e.g., report-generator, planner, etc.)
-	 */
+	/** 提示词类型（例如 report-generator、planner 等） */
 	private String promptType;
 
-	/**
-	 * Associated agent ID, null means global configuration
-	 */
+	/** 关联的智能体ID，为 null 表示全局配置 */
 	private Long agentId;
 
-	/**
-	 * User-defined system prompt content
-	 */
+	/** 用户自定义的系统提示词内容 */
 	private String systemPrompt;
 
-	/**
-	 * Whether to enable this configuration
-	 */
+	/** 是否启用该配置 */
 	@Builder.Default
 	private Boolean enabled = true;
 
-	/**
-	 * Configuration description
-	 */
+	/** 配置描述 */
 	private String description;
 
-	/**
-	 * Configuration priority (higher number = higher priority)
-	 */
+	/** 配置优先级（数值越大优先级越高） */
 	@Builder.Default
 	private Integer priority = 0;
 
-	/**
-	 * Configuration order for display
-	 */
+	/** 展示排序值 */
 	@Builder.Default
 	private Integer displayOrder = 0;
 
-	/**
-	 * Creation time
-	 */
+	/** 创建时间 */
 	private LocalDateTime createTime;
 
-	/**
-	 * Update time
-	 */
+	/** 更新时间 */
 	private LocalDateTime updateTime;
 
-	/**
-	 * Creator
-	 */
+	/** 创建者 */
 	private String creator;
 
 	public String getOptimizationPrompt() {

@@ -18,7 +18,7 @@
 	<v-dialog :model-value="modelValue" max-width="800" persistent @update:model-value="$emit('update:modelValue', $event)">
 		<v-card rounded="xl" class="pa-2">
 			<v-card-title class="d-flex align-center justify-space-between px-4 pt-4">
-				<span class="text-h6 font-weight-bold">{{ isEdit ? '编辑数据源' : '添加数据源' }}</span>
+				<span class="text-h6 font-weight-medium dialog-title">{{ isEdit ? '编辑数据源' : '添加数据源' }}</span>
 				<v-btn icon="mdi-close" variant="text" size="small" @click="$emit('update:modelValue', false)" />
 			</v-card-title>
 
@@ -74,7 +74,7 @@
 				</v-form>
 				<div class="d-flex justify-end mt-4 ga-3">
 					<v-btn variant="text" class="text-none" @click="$emit('update:modelValue', false)">取消</v-btn>
-					<v-btn color="primary" class="text-none px-8" elevation="0" :loading="saving" @click="handleSubmit">
+					<v-btn color="primary" class="text-none px-8 rounded-pill" elevation="0" :loading="saving" @click="handleSubmit">
 						{{ isEdit ? '保存' : '创建' }}
 					</v-btn>
 				</div>
@@ -127,3 +127,10 @@ async function handleSubmit() {
 	emit('submit', { ...form });
 }
 </script>
+
+<style scoped>
+.dialog-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.01em;
+}
+</style>

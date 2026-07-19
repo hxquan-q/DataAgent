@@ -24,20 +24,35 @@ import lombok.extern.slf4j.Slf4j;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
+ * SQL 执行分发器，根据 SQL 执行结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>SQL 执行失败：返回 SQL 生成节点重新生成</li>
+ * <li>SQL 执行成功：返回计划执行节点继续执行下一步</li>
+ * </ul>
+ * </p>
+ *
  * @author zhangshenghang
  */
 @Slf4j
 public class SQLExecutorDispatcher implements EdgeAction {
 
+	/**
+	 * 根据 SQL 执行结果决定下一个节点。
+	 * @param state 工作流全局状态，包含 SQL 重试原因
+	 * @return 下一个节点名称：{@value SQL_GENERATE_NODE} 或 {@value PLAN_EXECUTOR_NODE}
+	 */
 	@Override
 	public String apply(OverAllState state) {
 		SqlRetryDto retryDto = StateUtil.getObjectValue(state, SQL_REGENERATE_REASON, SqlRetryDto.class);
 		if (retryDto.sqlExecuteFail()) {
-			log.warn("SQL运行失败，需要重新生成！");
+			log.warn("SQL 执行失败，需要重新生成！");
 			return SQL_GENERATE_NODE;
 		}
 		else {
-			log.info("SQL运行成功，返回PlanExecutorNode。");
+			log.info("SQL 执行成功，返回计划执行节点。");
 			return PLAN_EXECUTOR_NODE;
 		}
 	}

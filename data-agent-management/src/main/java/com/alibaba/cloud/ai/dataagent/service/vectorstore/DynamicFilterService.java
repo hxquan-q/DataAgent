@@ -30,15 +30,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * 动态过滤条件构建服务，根据 Agent ID 和向量类型构建向量检索的过滤表达式。
+ *
+ * <p>
+ * 支持根据知识库召回状态动态过滤，将 Agent 知识库和业务术语的数据库状态映射为向量存储的过滤条件。
+ * </p>
+ */
 @Slf4j
 @Component
 @AllArgsConstructor
 public class DynamicFilterService {
 
+	/** Agent 知识数据访问层 */
 	private final AgentKnowledgeMapper agentKnowledgeMapper;
 
+	/** 业务知识数据访问层 */
 	private final BusinessKnowledgeMapper businessKnowledgeMapper;
 
+	/**
+	 * 根据 Agent ID 和向量类型构建动态过滤条件。
+	 * @param agentId Agent 主键 ID
+	 * @param vectorType 向量类型
+	 * @return 构建的过滤表达式，无可召回数据时返回 null
+	 */
 	public Filter.Expression buildDynamicFilter(String agentId, String vectorType) {
 		FilterExpressionBuilder b = new FilterExpressionBuilder();
 		List<Filter.Expression> conditions = new ArrayList<>();

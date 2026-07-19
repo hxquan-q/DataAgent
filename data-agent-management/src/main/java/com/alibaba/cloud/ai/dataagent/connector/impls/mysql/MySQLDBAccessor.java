@@ -22,6 +22,8 @@ import com.alibaba.cloud.ai.dataagent.enums.BizDataSourceTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**
+ * MySQL 数据库访问器，支持 MySQL 数据源的元数据查询和 SQL 执行。
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
@@ -29,18 +31,33 @@ import org.springframework.stereotype.Service;
 @Service("mysqlAccessor")
 public class MySQLDBAccessor extends AbstractAccessor {
 
+	/** 访问器类型标识 */
 	private final static String ACCESSOR_TYPE = "MySQL_Accessor";
 
+	/**
+	 * 构造函数，注入 DDL 工厂和连接池工厂。
+	 * @param ddlFactory DDL 执行器工厂
+	 * @param poolFactory 连接池工厂
+	 */
 	protected MySQLDBAccessor(DdlFactory ddlFactory, DBConnectionPoolFactory poolFactory) {
 
 		super(ddlFactory, poolFactory.getPoolByDbType(BizDataSourceTypeEnum.MYSQL.getTypeName()));
 	}
 
+	/**
+	 * 获取访问器类型标识。
+	 * @return 访问器类型名称
+	 */
 	@Override
 	public String getAccessorType() {
 		return ACCESSOR_TYPE;
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 MySQL 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.MYSQL.getTypeName().equalsIgnoreCase(type);

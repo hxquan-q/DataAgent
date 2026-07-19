@@ -31,10 +31,18 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+/**
+ * 本地文件系统存储服务实现类，将文件存储到本地磁盘。
+ *
+ * <p>
+ * 支持响应式和同步两种文件上传方式，包含路径安全检查防止目录穿越攻击。
+ * </p>
+ */
 @Slf4j
 @AllArgsConstructor
 public class LocalFileStorageServiceImpl implements FileStorageService {
 
+	/** 文件存储配置属性 */
 	private final FileStorageProperties fileStorageProperties;
 
 	@Override

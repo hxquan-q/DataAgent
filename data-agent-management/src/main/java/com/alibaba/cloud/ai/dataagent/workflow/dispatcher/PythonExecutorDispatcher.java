@@ -25,6 +25,18 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
+ * Python 执行分发器，根据 Python 执行结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>降级模式：跳过重试直接进入分析节点</li>
+ * <li>执行失败且超过最大重试次数：结束流程</li>
+ * <li>执行失败且未超过最大重试次数：返回 Python 生成节点重新生成</li>
+ * <li>执行成功：进入 Python 分析节点</li>
+ * </ul>
+ * </p>
+ *
  * @author vlsmb
  * @since 2025/7/29
  */
@@ -37,30 +49,39 @@ public class PythonExecutorDispatcher implements EdgeAction {
 		this.codeExecutorProperties = codeExecutorProperties;
 	}
 
+	/**
+	 * 根据 Python 执行结果决定下一个节点。
+	 * @param state 工作流全局状态，包含 Python 执行结果和重试次数
+	 * @return 下一个节点名称：{@value PYTHON_ANALYZE_NODE}、{@value PYTHON_GENERATE_NODE} 或
+	 * {@code END}
+	 * @throws Exception 读取状态时可能抛出的异常
+	 */
 	@Override
 	public String apply(OverAllState state) throws Exception {
+		// 检查是否为降级模式
 		boolean isFallbackMode = StateUtil.getObjectValue(state, PYTHON_FALLBACK_MODE, Boolean.class, false);
 		if (isFallbackMode) {
-			log.warn("Python执行进入降级模式，跳过重试直接进入分析节点");
+			log.warn("Python 执行进入降级模式，跳过重试直接进入分析节点");
 			return PYTHON_ANALYZE_NODE;
 		}
 
-		// Determine if failed
+		// 判断执行是否成功
 		boolean isSuccess = StateUtil.getObjectValue(state, PYTHON_IS_SUCCESS, Boolean.class, false);
 		if (!isSuccess) {
 			String message = StateUtil.getStringValue(state, PYTHON_EXECUTE_NODE_OUTPUT);
-			log.error("Python Executor Node Error: {}", message);
+			log.error("Python 执行节点错误: {}", message);
 			int tries = StateUtil.getObjectValue(state, PYTHON_TRIES_COUNT, Integer.class, 0);
 			if (tries >= codeExecutorProperties.getPythonMaxTriesCount()) {
-				log.error("Python执行失败且已超过最大重试次数（已尝试次数：{}），流程终止", tries);
+				// 超过最大重试次数，结束流程
+				log.error("Python 执行失败且已超过最大重试次数（已尝试次数：{}），流程终止", tries);
 				return END;
 			}
 			else {
-				// Regenerate code for testing
+				// 未超过最大重试次数，返回代码生成节点重新生成
 				return PYTHON_GENERATE_NODE;
 			}
 		}
-		// Go to code execution result analysis node
+		// 执行成功，进入代码执行结果分析节点
 		return PYTHON_ANALYZE_NODE;
 	}
 

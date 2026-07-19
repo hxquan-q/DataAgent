@@ -40,6 +40,12 @@ import java.util.stream.Collectors;
 import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
 
 /**
+ * PostgreSQL JDBC DDL 执行器实现。
+ * <p>
+ * 通过 pg_catalog 系统视图和 information_schema 查询 PostgreSQL 数据库的元数据信息，
+ * 支持数据库、schema、表、列、外键查询以及表数据扫描和列值采样。
+ * </p>
+ *
  * @author jiuhe
  * @since 2024/3/15
  */

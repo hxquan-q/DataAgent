@@ -20,6 +20,11 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * MCP Server 工具标识注解。
+ * <p>
+ * 标记一个类或方法为 MCP（Model Context Protocol）服务端工具， 用于在运行时识别和注册 MCP 工具端点。
+ */
 @Target({ ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface McpServerTool {

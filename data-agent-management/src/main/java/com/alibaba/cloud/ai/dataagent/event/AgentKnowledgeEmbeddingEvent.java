@@ -20,13 +20,26 @@ import org.springframework.context.ApplicationEvent;
 
 import java.time.Clock;
 
+/**
+ * 智能体知识向量化嵌入事件。
+ * <p>
+ * 当智能体知识创建或更新后发布此事件，由事件监听器异步执行向量化（Embedding）处理， 将文本内容写入向量库。
+ */
 @Getter
 public class AgentKnowledgeEmbeddingEvent extends ApplicationEvent {
 
+	/** 需要进行向量化的知识 ID */
 	private final Integer knowledgeId;
 
+	/** 文本分块策略类型 */
 	private final String splitterType;
 
+	/**
+	 * 构造知识向量化嵌入事件。
+	 * @param source 事件源（通常为发布事件的 Service 对象）
+	 * @param knowledgeId 知识 ID
+	 * @param splitterType 文本分块策略类型
+	 */
 	public AgentKnowledgeEmbeddingEvent(Object source, Integer knowledgeId, String splitterType) {
 		super(source, Clock.systemDefaultZone());
 		this.knowledgeId = knowledgeId;

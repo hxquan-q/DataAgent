@@ -30,8 +30,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * Agent Schema Initialization Controller Handles agent's database Schema initialization
- * to vector storage
+ * Agent 数据源管理控制器。
+ * <p>
+ * 管理智能体关联的数据源，包括 Schema 向量初始化、表选择、 数据源启用/禁用等操作。对应前端的「信息源初始化」功能。
+ * </p>
  */
 @Slf4j
 @RestController

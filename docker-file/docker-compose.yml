@@ -13,15 +13,22 @@
 #limitations under the License.
 
 services:
-  # MySQL数据库
+  # MySQL 元库（nl2sql_db）= 数据平面稳态组件
+  # 红线：禁止 docker compose down -v；禁止无卷 force-recreate mysql；日常只 stop/start
+  # 备份：bash scripts/backup-meta-db.sh
+  # 混合开发：bash scripts/dev-hybrid.sh up（不 recreate 本容器、默认不写库）
   mysql:
     image: mysql:8.0
     container_name: data-agent-mysql-inner
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: nl2sql_db
-#    volumes:
-#      - nl2sql-mysql-inner-data:/var/lib/mysql
+    ports:
+      # 仅本机回环：公网 0.0.0.0:3306 + root/root 曾导致扫库勒索清空元库（见 docs/dev/INCIDENT_2026-07-18_MYSQL_EXPOSURE_RANSOM.md）
+      - "127.0.0.1:3306:3306"
+    # 命名卷：restart/recreate 后保留数据。external 固定卷名，避免 compose 项目前缀空卷。
+    volumes:
+      - data-agent-mysql-inner-data:/var/lib/mysql
     networks:
       - app-network
     restart: unless-stopped
@@ -43,7 +50,9 @@ services:
       - DATA_AGENT_DATASOURCE_URL=jdbc:mysql://mysql:3306/nl2sql_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - DATA_AGENT_DATASOURCE_USERNAME=root
       - DATA_AGENT_DATASOURCE_PASSWORD=root
-      - DATA_AGENT_DATASOURCE_SQL_INIT=always
+      # never：重建 backend 不跑 schema/data.sql，避免误写元库。
+      # 空库首次初始化请显式设 always 一次性启动，或手工导入 SQL。
+      - DATA_AGENT_DATASOURCE_SQL_INIT=never
       - AI_DASHSCOPE_API_KEY=${AI_DASHSCOPE_API_KEY}
     ports:
       - "8065:8065"
@@ -67,7 +76,7 @@ services:
         - saa-data-agent-frontend:1.0.0-SNAPSHOT
     container_name: data-agent-frontend
     ports:
-      - "3000:3000"  # 只暴露前端端口
+      - "3301:3301"  # 公网访问前端端口
     depends_on:
       - backend
     volumes:
@@ -113,7 +122,11 @@ services:
       retries: 3
 
 volumes:
+  # external: 必须先存在（docker volume create data-agent-mysql-inner-data）
+  # 切勿 docker volume rm / compose down -v
   data-agent-mysql-inner-data:
+    name: data-agent-mysql-inner-data
+    external: true
 
 networks:
   app-network:

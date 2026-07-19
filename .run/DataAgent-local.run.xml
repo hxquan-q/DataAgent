@@ -1,0 +1,19 @@
+<!--
+  IDEA Run Configuration：混合热部署（数据平面 Docker MySQL + 开发平面 IDEA/JRebel）
+  导入：IDEA 自动识别 .run/ 目录
+  前置：bash scripts/dev-hybrid.sh up
+  要求：Profiles=local（sql.init=never）、JDK 17、端口 8065
+  JRebel：插件启用后对本配置用 JRebel 启动；rebel.xml → target/classes
+  文档：docs/dev/HYBRID_HOTDEPLOY.md
+-->
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DataAgent-local" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="local" />
+    <module name="spring-ai-alibaba-data-agent-management" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.alibaba.cloud.ai.dataagent.DataAgentApplication" />
+    <option name="ALTERNATIVE_JRE_PATH" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

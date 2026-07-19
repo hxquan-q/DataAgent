@@ -24,42 +24,55 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
- * Dispatches to the next node based on the plan execution and validation status.
+ * 计划执行分发器，根据计划校验状态决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>校验通过：进入计划中指定的下一个节点（或结束流程）</li>
+ * <li>校验失败且超过最大修复次数：结束流程</li>
+ * <li>校验失败且未超过最大修复次数：返回计划生成节点修复</li>
+ * </ul>
+ * </p>
  *
  * @author zhangshenghang
  */
 @Slf4j
 public class PlanExecutorDispatcher implements EdgeAction {
 
+	/** 最大修复次数 */
 	private static final int MAX_REPAIR_ATTEMPTS = 2;
 
+	/**
+	 * 根据计划校验状态决定下一个节点。
+	 * @param state 工作流全局状态，包含校验状态和修复次数
+	 * @return 下一个节点名称
+	 */
 	@Override
 	public String apply(OverAllState state) {
 		boolean validationPassed = StateUtil.getObjectValue(state, PLAN_VALIDATION_STATUS, Boolean.class, false);
 
 		if (validationPassed) {
-			log.info("Plan validation passed. Proceeding to next step.");
+			// 校验通过，进入下一个执行步骤
+			log.info("计划校验通过，进入下一步。");
 			String nextNode = state.value(PLAN_NEXT_NODE, END);
-			// 如果返回的是"END"，直接返回END常量
+			// 若返回 "END"，直接返回 END 常量
 			if ("END".equals(nextNode)) {
-				log.info("Plan execution completed successfully.");
+				log.info("计划执行成功完成。");
 				return END;
 			}
 			return nextNode;
 		}
 		else {
-			// Plan validation failed, check repair count and decide whether to retry or
-			// end.
+			// 校验失败，检查修复次数并决定是否重试
 			int repairCount = StateUtil.getObjectValue(state, PLAN_REPAIR_COUNT, Integer.class, 0);
 
 			if (repairCount > MAX_REPAIR_ATTEMPTS) {
-				log.error("Plan repair attempts exceeded the limit of {}. Terminating execution.", MAX_REPAIR_ATTEMPTS);
-				// The node is responsible for setting the final error message.
+				log.error("计划修复次数超过最大限制 {}，终止执行。", MAX_REPAIR_ATTEMPTS);
 				return END;
 			}
 
-			log.warn("Plan validation failed. Routing back to PlannerNode for repair. Attempt count from state: {}.",
-					repairCount);
+			log.warn("计划校验失败，返回计划生成节点进行修复。状态中的修复次数: {}。", repairCount);
 			return PLANNER_NODE;
 		}
 	}

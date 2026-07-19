@@ -34,6 +34,11 @@ import java.sql.Connection;
 import java.util.List;
 
 /**
+ * 访问器抽象实现类。
+ * <p>
+ * 通过 DDL 执行器和连接池实现数据库元数据查询和 SQL 执行。 利用反射式方法分发（accessDb）将各查询操作委托给对应的 DDL 执行器。
+ * </p>
+ *
  * @author yuluo
  * @author <a href="mailto:yuluo08290126@gmail.com">yuluo</a>
  */
@@ -45,12 +50,26 @@ public abstract class AbstractAccessor implements Accessor {
 
 	private final DBConnectionPool dbConnectionPool;
 
+	/**
+	 * 访问数据库并执行指定的方法。
+	 * <p>
+	 * 通过方法名分发到对应的 DDL 执行器方法，支持 showDatabases、showSchemas、showTables、
+	 * fetchTables、showColumns、showForeignKeys、sampleColumn、scanTable、executeSqlAndReturnObject
+	 * 等操作。
+	 * </p>
+	 * @param dbConfig 数据库配置信息
+	 * @param method 方法名称
+	 * @param param 查询参数
+	 * @return 结果对象
+	 * @throws Exception 数据库访问异常
+	 */
 	public <T> T accessDb(DbConfigBO dbConfig, String method, DbQueryParameter param) throws Exception {
 
 		try (Connection connection = getConnection(dbConfig)) {
 
 			AbstractJdbcDdl ddlExecutor = (AbstractJdbcDdl) ddlFactory.getDdlExecutorByDbConfig(dbConfig);
 
+			// 根据方法名分发到对应的 DDL 执行方法
 			switch (method) {
 				case "showDatabases":
 					return (T) ddlExecutor.showDatabases(connection);
@@ -82,42 +101,56 @@ public abstract class AbstractAccessor implements Accessor {
 		}
 	}
 
+	/** {@inheritDoc} */
 	public List<DatabaseInfoBO> showDatabases(DbConfigBO dbConfig) throws Exception {
 		return accessDb(dbConfig, "showDatabases", null);
 	}
 
+	/** {@inheritDoc} */
 	public List<SchemaInfoBO> showSchemas(DbConfigBO dbConfig) throws Exception {
 		return accessDb(dbConfig, "showSchemas", null);
 	}
 
+	/** {@inheritDoc} */
 	public List<TableInfoBO> showTables(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "showTables", param);
 	}
 
+	/** {@inheritDoc} */
 	public List<TableInfoBO> fetchTables(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "fetchTables", param);
 	}
 
+	/** {@inheritDoc} */
 	public List<ColumnInfoBO> showColumns(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "showColumns", param);
 	}
 
+	/** {@inheritDoc} */
 	public List<ForeignKeyInfoBO> showForeignKeys(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "showForeignKeys", param);
 	}
 
+	/** {@inheritDoc} */
 	public List<String> sampleColumn(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "sampleColumn", param);
 	}
 
+	/** {@inheritDoc} */
 	public ResultSetBO scanTable(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "scanTable", param);
 	}
 
+	/** {@inheritDoc} */
 	public ResultSetBO executeSqlAndReturnObject(DbConfigBO dbConfig, DbQueryParameter param) throws Exception {
 		return accessDb(dbConfig, "executeSqlAndReturnObject", param);
 	}
 
+	/**
+	 * 从连接池中获取数据库连接。
+	 * @param config 数据库配置信息
+	 * @return 数据库连接
+	 */
 	public Connection getConnection(DbConfigBO config) {
 		return this.dbConnectionPool.getConnection(config);
 	}

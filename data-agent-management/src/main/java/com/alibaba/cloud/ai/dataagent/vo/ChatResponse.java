@@ -20,24 +20,34 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Chat Response DTO
+ * 聊天响应 VO
+ *
+ * <p>
+ * 封装聊天接口的返回数据，包括会话ID、消息内容、消息类型、生成的 SQL、 查询结果和错误信息。
+ * </p>
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ChatResponse {
 
+	/** 会话ID */
 	private String sessionId;
 
+	/** 消息内容 */
 	private String message;
 
-	private String messageType; // text, sql, result, error
+	/** 消息类型：text-文本，sql-SQL语句，result-查询结果，error-错误信息 */
+	private String messageType;
 
-	private String sql; // Generated SQL statement
+	/** 生成的 SQL 语句 */
+	private String sql;
 
-	private Object result; // Query result
+	/** 查询结果 */
+	private Object result;
 
-	private String error; // Error message
+	/** 错误信息 */
+	private String error;
 
 	public ChatResponse(String sessionId, String message, String messageType) {
 		this.sessionId = sessionId;

@@ -1,0 +1,26 @@
+/*
+ * Copyright 2024-2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+export const samples = {
+  bar: { axis: { x: '地区', y: '销售额' }, data: [{ 地区: '华东', 销售额: 82 }, { 地区: '华南', 销售额: 68 }, { 地区: '华北', 销售额: 54 }] },
+  column: { axis: { x: '月份', y: '订单数' }, data: [{ 月份: '一月', 订单数: 120 }, { 月份: '二月', 订单数: 168 }, { 月份: '三月', 订单数: 146 }] },
+  line: { axis: { x: '日期', y: '访问量' }, data: [{ 日期: '周一', 访问量: 320 }, { 日期: '周二', 访问量: 480 }, { 日期: '周三', 访问量: 430 }, { 日期: '周四', 访问量: 610 }] },
+  pie: { axis: { y: '占比', color: '渠道' }, data: [{ 渠道: '线上', 占比: 55 }, { 渠道: '门店', 占比: 30 }, { 渠道: '分销', 占比: 15 }] },
+  'stacked-column': { axis: { x: '季度', y: '金额', color: '产品' }, data: [{ 季度: 'Q1', 产品: '产品甲', 金额: 40 }, { 季度: 'Q1', 产品: '产品乙', 金额: 30 }, { 季度: 'Q2', 产品: '产品甲', 金额: 55 }, { 季度: 'Q2', 产品: '产品乙', 金额: 36 }] },
+  'dual-axis': { axis: { x: '月份', y: '销售额', y2: '增长率' }, data: [{ 月份: '一月', 销售额: 120, 增长率: 12 }, { 月份: '二月', 销售额: 168, 增长率: 18 }, { 月份: '三月', 销售额: 146, 增长率: 9 }] },
+  gauge: { axis: { y: '完成率' }, data: [{ 完成率: 76 }] },
+  scatter: { axis: { x: '投入', y: '产出', color: '团队', size: '人数' }, data: [{ 投入: 10, 产出: 20, 团队: '一组', 人数: 8 }, { 投入: 18, 产出: 35, 团队: '二组', 人数: 12 }, { 投入: 25, 产出: 44, 团队: '一组', 人数: 10 }] },
+  funnel: { axis: { x: '阶段', y: '人数', color: '阶段' }, data: [{ 阶段: '访问', 人数: 1000 }, { 阶段: '注册', 人数: 620 }, { 阶段: '试用', 人数: 330 }, { 阶段: '付费', 人数: 120 }] },
+};

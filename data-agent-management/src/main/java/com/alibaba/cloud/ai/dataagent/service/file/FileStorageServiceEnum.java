@@ -15,8 +15,14 @@
  */
 package com.alibaba.cloud.ai.dataagent.service.file;
 
+/**
+ * 文件存储服务类型枚举，区分本地存储和阿里云 OSS 存储两种模式。
+ */
 public enum FileStorageServiceEnum {
 
-	LOCAL, OSS
+	/** 本地文件系统存储 */
+	LOCAL,
+	/** 阿里云 OSS 对象存储 */
+	OSS
 
 }

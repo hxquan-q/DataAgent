@@ -27,6 +27,7 @@ import java.util.Map;
 
 import com.alibaba.cloud.ai.dataagent.common.TestFixtures;
 import com.alibaba.cloud.ai.dataagent.dto.prompt.QueryEnhanceOutputDTO;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 import com.alibaba.cloud.ai.dataagent.service.llm.LlmService;
 import com.alibaba.cloud.ai.dataagent.service.prompt.UserPromptService;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
@@ -51,11 +52,17 @@ class ReportGeneratorNodeTest {
 	@Mock
 	private UserPromptService promptConfigService;
 
+	@Mock
+	private PromptHelper promptHelper;
+
 	private ReportGeneratorNode reportGeneratorNode;
 
 	@BeforeEach
 	void setUp() {
-		reportGeneratorNode = new ReportGeneratorNode(llmService, promptConfigService);
+		reportGeneratorNode = new ReportGeneratorNode(llmService, promptConfigService, promptHelper);
+		// 技能注入按透传处理（返回原 prompt），保证既有用例不受接线影响
+		when(promptHelper.injectSkills(anyString(), any(), anyString()))
+			.thenAnswer(invocation -> invocation.getArgument(2));
 	}
 
 	private OverAllState createTestState() {
@@ -221,6 +228,22 @@ class ReportGeneratorNodeTest {
 
 		assertNotNull(result);
 		assertTrue(result.containsKey(RESULT));
+	}
+
+	@Test
+	void limitPromptSection_truncatesLongTextPreservingHeadAndTail() {
+		String longText = "H".repeat(100) + "MID" + "T".repeat(100);
+		String out = ReportGeneratorNode.limitPromptSection(longText, 80);
+		assertTrue(out.length() <= 80 + 40); // marker overhead
+		assertTrue(out.contains("已截断"));
+		assertTrue(out.startsWith("H"));
+		assertTrue(out.endsWith("T"));
+	}
+
+	@Test
+	void limitPromptSection_nullAndShortPassthrough() {
+		assertEquals("", ReportGeneratorNode.limitPromptSection(null, 10));
+		assertEquals("abc", ReportGeneratorNode.limitPromptSection("abc", 10));
 	}
 
 }

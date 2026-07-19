@@ -22,24 +22,36 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 数据库表信息业务对象。
+ * <p>
+ * 描述数据库表的完整元数据信息，包括所属 Schema、表名、表类型、 外键信息、主键列表以及包含的列信息列表。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class TableInfoBO {
 
+	/** 所属 Schema 名称 */
 	private String schema;
 
+	/** 表名称 */
 	private String name;
 
+	/** 表描述/注释 */
 	private String description;
 
+	/** 表类型（如 TABLE、VIEW 等） */
 	private String type;
 
+	/** 外键信息（JSON 字符串） */
 	private String foreignKey;
 
+	/** 主键列名列表 */
 	private List<String> primaryKeys;
 
+	/** 表包含的列信息列表 */
 	private List<ColumnInfoBO> columns;
 
 }

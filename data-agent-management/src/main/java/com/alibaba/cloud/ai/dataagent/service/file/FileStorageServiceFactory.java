@@ -23,14 +23,23 @@ import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.stereotype.Component;
 
+/**
+ * 文件存储服务工厂，实现 {@link FactoryBean} 根据配置创建本地存储或阿里云 OSS 存储的服务实例。
+ */
 @Component
 @AllArgsConstructor
 public class FileStorageServiceFactory implements FactoryBean<FileStorageService> {
 
+	/** 文件存储配置属性 */
 	private final FileStorageProperties properties;
 
+	/** OSS 存储配置属性 */
 	private final OssStorageProperties ossProperties;
 
+	/**
+	 * 根据配置创建对应的文件存储服务实例。
+	 * @return 文件存储服务实例
+	 */
 	@Override
 	public FileStorageService getObject() {
 		if (FileStorageServiceEnum.OSS.equals(properties.getType())) {
@@ -41,6 +50,10 @@ public class FileStorageServiceFactory implements FactoryBean<FileStorageService
 		}
 	}
 
+	/**
+	 * 返回工厂生产的对象类型。
+	 * @return 文件存储服务接口类型
+	 */
 	@Override
 	public Class<?> getObjectType() {
 		return FileStorageService.class;

@@ -25,13 +25,22 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * 知识资源僵尸清理定时任务，每隔 1 小时执行一次，清理已删除但资源未清理的知识记录。
+ *
+ * <p>
+ * 通过定时兜底清理机制，处理因异步清理失败或系统异常导致的向量数据和文件残留。
+ * </p>
+ */
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class AgentKnowledgeResourceCleanerTask {
 
+	/** 知识数据访问层 */
 	private final AgentKnowledgeMapper mapper;
 
+	/** 知识资源管理器 */
 	private final AgentKnowledgeResourceManager resourceManager;
 
 	/**
@@ -68,6 +77,10 @@ public class AgentKnowledgeResourceCleanerTask {
 		}
 	}
 
+	/**
+	 * 清理单条僵尸记录，删除向量和文件资源，成功后更新清理状态。
+	 * @param knowledge 待清理的知识记录
+	 */
 	private void cleanupSingleRecord(AgentKnowledge knowledge) {
 		Integer id = knowledge.getId();
 

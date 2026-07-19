@@ -28,6 +28,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 业务术语知识管理控制器。
+ * <p>
+ * 管理业务领域的专有名词解释（如行业术语、缩写含义等）， 用于在 NL2SQL 过程中辅助 LLM 理解业务语义。 支持增删改查、召回开关、向量库刷新、重新向量化等操作。
+ * </p>
+ */
 @Slf4j
 @RestController
 @RequestMapping("/api/business-knowledge")

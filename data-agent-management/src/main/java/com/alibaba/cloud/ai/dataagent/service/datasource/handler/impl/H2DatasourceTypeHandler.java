@@ -20,14 +20,26 @@ import com.alibaba.cloud.ai.dataagent.entity.Datasource;
 import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeHandler;
 import org.springframework.stereotype.Component;
 
+/**
+ * H2 内存数据库类型处理器，负责构建 H2 JDBC 连接 URL（内存模式、MySQL 兼容模式）。
+ */
 @Component
 public class H2DatasourceTypeHandler implements DatasourceTypeHandler {
 
+	/**
+	 * 返回 H2 数据源类型名称。
+	 * @return H2 类型名称
+	 */
 	@Override
 	public String typeName() {
 		return BizDataSourceTypeEnum.H2.getTypeName();
 	}
 
+	/**
+	 * 构建 H2 JDBC 连接 URL，使用内存模式并兼容 MySQL 方言。
+	 * @param datasource 数据源实体
+	 * @return H2 JDBC 连接 URL
+	 */
 	@Override
 	public String buildConnectionUrl(Datasource datasource) {
 		if (!hasRequiredConnectionFields(datasource)) {

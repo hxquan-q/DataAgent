@@ -22,22 +22,33 @@ import com.alibaba.cloud.ai.dataagent.enums.BizDataSourceTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**
- * Hive 数据源访问器实现
+ * Hive 数据库访问器，支持 Hive 数据源的元数据查询和 SQL 执行。
+ * <p>
+ * 通过 JDBC 连接 Hive 数据仓库，执行 SHOW DATABASES、SHOW TABLES、DESCRIBE 等命令获取元数据。
+ * </p>
  */
 @Service("hiveAccessor")
 public class HiveDBAccessor extends AbstractAccessor {
 
+	/** 访问器类型标识 */
 	private final static String ACCESSOR_TYPE = "Hive_Accessor";
 
+	/**
+	 * 构造函数，注入 DDL 工厂和连接池工厂。
+	 * @param ddlFactory DDL 执行器工厂
+	 * @param poolFactory 连接池工厂
+	 */
 	protected HiveDBAccessor(DdlFactory ddlFactory, DBConnectionPoolFactory poolFactory) {
 		super(ddlFactory, poolFactory.getPoolByDbType(BizDataSourceTypeEnum.HIVE.getTypeName()));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String getAccessorType() {
 		return ACCESSOR_TYPE;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.HIVE.getTypeName().equalsIgnoreCase(type);

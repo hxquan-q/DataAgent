@@ -28,6 +28,18 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
+ * SQL 生成分发器，根据 SQL 生成结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>生成失败且未超过最大重试次数：返回 SQL 生成节点重试</li>
+ * <li>生成失败且超过最大重试次数：结束流程</li>
+ * <li>检测到流程结束标志：结束流程</li>
+ * <li>生成成功：进入语义一致性校验节点</li>
+ * </ul>
+ * </p>
+ *
  * @author zhangshenghang
  */
 @Slf4j
@@ -37,12 +49,18 @@ public class SqlGenerateDispatcher implements EdgeAction {
 
 	private final DataAgentProperties properties;
 
+	/**
+	 * 根据 SQL 生成结果决定下一个节点。
+	 * @param state 工作流全局状态，包含 SQL 生成输出
+	 * @return 下一个节点名称：{@value SEMANTIC_CONSISTENCY_NODE}、{@value SQL_GENERATE_NODE} 或
+	 * {@code END}
+	 */
 	@Override
 	public String apply(OverAllState state) {
 		Optional<Object> optional = state.value(SQL_GENERATE_OUTPUT);
 		if (optional.isEmpty()) {
+			// 生成失败，检查重试次数
 			int currentCount = state.value(SQL_GENERATE_COUNT, properties.getMaxSqlRetryCount());
-			// 生成失败，重新生成
 			if (currentCount < properties.getMaxSqlRetryCount()) {
 				log.info("SQL 生成失败，开始重试，当前次数: {}", currentCount);
 				return SQL_GENERATE_NODE;
@@ -58,7 +76,7 @@ public class SqlGenerateDispatcher implements EdgeAction {
 			return END;
 		}
 		else {
-			log.info("SQL生成成功，进入语义一致性检查节点: {}", SEMANTIC_CONSISTENCY_NODE);
+			log.info("SQL 生成成功，进入语义一致性校验节点: {}", SEMANTIC_CONSISTENCY_NODE);
 			return SEMANTIC_CONSISTENCY_NODE;
 		}
 	}

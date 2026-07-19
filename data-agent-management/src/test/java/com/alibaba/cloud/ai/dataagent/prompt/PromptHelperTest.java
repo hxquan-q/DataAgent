@@ -334,4 +334,156 @@ class PromptHelperTest {
 		assertNotNull(result);
 	}
 
+	@Test
+	void buildMixMacSqlTablePrompt_longExampleValue_isShortened() {
+		TableDTO table = new TableDTO();
+		table.setName("users");
+		table.setDescription("User table");
+
+		ColumnDTO col = new ColumnDTO();
+		col.setName("bio");
+		col.setType("text");
+		col.setDescription("Bio");
+		String longVal = "x".repeat(80);
+		col.setData(Arrays.asList(longVal, "short", "another-long-" + "y".repeat(50)));
+		table.setColumn(Arrays.asList(col));
+
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+
+		assertTrue(result.contains("Examples:"));
+		assertFalse(result.contains(longVal));
+		assertTrue(result.contains("…"));
+		int idx = result.indexOf("Examples: [");
+		String ex = result.substring(idx, result.indexOf(']', idx) + 1);
+		assertEquals(1, ex.chars().filter(ch -> ch == ',').count());
+	}
+
+	@Test
+	void shortenExampleValue_passthroughAndTrim() {
+		assertEquals("ab", PromptHelper.shortenExampleValue("  ab  "));
+		assertTrue(PromptHelper.shortenExampleValue("z".repeat(50)).endsWith("…"));
+	}
+
+	@Test
+	void buildMixMacSqlTablePrompt_manyColumns_isCapped() {
+		TableDTO table = new TableDTO();
+		table.setName("wide");
+		table.setDescription("wide");
+		java.util.List<ColumnDTO> cols = new java.util.ArrayList<>();
+		for (int i = 0; i < 50; i++) {
+			ColumnDTO c = new ColumnDTO();
+			c.setName("c" + i);
+			c.setType("int");
+			c.setDescription("c" + i);
+			cols.add(c);
+		}
+		table.setColumn(cols);
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+		assertTrue(result.contains("more columns omitted"));
+		assertFalse(result.contains("(c49"));
+		assertTrue(result.contains("(c0"));
+	}
+
+	@Test
+	void buildMixMacSqlTablePrompt_wideTable_keepsPrimaryKeyWhenCapped() {
+		TableDTO table = new TableDTO();
+		table.setName("wide");
+		table.setDescription("wide");
+		table.setPrimaryKeys(Arrays.asList("id_pk"));
+		java.util.List<ColumnDTO> cols = new java.util.ArrayList<>();
+		for (int i = 0; i < 45; i++) {
+			ColumnDTO c = new ColumnDTO();
+			c.setName("c" + i);
+			c.setType("int");
+			c.setDescription("c" + i);
+			cols.add(c);
+		}
+		// PK last in source order — must still appear after prioritization
+		ColumnDTO pk = new ColumnDTO();
+		pk.setName("id_pk");
+		pk.setType("bigint");
+		pk.setDescription("Primary key");
+		cols.add(pk);
+		table.setColumn(cols);
+
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+		assertTrue(result.contains("id_pk"));
+		assertTrue(result.contains("Primary Key"));
+		assertTrue(result.contains("more columns omitted"));
+	}
+
+	@Test
+	void prioritizePrimaryKeyColumns_movesPkToFront() {
+		ColumnDTO a = new ColumnDTO();
+		a.setName("a");
+		ColumnDTO b = new ColumnDTO();
+		b.setName("b");
+		ColumnDTO pk = new ColumnDTO();
+		pk.setName("id");
+		java.util.List<ColumnDTO> ordered = PromptHelper.prioritizePrimaryKeyColumns(
+				Arrays.asList(a, b, pk), Arrays.asList("id"));
+		assertEquals("id", ordered.get(0).getName());
+		assertEquals(3, ordered.size());
+	}
+
+	@Test
+	void prioritizePrimaryKeyColumns_idLikeAfterPk() {
+		ColumnDTO a = new ColumnDTO();
+		a.setName("amount");
+		ColumnDTO fk = new ColumnDTO();
+		fk.setName("user_id");
+		ColumnDTO pk = new ColumnDTO();
+		pk.setName("id");
+		java.util.List<ColumnDTO> ordered = PromptHelper.prioritizePrimaryKeyColumns(
+				Arrays.asList(a, fk, pk), Arrays.asList("id"));
+		assertEquals("id", ordered.get(0).getName());
+		assertEquals("user_id", ordered.get(1).getName());
+		assertEquals("amount", ordered.get(2).getName());
+	}
+
+	@Test
+	void buildMixMacSqlTablePrompt_longDescription_isShortened() {
+		TableDTO table = new TableDTO();
+		table.setName("t");
+		String longDesc = "d".repeat(120);
+		table.setDescription(longDesc);
+		ColumnDTO col = new ColumnDTO();
+		col.setName("c");
+		col.setType("varchar");
+		col.setDescription("e".repeat(120));
+		table.setColumn(Arrays.asList(col));
+		String result = PromptHelper.buildMixMacSqlTablePrompt(table, true);
+		assertFalse(result.contains(longDesc));
+		assertTrue(result.contains("…"));
+	}
+
+	@Test
+	void buildMixMacSqlDbPrompt_manyForeignKeys_isCapped() {
+		SchemaDTO schema = new SchemaDTO();
+		schema.setName("db");
+		schema.setTable(Arrays.asList());
+		java.util.List<String> fks = new java.util.ArrayList<>();
+		for (int i = 0; i < 40; i++) {
+			fks.add("t" + i + ".a = t" + i + ".b");
+		}
+		schema.setForeignKeys(fks);
+		String result = PromptHelper.buildMixMacSqlDbPrompt(schema, true);
+		assertTrue(result.contains("more foreign keys omitted"));
+		assertFalse(result.contains("t39.a"));
+	}
+
+	@Test
+	void boundEvidence_blankBecomesWu() {
+		assertEquals("无", PromptHelper.boundEvidence(null));
+		assertEquals("无", PromptHelper.boundEvidence("  "));
+	}
+
+	@Test
+	void boundQuery_truncatesLongQuery() {
+		String q = "q".repeat(1200);
+		String out = PromptHelper.boundQuery(q);
+		assertTrue(out.length() <= 1001);
+		assertTrue(out.endsWith("…"));
+	}
+
 }

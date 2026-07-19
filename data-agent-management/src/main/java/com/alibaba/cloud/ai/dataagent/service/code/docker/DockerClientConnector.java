@@ -18,11 +18,16 @@ package com.alibaba.cloud.ai.dataagent.service.code.docker;
 import com.github.dockerjava.api.DockerClient;
 
 /**
- * Creates a Docker client for one endpoint without probing the daemon.
+ * Docker 客户端连接器接口，为单个 Docker 端点创建客户端（不包含守护进程探测）。
  */
 @FunctionalInterface
 public interface DockerClientConnector {
 
+	/**
+	 * 连接到指定的 Docker 主机。
+	 * @param host Docker 主机地址
+	 * @return Docker 客户端
+	 */
 	DockerClient connect(String host);
 
 }

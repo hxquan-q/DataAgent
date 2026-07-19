@@ -166,7 +166,7 @@ class PlanExecutorNodeTest {
 
 		assertFalse((Boolean) result.get(PLAN_VALIDATION_STATUS));
 		assertTrue(result.containsKey(PLAN_VALIDATION_ERROR));
-		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("no execution steps"));
+		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("没有执行步骤"));
 	}
 
 	@Test
@@ -185,7 +185,7 @@ class PlanExecutorNodeTest {
 
 		assertFalse((Boolean) result.get(PLAN_VALIDATION_STATUS));
 		assertTrue(result.containsKey(PLAN_VALIDATION_ERROR));
-		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("Tool parameters are missing"));
+		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("缺少工具参数"));
 	}
 
 	@Test
@@ -204,7 +204,7 @@ class PlanExecutorNodeTest {
 
 		assertFalse((Boolean) result.get(PLAN_VALIDATION_STATUS));
 		assertTrue(result.containsKey(PLAN_VALIDATION_ERROR));
-		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("SQL generation node is missing description"));
+		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("SQL 生成节点缺少描述信息"));
 	}
 
 	@Test
@@ -223,8 +223,7 @@ class PlanExecutorNodeTest {
 
 		assertFalse((Boolean) result.get(PLAN_VALIDATION_STATUS));
 		assertTrue(result.containsKey(PLAN_VALIDATION_ERROR));
-		assertTrue(
-				((String) result.get(PLAN_VALIDATION_ERROR)).contains("Python generation node is missing instruction"));
+		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("Python 生成节点缺少指令信息"));
 	}
 
 	@Test
@@ -268,7 +267,7 @@ class PlanExecutorNodeTest {
 
 		assertFalse((Boolean) result.get(PLAN_VALIDATION_STATUS));
 		assertTrue(result.containsKey(PLAN_VALIDATION_ERROR));
-		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("missing summary_and_recommendations"));
+		assertTrue(((String) result.get(PLAN_VALIDATION_ERROR)).contains("缺少总结和建议信息"));
 	}
 
 	@Test

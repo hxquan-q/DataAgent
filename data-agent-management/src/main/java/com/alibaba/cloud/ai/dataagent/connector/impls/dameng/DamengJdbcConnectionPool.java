@@ -22,16 +22,33 @@ import org.springframework.stereotype.Service;
 
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.OTHERS;
 
+/**
+ * 达梦（Dameng）JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用达梦 JDBC 驱动（dm.jdbc.driver.DmDriver），支持连接测试（ping）和错误码映射。 达梦驱动不兼容 Druid 的
+ * wall 过滤器，仅启用 stat 过滤器。
+ * </p>
+ */
 @Service("damengJdbcConnectionPool")
 public class DamengJdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/** 达梦 JDBC 驱动类名 */
 	private static final String DRIVER = "dm.jdbc.driver.DmDriver";
 
+	/**
+	 * 获取达梦 JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return DRIVER;
 	}
 
+	/**
+	 * 将达梦 SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 		ErrorCodeEnum ret = ErrorCodeEnum.fromCode(sqlState);
@@ -41,11 +58,20 @@ public class DamengJdbcConnectionPool extends AbstractDBConnectionPool {
 		return OTHERS;
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为达梦类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.DAMENG.getTypeName().equals(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return 达梦类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return BizDataSourceTypeEnum.DAMENG.getTypeName();

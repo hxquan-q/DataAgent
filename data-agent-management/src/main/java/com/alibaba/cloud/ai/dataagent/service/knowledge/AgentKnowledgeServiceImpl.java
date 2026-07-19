@@ -38,19 +38,31 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Agent 知识库服务实现类，实现知识的增删改查、分页查询、召回状态切换和向量嵌入重试逻辑。
+ *
+ * <p>
+ * 创建和删除知识时通过 Spring 事件机制异步触发向量嵌入和资源清理。
+ * </p>
+ */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class AgentKnowledgeServiceImpl implements AgentKnowledgeService {
 
+	/** 知识文件存储路径 */
 	private static final String AGENT_KNOWLEDGE_FILE_PATH = "agent-knowledge";
 
+	/** 知识数据访问层 */
 	private final AgentKnowledgeMapper agentKnowledgeMapper;
 
+	/** 文件存储服务 */
 	private final FileStorageService fileStorageService;
 
+	/** 知识对象转换器 */
 	private final AgentKnowledgeConverter agentKnowledgeConverter;
 
+	/** Spring 事件发布器 */
 	private final ApplicationEventPublisher eventPublisher;
 
 	@Override

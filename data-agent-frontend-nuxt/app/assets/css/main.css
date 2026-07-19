@@ -14,38 +14,169 @@
  * limitations under the License.
  */
 
+@import './tokens.css';
+
 /* 页面淡入淡出且轻微位移 */
 .page-enter-active,
 .page-leave-active {
-	transition: all 0.3s ease;
+	transition: opacity var(--da-dur-base) var(--da-ease-out), transform var(--da-dur-base) var(--da-ease-out);
 }
 
 .page-enter-from {
 	opacity: 0;
-	transform: translateY(10px); /* 从下方一点点浮现 */
+	transform: translateY(10px);
 }
 
 .page-leave-to {
 	opacity: 0;
-	transform: translateY(-10px); /* 向上方一点点消失 */
+	transform: translateY(-10px);
 }
 
-/* ── 公共页面样式 ──────────────────────────────────────────────────────────── */
+/* ── App base (shell rebuild) ─────────────────────────────────────────────── */
+html,
+body,
+#__nuxt {
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	font-family: var(--da-font-sans);
+	color: var(--da-ink);
+	background: var(--da-surface-soft);
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+.v-application {
+	background: var(--da-surface-soft) !important;
+	color: var(--da-ink) !important;
+	font-family: var(--da-font-sans) !important;
+}
+
+.v-application .text-none {
+	letter-spacing: 0;
+}
+
+/* ── 公共页面样式（shell rebuild · DEEIX paper shell） ─────────────────────── */
 
 .page-shell {
-	padding: 32px;
+	padding: 20px 24px 32px;
+	max-width: 1280px;
+	margin: 0 auto;
+	color: var(--da-ink);
+	box-sizing: border-box;
+	background: transparent;
+}
+
+.page-title {
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+}
+
+.page-shell h1,
+.page-shell .text-h4 {
+	letter-spacing: -0.03em;
+	color: var(--da-ink);
+	font-family: var(--da-font-display);
+	font-weight: 500;
+}
+
+.page-shell .text-medium-emphasis,
+.page-shell .text-caption {
+	color: var(--da-muted);
+}
+
+/* Soft paper cards across admin pages without touching business markup */
+.page-shell :deep(.v-card) {
+	border: 1px solid var(--da-line-soft) !important;
+	border-radius: var(--da-radius-md) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+	background: var(--da-surface) !important;
+}
+
+.page-shell :deep(.v-card.v-card--variant-outlined) {
+	border-color: var(--da-line-soft) !important;
+}
+
+.page-shell :deep(.v-table),
+.page-shell :deep(.v-data-table) {
+	border-radius: var(--da-radius-md);
+	overflow: hidden;
+}
+
+.page-shell :deep(.v-field) {
+	border-radius: var(--da-radius-sm) !important;
+}
+
+.page-shell :deep(.v-btn) {
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.page-shell :deep(.v-chip) {
+	border-radius: 999px;
+}
+
+/* Shared paper panel utility */
+.bg-primary-soft {
+	background: var(--da-primary-soft) !important;
+	color: var(--da-ink);
+}
+
+.da-paper {
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	box-shadow: var(--da-shadow-sm);
 }
 
 .search-field .v-field__outline {
-	--v-field-border-color: #e2e8f0;
+	--v-field-border-color: var(--da-line-soft);
+}
+
+.search-field :deep(.v-field) {
+	border-radius: 999px !important;
+	background: var(--da-surface) !important;
+}
+
+.search-field :deep(.v-field--focused) {
+	box-shadow: 0 0 0 3px color-mix(in srgb, var(--da-primary) 12%, transparent);
+}
+
+/* Segmented pill toggle (model tabs etc.) */
+.segmented-toggle {
+	background: var(--da-surface-soft) !important;
+	border: 1px solid var(--da-line-soft) !important;
+	padding: 4px !important;
+	box-shadow: var(--da-shadow-sm);
+}
+
+.segmented-toggle .v-btn {
+	border: none !important;
+	border-radius: 999px !important;
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 600 !important;
+	color: var(--da-muted) !important;
+	min-height: 36px !important;
+}
+
+.segmented-toggle .v-btn--active,
+.segmented-toggle .v-btn--selected {
+	background: var(--da-surface) !important;
+	color: var(--da-primary) !important;
+	box-shadow: var(--da-shadow-sm) !important;
 }
 
 .custom-label {
-	font-size: 0.75rem;
+	font-size: 11.5px;
 	font-weight: 600;
-	color: #64748b;
+	color: var(--da-muted);
 	text-transform: uppercase;
-	letter-spacing: 0.05em;
+	letter-spacing: 0.04em;
 	margin-bottom: 6px;
 	display: block;
 }
@@ -53,7 +184,7 @@
 .breathing-dot {
 	width: 8px;
 	height: 8px;
-	background-color: #10b981;
+	background-color: var(--da-success);
 	border-radius: 50%;
 	margin-right: 6px;
 	display: inline-block;
@@ -63,11 +194,11 @@
 .breathing-dot-green {
 	width: 8px;
 	height: 8px;
-	background-color: #10b981;
+	background-color: var(--da-success);
 	border-radius: 50%;
 	margin-right: 8px;
 	display: inline-block;
-	box-shadow: 0 0 0 rgba(16, 185, 129, 0.4);
+	box-shadow: 0 0 0 color-mix(in srgb, var(--da-success) 40%, transparent);
 	animation: breathe 2s infinite ease-in-out;
 }
 
@@ -75,16 +206,533 @@
 	0% {
 		transform: scale(0.9);
 		opacity: 0.7;
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.5);
+		box-shadow: 0 0 0 0 color-mix(in srgb, var(--da-success) 50%, transparent);
 	}
 	50% {
 		transform: scale(1.1);
 		opacity: 1;
-		box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+		box-shadow: 0 0 0 6px transparent;
 	}
 	100% {
 		transform: scale(0.9);
 		opacity: 0.7;
-		box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+		box-shadow: 0 0 0 0 transparent;
 	}
+}
+
+/* ── 表名标记 chip（[table::name] → <span class="table-tag">name</span>） ────── */
+.table-tag {
+	display: inline-block;
+	padding: 1px 6px;
+	margin: 0 2px;
+	background: rgba(var(--v-theme-primary), 0.12);
+	color: rgb(var(--v-theme-primary));
+	border-radius: var(--da-radius-sm);
+	font-family: var(--da-font-mono);
+	font-size: 0.85em;
+	font-weight: 500;
+	vertical-align: baseline;
+	line-height: 1.4;
+}
+
+/* ── Chat polish (CSS-only, no motion lib) ─────────────────────────────────── */
+
+@keyframes da-fade-up {
+	from {
+		opacity: 0;
+		transform: translateY(12px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes da-scale-x {
+	from {
+		transform: scaleX(0);
+	}
+	to {
+		transform: scaleX(1);
+	}
+}
+
+@keyframes da-soft-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px) scale(0.99);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0) scale(1);
+	}
+}
+
+.da-reveal {
+	animation: da-fade-up var(--da-dur) var(--da-ease-out) both;
+}
+
+.da-reveal-delay-1 {
+	animation-delay: 0.06s;
+}
+.da-reveal-delay-2 {
+	animation-delay: 0.12s;
+}
+.da-reveal-delay-3 {
+	animation-delay: 0.18s;
+}
+
+.da-hairline {
+	height: 1px;
+	width: 100%;
+	background: var(--da-line);
+	transform-origin: left center;
+	animation: da-scale-x 0.7s var(--da-ease-out) both;
+}
+
+.da-msg-enter {
+	animation: da-soft-in var(--da-dur-slow) var(--da-ease-out) both;
+}
+
+/* Focus ring utility for custom controls */
+.da-focus-ring:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+
+/* Global keyboard affordance for custom buttons without Vuetify */
+button:focus-visible,
+[role='button']:focus-visible,
+[role='option']:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+
+/* Narrow screens: denser page shell */
+@media (max-width: 640px) {
+	.page-shell {
+		padding: 14px 14px 24px;
+	}
+}
+
+/* ── Mobile product shell ───────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+	.page-shell,
+	.page-shell.v-container,
+	.v-container.page-shell {
+		padding: 14px 14px calc(20px + var(--da-safe-bottom)) !important;
+		max-width: 100% !important;
+	}
+
+	.page-shell :deep(.v-data-table),
+	.page-shell :deep(.v-table) {
+		font-size: 12.5px;
+	}
+
+	.page-shell :deep(.v-btn) {
+		min-height: 36px !important;
+	}
+
+	/* knowledge header stack */
+	.knowledge-header {
+		flex-direction: column !important;
+		align-items: stretch !important;
+	}
+	.knowledge-header__actions {
+		width: 100%;
+	}
+	.knowledge-header__actions :deep(.v-btn) {
+		flex: 1;
+	}
+}
+
+@media (max-width: 480px) {
+	html {
+		-webkit-text-size-adjust: 100%;
+	}
+	body {
+		overscroll-behavior-y: none;
+	}
+}
+
+
+@media (prefers-reduced-motion: reduce) {
+	.page-enter-active,
+	.page-leave-active {
+		transition: none !important;
+	}
+
+	.breathing-dot,
+	.breathing-dot-green,
+	.da-reveal,
+	.da-reveal-delay-1,
+	.da-reveal-delay-2,
+	.da-reveal-delay-3,
+	.da-hairline,
+	.da-msg-enter {
+		animation: none !important;
+	}
+
+	*,
+	*::before,
+	*::after {
+		scroll-behavior: auto !important;
+	}
+}
+
+
+/* Global soft scrollbar (DEEIX-like quiet chrome) */
+.custom-scrollbar {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in srgb, var(--da-muted) 45%, transparent) transparent;
+}
+.custom-scrollbar::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--da-muted) 35%, transparent);
+	border-radius: 999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+	background: color-mix(in srgb, var(--da-muted) 55%, transparent);
+}
+
+
+/* Shared empty state (admin lists) */
+.da-empty,
+.model-empty {
+	padding: 40px 24px;
+	border: 1.5px dashed var(--da-line-soft);
+	border-radius: var(--da-radius-lg);
+	background: color-mix(in srgb, var(--da-surface-soft) 70%, var(--da-surface));
+}
+.da-empty__title,
+.model-empty h3 {
+	color: var(--da-ink);
+	letter-spacing: -0.01em;
+}
+.da-empty__desc,
+.model-empty__desc {
+	max-width: 420px;
+	margin-left: auto;
+	margin-right: auto;
+	line-height: 1.6;
+}
+
+
+/* Dialog paper surfaces */
+.v-dialog > .v-overlay__content > .v-card {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
+	box-shadow: var(--da-shadow-md) !important;
+	border-radius: 16px !important;
+	overflow: hidden;
+	background: var(--da-surface) !important;
+}
+
+.v-dialog .v-card-title {
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	font-size: 1.05rem !important;
+}
+
+.v-dialog .v-card-actions .v-btn {
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	font-weight: 500 !important;
+}
+
+
+/* Data table density (admin lists) */
+.page-shell :deep(.v-data-table),
+.page-shell :deep(.v-table) {
+	background: var(--da-surface) !important;
+}
+
+.page-shell :deep(.v-data-table-header th),
+.page-shell :deep(thead th) {
+	font-size: 11.5px !important;
+	font-weight: 500 !important;
+	letter-spacing: 0.01em;
+	color: var(--da-muted) !important;
+	background: color-mix(in srgb, var(--da-surface) 94%, var(--da-surface-soft)) !important;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+}
+
+.page-shell :deep(.v-data-table__td),
+.page-shell :deep(tbody td) {
+	font-size: 13px !important;
+	border-bottom-color: color-mix(in srgb, var(--da-line-soft) 90%, transparent) !important;
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
+}
+
+.page-shell :deep(.v-data-table__tr:hover),
+.page-shell :deep(tbody tr:hover) {
+	background: color-mix(in srgb, var(--da-muted) 6%, transparent) !important;
+}
+
+/* Soften admin table outer paper */
+.page-shell :deep(.v-data-table) {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	border-radius: var(--da-radius-md) !important;
+	overflow: hidden;
+	box-shadow: var(--da-shadow-sm) !important;
+}
+
+
+/* Alert paper */
+.page-shell :deep(.v-alert) {
+	border-radius: var(--da-radius-md) !important;
+	box-shadow: var(--da-shadow-sm);
+}
+
+.page-shell :deep(.v-alert--variant-tonal) {
+	border: 1px solid color-mix(in srgb, currentColor 18%, transparent);
+}
+
+
+/* Admin filter toolbar paper */
+.page-shell :deep(.da-toolbar),
+.da-toolbar {
+	box-shadow: none !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface)) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 40%, transparent) !important;
+	border-radius: 12px !important;
+}
+
+
+/* Dialog title display */
+.v-dialog .v-card-title {
+	font-family: var(--da-font-display);
+	font-weight: 500 !important;
+	letter-spacing: -0.01em;
+	color: var(--da-ink);
+}
+
+
+/* Dialog/list title display weight */
+.dialog-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.02em;
+	font-weight: 500;
+	font-size: 1.1rem;
+	color: var(--da-ink);
+}
+
+
+/* Focusable Vuetify buttons in shell */
+.page-shell :deep(.v-btn:focus-visible),
+.base-drawer :deep(.v-btn:focus-visible) {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+
+
+/* Form field soft radius (admin/create forms) */
+.page-shell :deep(.v-field) {
+	border-radius: 10px !important;
+}
+
+.page-shell :deep(.v-field--variant-outlined .v-field__outline) {
+	--v-field-border-opacity: 0.5;
+}
+
+.page-shell :deep(.v-field--focused .v-field__outline) {
+	--v-field-border-opacity: 0.85;
+}
+
+.page-shell :deep(.v-label),
+.page-shell :deep(.v-field-label) {
+	letter-spacing: -0.01em;
+}
+
+
+
+/* Quiet empty state (admin tables / lists) */
+.page-shell .da-empty,
+.da-empty {
+	padding: 40px 20px 36px;
+	text-align: center;
+	background: transparent;
+	border: none;
+}
+
+.page-shell .da-empty__icon,
+.da-empty__icon {
+	width: 48px;
+	height: 48px;
+	margin: 0 auto 12px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 12px;
+	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 48%, transparent);
+	box-shadow: var(--da-shadow-sm);
+}
+
+.page-shell .da-empty__title,
+.da-empty__title {
+	margin: 0 0 6px;
+	font-family: var(--da-font-display);
+	font-size: 1.15rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+}
+
+.page-shell .da-empty__desc,
+.da-empty__desc {
+	max-width: 420px;
+	margin: 0 auto 16px;
+	font-size: 13.5px;
+	line-height: 1.6;
+	color: var(--da-muted);
+}
+
+.page-shell .da-empty .v-btn,
+.da-empty .v-btn {
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	font-weight: 500 !important;
+	letter-spacing: 0 !important;
+	box-shadow: none !important;
+	text-transform: none !important;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Coordinated product shell (rebuild) — shared primitives
+   Keep components thin; put shared chrome here.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* v-container used as page-shell should not double-pad */
+.page-shell.v-container,
+.v-container.page-shell {
+	max-width: 1280px !important;
+	padding: 20px 24px 32px !important;
+	margin-left: auto !important;
+	margin-right: auto !important;
+}
+
+/* Segmented / filter pills (admin) */
+.page-shell :deep(.v-btn-toggle),
+.page-shell :deep(.v-slide-group) {
+	border-radius: 999px;
+}
+
+.page-shell :deep(.v-btn-toggle .v-btn) {
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 500 !important;
+	border-radius: 999px !important;
+}
+
+/* Soft paper toolbar row */
+.da-toolbar {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-bottom: 14px;
+}
+
+/* Primary pill action */
+.da-btn-primary {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 34px;
+	padding: 0 14px;
+	border: none;
+	border-radius: 999px;
+	background: var(--da-primary);
+	color: var(--da-on-primary);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	cursor: pointer;
+	text-decoration: none;
+}
+.da-btn-primary:hover {
+	background: color-mix(in srgb, var(--da-primary) 90%, #000);
+}
+.da-btn-ghost {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 6px;
+	min-height: 34px;
+	padding: 0 14px;
+	border: 1px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	border-radius: 999px;
+	background: var(--da-surface);
+	color: var(--da-ink);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 600;
+	cursor: pointer;
+	text-decoration: none;
+}
+.da-btn-ghost:hover {
+	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent);
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
+}
+
+/* Paper card utility */
+.da-paper {
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	box-shadow: var(--da-shadow-sm);
+}
+
+/* Quiet dialogs */
+.v-overlay__content > .v-card {
+	border: 1px solid var(--da-line-soft) !important;
+	border-radius: var(--da-radius-md) !important;
+	box-shadow: var(--da-shadow-md) !important;
+}
+
+/* Soft scrollbars product-wide */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: color-mix(in srgb, var(--da-muted) 35%, transparent) transparent;
+}
+*::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+*::-webkit-scrollbar-thumb {
+	background: color-mix(in srgb, var(--da-muted) 35%, transparent);
+	border-radius: 999px;
+}
+
+/* Admin main content fill */
+.base-drawer__content,
+.v-main {
+	background: var(--da-surface-soft);
+}
+
+/* Search field pill */
+.page-shell :deep(.v-text-field .v-field) {
+	border-radius: 999px !important;
+}
+.page-shell :deep(.v-textarea .v-field),
+.page-shell :deep(.v-select .v-field),
+.page-shell :deep(.v-autocomplete .v-field) {
+	border-radius: 10px !important;
 }

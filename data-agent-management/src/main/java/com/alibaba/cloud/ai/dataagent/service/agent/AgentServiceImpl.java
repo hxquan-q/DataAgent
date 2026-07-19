@@ -29,45 +29,72 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Agent Service Class
+ * Agent 管理服务实现类，提供 Agent 实体的增删改查、API Key 生成与管理， 以及删除时关联向量数据和头像文件的级联清理。
  */
 @Slf4j
 @Service
 @AllArgsConstructor
 public class AgentServiceImpl implements AgentService {
 
+	/** Agent 数据访问层 */
 	private final AgentMapper agentMapper;
 
+	/** 向量存储服务，用于清理 Agent 关联的向量数据 */
 	private final AgentVectorStoreService agentVectorStoreService;
 
+	/** 文件存储服务，用于清理 Agent 头像文件 */
 	private final FileStorageService fileStorageService;
 
+	/**
+	 * 查询全部 Agent。
+	 * @return Agent 列表
+	 */
 	@Override
 	public List<Agent> findAll() {
 		return agentMapper.findAll();
 	}
 
+	/**
+	 * 根据主键 ID 查询单个 Agent。
+	 * @param id Agent 主键 ID
+	 * @return 对应的 Agent 对象，不存在时返回 null
+	 */
 	@Override
 	public Agent findById(Long id) {
 		return agentMapper.findById(id);
 	}
 
+	/**
+	 * 根据状态查询 Agent 列表。
+	 * @param status Agent 状态
+	 * @return 符合状态的 Agent 列表
+	 */
 	@Override
 	public List<Agent> findByStatus(String status) {
 		return agentMapper.findByStatus(status);
 	}
 
+	/**
+	 * 根据关键字搜索 Agent。
+	 * @param keyword 搜索关键字
+	 * @return 匹配的 Agent 列表
+	 */
 	@Override
 	public List<Agent> search(String keyword) {
 		return agentMapper.searchByKeyword(keyword);
 	}
 
+	/**
+	 * 保存 Agent，根据是否存在 ID 判断新增或更新操作。
+	 * @param agent 待保存的 Agent 对象
+	 * @return 保存后的 Agent 对象
+	 */
 	@Override
 	public Agent save(Agent agent) {
 		LocalDateTime now = LocalDateTime.now();
 
 		if (agent.getId() == null) {
-			// Add
+			// 新增：设置创建和更新时间
 			agent.setCreateTime(now);
 			agent.setUpdateTime(now);
 			if (agent.getApiKeyEnabled() == null) {
@@ -77,7 +104,7 @@ public class AgentServiceImpl implements AgentService {
 			agentMapper.insert(agent);
 		}
 		else {
-			// Update
+			// 更新：仅更新更新时间
 			agent.setUpdateTime(now);
 			if (agent.getApiKeyEnabled() == null) {
 				agent.setApiKeyEnabled(0);
@@ -88,6 +115,10 @@ public class AgentServiceImpl implements AgentService {
 		return agent;
 	}
 
+	/**
+	 * 根据主键 ID 删除 Agent，同时级联清理关联的向量数据和头像文件。
+	 * @param id Agent 主键 ID
+	 */
 	@Override
 	public void deleteById(Long id) {
 		try {
@@ -95,10 +126,10 @@ public class AgentServiceImpl implements AgentService {
 			Agent existing = agentMapper.findById(id);
 			String avatar = existing != null ? existing.getAvatar() : null;
 
-			// Delete agent record from database
+			// 删除数据库中的 Agent 记录
 			agentMapper.deleteById(id);
 
-			// Also clean up the agent's vector data
+			// 清理该 Agent 关联的向量数据
 			if (agentVectorStoreService != null) {
 				try {
 					agentVectorStoreService.deleteDocumentsByMetedata(id.toString(), new HashMap<>());
@@ -106,7 +137,7 @@ public class AgentServiceImpl implements AgentService {
 				}
 				catch (Exception vectorException) {
 					log.warn("Failed to delete vector data for agent: {}, error: {}", id, vectorException.getMessage());
-					// Vector data deletion failure does not affect the main process
+					// 向量数据删除失败不影响主流程
 				}
 			}
 
@@ -130,9 +161,15 @@ public class AgentServiceImpl implements AgentService {
 		}
 	}
 
+	/**
+	 * 为指定 Agent 生成新的 API Key 并启用。
+	 * @param id Agent 主键 ID
+	 * @return 更新后的 Agent 对象
+	 */
 	@Override
 	public Agent generateApiKey(Long id) {
 		Agent agent = requireAgent(id);
+		// 生成新的 API Key 并更新到数据库
 		String apiKey = ApiKeyUtil.generate();
 		agentMapper.updateApiKey(id, apiKey, 1);
 		agent.setApiKey(apiKey);
@@ -140,20 +177,37 @@ public class AgentServiceImpl implements AgentService {
 		return agent;
 	}
 
+	/**
+	 * 重置指定 Agent 的 API Key，等同于重新生成。
+	 * @param id Agent 主键 ID
+	 * @return 更新后的 Agent 对象
+	 */
 	@Override
 	public Agent resetApiKey(Long id) {
 		return generateApiKey(id);
 	}
 
+	/**
+	 * 删除指定 Agent 的 API Key 并禁用。
+	 * @param id Agent 主键 ID
+	 * @return 更新后的 Agent 对象
+	 */
 	@Override
 	public Agent deleteApiKey(Long id) {
 		Agent agent = requireAgent(id);
+		// 清空 API Key 并设为禁用状态
 		agentMapper.updateApiKey(id, null, 0);
 		agent.setApiKey(null);
 		agent.setApiKeyEnabled(0);
 		return agent;
 	}
 
+	/**
+	 * 切换指定 Agent 的 API Key 启用状态。
+	 * @param id Agent 主键 ID
+	 * @param enabled 是否启用
+	 * @return 更新后的 Agent 对象
+	 */
 	@Override
 	public Agent toggleApiKey(Long id, boolean enabled) {
 		agentMapper.toggleApiKey(id, enabled ? 1 : 0);
@@ -162,6 +216,11 @@ public class AgentServiceImpl implements AgentService {
 		return agent;
 	}
 
+	/**
+	 * 获取指定 Agent 的 API Key 脱敏字符串。
+	 * @param id Agent 主键 ID
+	 * @return 脱敏后的 API Key 字符串，不存在时返回 null
+	 */
 	@Override
 	public String getApiKeyMasked(Long id) {
 		Agent agent = requireAgent(id);
@@ -169,9 +228,16 @@ public class AgentServiceImpl implements AgentService {
 		if (apiKey == null || apiKey.isBlank()) {
 			return null;
 		}
+		// 对 API Key 进行脱敏处理后返回
 		return ApiKeyUtil.mask(apiKey);
 	}
 
+	/**
+	 * 根据主键 ID 获取 Agent，不存在时抛出异常。
+	 * @param id Agent 主键 ID
+	 * @return 查询到的 Agent 对象
+	 * @throws IllegalArgumentException 当 Agent 不存在时抛出
+	 */
 	private Agent requireAgent(Long id) {
 		Agent agent = agentMapper.findById(id);
 		if (agent == null) {

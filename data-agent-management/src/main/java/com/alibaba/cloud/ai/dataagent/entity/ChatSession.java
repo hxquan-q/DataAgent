@@ -22,7 +22,11 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Chat Session Entity Class
+ * 聊天会话实体类
+ *
+ * <p>
+ * 表示用户与某个智能体之间的一次完整对话会话。一个会话包含多条聊天消息（ChatMessage）， 并记录会话状态与是否置顶等信息。
+ * </p>
  */
 @Data
 @NoArgsConstructor
@@ -30,21 +34,29 @@ import java.time.LocalDateTime;
 @Builder
 public class ChatSession {
 
-	private String id; // UUID
+	/** 会话ID（UUID） */
+	private String id;
 
+	/** 关联的智能体ID */
 	private Integer agentId;
 
+	/** 会话标题 */
 	private String title;
 
-	private String status; // active, archived, deleted
+	/** 会话状态：active-活跃，archived-已归档，deleted-已删除 */
+	private String status;
 
+	/** 是否置顶 */
 	@Builder.Default
-	private Boolean isPinned = false; // Whether pinned
+	private Boolean isPinned = false;
 
+	/** 用户ID */
 	private Long userId;
 
+	/** 创建时间 */
 	private LocalDateTime createTime;
 
+	/** 更新时间 */
 	private LocalDateTime updateTime;
 
 	public ChatSession(String id, Integer agentId, String title, String status, Long userId) {

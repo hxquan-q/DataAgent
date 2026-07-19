@@ -66,8 +66,8 @@ export const useChatStore = defineStore('chat', () => {
 	const requestOptions = ref<ChatRequestOptions>({
 		humanFeedback: false,
 		nl2sqlOnly: false,
-		showSqlResults: false,
-		pageSize: 20,
+		showSqlResults: true,
+		pageSize: 50,
 	});
 
 	// ── Report state ────────────────────────────────────────────────────────────
@@ -96,7 +96,7 @@ export const useChatStore = defineStore('chat', () => {
 	const activeModelConfig = ref<ModelConfig | null>(null);
 
 	// ── SSE session stream refs (not reactive) ──────────────────────────────────
-	let sessionEventSource: EventSource | null = null;
+	let sessionStreamClose: (() => void) | null = null;
 	let sessionReconnectTimer: ReturnType<typeof setTimeout> | null = null;
 	let isStoreActive = true;
 
@@ -113,44 +113,64 @@ export const useChatStore = defineStore('chat', () => {
 			clearTimeout(sessionReconnectTimer);
 			sessionReconnectTimer = null;
 		}
-		if (sessionEventSource) sessionEventSource.close();
+		if (sessionStreamClose) {
+			sessionStreamClose();
+			sessionStreamClose = null;
+		}
 
-		const source = new EventSource(`/api/agent/${agentId}/sessions/stream`);
-		source.addEventListener('title-updated', (event) => {
-			try {
-				const data = JSON.parse((event as MessageEvent<string>).data) as {
-					sessionId: string;
-					title: string;
-				};
-				const target = sessions.value.find((s) => s.id === data.sessionId);
-				if (target) {
-					target.title = data.title;
-					target.editingTitle = data.title;
-				}
-				if (currentSession.value?.id === data.sessionId)
-					currentSession.value.title = data.title;
-			} catch {
-				/* ignore */
-			}
+		// fetch SSE — Bearer header, no EventSource reconnect thrash
+		import('~/utils/sse').then(({ openSseStream }) => {
+			if (!isStoreActive) return;
+			sessionStreamClose = openSseStream(
+				`/api/agent/${agentId}/sessions/stream`,
+				{
+					onMessage: (msg) => {
+						if (msg.event !== 'title-updated' || !msg.data) return;
+						try {
+							const data = JSON.parse(msg.data) as {
+								sessionId: string;
+								title: string;
+							};
+							const target = sessions.value.find((s) => s.id === data.sessionId);
+							if (target) {
+								target.title = data.title;
+								target.editingTitle = data.title;
+							}
+							if (currentSession.value?.id === data.sessionId)
+								currentSession.value.title = data.title;
+						} catch {
+							/* ignore */
+						}
+					},
+					onError: () => {
+						sessionStreamClose = null;
+						if (isStoreActive) {
+							sessionReconnectTimer = setTimeout(
+								() => connectSessionStream(agentId),
+								4000,
+							);
+						}
+					},
+					onDone: () => {
+						sessionStreamClose = null;
+						if (isStoreActive) {
+							sessionReconnectTimer = setTimeout(
+								() => connectSessionStream(agentId),
+								4000,
+							);
+						}
+					},
+				},
+			);
 		});
-		source.onerror = () => {
-			source.close();
-			sessionEventSource = null;
-			if (isStoreActive)
-				sessionReconnectTimer = setTimeout(
-					() => connectSessionStream(agentId),
-					3000,
-				);
-		};
-		sessionEventSource = source;
 	}
 
 	function disconnectSessionStream() {
 		isStoreActive = false;
 		if (sessionReconnectTimer) clearTimeout(sessionReconnectTimer);
-		if (sessionEventSource) {
-			sessionEventSource.close();
-			sessionEventSource = null;
+		if (sessionStreamClose) {
+			sessionStreamClose();
+			sessionStreamClose = null;
 		}
 	}
 
@@ -163,13 +183,33 @@ export const useChatStore = defineStore('chat', () => {
 		} else {
 			await createNewSession(agentId);
 		}
-		// Load global datasources (active)
+		// R203: 优先加载智能体已绑定数据源；无绑定时再回退全局 active 列表
 		try {
-			const list = await datasourceService.getAllDatasource('active');
-			allDatasources.value = list;
-			activeDatasource.value = list[0] || null;
+			const agentDs = await agentDatasourceService.getAgentDatasource(agentId);
+			const mapped = (agentDs || [])
+				.map((ad) => {
+					const ds = ad.datasource || {};
+					return {
+						...ds,
+						id: ad.datasourceId ?? ds.id,
+						isActive: Number(ad.isActive) === 1,
+						selectTables: ad.selectTables,
+					} as Datasource;
+				})
+				.filter((ds) => ds.id != null);
+			// R207: 空绑定 = 未就绪，不再用全局 DS 冒充已绑定
+			allDatasources.value = mapped;
+			activeDatasource.value = mapped.length
+				? mapped.find((d) => d.isActive) || mapped[0] || null
+				: null;
 		} catch {
-			/* ignore */
+			try {
+				const list = await datasourceService.getAllDatasource('active');
+				allDatasources.value = list;
+				activeDatasource.value = list[0] || null;
+			} catch {
+				/* ignore */
+			}
 		}
 		// Load chat models
 		try {
@@ -197,12 +237,34 @@ export const useChatStore = defineStore('chat', () => {
 			return;
 		}
 		try {
-			// 全局数据源列表切换：确保先建立/启用 agent 关联
-			// 后端 add 接口会自动禁用该 agent 其他数据源并启用当前数据源
+			// 后端 add 会启用当前并禁用其他 agent 数据源
 			await agentDatasourceService.addDatasourceToAgent(
 				String(agentId),
 				nextDatasourceId,
 			);
+			// R204: 切换后尽量刷新为 agent 绑定视图
+			try {
+				const agentDs = await agentDatasourceService.getAgentDatasource(agentId);
+				const mapped = (agentDs || [])
+					.map((ad) => {
+						const raw = ad.datasource || {};
+						return {
+							...raw,
+							id: ad.datasourceId ?? raw.id,
+							isActive: Number(ad.isActive) === 1,
+							selectTables: ad.selectTables,
+						} as Datasource;
+					})
+					.filter((item) => item.id != null);
+				if (mapped.length) {
+					allDatasources.value = mapped;
+					activeDatasource.value =
+						mapped.find((d) => d.isActive) || mapped.find((d) => d.id === nextDatasourceId) || mapped[0] || null;
+					return;
+				}
+			} catch {
+				/* fall through */
+			}
 			allDatasources.value = allDatasources.value.map((item) => ({
 				...item,
 				isActive: item.id === nextDatasourceId,
@@ -229,7 +291,11 @@ export const useChatStore = defineStore('chat', () => {
 	}
 
 	async function createNewSession(agentId: number) {
-		const newSession = await chatService.createSession(agentId, '新会话');
+		// R205: 默认标题带智能体名，便于侧栏识别
+		const title = currentAgentName.value
+			? `${currentAgentName.value} · 新会话`
+			: '新会话';
+		const newSession = await chatService.createSession(agentId, title);
 		sessions.value.unshift(newSession);
 		await selectSession(newSession);
 		return newSession;
@@ -281,6 +347,24 @@ export const useChatStore = defineStore('chat', () => {
 	}
 
 	// ── Message send & stream ───────────────────────────────────────────────────
+	function mapStreamErrorMessage(error: Error): string {
+		const raw = (error?.message || '').trim();
+		if (!raw) return '请求失败，请检查网络连接并重试。';
+		if (/Stream connection failed/i.test(raw)) {
+			return '流式连接中断，请重试。若反复失败请检查登录状态与后端服务。';
+		}
+		if (/未认证|登录已过期|401/i.test(raw)) {
+			return '登录已过期，请重新登录后再试。';
+		}
+		if (/CHAT model|未配置或未激活 CHAT|No active CHAT/i.test(raw)) {
+			return '未配置或未激活对话模型，请到「模型服务」添加并激活 CHAT 模型。';
+		}
+		if (/数据源|datasource/i.test(raw)) {
+			return '数据源不可用，请绑定并激活数据源后重试。';
+		}
+		return raw.length > 240 ? raw.slice(0, 240) + '…' : raw;
+	}
+
 	async function sendMessage(query: string) {
 		if (!currentSession.value) return;
 
@@ -341,22 +425,28 @@ export const useChatStore = defineStore('chat', () => {
 		let currentNodeName: string | null = null;
 		let currentBlockIndex = -1;
 
-		let viewSyncRafId: number | null = null;
+		// Mobile: process/report UI updates must be throttled — full MD re-render
+		// every SSE tick freezes Safari/Chrome on phone (page feels unrefreshable).
+		const isCoarse =
+			typeof window !== 'undefined' &&
+			(window.matchMedia('(max-width: 768px)').matches ||
+				window.matchMedia('(pointer: coarse)').matches);
+		const VIEW_SYNC_MS = isCoarse ? 220 : 100;
+		const REPORT_SYNC_MS = isCoarse ? 200 : 120;
+
+		let viewSyncTimer: ReturnType<typeof setTimeout> | null = null;
 		function scheduleViewSync() {
-			if (viewSyncRafId) return;
-			viewSyncRafId = requestAnimationFrame(() => {
-				viewSyncRafId = null;
+			if (viewSyncTimer) return;
+			viewSyncTimer = setTimeout(() => {
+				viewSyncTimer = null;
 				if (currentSession.value?.id === sessionId) {
-					nodeBlocks.value = [...sessionState.nodeBlocks];
+					// shallow copy of blocks only (step shells); report body lives in streamingReportContent
+					nodeBlocks.value = sessionState.nodeBlocks.map((b) => b.slice());
 				}
-			});
+			}, VIEW_SYNC_MS);
 		}
 
-		// Throttle report content pushes: batch SSE chunks and push at most
-		// once every ~80ms. This prevents excessive re-renders while keeping
-		// the typewriter animation looking smooth on the frontend.
 		let reportSyncTimer: ReturnType<typeof setTimeout> | null = null;
-		const REPORT_SYNC_INTERVAL = 80; // ms
 		function scheduleReportSync() {
 			if (reportSyncTimer) return;
 			reportSyncTimer = setTimeout(() => {
@@ -365,20 +455,20 @@ export const useChatStore = defineStore('chat', () => {
 					isReportStreaming.value = true;
 					streamingReportContent.value = sessionState.markdownReportContent;
 				}
-			}, REPORT_SYNC_INTERVAL);
+			}, REPORT_SYNC_MS);
 		}
 
 		function flushPendingSync() {
-			if (viewSyncRafId) {
-				cancelAnimationFrame(viewSyncRafId);
-				viewSyncRafId = null;
+			if (viewSyncTimer) {
+				clearTimeout(viewSyncTimer);
+				viewSyncTimer = null;
 			}
 			if (reportSyncTimer) {
 				clearTimeout(reportSyncTimer);
 				reportSyncTimer = null;
 			}
 			if (currentSession.value?.id === sessionId) {
-				nodeBlocks.value = [...sessionState.nodeBlocks];
+				nodeBlocks.value = sessionState.nodeBlocks.map((b) => b.slice());
 				if (sessionState.markdownReportContent) {
 					isReportStreaming.value = true;
 					streamingReportContent.value = sessionState.markdownReportContent;
@@ -416,20 +506,28 @@ export const useChatStore = defineStore('chat', () => {
 							sessionState.nodeBlocks.push([
 								{ ...response, text: `正在收集HTML报告...` },
 							]);
-					} else if (response.textType === 'MARK_DOWN') {
-						sessionState.markdownReportContent += response.text;
-						scheduleReportSync();
+					} else if (
+						['MARK_DOWN', 'MARKDOWN', 'MD', 'TEXT', ''].includes(
+							String(response.textType || '').toUpperCase(),
+						)
+					) {
+						if (response.text) {
+							sessionState.markdownReportContent += response.text;
+							scheduleReportSync();
+						}
 						const rn = sessionState.nodeBlocks.find(
-							(b) =>
-								b.length > 0 &&
-								b[0].nodeName === 'ReportGeneratorNode' &&
-								b[0].textType === 'MARK_DOWN',
+							(b) => b.length > 0 && b[0].nodeName === 'ReportGeneratorNode',
 						);
-						if (rn) rn[0].text = sessionState.markdownReportContent;
-						else
+						const brief =
+							'报告生成中… ' + sessionState.markdownReportContent.length + ' 字';
+						if (rn) {
+							rn[0].text = brief;
+							rn[0].textType = 'MARK_DOWN';
+						} else {
 							sessionState.nodeBlocks.push([
-								{ ...response, text: response.text },
+								{ ...response, text: brief, textType: TextType.MARK_DOWN },
 							]);
+						}
 					}
 				} else if (response.textType === TextType.RESULT_SET) {
 					currentNodeName = 'result_set';
@@ -479,7 +577,7 @@ export const useChatStore = defineStore('chat', () => {
 				const errorMsg: ChatMessage = {
 					sessionId,
 					role: 'assistant',
-					content: error.message || '请求失败，请检查网络连接并重试。',
+					content: mapStreamErrorMessage(error),
 					messageType: 'error',
 				};
 				await chatService
@@ -500,7 +598,36 @@ export const useChatStore = defineStore('chat', () => {
 			async () => {
 				flushPendingSync();
 
-				if (sessionState.nodeBlocks.length > 0) {
+				// Finalize report text into timeline so history can extract full MD
+				if (sessionState.markdownReportContent) {
+					const rn = sessionState.nodeBlocks.find(
+						(b) => b.length > 0 && b[0].nodeName === 'ReportGeneratorNode',
+					);
+					if (rn) {
+						rn[0].text = sessionState.markdownReportContent;
+						rn[0].textType = 'MARK_DOWN';
+					} else {
+						sessionState.nodeBlocks.push([
+							{
+								agentId: String(currentAgentId.value || ''),
+								threadId: sessionState.lastRequest?.threadId || '',
+								nodeName: 'ReportGeneratorNode',
+								textType: TextType.MARK_DOWN,
+								text: sessionState.markdownReportContent,
+								error: false,
+								complete: true,
+							},
+						]);
+					}
+				}
+
+				const hasMd =
+					!!sessionState.markdownReportContent &&
+					sessionState.markdownReportContent.length > 40 &&
+					!/^报告生成中/.test(sessionState.markdownReportContent);
+
+				if (hasMd && sessionState.nodeBlocks.length > 0) {
+					// Real analysis: timeline embeds full MD for history extract
 					const timelineMsg: ChatMessage = {
 						sessionId,
 						role: 'assistant',
@@ -515,6 +642,45 @@ export const useChatStore = defineStore('chat', () => {
 						});
 					if (savedTimeline && currentSession.value?.id === sessionId)
 						currentMessages.value.push(savedTimeline);
+				} else {
+					// No report (chitchat / early end): pure MD message only
+					const parts: string[] = [];
+					for (const block of sessionState.nodeBlocks) {
+						for (const node of block || []) {
+							if (!node?.text) continue;
+							const tt = String(node.textType || '').toUpperCase();
+							if (tt === 'JSON' || tt === 'SQL' || tt === 'PYTHON' || tt === 'RESULT_SET')
+								continue;
+							const s = String(node.text).trim();
+							if (!s || (s.startsWith('{') && s.length < 120)) continue;
+							if (/^报告生成中/.test(s)) continue;
+							parts.push(s);
+						}
+					}
+					const nl = String.fromCharCode(10);
+					const body =
+						(sessionState.markdownReportContent &&
+						!/^报告生成中/.test(sessionState.markdownReportContent)
+							? sessionState.markdownReportContent
+							: '') ||
+						parts.join(nl + nl).trim() ||
+						'未生成分析报告。若是闲聊/无关问题，系统只会完成意图识别；请改问与数据相关的问题。';
+					const savedAns = await chatService
+						.saveMessage(sessionId, {
+							sessionId,
+							role: 'assistant',
+							content: body,
+							messageType: 'markdown-report',
+						})
+						.catch((e) => {
+							console.error(e);
+							return null;
+						});
+					if (savedAns && currentSession.value?.id === sessionId) {
+						currentMessages.value.push(savedAns);
+						// keep visible until reload
+						streamingReportContent.value = body;
+					}
 				}
 
 				if (requestOptions.value.humanFeedback && _rejectedPlan) {
@@ -548,12 +714,37 @@ export const useChatStore = defineStore('chat', () => {
 		const sessionState = getSessionState(sessionId);
 		if (!sessionState.closeStream) return;
 
+		// Snapshot partial work before abort (abort must not fire onError)
+		const partialBlocks = [...sessionState.nodeBlocks];
+		const partialReport = sessionState.markdownReportContent || '';
+
 		sessionState.closeStream();
 		sessionState.closeStream = null;
 		sessionState.isStreaming = false;
-		sessionState.nodeBlocks = [];
 
-		// Save user-terminated warning message
+		// Persist partial timeline so stop is not a total loss
+		if (partialBlocks.length > 0) {
+			const timelineMsg: ChatMessage = {
+				sessionId,
+				role: 'assistant',
+				content: JSON.stringify(partialBlocks),
+				messageType: 'timeline',
+			};
+			await chatService
+				.saveMessage(sessionId, timelineMsg)
+				.catch((e) => console.error(e));
+		} else if (partialReport) {
+			const reportMsg: ChatMessage = {
+				sessionId,
+				role: 'assistant',
+				content: partialReport,
+				messageType: 'markdown-report',
+			};
+			await chatService
+				.saveMessage(sessionId, reportMsg)
+				.catch((e) => console.error(e));
+		}
+
 		const warningMsg: ChatMessage = {
 			sessionId,
 			role: 'assistant',
@@ -563,6 +754,10 @@ export const useChatStore = defineStore('chat', () => {
 		await chatService
 			.saveMessage(sessionId, warningMsg)
 			.catch((e) => console.error(e));
+
+		sessionState.nodeBlocks = [];
+		sessionState.markdownReportContent = '';
+		sessionState.htmlReportContent = '';
 
 		if (currentSession.value?.id === sessionId) {
 			isStreaming.value = false;

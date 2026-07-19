@@ -49,3 +49,30 @@ INSERT INTO agent_datasource (id, agent_id, datasource_id, is_active, create_tim
 (3, 3, 1, 0, NOW(), NOW()),  -- 财务报表智能体使用生产环境数据库
 (4, 4, 1, 0, NOW(), NOW())  -- 库存管理智能体使用生产环境数据库
 ON DUPLICATE KEY UPDATE agent_id=VALUES(agent_id);
+
+
+-- ====================== v0.2 语义层种子数据（agent_id=2 销售数据分析智能体，datasource_id=3 h2 product_db）======================
+-- 指标定义（metric）
+INSERT INTO metric (metric_code, metric_name, agent_id, datasource_id, source_table, agg_field, agg_func, default_time_field, description, status, created_time, updated_time) VALUES
+('order_count', '订单数量', 2, 3, 'orders', 'id', 'COUNT', 'order_date', '统计订单总数', 1, NOW(), NOW()),
+('order_amount', '订单金额', 2, 3, 'orders', 'total_amount', 'SUM', 'order_date', '订单总金额', 1, NOW(), NOW()),
+('avg_order_amount', '客单价', 2, 3, 'orders', 'total_amount', 'AVG', 'order_date', '平均订单金额', 1, NOW(), NOW()),
+('item_quantity', '商品销量', 2, 3, 'order_items', 'quantity', 'SUM', NULL, '销售商品总件数', 1, NOW(), NOW()),
+('product_count', '商品数量', 2, 3, 'products', 'id', 'COUNT', 'created_at', '在售商品总数', 1, NOW(), NOW()),
+('user_count', '用户数量', 2, 3, 'users', 'id', 'COUNT', 'created_at', '注册用户总数', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE metric_name=VALUES(metric_name);
+
+-- 指标多口径版本（metric_version，order_amount 多口径 demo 歧义：已完成 vs 全部）
+INSERT INTO metric_version (metric_id, ver_code, time_field, filter_condition, is_default, description, status, created_time, updated_time) VALUES
+((SELECT id FROM metric WHERE metric_code='order_amount'), 'completed', 'order_date', '{"status":"completed"}', 1, '已完成订单金额（排除取消）', 1, NOW(), NOW()),
+((SELECT id FROM metric WHERE metric_code='order_amount'), 'all', 'order_date', NULL, 0, '全部订单金额（含取消）', 1, NOW(), NOW())
+ON DUPLICATE KEY UPDATE description=VALUES(description);
+
+-- 语义别名（semantic_alias，指标口语化映射）
+INSERT INTO semantic_alias (agent_id, alias_text, target_type, target_code, match_type, priority, status, created_time) VALUES
+(2, '订单数', 'METRIC', 'order_count', 'EXACT', 10, 1, NOW()),
+(2, '销售额', 'METRIC', 'order_amount', 'EXACT', 10, 1, NOW()),
+(2, '金额', 'METRIC', 'order_amount', 'FUZZY', 5, 1, NOW()),
+(2, '销量', 'METRIC', 'item_quantity', 'EXACT', 10, 1, NOW()),
+(2, '客单价', 'METRIC', 'avg_order_amount', 'EXACT', 10, 1, NOW())
+ON DUPLICATE KEY UPDATE target_code=VALUES(target_code);

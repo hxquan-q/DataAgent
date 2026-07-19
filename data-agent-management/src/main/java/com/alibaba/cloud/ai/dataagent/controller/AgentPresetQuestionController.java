@@ -25,12 +25,18 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Agent 预设问题管理控制器。
+ * <p>
+ * 管理智能体的预设推荐问题，支持批量保存和删除。 预设问题用于在聊天界面引导用户快速发起对话。
+ * </p>
+ */
+// TODO 部分返回值和参数需要定义 DTO
 @Slf4j
 @RestController
 @RequestMapping("/api/agent")
 @CrossOrigin(origins = "*")
 @AllArgsConstructor
-// todo: 部分返回值和参数需要定义DTO
 public class AgentPresetQuestionController {
 
 	private final AgentPresetQuestionService presetQuestionService;

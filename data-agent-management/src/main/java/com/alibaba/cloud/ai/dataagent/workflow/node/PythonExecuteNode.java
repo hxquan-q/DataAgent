@@ -40,7 +40,12 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * 根据SQL查询结果生成Python代码，并运行Python代码获取运行结果。
+ * Python 代码执行节点，位于 Python 代码生成之后、结果分析之前。
+ *
+ * <p>
+ * 该节点接收生成的 Python 代码，在代码池中执行，并获取运行结果。 支持最大重试次数控制和降级兜底策略：当代码执行失败且超过最大重试次数时，
+ * 启动降级模式以保障流程继续执行。
+ * </p>
  *
  * @author vlsmb
  * @since 2025/7/29
@@ -65,11 +70,20 @@ public class PythonExecuteNode implements NodeAction {
 		this.codeExecutorProperties = codeExecutorProperties;
 	}
 
+	/**
+	 * 执行 Python 代码逻辑。
+	 * <p>
+	 * 从状态中获取 Python 代码和 SQL 结果，构建任务请求并在代码池中执行。 执行成功则解析标准输出；执行失败则根据重试次数决定重新生成或启用降级模式。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含 Python 执行结果的 Map，key 为 {@value PYTHON_EXECUTE_NODE_OUTPUT}
+	 * @throws Exception 执行代码时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
 		try {
-			// Get context
+			// 获取上下文：Python 代码和 SQL 结果
 			String pythonCode = StateUtil.getStringValue(state, PYTHON_GENERATE_NODE_OUTPUT);
 			List<Map<String, String>> sqlResults = StateUtil.hasValue(state, SQL_RESULT_LIST_MEMORY)
 					? StateUtil.getListValue(state, SQL_RESULT_LIST_MEMORY) : new ArrayList<>();
@@ -77,20 +91,23 @@ public class PythonExecuteNode implements NodeAction {
 			// 检查重试次数
 			int triesCount = StateUtil.getObjectValue(state, PYTHON_TRIES_COUNT, Integer.class, 0);
 
+			// 构建代码执行任务请求
 			CodePoolExecutorService.TaskRequest taskRequest = new CodePoolExecutorService.TaskRequest(pythonCode,
 					objectMapper.writeValueAsString(sqlResults), null);
 
-			// Run Python code
+			// 在代码池中执行 Python 代码
 			CodePoolExecutorService.TaskResponse taskResponse = this.codePoolExecutor.runTask(taskRequest);
 			if (!taskResponse.isSuccess()) {
-				String errorMsg = "Python Execute Failed!\nStdOut: " + taskResponse.stdOut() + "\nStdErr: "
-						+ taskResponse.stdErr() + "\nExceptionMsg: " + taskResponse.exceptionMsg();
+				// 执行失败，构建错误信息
+				String errorMsg = "Python 执行失败！\n标准输出: " + taskResponse.stdOut() + "\n标准错误: " + taskResponse.stdErr()
+						+ "\n异常信息: " + taskResponse.exceptionMsg();
 				log.error(errorMsg);
 
 				// 检查是否超过最大重试次数
 				if (triesCount >= codeExecutorProperties.getPythonMaxTriesCount()) {
-					log.error("Python执行失败且已超过最大重试次数（已尝试次数：{}），启动降级兜底逻辑。错误信息: {}", triesCount, errorMsg);
+					log.error("Python 执行失败且已超过最大重试次数（已尝试次数：{}），启动降级兜底逻辑。错误信息: {}", triesCount, errorMsg);
 
+					// 降级模式输出
 					String fallbackOutput = "{}";
 
 					Flux<ChatResponse> fallbackDisplayFlux = Flux.create(emitter -> {
@@ -111,7 +128,7 @@ public class PythonExecuteNode implements NodeAction {
 				throw new RuntimeException(errorMsg);
 			}
 
-			// Python输出的JSON字符串可能有Unicode转义形式，需要解析回汉字
+			// Python 输出的 JSON 字符串可能包含 Unicode 转义形式，需要解析回汉字
 			String stdout = taskResponse.stdOut();
 			Object value = jsonParseUtil.tryConvertToObject(stdout, Object.class);
 			if (value != null) {
@@ -119,9 +136,9 @@ public class PythonExecuteNode implements NodeAction {
 			}
 			String finalStdout = stdout;
 
-			log.info("Python Execute Success! StdOut: {}", finalStdout);
+			log.info("Python 执行成功！标准输出: {}", finalStdout);
 
-			// Create display flux for user experience only
+			// 创建展示流，仅用于提升用户体验
 			Flux<ChatResponse> displayFlux = Flux.create(emitter -> {
 				emitter.next(ChatResponseUtil.createResponse("开始执行Python代码..."));
 				emitter.next(ChatResponseUtil.createResponse("标准输出："));
@@ -132,8 +149,7 @@ public class PythonExecuteNode implements NodeAction {
 				emitter.complete();
 			});
 
-			// Create generator using utility class, returning pre-computed business logic
-			// result
+			// 使用工具类创建生成器，返回预先计算好的业务结果
 			Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(
 					this.getClass(), state,
 					v -> Map.of(PYTHON_EXECUTE_NODE_OUTPUT, finalStdout, PYTHON_IS_SUCCESS, true), displayFlux);
@@ -142,20 +158,20 @@ public class PythonExecuteNode implements NodeAction {
 		}
 		catch (Exception e) {
 			String errorMessage = e.getMessage();
-			log.error("Python Execute Exception: {}", errorMessage);
+			log.error("Python 执行异常: {}", errorMessage);
 
-			// Prepare error result
+			// 准备错误结果
 			Map<String, Object> errorResult = Map.of(PYTHON_EXECUTE_NODE_OUTPUT, errorMessage, PYTHON_IS_SUCCESS,
 					false);
 
-			// Create error display flux
+			// 创建错误展示流
 			Flux<ChatResponse> errorDisplayFlux = Flux.create(emitter -> {
 				emitter.next(ChatResponseUtil.createResponse("开始执行Python代码..."));
 				emitter.next(ChatResponseUtil.createResponse("Python代码执行失败: " + errorMessage));
 				emitter.complete();
 			});
 
-			// Create error generator using utility class
+			// 使用工具类创建错误生成器
 			var generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(), state, v -> errorResult,
 					errorDisplayFlux);
 

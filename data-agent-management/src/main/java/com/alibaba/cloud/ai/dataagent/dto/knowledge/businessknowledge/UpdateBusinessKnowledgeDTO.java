@@ -22,21 +22,31 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 更新业务知识 DTO
+ *
+ * <p>
+ * 用于更新业务术语知识的请求数据传输对象，包含业务术语、描述、同义词 及关联的智能体ID。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class UpdateBusinessKnowledgeDTO {
 
+	/** 业务术语 */
 	@NotBlank(message = "Business term cannot be empty")
 	private String businessTerm;
 
+	/** 业务术语描述 */
 	@NotBlank(message = "Description cannot be empty")
 	private String description;
 
-	// Synonyms, comma separated
+	/** 同义词，多个以逗号分隔 */
 	private String synonyms;
 
+	/** 关联的智能体ID */
 	@NotNull(message = "Agent ID cannot be Null")
 	private Long agentId;
 

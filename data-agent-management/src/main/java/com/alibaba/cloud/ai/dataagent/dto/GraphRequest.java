@@ -20,24 +20,38 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 图执行请求 DTO
+ *
+ * <p>
+ * 封装提交给工作流图（Graph）执行的请求参数，包括智能体ID、会话ID、用户查询、 人工反馈以及执行模式控制等信息。
+ * </p>
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class GraphRequest {
 
+	/** 智能体ID */
 	private String agentId;
 
+	/** 会话ID（线程ID） */
 	private String threadId;
 
+	/** 用户查询内容 */
 	private String query;
 
+	/** 是否包含人工反馈 */
 	private boolean humanFeedback;
 
+	/** 人工反馈内容 */
 	private String humanFeedbackContent;
 
+	/** 是否拒绝当前执行计划 */
 	private boolean rejectedPlan;
 
+	/** 是否仅执行 NL2SQL（不生成报告） */
 	private boolean nl2sqlOnly;
 
 }

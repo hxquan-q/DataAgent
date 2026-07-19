@@ -22,14 +22,29 @@ import org.springframework.stereotype.Service;
 
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.*;
 
+/**
+ * PostgreSQL JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用 PostgreSQL JDBC 驱动，支持连接测试（ping）和错误码映射。
+ * </p>
+ */
 @Service("postgreSqlJdbcConnectionPool")
 public class PostgreSqlJdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/**
+	 * 获取 PostgreSQL JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return "org.postgresql.Driver";
 	}
 
+	/**
+	 * 将 PostgreSQL SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 		ErrorCodeEnum ret = ErrorCodeEnum.fromCode(sqlState);
@@ -44,11 +59,20 @@ public class PostgreSqlJdbcConnectionPool extends AbstractDBConnectionPool {
 		};
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 PostgreSQL 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.POSTGRESQL.getTypeName().equals(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return PostgreSQL 类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return BizDataSourceTypeEnum.POSTGRESQL.getTypeName();

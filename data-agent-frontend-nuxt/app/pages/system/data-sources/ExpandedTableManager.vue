@@ -20,7 +20,7 @@
 			<div class="d-flex align-center justify-space-between mb-4">
 				<div class="d-flex align-center">
 					<v-icon size="20" class="mr-2 text-primary">mdi-table-cog</v-icon>
-					<span class="text-subtitle-1 font-weight-bold">数据表管理</span>
+					<span class="text-subtitle-1 font-weight-medium">数据表管理</span>
 					<span class="text-caption text-medium-emphasis ml-4">
 						已选择 {{ selectedTables.length }} 个表
 					</span>
@@ -93,10 +93,10 @@ function clearAll() {
 
 <style scoped>
 .manage-tables-container {
-	background: white;
-	border-radius: 12px;
-	border: 1px solid #e2e8f0;
-	box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+	background: var(--da-surface);
+	border-radius: var(--da-radius-md);
+	border: 1px solid var(--da-line-soft);
+	box-shadow: inset 0 1px 0 var(--da-line-soft);
 	padding: 24px;
 }
 
@@ -123,5 +123,10 @@ function clearAll() {
 @keyframes expandSlideDown {
 	from { max-height: 0; opacity: 0; overflow: hidden; }
 	to { max-height: 800px; opacity: 1; overflow: visible; }
+}
+@media (prefers-reduced-motion: reduce) {
+.expand-row-content {
+	animation: none !important;
+}
 }
 </style>

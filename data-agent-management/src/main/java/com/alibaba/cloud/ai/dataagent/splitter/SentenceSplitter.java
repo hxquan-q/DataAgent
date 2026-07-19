@@ -1,11 +1,11 @@
 /*
- * Copyright 2024-2025 the original author or authors.
+ * Copyright 2024-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.alibaba.cloud.ai.dataagent.splitter;
 
 import lombok.extern.slf4j.Slf4j;
@@ -83,11 +82,21 @@ public class SentenceSplitter extends TextSplitter {
 
 	}
 
+	/**
+	 * 将文本按句子级别提取为句子列表（内部使用的文本切分方法）。
+	 * @param text 待切分的文本
+	 * @return 句子列表
+	 */
 	@Override
 	protected List<String> splitText(String text) {
 		return extractSentences(text);
 	}
 
+	/**
+	 * 对文档列表进行句子级分块处理。
+	 * @param documents 待分块的文档列表
+	 * @return 分块后的文档列表
+	 */
 	@Override
 	public List<Document> apply(List<Document> documents) {
 		if (CollectionUtils.isEmpty(documents))

@@ -15,42 +15,103 @@
  */
 
 <template>
-	<div class="result-set-wrap">
+	<div class="result-set-wrap" :class="{ 'is-pending-report': pendingReport }">
 		<!-- Error state -->
-		<div v-if="errorMsg" class="result-error">
+		<div v-if="errorMsg" class="result-error" role="alert">
 			<v-icon size="14" color="error" class="mr-1">mdi-alert-circle-outline</v-icon>
 			{{ errorMsg }}
 		</div>
 
-		<!-- Empty state -->
-		<div v-else-if="!columns.length" class="result-empty">
-			暂无数据
+		<!-- Parse miss / no structure -->
+		<div v-else-if="!data || !columns.length" class="result-empty" role="status">
+			<v-icon size="18" color="grey" class="mb-1">mdi-table-off</v-icon>
+			<div>{{ parseHint }}</div>
 		</div>
+
+		<!-- Columns but 0 rows -->
+		<template v-else-if="totalRows === 0">
+			<div class="result-header">
+				<span class="result-count">查询成功 · <strong>0</strong> 条</span>
+			</div>
+			<div class="result-empty result-empty--soft" role="status">
+				结果集为空（列已解析，无行数据）
+			</div>
+		</template>
 
 		<!-- Table -->
 		<template v-else>
+			<div v-if="pendingReport" class="result-pending" role="status">
+				<span class="result-pending-dot" />
+				数据已就绪 · 报告生成中
+			</div>
 			<div class="result-header">
-				<span class="result-count">共 {{ totalRows }} 条记录</span>
-				<div v-if="totalPages > 1" class="pagination">
-					<span class="pagination-info">第 {{ currentPage }} / {{ totalPages }} 页</span>
-					<button class="page-btn" :disabled="currentPage <= 1" @click="currentPage--">
-						<v-icon size="13">mdi-chevron-left</v-icon>
+				<span class="result-count">
+					共 <strong>{{ totalRows }}</strong> 条
+					<span v-if="columns.length" class="result-meta">· {{ columns.length }} 列</span>
+					<span v-if="isLarge" class="result-warn">· 大数据集，已分页</span>
+				</span>
+				<div class="result-actions">
+					<button
+						type="button"
+						class="action-btn"
+						:title="copied ? '已复制' : '复制 CSV'"
+						:aria-label="copied ? '已复制' : '复制 CSV'"
+						title="复制 CSV"
+						@click="copyCsv"
+					>
+						<v-icon size="14">{{ copied ? 'mdi-check' : 'mdi-content-copy' }}</v-icon>
+						<span>{{ copied ? '已复制' : '复制' }}</span>
 					</button>
-					<button class="page-btn" :disabled="currentPage >= totalPages" @click="currentPage++">
-						<v-icon size="13">mdi-chevron-right</v-icon>
+					<button
+						type="button"
+						class="action-btn"
+						title="下载 CSV"
+						aria-label="下载 CSV"
+						@click="downloadCsv"
+					>
+						<v-icon size="14">mdi-download</v-icon>
+						<span>下载</span>
 					</button>
+					<div v-if="totalPages > 1" class="pagination">
+						<span class="pagination-info">{{ currentPage }}/{{ totalPages }}</span>
+						<button
+							type="button"
+							class="page-btn"
+							:disabled="currentPage <= 1"
+							aria-label="上一页"
+							@click="currentPage--"
+						>
+							<v-icon size="13">mdi-chevron-left</v-icon>
+						</button>
+						<button
+							type="button"
+							class="page-btn"
+							:disabled="currentPage >= totalPages"
+							aria-label="下一页"
+							@click="currentPage++"
+						>
+							<v-icon size="13">mdi-chevron-right</v-icon>
+						</button>
+					</div>
 				</div>
 			</div>
 			<div class="table-container custom-scrollbar">
 				<table class="result-table">
 					<thead>
 						<tr>
-							<th v-for="col in columns" :key="col">{{ col }}</th>
+							<th v-for="col in columns" :key="col" scope="col">{{ col }}</th>
 						</tr>
 					</thead>
 					<tbody>
 						<tr v-for="(row, i) in pageData" :key="i">
-							<td v-for="col in columns" :key="col">{{ row[col] ?? '' }}</td>
+							<td
+								v-for="col in columns"
+								:key="col"
+								:class="cellClass(row[col])"
+								:title="cellTitle(row[col])"
+							>
+								{{ formatCell(row[col]) }}
+							</td>
 						</tr>
 					</tbody>
 				</table>
@@ -60,16 +121,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import type { ResultData } from '~/services/resultSet/index';
+
+const LARGE_THRESHOLD = 500;
 
 const props = defineProps<{
 	data: ResultData | null;
 	pageSize?: number;
+	/** vercel AI: 报告流式中时表可先到，标「数据就绪」避免双焦点误判 */
+	pendingReport?: boolean;
 }>();
 
 const currentPage = ref(1);
-const pageSz = computed(() => props.pageSize || 20);
+const copied = ref(false);
+let copyTimer: ReturnType<typeof setTimeout> | null = null;
+
+const pageSz = computed(() => props.pageSize || 50);
 const columns = computed(() => props.data?.resultSet?.column || []);
 const allRows = computed(() => props.data?.resultSet?.data || []);
 const totalRows = computed(() => allRows.value.length);
@@ -79,37 +147,233 @@ const pageData = computed(() => {
 	return allRows.value.slice(start, start + pageSz.value);
 });
 const errorMsg = computed(() => props.data?.resultSet?.errorMsg || '');
+const isLarge = computed(() => totalRows.value >= LARGE_THRESHOLD);
+const parseHint = computed(() => {
+	if (!props.data) return '结果解析失败或未返回数据';
+	return '暂无表格结构';
+});
+
+watch(
+	() => props.data,
+	() => {
+		currentPage.value = 1;
+	},
+);
+
+function isNumeric(v: unknown): boolean {
+	if (typeof v === 'number') return Number.isFinite(v);
+	if (typeof v !== 'string' || v.trim() === '') return false;
+	return /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/.test(v.trim());
+}
+
+function formatCell(v: unknown): string {
+	if (v === null || v === undefined) return 'NULL';
+	if (v === '') return '—';
+	if (typeof v === 'object') {
+		try {
+			return JSON.stringify(v);
+		} catch {
+			return String(v);
+		}
+	}
+	return String(v);
+}
+
+function cellClass(v: unknown): string {
+	if (v === null || v === undefined) return 'cell-null';
+	if (v === '') return 'cell-empty';
+	if (isNumeric(v)) return 'cell-num';
+	return '';
+}
+
+function cellTitle(v: unknown): string {
+	const s = formatCell(v);
+	return s.length > 40 ? s : '';
+}
+
+function csvEscape(v: unknown): string {
+	if (v === null || v === undefined) return '';
+	const s = typeof v === 'object' ? JSON.stringify(v) : String(v);
+	if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+	return s;
+}
+
+function buildCsv(): string {
+	const cols = columns.value;
+	const rows = allRows.value;
+	const lines = [
+		cols.map(csvEscape).join(','),
+		...rows.map((row) => cols.map((c) => csvEscape(row[c])).join(',')),
+	];
+	return lines.join('\n');
+}
+
+async function copyCsv() {
+	const text = buildCsv();
+	try {
+		await navigator.clipboard.writeText(text);
+	} catch {
+		// ponytail: clipboard fallback
+		const ta = document.createElement('textarea');
+		ta.value = text;
+		ta.style.position = 'fixed';
+		ta.style.left = '-9999px';
+		document.body.appendChild(ta);
+		ta.select();
+		document.execCommand('copy');
+		document.body.removeChild(ta);
+	}
+	copied.value = true;
+	if (copyTimer) clearTimeout(copyTimer);
+	copyTimer = setTimeout(() => {
+		copied.value = false;
+	}, 1600);
+}
+
+function downloadCsv() {
+	const text = buildCsv();
+	const blob = new Blob(['﻿' + text], { type: 'text/csv;charset=utf-8' });
+	const url = URL.createObjectURL(blob);
+	const a = document.createElement('a');
+	a.href = url;
+	a.download = `result-${Date.now()}.csv`;
+	a.click();
+	URL.revokeObjectURL(url);
+}
 </script>
 
 <style scoped>
 .result-set-wrap {
 	font-size: 13px;
 }
-.result-error {
+.result-set-wrap.is-pending-report {
+	opacity: 0.96;
+}
+.result-pending {
 	display: flex;
 	align-items: center;
-	background: #fef2f2;
-	color: #dc2626;
-	padding: 10px 14px;
+	gap: 6px;
+	padding: 4px 2px 6px;
+	font-size: 11.5px;
+	font-weight: 500;
+	color: var(--da-muted);
+	background: transparent;
+	border: none;
+	border-radius: 0;
+}
+.result-pending-dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-accent);
+	animation: pendingPulse 1.2s ease-in-out infinite;
+}
+@keyframes pendingPulse {
+	0%,
+	100% {
+		opacity: 0.45;
+		transform: scale(0.9);
+	}
+	50% {
+		opacity: 1;
+		transform: scale(1.1);
+	}
+}
+.result-error {
+	font-size: 12.5px;
+	display: flex;
+	align-items: center;
+	background: color-mix(in srgb, var(--da-danger) 8%, white);
+	color: var(--da-danger);
+	padding: 6px 10px;
 	font-size: 13px;
+	border-radius: var(--da-radius-sm);
 }
 .result-empty {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 	text-align: center;
-	color: #94a3b8;
-	padding: 16px;
+	color: var(--da-muted);
+	padding: 20px 12px;
 	font-size: 13px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+	gap: 6px;
+}
+.result-empty--soft {
+	border-radius: 12px;
+	border: 0.5px dashed var(--da-line-soft);
+	background: transparent;
 }
 .result-header {
+	min-height: 28px;
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 8px 12px;
-	background: #f8fafc;
-	border-bottom: 1px solid #e8edf2;
+	gap: 8px;
+	padding: 2px 2px 8px;
+	background: transparent;
+	border: none;
+	border-radius: 0;
+}
+.result-set-wrap.is-pending-report .result-header {
+	border-radius: 0;
 }
 .result-count {
 	font-size: 12px;
-	color: #64748b;
+	color: var(--da-muted);
+	font-weight: 400;
+}
+.result-count strong {
+	color: var(--da-ink);
+	font-weight: 600;
+}
+.result-meta {
+	color: var(--da-muted);
+	font-size: 11.5px;
+	line-height: 1.3;
+}
+.result-warn {
+	color: var(--da-warning);
+	font-weight: 600;
+	font-size: 11px;
+}
+.result-actions {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+	justify-content: flex-end;
+}
+.action-btn {
+	min-width: 28px;
+	height: 28px;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	padding: 0 8px;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
+	font-size: 12px;
+	font-weight: 500;
+	color: var(--da-muted);
+	cursor: pointer;
+	transition:
+		background var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out);
+}
+.action-btn:hover {
+	background: color-mix(in srgb, var(--da-muted) 10%, transparent);
+	border-color: transparent;
+	color: var(--da-ink);
+}
+.action-btn:focus-visible {
+	outline: 2px solid var(--da-primary);
+	outline-offset: 1px;
 }
 .pagination {
 	display: flex;
@@ -118,57 +382,119 @@ const errorMsg = computed(() => props.data?.resultSet?.errorMsg || '');
 }
 .pagination-info {
 	font-size: 11.5px;
-	color: #64748b;
+	color: var(--da-muted);
 	padding: 0 4px;
+	min-width: 36px;
+	text-align: center;
 }
 .page-btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	width: 24px;
-	height: 24px;
-	background: white;
-	border: 1px solid #e2e8f0;
-	border-radius: 4px;
+	width: 28px;
+	height: 28px;
+	background: transparent;
+	border: none;
+	border-radius: 8px;
 	cursor: pointer;
-	transition: background 0.1s;
+	color: var(--da-muted);
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out);
 }
 .page-btn:hover:not(:disabled) {
-	background: #f1f5f9;
+	background: color-mix(in srgb, var(--da-muted) 10%, transparent);
+	border-color: transparent;
+	color: var(--da-ink);
 }
 .page-btn:disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
 }
+.page-btn:focus-visible {
+	outline: 2px solid var(--da-primary);
+	outline-offset: 1px;
+}
 .table-container {
-	overflow-x: auto;
+	overflow: auto;
+	max-height: 360px;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent);
+	border-radius: 12px;
+	background: var(--da-surface);
+	box-shadow: var(--da-shadow-sm);
 }
 .result-table {
 	width: 100%;
-	border-collapse: collapse;
+	border-collapse: separate;
+	border-spacing: 0;
+	min-width: 100%;
 }
 .result-table th {
-	background: #f8fafc;
-	padding: 8px 12px;
-	border-bottom: 1px solid #e2e8f0;
-	font-weight: 600;
-	color: #475569;
-	font-size: 12.5px;
+	position: sticky;
+	top: 0;
+	z-index: 1;
+	background: color-mix(in srgb, var(--da-surface) 92%, var(--da-surface-soft));
+	padding: 8px 10px;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent);
+	font-weight: 500;
+	font-size: 11.5px;
+	color: var(--da-muted);
 	text-align: left;
 	white-space: nowrap;
+	backdrop-filter: blur(6px);
 }
 .result-table td {
-	padding: 7px 12px;
-	border-bottom: 1px solid #f1f5f9;
-	color: #374151;
-	font-size: 12.5px;
-	word-break: break-word;
-	max-width: 200px;
+	padding: 8px 10px;
+	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line-soft) 90%, transparent);
+	font-size: 13px;
+	color: var(--da-ink);
+	line-height: 1.45;
+}
+.result-table tr:last-child td {
+	border-bottom: none;
 }
 .result-table tr:hover td {
-	background: #f8fafc;
+	background: var(--da-surface-soft);
 }
-.custom-scrollbar::-webkit-scrollbar { height: 4px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+.cell-null {
+	color: var(--da-muted);
+	font-style: italic;
+	font-family: var(--da-font-mono);
+	font-size: 11.5px;
+}
+.cell-empty {
+	color: var(--da-line);
+}
+.cell-num {
+	font-size: 12px;
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	font-family: var(--da-font-mono);
+}
+.custom-scrollbar::-webkit-scrollbar {
+	height: 6px;
+	width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+	background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+	background: var(--da-line);
+	border-radius: var(--da-radius-sm);
+}
+@media (prefers-reduced-motion: reduce) {
+	.result-pending-dot {
+		animation: none !important;
+		opacity: 0.85;
+	}
+
+	.result-pending-dot {
+		animation: none;
+	}
+}
+
+.result-header :deep(.v-btn) {
+	min-width: 28px !important;
+	width: 28px !important;
+	height: 28px !important;
+}
 </style>

@@ -22,24 +22,34 @@ import com.alibaba.cloud.ai.dataagent.enums.BizDataSourceTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**
+ * Oracle 数据库访问器，支持 Oracle 数据源的元数据查询和 SQL 执行。
+ *
  * @author zihenzzz
  */
 
 @Service("oracleAccessor")
 public class OracleDBAccessor extends AbstractAccessor {
 
+	/** 访问器类型标识 */
 	private final static String ACCESSOR_TYPE = "Oracle_Accessor";
 
+	/**
+	 * 构造函数，注入 DDL 工厂和连接池工厂。
+	 * @param ddlFactory DDL 执行器工厂
+	 * @param poolFactory 连接池工厂
+	 */
 	protected OracleDBAccessor(DdlFactory ddlFactory, DBConnectionPoolFactory poolFactory) {
 
 		super(ddlFactory, poolFactory.getPoolByDbType(BizDataSourceTypeEnum.ORACLE.getTypeName()));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String getAccessorType() {
 		return ACCESSOR_TYPE;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.ORACLE.getTypeName().equalsIgnoreCase(type);

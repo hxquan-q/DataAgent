@@ -24,22 +24,25 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
 /**
- * AOP切面类，用于记录所有Node类的入口日志
- *
- *
+ * 工作流节点入口日志切面。
+ * <p>
+ * 通过 AOP 拦截所有工作流节点的 {@code apply} 方法，在方法执行前记录节点入口日志， 便于调试和追踪工作流执行流程。
  */
 @Aspect
 @Component
 @Slf4j
 public class NodeEntryLoggingAspect {
 
+	/**
+	 * 定义切点：匹配工作流 node 包下所有接收 {@link OverAllState} 参数的 {@code apply} 方法。
+	 */
 	@Pointcut("execution(* com.alibaba.cloud.ai.dataagent.workflow.node..*.apply(com.alibaba.cloud.ai.graph.OverAllState))")
 	public void nodeEntry() {
 	}
 
 	/**
-	 * 在所有实现NodeAction接口的类的apply方法执行前记录日志
-	 * @param joinPoint 连接点
+	 * 在节点 apply 方法执行前记录入口日志。
+	 * @param joinPoint 连接点，包含目标类和方法参数信息
 	 */
 	@Before("nodeEntry()")
 	public void logNodeEntry(JoinPoint joinPoint) {

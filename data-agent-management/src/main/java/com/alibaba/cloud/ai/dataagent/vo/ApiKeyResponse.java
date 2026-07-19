@@ -20,15 +20,21 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * API Key response payload.
+ * API Key 响应 VO
+ *
+ * <p>
+ * 返回智能体的 API Key 及其启用状态，用于前端展示和外部调用配置。
+ * </p>
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ApiKeyResponse {
 
+	/** API 密钥 */
 	private String apiKey;
 
+	/** 是否启用 API 访问（0-关闭，1-开启） */
 	private Integer apiKeyEnabled;
 
 }

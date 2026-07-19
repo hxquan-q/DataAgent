@@ -27,6 +27,7 @@ import com.alibaba.cloud.ai.graph.OverAllState;
 import com.alibaba.cloud.ai.graph.action.NodeAction;
 import com.alibaba.cloud.ai.graph.streaming.StreamingOutput;
 import com.alibaba.cloud.ai.dataagent.util.ChatResponseUtil;
+import com.alibaba.cloud.ai.dataagent.util.DataSummarizer;
 import com.alibaba.cloud.ai.dataagent.util.FluxUtil;
 import com.alibaba.cloud.ai.dataagent.util.StateUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -43,12 +44,17 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * Report generation node that creates comprehensive analysis reports based on execution
- * results.
+ * 报告生成节点，位于所有执行步骤完成之后，负责生成最终的分析报告。
  *
- * This node is responsible for: - Generating detailed analysis reports from SQL execution
- * results - Summarizing data insights and findings - Providing comprehensive answers to
- * user queries - Creating structured final output for users
+ * <p>
+ * 该节点的职责包括：
+ * <ul>
+ * <li>根据 SQL 执行结果生成详细的分析报告</li>
+ * <li>总结数据洞察和发现</li>
+ * <li>为用户查询提供全面的回答</li>
+ * <li>创建结构化的最终输出</li>
+ * </ul>
+ * </p>
  *
  * @author zhangshenghang
  */
@@ -62,17 +68,30 @@ public class ReportGeneratorNode implements NodeAction {
 
 	private final UserPromptService promptConfigService;
 
-	public ReportGeneratorNode(LlmService llmService, UserPromptService promptConfigService) {
+	private final PromptHelper promptHelper;
+
+	public ReportGeneratorNode(LlmService llmService, UserPromptService promptConfigService,
+			PromptHelper promptHelper) {
 		this.llmService = llmService;
 		this.converter = new BeanOutputConverter<>(new ParameterizedTypeReference<>() {
 		});
 		this.promptConfigService = promptConfigService;
+		this.promptHelper = promptHelper;
 	}
 
+	/**
+	 * 执行报告生成逻辑。
+	 * <p>
+	 * 获取执行计划、用户输入、执行结果和当前步骤信息，构建报告生成提示词并调用大模型， 最终将报告内容写入状态。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含报告内容的 Map，key 为 {@value RESULT}
+	 * @throws Exception 调用大模型时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
-		// Get necessary input parameters
+		// 获取必要的输入参数
 		String plannerNodeOutput = StateUtil.getStringValue(state, PLANNER_NODE_OUTPUT);
 		String userInput = StateUtil.getCanonicalQuery(state);
 		Integer currentStep = StateUtil.getObjectValue(state, PLAN_CURRENT_STEP, Integer.class, 1);
@@ -80,12 +99,12 @@ public class ReportGeneratorNode implements NodeAction {
 		HashMap<String, String> executionResults = StateUtil.getObjectValue(state, SQL_EXECUTE_NODE_OUTPUT,
 				HashMap.class, new HashMap<>());
 
-		// Parse plan and get current step
+		// 解析计划并获取当前步骤
 		Plan plan = converter.convert(plannerNodeOutput);
 		ExecutionStep executionStep = getCurrentExecutionStep(plan, currentStep);
 		String summaryAndRecommendations = executionStep.getToolParameters().getSummaryAndRecommendations();
 
-		// Get agent id from state
+		// 从状态中获取智能体 ID
 		String agentIdStr = StateUtil.getStringValue(state, AGENT_ID);
 		Long agentId = null;
 		try {
@@ -94,19 +113,19 @@ public class ReportGeneratorNode implements NodeAction {
 			}
 		}
 		catch (NumberFormatException ignore) {
-			// ignore parse error, treat as global config
+			// 忽略解析错误，视为全局配置
 		}
 
-		// Generate report streaming flux
+		// 生成报告的流式输出
 		Flux<ChatResponse> reportGenerationFlux = generateReport(userInput, plan, executionResults,
 				summaryAndRecommendations, agentId);
 
 		TextType reportTextType = TextType.MARK_DOWN;
 
-		// Use utility class to create streaming generator with content collection
+		// 使用工具类创建流式生成器，收集报告内容
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, "开始生成报告...", "报告生成完成！", reportContent -> {
-					log.info("Generated report content: {}", reportContent);
+					log.info("生成的报告内容: {}", reportContent);
 					Map<String, Object> result = new HashMap<>();
 					result.put(RESULT, reportContent);
 					result.put(SQL_EXECUTE_NODE_OUTPUT, null);
@@ -122,53 +141,86 @@ public class ReportGeneratorNode implements NodeAction {
 	}
 
 	/**
-	 * Gets the current execution step from the plan.
+	 * 从执行计划中获取当前执行步骤。
+	 * @param plan 执行计划
+	 * @param currentStep 当前步骤号
+	 * @return 当前执行步骤
+	 * @throws IllegalStateException 若执行计划为空或步骤索引越界
 	 */
 	private ExecutionStep getCurrentExecutionStep(Plan plan, Integer currentStep) {
 		List<ExecutionStep> executionPlan = plan.getExecutionPlan();
 		if (executionPlan == null || executionPlan.isEmpty()) {
-			throw new IllegalStateException("Execution plan is empty");
+			throw new IllegalStateException("执行计划为空");
 		}
 
 		int stepIndex = currentStep - 1;
 		if (stepIndex < 0 || stepIndex >= executionPlan.size()) {
-			throw new IllegalStateException("Current step index out of range: " + stepIndex);
+			throw new IllegalStateException("当前步骤索引越界: " + stepIndex);
 		}
 
 		return executionPlan.get(stepIndex);
 	}
 
 	/**
-	 * Generates the analysis report.
+	 * 生成分析报告。
+	 * <p>
+	 * 构建用户需求和计划描述、分析步骤和数据结果描述，加载优化配置， 最终调用大模型生成报告。
+	 * </p>
+	 * @param userInput 用户输入
+	 * @param plan 执行计划
+	 * @param executionResults 执行结果
+	 * @param summaryAndRecommendations 总结和建议
+	 * @param agentId 智能体 ID
+	 * @return 报告生成的流式响应
 	 */
 	private Flux<ChatResponse> generateReport(String userInput, Plan plan, HashMap<String, String> executionResults,
 			String summaryAndRecommendations, Long agentId) {
-		// Build user requirements and plan description
+		// 构建用户需求和计划描述
 		String userRequirementsAndPlan = buildUserRequirementsAndPlan(userInput, plan);
 
-		// Build analysis steps and data results description
+		// 构建分析步骤和数据结果描述
 		String analysisStepsAndData = buildAnalysisStepsAndData(plan, executionResults);
 
-		// Get optimization configs if available (优先按智能体加载)
+		// V3: 有界注入 — 防止超长结果集/分析文本拖垮报告生成 token 与墙钟
+		userRequirementsAndPlan = limitPromptSection(userRequirementsAndPlan, MAX_PLAN_CHARS);
+		analysisStepsAndData = limitPromptSection(analysisStepsAndData, MAX_ANALYSIS_CHARS);
+		summaryAndRecommendations = limitPromptSection(summaryAndRecommendations, MAX_SUMMARY_CHARS);
+
+		// 获取优化配置（优先按智能体加载）
 		List<UserPromptConfig> optimizationConfigs = promptConfigService.getOptimizationConfigs("report-generator",
 				agentId);
+		// R217: 可观测 — 报告 prompt 各段体量
+		log.info("报告生成上下文体量: planLen={}, analysisLen={}, summaryLen={}, optCount={}",
+				userRequirementsAndPlan != null ? userRequirementsAndPlan.length() : 0,
+				analysisStepsAndData != null ? analysisStepsAndData.length() : 0,
+				summaryAndRecommendations != null ? summaryAndRecommendations.length() : 0,
+				optimizationConfigs != null ? optimizationConfigs.size() : 0);
 
+		// 构建报告生成提示词
 		String reportPrompt = PromptHelper.buildReportGeneratorPromptWithOptimization(userRequirementsAndPlan,
 				analysisStepsAndData, summaryAndRecommendations, optimizationConfigs);
-		log.debug("Report Node Prompt: \n {} \n", reportPrompt);
+		// 注入智能体绑定的报告技能（管理驾驶舱 / 深度分析 / 数据探索等），按 agent 生效
+		reportPrompt = promptHelper.injectSkills("report", agentId, reportPrompt);
+		log.debug("报告节点提示词: \n {} \n", reportPrompt);
 		return llmService.callUser(reportPrompt);
 	}
 
 	/**
-	 * Builds user requirements and plan description.
+	 * 构建用户需求和计划描述。
+	 * @param userInput 用户输入
+	 * @param plan 执行计划
+	 * @return 用户需求和计划描述字符串
 	 */
 	private String buildUserRequirementsAndPlan(String userInput, Plan plan) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("## 用户原始需求\n");
-		sb.append(userInput).append("\n\n");
+		sb.append(limitPromptSection(userInput, 800)).append("\n\n");
 
 		sb.append("## 执行计划概述\n");
-		sb.append("**思考过程**: ").append(plan.getThoughtProcess()).append("\n\n");
+		// R9: 思考过程有界，避免 planner 长链式思考灌入报告 prompt
+		sb.append("**思考过程**: ")
+			.append(limitPromptSection(plan.getThoughtProcess(), MAX_THOUGHT_CHARS))
+			.append("\n\n");
 
 		sb.append("## 详细执行步骤\n");
 		List<ExecutionStep> executionPlan = plan.getExecutionPlan();
@@ -177,7 +229,7 @@ public class ReportGeneratorNode implements NodeAction {
 			sb.append("### 步骤 ").append(i + 1).append(": 步骤编号 ").append(step.getStep()).append("\n");
 			sb.append("**工具**: ").append(step.getToolToUse()).append("\n");
 			if (step.getToolParameters() != null) {
-				sb.append("**参数描述**: ").append(step.getToolParameters().getInstruction()).append("\n");
+				sb.append("**参数描述**: ").append(limitPromptSection(step.getToolParameters().getInstruction(), MAX_INSTRUCTION_CHARS)).append("\n");
 			}
 			sb.append("\n");
 		}
@@ -186,7 +238,10 @@ public class ReportGeneratorNode implements NodeAction {
 	}
 
 	/**
-	 * Builds analysis steps and data results description.
+	 * 构建分析步骤和数据结果描述。
+	 * @param plan 执行计划
+	 * @param executionResults 执行结果
+	 * @return 分析步骤和数据结果描述字符串
 	 */
 	private String buildAnalysisStepsAndData(Plan plan, HashMap<String, String> executionResults) {
 		StringBuilder sb = new StringBuilder();
@@ -213,24 +268,76 @@ public class ReportGeneratorNode implements NodeAction {
 				sb.append("**步骤编号**: ").append(step.getStep()).append("\n");
 				sb.append("**使用工具**: ").append(step.getToolToUse()).append("\n");
 				if (step.getToolParameters() != null) {
-					sb.append("**参数描述**: ").append(step.getToolParameters().getInstruction()).append("\n");
+					sb.append("**参数描述**: ").append(limitPromptSection(step.getToolParameters().getInstruction(), MAX_INSTRUCTION_CHARS)).append("\n");
 					if (step.getToolParameters().getSqlQuery() != null) {
 						sb.append("**执行SQL**: \n```sql\n")
-							.append(step.getToolParameters().getSqlQuery())
+							.append(limitPromptSection(step.getToolParameters().getSqlQuery(), MAX_SQL_CHARS))
 							.append("\n```\n");
 					}
 				}
 
 				if (stepResult != null && !stepResult.trim().isEmpty()) {
-					sb.append("**执行结果**: \n```json\n").append(stepResult).append("\n```\n\n");
+					sb.append(DataSummarizer.summarize(stepResult)).append("\n");
+					// #6 图文并茂：若该步骤已渲染图表，嵌入图片（Markdown 图片语法，前端 markdown 渲染）
+					String chartUrl = executionResults.get(stepKey + "_chart_url");
+					if (chartUrl != null && !chartUrl.isBlank()) {
+						sb.append("![图表](").append(chartUrl).append(")\n\n");
+					}
 				}
 				if (analysisResult != null && !analysisResult.trim().isEmpty()) {
-					sb.append("**Python 分析结果**: ").append(analysisResult).append("\n\n");
+					sb.append("**Python 分析结果**: ")
+						.append(limitPromptSection(analysisResult, MAX_PYTHON_ANALYSIS_CHARS))
+						.append("\n\n");
 				}
 			}
 		}
 
 		return sb.toString();
 	}
+
+
+	/** 报告提示词：分析步骤与数据上限（字符）。 */
+	private static final int MAX_ANALYSIS_CHARS = 12_000;
+
+	/** 报告提示词：计划描述上限。 */
+	private static final int MAX_PLAN_CHARS = 4_000;
+
+	/** 报告提示词：总结建议上限。 */
+	private static final int MAX_SUMMARY_CHARS = 1_500;
+
+	/** 报告提示词：计划思考过程上限。 */
+	private static final int MAX_THOUGHT_CHARS = 1_200;
+
+	/** 单步 Python 分析文本上限。 */
+	private static final int MAX_PYTHON_ANALYSIS_CHARS = 2_000;
+
+	/**
+	 * 截断过长提示词片段，保留头尾以便模型仍可见结构与结论。
+	 * @param text 原文
+	 * @param maxChars 最大字符数
+	 * @return 截断后文本
+	 */
+	/** 报告提示词：步骤指令上限。 */
+	private static final int MAX_INSTRUCTION_CHARS = 500;
+
+	/** 报告提示词：单条 SQL 上限。 */
+	private static final int MAX_SQL_CHARS = 2_000;
+
+	static String limitPromptSection(String text, int maxChars) {
+		if (text == null) {
+			return "";
+		}
+		if (maxChars <= 0 || text.length() <= maxChars) {
+			return text;
+		}
+		int head = Math.max(1, (int) (maxChars * 0.7));
+		int tail = Math.max(1, maxChars - head - 32);
+		if (head + tail >= text.length()) {
+			return text.substring(0, maxChars);
+		}
+		return text.substring(0, head) + "\n\n…(已截断 " + (text.length() - head - tail) + " 字符)…\n\n"
+				+ text.substring(text.length() - tail);
+	}
+
 
 }

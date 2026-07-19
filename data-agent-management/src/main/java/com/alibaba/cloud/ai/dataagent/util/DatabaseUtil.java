@@ -26,7 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 /**
- * Utility class for processing database.
+ * 数据库处理工具类。
+ * <p>
+ * 基于当前 Agent 启用的数据源，构建数据库配置（{@link DbConfigBO}）并获取对应的数据库访问器（ {@link Accessor}），供下游节点统一使用。
+ * </p>
  */
 @Slf4j
 @Component
@@ -39,12 +42,17 @@ public class DatabaseUtil {
 
 	private final DatasourceService datasourceService;
 
+	/**
+	 * 获取指定 Agent 当前启用的数据源对应的数据库配置。
+	 * @param agentId Agent 主键
+	 * @return 数据库配置信息
+	 */
 	public DbConfigBO getAgentDbConfig(Long agentId) {
 		log.info("Getting datasource config for agent: {}", agentId);
 
-		// Get the enabled data source for the agent
+		// 获取该 Agent 当前启用的数据源
 		AgentDatasource activeDatasource = agentDatasourceService.getCurrentAgentDatasource(agentId);
-		// Convert to DbConfig
+		// 将数据源实体转换为数据库配置
 		DbConfigBO dbConfig = datasourceService.getDbConfig(activeDatasource.getDatasource());
 		log.info("Successfully created DbConfig for agent {}: url={}, schema={}, type={}", agentId, dbConfig.getUrl(),
 				dbConfig.getSchema(), dbConfig.getDialectType());
@@ -52,6 +60,11 @@ public class DatabaseUtil {
 		return dbConfig;
 	}
 
+	/**
+	 * 获取指定 Agent 当前启用数据源对应的数据库访问器。
+	 * @param agentId Agent 主键
+	 * @return 数据库访问器实例
+	 */
 	public Accessor getAgentAccessor(Long agentId) {
 		DbConfigBO dbConfig = getAgentDbConfig(agentId);
 		return accessorFactory.getAccessorByDbConfig(dbConfig);

@@ -20,14 +20,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Parses the compact timeout format used by the code executor.
+ * 代码执行超时时间解析器，解析紧凑的超时格式（如 "30s"、"5m"、"1h"）。
  */
 public final class ExecutionTimeoutParser {
 
+	/** 默认超时时间（60 秒） */
 	public static final long DEFAULT_TIMEOUT_MILLIS = 60_000L;
 
+	/** 超时格式正则：数字 + 单位（ms/s/m/h/d） */
 	private static final Pattern TIMEOUT_PATTERN = Pattern.compile("(\\d+)(ms|[smhd])");
 
+	/**
+	 * 解析超时字符串为毫秒数。
+	 * @param value 超时字符串（如 "30s"、"5m"），为空时返回默认值
+	 * @return 超时毫秒数
+	 */
 	public long parse(String value) {
 		if (value == null) {
 			return DEFAULT_TIMEOUT_MILLIS;

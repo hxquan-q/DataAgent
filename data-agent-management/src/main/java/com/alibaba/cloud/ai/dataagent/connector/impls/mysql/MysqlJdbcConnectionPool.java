@@ -25,16 +25,32 @@ import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.PASSWORD_ERROR_
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.DATABASE_NOT_EXIST_42000;
 import static com.alibaba.cloud.ai.dataagent.enums.ErrorCodeEnum.OTHERS;
 
+/**
+ * MySQL JDBC 连接池实现。
+ * <p>
+ * 基于 Druid 连接池，使用 MySQL Connector/J 驱动，支持连接测试（ping）和错误码映射。
+ * </p>
+ */
 @Service("mysqlJdbcConnectionPool")
 public class MysqlJdbcConnectionPool extends AbstractDBConnectionPool {
 
+	/** MySQL JDBC 驱动类名 */
 	private final static String DRIVER = "com.mysql.cj.jdbc.Driver";
 
+	/**
+	 * 获取 MySQL JDBC 驱动类名。
+	 * @return 驱动类全限定名
+	 */
 	@Override
 	public String getDriver() {
 		return DRIVER;
 	}
 
+	/**
+	 * 将 MySQL SQL 异常的 sqlState 映射为对应的错误码枚举。
+	 * @param sqlState SQL 异常状态码
+	 * @return 对应的错误码枚举
+	 */
 	@Override
 	public ErrorCodeEnum errorMapping(String sqlState) {
 
@@ -51,11 +67,20 @@ public class MysqlJdbcConnectionPool extends AbstractDBConnectionPool {
 		};
 	}
 
+	/**
+	 * 判断是否支持指定的数据源类型。
+	 * @param type 数据源类型名称
+	 * @return 是否为 MySQL 类型
+	 */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.MYSQL.getTypeName().equals(type);
 	}
 
+	/**
+	 * 获取连接池类型标识。
+	 * @return MySQL 类型名称
+	 */
 	@Override
 	public String getConnectionPoolType() {
 		return BizDataSourceTypeEnum.MYSQL.getTypeName();

@@ -19,16 +19,25 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Common API Response Class
+ * 通用 API 响应类
+ *
+ * <p>
+ * 统一封装所有 API 接口的返回数据，包含操作是否成功、消息和业务数据。 泛型参数 T 表示业务数据的类型。
+ * </p>
+ *
+ * @param <T> 业务数据类型
  */
 @Data
 @NoArgsConstructor
 public class ApiResponse<T> {
 
+	/** 是否成功 */
 	private boolean success;
 
+	/** 响应消息 */
 	private String message;
 
+	/** 业务数据 */
 	private T data;
 
 	public ApiResponse(boolean success, String message) {

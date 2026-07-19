@@ -25,17 +25,26 @@ import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Resolves Docker connection candidates and classifies their network location.
+ * Docker 主机解析器，解析候选连接地址并判断其网络位置（本地或远程）。
  */
 @Component
 public class DockerHostResolver {
 
+	/** Unix 套接字地址 */
 	private static final String UNIX_SOCKET = "unix:///var/run/docker.sock";
 
+	/** Windows 命名管道地址 */
 	private static final String WINDOWS_NAMED_PIPE = "npipe://./pipe/docker_engine";
 
+	/** 本地 TCP 地址 */
 	private static final String LOCAL_TCP = "tcp://localhost:2375";
 
+	/**
+	 * 根据配置的主机地址和操作系统名称生成候选连接列表。
+	 * @param configuredHost 配置的主机地址
+	 * @param osName 操作系统名称
+	 * @return 候选 Docker 主机列表
+	 */
 	public List<String> candidates(String configuredHost, String osName) {
 		String normalizedOs = Objects.requireNonNullElse(osName, "").toLowerCase(Locale.ROOT);
 		if (normalizedOs.contains("win")) {

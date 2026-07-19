@@ -22,8 +22,8 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -32,7 +32,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="blue-darken-1"
+					color="primary"
 					prepend-icon="mdi-sync"
 					class="text-none px-6"
 					elevation="0"
@@ -42,7 +42,7 @@
 					同步到向量库
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -54,7 +54,7 @@
 		</KnowledgePageHeader>
 
 		<!-- 搜索栏 -->
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<v-text-field
 				v-model="searchKeyword"
 				placeholder="请输入关键词搜索业务名词、描述或同义词..."
@@ -130,7 +130,7 @@
 				<!-- eslint-disable-next-line vue/valid-v-slot -->
 				<template #item.isRecall="{ item }">
 					<v-chip
-						:color="item.isRecall ? 'blue-darken-1' : 'grey'"
+						:color="item.isRecall ? 'primary' : 'grey'"
 						size="small"
 						variant="tonal"
 						class="font-weight-medium"
@@ -193,7 +193,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editKnowledge(item)"
 						/>
@@ -201,7 +201,7 @@
 							v-if="item.embeddingStatus === 'FAILED'"
 							size="small"
 							variant="text"
-							color="orange-darken-1"
+							color="warning"
 							icon="mdi-reload"
 							:loading="
 								item.id !== undefined ? retryLoadingMap[item.id] : false
@@ -212,7 +212,7 @@
 							v-if="item.isRecall"
 							size="small"
 							variant="text"
-							color="grey-darken-1"
+							color="grey"
 							icon="mdi-bookmark-off"
 							@click="toggleRecall(item, false)"
 						>
@@ -222,7 +222,7 @@
 							v-else
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-bookmark-plus"
 							@click="toggleRecall(item, true)"
 						>
@@ -231,7 +231,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteKnowledge(item)"
 						/>
@@ -240,19 +240,14 @@
 
 				<!-- 空状态 -->
 				<template #no-data>
-					<div class="d-flex flex-column align-center py-12">
-						<v-icon
-							icon="mdi-book-open-blank-variant"
-							size="64"
-							color="blue-lighten-3"
-							class="mb-4"
-						/>
-						<p class="text-body-1 text-medium-emphasis mb-2">暂无业务知识</p>
-						<p class="text-body-2 text-disabled mb-6">
-							点击「添加知识」开始配置业务术语词汇
-						</p>
+					<div class="d-flex flex-column align-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-book-open-blank-variant" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无业务知识</h3>
+						<p class="da-empty__desc">点击「添加知识」开始配置业务术语词汇</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -268,14 +263,14 @@
 		<!-- 添加/编辑 Dialog -->
 		<v-dialog v-model="dialogVisible" max-width="640" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑业务知识' : '添加业务知识'
 					}}</span>
 					<v-spacer />
@@ -289,10 +284,10 @@
 
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								业务名词 <span class="text-error">*</span>
 							</p>
 							<v-text-field
@@ -306,7 +301,7 @@
 						</div>
 
 						<div class="mb-5">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								描述 <span class="text-error">*</span>
 							</p>
 							<v-textarea
@@ -321,7 +316,7 @@
 						</div>
 
 						<div class="mb-2">
-							<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+							<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 								同义词
 							</p>
 							<v-textarea
@@ -347,7 +342,7 @@
 						取消
 					</v-btn>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -462,7 +457,7 @@ function getVectorStatusColor(status?: string): string {
 		case 'PENDING':
 			return 'warning';
 		case 'PROCESSING':
-			return 'blue-darken-1';
+			return 'primary';
 		default:
 			return 'grey';
 	}

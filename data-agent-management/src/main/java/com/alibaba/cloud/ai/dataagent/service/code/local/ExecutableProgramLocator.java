@@ -19,11 +19,16 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Finds the first available executable from an ordered candidate list.
+ * 可执行程序定位器接口，从有序候选列表中查找第一个可用的可执行程序。
  */
 @FunctionalInterface
 public interface ExecutableProgramLocator {
 
+	/**
+	 * 从候选程序名列表中查找第一个可用的可执行程序。
+	 * @param programNames 候选程序名列表（按优先级排序）
+	 * @return 第一个找到的可执行程序名，未找到时返回空
+	 */
 	Optional<String> findFirst(List<String> programNames);
 
 }

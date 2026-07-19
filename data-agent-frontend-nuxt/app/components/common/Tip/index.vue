@@ -20,6 +20,9 @@
 		:color="color"
 		:timeout="timeout"
 		:location="location"
+		rounded="lg"
+		elevation="0"
+		class="da-tip-snackbar"
 	>
 		<div class="d-flex align-center w-100">
 			<v-icon v-if="icon" :icon="icon" class="me-2"></v-icon>
@@ -47,3 +50,19 @@ const tipStore = useTipStore();
 const { isVisible, message, color, timeout, location, icon } =
 	storeToRefs(tipStore);
 </script>
+
+<style scoped>
+.da-tip-snackbar :deep(.v-snackbar__wrapper) {
+	min-width: 280px;
+	border: 0.5px solid color-mix(in srgb, currentColor 22%, transparent);
+	box-shadow: var(--da-shadow-sm) !important;
+	border-radius: 12px !important;
+	font-size: 13px;
+	font-weight: 500;
+	letter-spacing: -0.01em;
+	backdrop-filter: blur(8px);
+}
+.da-tip-snackbar :deep(.v-btn) {
+	border-radius: 8px !important;
+}
+</style>

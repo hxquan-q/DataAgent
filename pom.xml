@@ -371,6 +371,18 @@
           <compilerArgs>
             <arg>-parameters</arg>
           </compilerArgs>
+          <!-- 显式声明 Lombok 为注解处理器。
+               根 pom 不继承 spring-boot-starter-parent，且本环境下 maven-compiler-plugin 3.11.0
+               未能从 classpath 自动发现 Lombok SPI（clean 构建时 @Slf4j/@Data/@RequiredArgsConstructor
+               生成的符号全部缺失）。显式声明后 clean 构建恢复正常；版本走 BOM 托管（3.11.0 起支持）。 -->
+          <annotationProcessorPaths>
+            <path>
+              <groupId>org.projectlombok</groupId>
+              <artifactId>lombok</artifactId>
+              <!-- 须与 BOM 托管的 lombok 依赖版本一致（当前 1.18.38，spring-ai 1.1.0.0）。 -->
+              <version>1.18.38</version>
+            </path>
+          </annotationProcessorPaths>
         </configuration>
       </plugin>
     </plugins>

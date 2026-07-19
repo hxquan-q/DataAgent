@@ -21,16 +21,25 @@ import com.alibaba.cloud.ai.dataagent.service.datasource.handler.DatasourceTypeH
 import org.springframework.stereotype.Component;
 
 /**
- * Hive 数据源类型处理器
+ * Hive 数据源类型处理器，负责构建 Hive JDBC 连接 URL。
  */
 @Component
 public class HiveDatasourceTypeHandler implements DatasourceTypeHandler {
 
+	/**
+	 * 返回 Hive 数据源类型名称。
+	 * @return Hive 类型名称
+	 */
 	@Override
 	public String typeName() {
 		return BizDataSourceTypeEnum.HIVE.getTypeName();
 	}
 
+	/**
+	 * 构建 Hive JDBC 连接 URL，格式为 jdbc:hive2://host:port/database。
+	 * @param datasource 数据源实体
+	 * @return Hive JDBC 连接 URL
+	 */
 	@Override
 	public String buildConnectionUrl(Datasource datasource) {
 		if (!hasRequiredConnectionFields(datasource)) {
@@ -41,6 +50,12 @@ public class HiveDatasourceTypeHandler implements DatasourceTypeHandler {
 				datasource.getDatabaseName());
 	}
 
+	/**
+	 * Hive 连接测试 URL 不需要额外处理，直接返回原始 URL。
+	 * @param datasource 数据源实体
+	 * @param url 待规范化的 URL
+	 * @return 原始 URL
+	 */
 	@Override
 	public String normalizeTestUrl(Datasource datasource, String url) {
 		return url;

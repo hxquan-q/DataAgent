@@ -38,9 +38,20 @@ import java.util.stream.Collectors;
 
 import static com.alibaba.cloud.ai.dataagent.util.ColumnTypeUtil.wrapType;
 
+/**
+ * MySQL JDBC DDL 执行器实现。
+ * <p>
+ * 通过 information_schema 和 SHOW 命令查询 MySQL 数据库的元数据信息， 支持数据库、表、列、外键查询以及表数据扫描和列值采样。
+ * </p>
+ */
 @Service
 public class MysqlJdbcDdl extends AbstractJdbcDdl {
 
+	/**
+	 * 查询所有数据库列表。
+	 * @param connection 数据库连接
+	 * @return 数据库信息列表
+	 */
 	@Override
 	public List<DatabaseInfoBO> showDatabases(Connection connection) {
 		String sql = "show databases;";
@@ -66,11 +77,23 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return databaseInfoList;
 	}
 
+	/**
+	 * MySQL 不支持 schema 概念，返回空列表。
+	 * @param connection 数据库连接
+	 * @return 空列表
+	 */
 	@Override
 	public List<SchemaInfoBO> showSchemas(Connection connection) {
 		return Collections.emptyList();
 	}
 
+	/**
+	 * 查询指定数据库下的表列表（通过 information_schema）。
+	 * @param connection 数据库连接
+	 * @param schema 数据库名（MySQL 中 schema 等同于 database）
+	 * @param tablePattern 表名匹配模式（用于模糊查询，可为空）
+	 * @return 表信息列表（最多 2000 条）
+	 */
 	@Override
 	public List<TableInfoBO> showTables(Connection connection, String schema, String tablePattern) {
 		String sql = "SELECT TABLE_NAME, TABLE_COMMENT \n" + "FROM INFORMATION_SCHEMA.TABLES \n"
@@ -103,6 +126,13 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return tableInfoList;
 	}
 
+	/**
+	 * 获取指定表名的详细信息。
+	 * @param connection 数据库连接
+	 * @param schema 数据库名
+	 * @param tables 表名列表
+	 * @return 表信息列表（最多 200 条）
+	 */
 	@Override
 	public List<TableInfoBO> fetchTables(Connection connection, String schema, List<String> tables) {
 		String sql = "SELECT TABLE_NAME, TABLE_COMMENT \n" + "FROM INFORMATION_SCHEMA.TABLES \n"
@@ -132,6 +162,13 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return tableInfoList;
 	}
 
+	/**
+	 * 查询指定表的列信息（通过 information_schema.COLUMNS）。
+	 * @param connection 数据库连接
+	 * @param schema 数据库名
+	 * @param table 表名
+	 * @return 列信息列表，包含列名、注释、类型、是否主键、是否非空
+	 */
 	@Override
 	public List<ColumnInfoBO> showColumns(Connection connection, String schema, String table) {
 		String sql = "SELECT column_name, column_comment, data_type, "
@@ -165,6 +202,13 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return columnInfoList;
 	}
 
+	/**
+	 * 查询指定表的外键信息（通过 INFORMATION_SCHEMA.KEY_COLUMN_USAGE）。
+	 * @param connection 数据库连接
+	 * @param schema 数据库名
+	 * @param tables 表名列表
+	 * @return 外键信息列表，包含表名、列名、引用表名、引用列名
+	 */
 	@Override
 	public List<ForeignKeyInfoBO> showForeignKeys(Connection connection, String schema, List<String> tables) {
 		String sql = "SELECT \n" + "    TABLE_NAME AS '表名',\n" + "    COLUMN_NAME AS '列名',\n"
@@ -201,6 +245,14 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return foreignKeyInfoList;
 	}
 
+	/**
+	 * 采样指定列的数据值（取前 99 行，已去重）。
+	 * @param connection 数据库连接
+	 * @param schema 数据库名
+	 * @param table 表名
+	 * @param column 列名
+	 * @return 去重后的采样值列表
+	 */
 	@Override
 	public List<String> sampleColumn(Connection connection, String schema, String table, String column) {
 		String sql = "SELECT \n" + "    `%s`\n" + "FROM \n" + "    `%s`\n" + "LIMIT 99;";
@@ -228,6 +280,13 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return sampleInfo;
 	}
 
+	/**
+	 * 扫描表数据（预览前 20 行）。
+	 * @param connection 数据库连接
+	 * @param schema schema 名称
+	 * @param table 表名
+	 * @return 结构化结果集
+	 */
 	@Override
 	public ResultSetBO scanTable(Connection connection, String schema, String table) {
 		String sql = "SELECT *\n" + "FROM \n" + "    `%s`\n" + "LIMIT 20;";
@@ -241,6 +300,10 @@ public class MysqlJdbcDdl extends AbstractJdbcDdl {
 		return resultSet;
 	}
 
+	/**
+	 * 获取当前 DDL 执行器对应的数据源类型枚举。
+	 * @return MySQL 数据源类型枚举
+	 */
 	@Override
 	public BizDataSourceTypeEnum getDataSourceType() {
 		return BizDataSourceTypeEnum.MYSQL;

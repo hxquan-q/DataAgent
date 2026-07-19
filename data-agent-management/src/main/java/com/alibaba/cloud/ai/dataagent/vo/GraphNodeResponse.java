@@ -21,26 +21,39 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 图节点响应 VO
+ *
+ * <p>
+ * 表示工作流图中单个节点的执行响应，包含节点名称、文本类型、输出内容及状态标志。 用于流式推送每个节点的中间结果。
+ * </p>
+ */
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class GraphNodeResponse {
 
+	/** 智能体ID */
 	private String agentId;
 
+	/** 会话ID（线程ID） */
 	private String threadId;
 
-	// 使用Constant常量
+	/** 当前节点名称（使用 Constant 常量定义） */
 	private String nodeName;
 
+	/** 文本类型 */
 	private TextType textType;
 
+	/** 节点输出文本 */
 	private String text;
 
+	/** 是否为错误响应（默认 false） */
 	@Builder.Default
 	private boolean error = false;
 
+	/** 是否为完成标志（默认 false） */
 	@Builder.Default
 	private boolean complete = false;
 

@@ -15,35 +15,21 @@
  */
 
 <template>
-	<v-app id="app">
+	<v-app id="app" class="admin-app">
 		<v-main>
-			<BaseDrawer v-model="drawer" :drawer-width="280">
+			<BaseDrawer v-model="drawer" :drawer-width="272">
 				<template #drawer>
-					<div class="d-flex flex-column h-100">
-						<div class="pa-4 border-b border-white-5">
-							<div class="d-flex align-center mb-3">
-								<v-avatar color="primary" size="36" class="mr-3 rounded-lg">
-									<v-icon icon="mdi-robot" color="white" size="22" />
-								</v-avatar>
-								<div>
-									<div class="text-subtitle-2 font-weight-bold text-white">
-										Spring AI Alibaba
-									</div>
-									<div
-										class="text-caption text-blue-lighten-3 font-weight-bold brand-subtitle"
-									>
-										DATA AGENT
-									</div>
-								</div>
+					<div class="d-flex flex-column h-100 admin-rail">
+						<div class="brand-block">
+							<div class="brand-row">
+								<button type="button" class="brand-title" @click="goChatWorkspace">DataAgent</button>
+								<span class="brand-pill">管理</span>
 							</div>
 
 							<div class="agent-switcher-box">
-								<p
-									class="text-caption text-blue-lighten-3 mb-2 font-weight-bold"
-								>
-									当前选择智能体
-								</p>
+								<label class="agent-switcher-label" for="admin-agent-select">智能体上下文</label>
 								<v-select
+									id="admin-agent-select"
 									v-model="selectedAgentId"
 									:items="agentOptions"
 									item-title="title"
@@ -51,23 +37,22 @@
 									variant="outlined"
 									density="compact"
 									hide-details
-									placeholder="请选择智能体"
+									placeholder="选择智能体"
 									class="agent-switcher"
 									menu-icon="mdi-chevron-down"
-									theme="dark"
 									:menu-props="{
 										contentClass: 'agent-switcher-menu',
 										offset: [0, 8],
 									}"
-									:list-props="{ bgColor: '#1e293b', theme: 'dark' }"
-									item-color="blue-lighten-2"
+									:list-props="{ bgColor: 'var(--da-surface)', elevation: 2 }"
+									item-color="primary"
 									@update:model-value="handleAgentSwitch"
 								>
 									<template #selection="{ item }">
 										<div
 											class="agent-option agent-option--selection d-flex align-center w-100"
 										>
-											<v-avatar size="24" class="mr-2 border border-white-10">
+											<v-avatar size="24" class="mr-2 border">
 												<v-img
 													v-if="item.raw.avatar"
 													:src="item.raw.avatar"
@@ -77,7 +62,7 @@
 													v-else
 													icon="mdi-robot"
 													size="14"
-													color="blue-lighten-3"
+													color="primary"
 												/>
 											</v-avatar>
 											<div class="agent-option__text">
@@ -104,7 +89,7 @@
 											}"
 										>
 											<template #prepend>
-												<v-avatar size="28" class="mr-2 border border-white-10">
+												<v-avatar size="28" class="mr-2 border">
 													<v-img
 														v-if="item.raw.avatar"
 														:src="item.raw.avatar"
@@ -114,7 +99,7 @@
 														v-else
 														icon="mdi-robot"
 														size="15"
-														color="blue-lighten-3"
+														color="primary"
 													/>
 												</v-avatar>
 											</template>
@@ -130,7 +115,7 @@
 												<v-icon
 													v-if="item.raw.value === selectedAgentId"
 													icon="mdi-check"
-													color="blue-lighten-2"
+													color="primary"
 													size="16"
 												/>
 											</template>
@@ -144,9 +129,8 @@
 							v-model:opened="openedGroups"
 							density="compact"
 							nav
-							class="flex-grow-1 pa-2 px-4 custom-scrollbar bg-transparent"
-							theme="dark"
-						>
+							class="flex-grow-1 pa-1 px-2 custom-scrollbar bg-transparent"
+													>
 							<v-list-item
 								prepend-icon="mdi-chat-processing-outline"
 								title="数据问答"
@@ -172,12 +156,21 @@
 								@click="navigateToPath('/prompt-config')"
 							/>
 
+							<v-list-item
+								prepend-icon="mdi-puzzle-outline"
+								:active="isActive('/skills')"
+								class="rounded-lg mb-1 navigation-item"
+								color="primary"
+								title="技能管理"
+								@click="navigateToPath('/skills')"
+							/>
+
 							<v-list-group value="knowledge">
 								<template #activator="{ props }">
 									<v-list-item
 										v-bind="props"
 										title="知识库管理"
-										class="text-overline text-slate-500 mt-4"
+										class="text-overline nav-group-label mt-4"
 									/>
 								</template>
 								<v-list-item
@@ -214,7 +207,7 @@
 									<v-list-item
 										v-bind="props"
 										title="通用设置"
-										class="text-overline text-slate-500 mt-2"
+										class="text-overline nav-group-label mt-2"
 									/>
 								</template>
 								<v-list-item
@@ -244,20 +237,83 @@
 									color="primary"
 									@click="navigateToPath('/system/model-config')"
 								/>
+								<v-list-item
+									prepend-icon="mdi-chart-line"
+									title="指标配置"
+									:active="isActive('/system/metrics')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/metrics')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-format-list-bulleted-type"
+									title="口径版本"
+									:active="isActive('/system/metric-versions')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/metric-versions')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-tag-multiple"
+									title="语义别名"
+									:active="isActive('/system/semantic-aliases')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/semantic-aliases')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-shield-search"
+									title="查询证据链"
+									:active="isActive('/system/query-log')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/query-log')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-chart-bar"
+									title="评测游乐场"
+									:active="isActive('/system/eval-playground')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/eval-playground')"
+								/>
+								<v-list-item
+									prepend-icon="mdi-shield-lock"
+									title="安全状态"
+									:active="isActive('/system/security')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/security')"
+								/>
+									<v-list-item
+										prepend-icon="mdi-web-box"
+									title="网页嵌入"
+									:active="isActive('/system/embed')"
+									density="compact"
+									class="rounded-lg mb-1 navigation-sub-item"
+									color="primary"
+									@click="navigateToPath('/system/embed')"
+								/>
 							</v-list-group>
 
-							<div class="mt-6 pt-4 border-t border-white/5">
+							<div class="mt-6 pt-4 sidebar-footer-sep">
 								<v-list-item
 									color="primary"
 									density="compact"
 									:active="isActive('/agent/new')"
 									variant="flat"
-									class="rounded-xl mx-2 shadow-lg bg-blue-grey-darken-4 new-agent-item"
+									class="rounded-xl mx-2 new-agent-item"
 									@click="navigateToPath('/agent/new')"
 								>
 									<div class="d-flex align-center justify-center gap-2 w-100">
 										<v-icon icon="mdi-plus-box-outline" size="16" rounded />
-										<span class="font-weight-bold text-caption mx-1"
+										<span class="font-weight-medium text-caption mx-1"
 											>新建智能体</span
 										>
 									</div>
@@ -265,33 +321,87 @@
 							</div>
 						</v-list>
 
-						<!-- <div class="pa-2 border-t border-white/5">
-							<v-list-item class="rounded-lg navigation-item logout-item" color="red-lighten-2" @click="logout">
+						<div class="pa-2 sidebar-footer-sep">
+							<v-list-item
+								class="rounded-lg navigation-item logout-item"
+								color="error"
+								@click="openChangePassword"
+							>
 								<template #prepend>
-									<v-avatar size="24" color="grey-darken-3"><v-icon icon="mdi-account" size="14" color="white" /></v-avatar>
+									<v-avatar size="24" color="primary" variant="tonal">
+										<v-icon icon="mdi-account" size="14" color="primary" />
+									</v-avatar>
 								</template>
-								<v-list-item-title class="text-caption font-weight-bold ms-2">root</v-list-item-title>
-								<template #append><v-icon icon="mdi-logout" size="24" color="red" /></template>
+								<v-list-item-title class="text-caption font-weight-medium ms-2">
+									{{ authDisplayName }}
+								</v-list-item-title>
+								<template #append>
+									<v-btn
+										icon
+										variant="text"
+										size="small"
+										color="red"
+										:title="'退出登录'"
+										@click.stop="onLogout"
+									>
+										<v-icon icon="mdi-logout" size="20" />
+									</v-btn>
+								</template>
 							</v-list-item>
-						</div> -->
+						</div>
+
+						<v-dialog v-model="pwdDialog" max-width="380">
+							<v-card rounded="lg" class="pa-5 pwd-card" elevation="0">
+								<div class="dialog-title mb-1">修改密码</div>
+								<p class="pwd-hint mb-4">使用当前账号修改登录密码</p>
+								<v-alert
+									v-if="pwdError"
+									type="error"
+									variant="tonal"
+									density="compact"
+									class="mb-3"
+									:text="pwdError"
+								/>
+								<v-text-field
+									v-model="oldPassword"
+									label="原密码"
+									type="password"
+									density="comfortable"
+									variant="outlined"
+									hide-details="auto"
+									class="mb-3"
+								/>
+								<v-text-field
+									v-model="newPassword"
+									label="新密码（≥8位）"
+									type="password"
+									density="comfortable"
+									variant="outlined"
+									hide-details="auto"
+									class="mb-5"
+								/>
+								<div class="d-flex justify-end ga-2">
+									<v-btn variant="text" class="text-none pwd-btn" @click="pwdDialog = false">取消</v-btn>
+									<v-btn color="primary" class="text-none px-5 pwd-btn" :loading="pwdLoading" @click="submitChangePassword">
+										确认
+									</v-btn>
+								</div>
+							</v-card>
+						</v-dialog>
 					</div>
 				</template>
 
 				<template #header="{ toggle, isOpen }">
-					<v-btn icon variant="text" size="small" class="mr-2" @click="toggle">
+					<v-btn icon variant="text" size="small" class="mr-2 header-menu-btn" @click="toggle">
 						<v-icon :icon="isOpen ? 'mdi-menu-open' : 'mdi-menu'" />
 					</v-btn>
-					<div class="text-subtitle-1 font-weight-medium text-grey-darken-3">
+					<div class="text-subtitle-1 font-weight-medium app-header-title">
 						{{ currentRouteTitle }}
 					</div>
 					<v-spacer />
-					<v-chip
-						size="small"
-						variant="outlined"
-						color="primary"
-						class="font-weight-bold"
-						>Alibaba Edition</v-chip
-					>
+					<button type="button" class="header-back-chat" @click="goChatWorkspace">
+						返回问答
+					</button>
 				</template>
 
 				<slot />
@@ -314,13 +424,62 @@
 import BaseDrawer from '../components/BaseDrawer/index.vue';
 import agentService from '~/services/agent/index';
 import modelConfigService from '~/services/modelConfig/index';
+import { useAuthStore } from '~/stores/auth';
 
 const { dialogState, handleGlobalConfirm } = useConfirm();
 const drawer = ref(true);
+function applyAdminMobile() {
+	if (typeof window === 'undefined') return;
+	if (window.matchMedia('(max-width: 768px)').matches) drawer.value = false;
+}
+
 const router = useRouter();
 const route = useRoute();
+const authStore = useAuthStore();
+const authDisplayName = computed(
+	() => authStore.displayName || authStore.username || 'admin',
+);
+const pwdDialog = ref(false);
+const oldPassword = ref('');
+const newPassword = ref('');
+const pwdLoading = ref(false);
+const pwdError = ref('');
 // 默认都展开
 const openedGroups = ref(['knowledge', 'system']);
+onMounted(() => {
+	applyAdminMobile();
+	window.matchMedia('(max-width: 768px)').addEventListener?.('change', (e) => {
+		if (e.matches) drawer.value = false;
+	});
+});
+
+function openChangePassword() {
+	pwdError.value = '';
+	oldPassword.value = '';
+	newPassword.value = '';
+	pwdDialog.value = true;
+}
+
+async function submitChangePassword() {
+	pwdLoading.value = true;
+	pwdError.value = '';
+	try {
+		await authStore.changePassword(oldPassword.value, newPassword.value);
+		pwdDialog.value = false;
+		await router.push('/login');
+	}
+	catch (e: any) {
+		pwdError.value = e?.response?.data?.message || e?.message || '改密失败';
+	}
+	finally {
+		pwdLoading.value = false;
+	}
+}
+
+async function onLogout() {
+	await authStore.logout();
+	await router.push('/login');
+}
 
 type DrawerAgentOption = {
 	id: number;
@@ -340,13 +499,23 @@ const routeTitleMap: Record<string, string> = {
 	'/chat': '数据问答',
 	'/dashboard': '数据看板',
 	'/prompt-config': '提示词配置',
+	'/skills': '技能管理',
 	'/knowledge/business': '业务知识配置',
 	'/knowledge/agents': '智能体知识库',
 	'/knowledge/semantic-models': '语义模型配置',
+	'/system/agents': '智能体管理',
 	'/system/data-sources': '数据连接',
 	'/system/model-config': '模型配置',
+	'/system/metrics': '指标配置',
+	'/system/metric-versions': '口径版本配置',
+	'/system/semantic-aliases': '语义别名配置',
+	'/system/query-log': '查询证据链',
+	'/system/eval-playground': '评测游乐场',
+	'/system/security': '安全状态',
+	'/system/embed': '网页嵌入',
 	'/system/settings': '通用设置',
 	'/agent/new': '新建智能体',
+	'/agent': '智能体工作台',
 };
 
 const agentOptions = computed(() => agents.value);
@@ -403,7 +572,19 @@ function applyAgentToCurrentRoute(agentId: number, replace = false) {
 	}
 }
 
+function goChatWorkspace() {
+	const id = selectedAgentId.value;
+	if (id) {
+		router.push({ path: '/chat', query: { agentId: String(id) } });
+		return;
+	}
+	router.push('/chat');
+}
+
 function navigateToPath(path: string) {
+	if (typeof window !== 'undefined' && window.matchMedia('(max-width: 768px)').matches) {
+		drawer.value = false;
+	}
 	if (path === '/agent/new') {
 		if (route.path !== path) router.push({ path });
 		return;
@@ -492,31 +673,143 @@ watch(
 </script>
 
 <style scoped>
+
+.admin-rail {
+	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface));
+}
+.brand-block {
+	padding: 12px 12px 10px !important;
+	border-bottom: 1px solid var(--da-sidebar-line) !important;
+}
+.brand-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	margin-bottom: 10px;
+}
+.brand-title {
+	appearance: none;
+	border: none;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+	font-family: var(--da-font-display);
+	font-size: 0.95rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-sidebar-ink, #1a2332);
+	cursor: pointer;
+	text-align: left;
+}
+.brand-title:hover {
+	color: var(--da-primary);
+}
+.brand-title:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+.brand-pill {
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--da-primary);
+	background: var(--da-primary-soft);
+	border: 1px solid color-mix(in srgb, var(--da-primary) 22%, transparent);
+	border-radius: 999px;
+	padding: 2px 8px;
+}
+.agent-switcher-box {
+	margin: 0;
+}
+.agent-switcher-label {
+	display: block;
+	margin: 0 0 6px;
+	font-size: 11px;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	color: var(--da-sidebar-muted, #64748b);
+}
+.admin-app {
+	background: var(--da-surface-soft) !important;
+}
+
 .border-white-5 {
-	border-color: rgba(255, 255, 255, 0.05) !important;
+	border-color: var(--da-sidebar-line, #e4edf5) !important;
+}
+
+.agent-switcher-label {
+	color: var(--da-sidebar-muted, #64748b);
+}
+
+.nav-group-label {
+	color: var(--da-sidebar-muted, #64748b) !important;
+	letter-spacing: 0.08em;
+	opacity: 0.95;
 }
 
 .brand-subtitle {
 	font-size: 10px;
-	letter-spacing: 1px;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--da-sidebar-muted, #64748b);
+}
+
+.brand-block {
+	padding-bottom: 10px !important;
+}
+.brand-title {
+	color: var(--da-sidebar-ink, #1a2332);
+	font-family: var(--da-font-display);
+	letter-spacing: -0.02em;
+	font-size: 0.95rem;
+}
+
+.app-header-title {
+	color: var(--da-ink, #1a2332);
+	letter-spacing: -0.02em;
+	font-size: 0.95rem !important;
+}
+
+.header-menu-btn {
+	color: var(--da-muted, #64748b) !important;
+}
+
+.app-header-meta {
+	font-size: 11.5px;
+	font-weight: 500;
+	color: var(--da-muted);
+	letter-spacing: 0.02em;
+	user-select: none;
+}
+
+/* rebuild-ui: light paper sidebar brand */
+:deep(.base-drawer__left .text-white) {
+	color: var(--da-sidebar-ink, #1a2332) !important;
 }
 
 .agent-switcher :deep(.v-field) {
-	background: rgba(30, 41, 59, 0.8);
-	border-radius: 10px;
+	background: var(--da-sidebar-field, #ffffff);
+	border-radius: var(--da-radius-md, 12px);
+	border: 1px solid var(--da-sidebar-line, #e4edf5);
+	box-shadow: var(--da-shadow-sm);
 }
 
 .agent-switcher :deep(.v-field__input),
 .agent-switcher :deep(.v-field-label),
 .agent-switcher :deep(.v-icon) {
-	color: #dbeafe;
+	color: var(--da-sidebar-ink, #1a2332);
 }
 
 :deep(.agent-switcher-menu) {
-	background: #1e293b !important;
-	border: 1px solid rgba(59, 130, 246, 0.3) !important;
-	border-radius: 12px !important;
+	background: var(--da-surface, #ffffff) !important;
+	border: 1px solid var(--da-line-soft, #e4edf5) !important;
+	border-radius: var(--da-radius-md, 12px) !important;
+	box-shadow: var(--da-shadow-md) !important;
 	overflow: hidden;
+	z-index: var(--da-z-dropdown, 1000);
 }
 
 :deep(.agent-switcher-menu .v-list) {
@@ -525,13 +818,14 @@ watch(
 }
 
 :deep(.agent-switcher-menu .v-list-item) {
-	border-radius: 8px !important;
+	border-radius: var(--da-radius-sm, 8px) !important;
 	margin-bottom: 2px !important;
 	min-height: 44px !important;
+	color: var(--da-ink, #1a2332) !important;
 }
 
 :deep(.agent-switcher-menu .v-list-item:hover) {
-	background: rgba(59, 130, 246, 0.12) !important;
+	background: var(--da-sidebar-hover, rgba(47, 132, 214, 0.08)) !important;
 }
 
 .agent-option__text {
@@ -550,13 +844,13 @@ watch(
 }
 
 .agent-option__title--active {
-	color: #60a5fa;
+	color: var(--da-sidebar-accent, #2f84d6);
 }
 
 .agent-option__subtitle {
 	font-size: 10px;
 	line-height: 1.2;
-	color: #94a3b8;
+	color: var(--da-sidebar-muted, #64748b);
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -565,12 +859,12 @@ watch(
 }
 
 .agent-tags-text {
-	background: rgba(59, 130, 246, 0.15);
-	color: #93c5fd;
+	background: var(--da-sidebar-chip-bg, rgba(47, 132, 214, 0.1));
+	color: var(--da-sidebar-chip-ink, #1e5fa8);
 	padding: 1px 6px;
-	border-radius: 4px;
+	border-radius: var(--da-radius-sm);
 	font-size: 9px;
-	border: 1px solid rgba(59, 130, 246, 0.2);
+	border: 1px solid var(--da-sidebar-chip-line, rgba(47, 132, 214, 0.18));
 }
 
 .agent-option--selection .agent-option__title {
@@ -582,13 +876,41 @@ watch(
 }
 
 .navigation-item {
-	--v-list-item-padding-start: 16px;
-	--v-list-item-min-height: 36px;
+	--v-list-item-padding-start: 10px;
+	--v-list-item-min-height: 32px;
+	border-radius: 8px !important;
+	color: var(--da-sidebar-ink, #1a2332) !important;
+	margin-inline: 2px;
+	margin-bottom: 1px !important;
+	font-size: 13px !important;
+	font-weight: 400 !important;
+}
+
+.navigation-item :deep(.v-list-item-title) {
+	font-size: 13px !important;
+	font-weight: 400 !important;
+	letter-spacing: -0.01em;
+}
+
+.navigation-item:hover {
+	background: var(--da-sidebar-hover, rgba(47, 132, 214, 0.08)) !important;
+}
+
+.navigation-item.v-list-item--active {
+	background: var(--da-sidebar-active, rgba(47, 132, 214, 0.12)) !important;
+	color: var(--da-sidebar-accent, #2f84d6) !important;
+	box-shadow: none;
+	font-weight: 500 !important;
+}
+
+.navigation-item.v-list-item--active :deep(.v-list-item-title) {
+	font-weight: 500 !important;
 }
 
 .navigation-sub-item {
-	--v-list-item-padding-start: 28px;
-	--v-list-item-min-height: 36px;
+	--v-list-item-padding-start: 22px;
+	--v-list-item-min-height: 32px;
+	font-size: 13px !important;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -600,12 +922,35 @@ watch(
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-	background: rgba(255, 255, 255, 0.1);
-	border-radius: 4px;
+	background: color-mix(in srgb, var(--da-muted, #64748b) 35%, transparent);
+	border-radius: var(--da-radius-sm);
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-	background: rgba(255, 255, 255, 0.2);
+	background: color-mix(in srgb, var(--da-muted, #64748b) 55%, transparent);
+}
+
+.sidebar-footer-sep {
+	border-top: 1px solid var(--da-sidebar-line, #e4edf5);
+}
+
+.logout-item :deep(.v-list-item-title) {
+	color: var(--da-sidebar-ink, #1a2332);
+}
+
+.new-agent-item {
+	min-height: 32px !important;
+	background: transparent !important;
+	color: var(--da-primary, #2f84d6) !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-primary) 22%, transparent) !important;
+	box-shadow: none !important;
+	border-radius: 8px !important;
+	transition: background var(--da-dur-fast) var(--da-ease-out),
+		border-color var(--da-dur-fast) var(--da-ease-out);
+}
+.new-agent-item:hover {
+	background: var(--da-primary-soft, #e8f3fc) !important;
+	box-shadow: none !important;
 }
 
 :deep(.v-list-group__items .v-list-item) {
@@ -613,10 +958,93 @@ watch(
 }
 
 :deep(.flex-grow-1.v-list .v-list-item) {
-	min-height: 36px !important;
+	min-height: 32px !important;
 }
 
 :deep(.v-list-item__spacer) {
-	width: 12px !important;
+	width: 10px !important;
+}
+
+/* Quieter group labels */
+.nav-group-label {
+	font-size: 10.5px !important;
+	letter-spacing: 0.08em !important;
+	min-height: 28px !important;
+	margin-top: 10px !important;
+	opacity: 0.85;
+}
+
+.agent-switcher-box {
+	padding: 0;
+}
+
+.agent-switcher :deep(.v-field) {
+	min-height: 36px !important;
+	box-shadow: none !important;
+	border-radius: 10px !important;
+}
+
+.agent-switcher :deep(.v-field__input) {
+	min-height: 36px !important;
+	padding-top: 0 !important;
+	padding-bottom: 0 !important;
+	font-size: 13px !important;
+}
+
+.agent-option__title {
+	font-weight: 400 !important;
+	font-size: 13px !important;
+}
+
+.agent-option__title--active {
+	font-weight: 500 !important;
+}
+
+.sidebar-footer-sep {
+	border-top: 0.5px solid color-mix(in srgb, var(--da-sidebar-line) 80%, transparent);
+}
+
+.pwd-card {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
+	box-shadow: var(--da-shadow-md) !important;
+}
+.pwd-hint {
+	margin: 0;
+	font-size: 12.5px;
+	color: var(--da-muted);
+}
+.pwd-btn {
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	letter-spacing: 0 !important;
+}
+
+.header-back-chat {
+	appearance: none;
+	border: 1px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	background: var(--da-surface);
+	color: var(--da-ink);
+	border-radius: 999px;
+	min-height: 32px;
+	padding: 4px 14px;
+	font: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	letter-spacing: -0.01em;
+	cursor: pointer;
+	box-shadow: var(--da-shadow-sm);
+	transition: border-color var(--da-dur-fast) var(--da-ease-out), background var(--da-dur-fast) var(--da-ease-out);
+}
+.header-back-chat:hover {
+	border-color: color-mix(in srgb, var(--da-primary) 40%, transparent);
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
+}
+.header-back-chat:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
+}
+.brand-row {
+	min-height: 28px;
 }
 </style>

@@ -23,11 +23,16 @@ import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import org.springframework.stereotype.Component;
 
 /**
- * docker-java connector backed by its dependency-free HTTP transport.
+ * 基于 docker-java 无依赖 HTTP 传输的 Docker 客户端连接器实现。
  */
 @Component
 public class ZerodepDockerClientConnector implements DockerClientConnector {
 
+	/**
+	 * 使用无依赖 HTTP 客户端连接到指定的 Docker 主机。
+	 * @param host Docker 主机地址
+	 * @return Docker 客户端
+	 */
 	@Override
 	public DockerClient connect(String host) {
 		DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()

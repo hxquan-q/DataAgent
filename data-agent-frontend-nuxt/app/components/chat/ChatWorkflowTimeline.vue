@@ -1,109 +1,86 @@
-/*
- * Copyright 2026 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 <template>
-	<div ref="timelineRef" class="workflow-timeline">
-		<!-- Title + global toggle -->
-		<div class="timeline-title-bar">
-			<v-card-title class="timeline-title pa-0">
-				<v-icon size="18" color="blue" class="mr-1"
-					>mdi-rocket-launch-outline</v-icon
-				>
-				任务开始
-			</v-card-title>
-			<v-btn
-				variant="outlined"
-				size="x-small"
-				color="grey"
-				class="toggle-all-btn"
-				:prepend-icon="
-					allExpanded
-						? 'mdi-unfold-less-horizontal'
-						: 'mdi-unfold-more-horizontal'
-				"
-				@click="toggleAll"
-			>
-				{{ allExpanded ? '折叠全部' : '展开全部' }}
-			</v-btn>
-		</div>
+	<div
+		ref="timelineRef"
+		class="process-bubble"
+		:class="{
+			'process-bubble--done': completed,
+			'process-bubble--live': !completed,
+			'process-bubble--open': processOpen,
+		}"
+	>
+		<!-- DEEIX: one small process chip -->
+		<button
+			type="button"
+			class="process-chip"
+			:aria-expanded="processOpen ? 'true' : 'false'"
+			@click="processOpen = !processOpen"
+		>
+			<span class="process-chip__dot" :class="{ live: !completed }" aria-hidden="true" />
+			<span class="process-chip__title">
+				{{ completed ? '过程' : '分析中' }}
+			</span>
+			<span v-if="timelineSteps.length" class="process-chip__meta">
+				{{ doneCount }}/{{ timelineSteps.length }}
+			</span>
+			<span v-if="!completed && activeLabel" class="process-chip__active">
+				{{ activeLabel }}
+			</span>
+			<v-icon size="14" class="process-chip__chevron">
+				{{ processOpen ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
+			</v-icon>
+		</button>
 
-		<v-timeline density="compact" side="end" truncate-line="both">
-			<v-timeline-item
+		<!-- Expanded: tiny step bubbles (not heavy timeline chrome) -->
+		<div v-show="processOpen" class="process-steps" role="list">
+			<button
+				type="button"
+				class="process-steps__toggle"
+				@click.stop="toggleAll"
+			>
+				{{ allExpanded ? '全部折叠' : '全部展开' }}
+			</button>
+
+			<div
 				v-for="step in timelineSteps"
 				:key="step.nodeName"
-				:dot-color="dotColor(step.status)"
-				:icon="dotIcon(step.status)"
-				size="small"
+				class="step-bubble"
+				:class="{
+					'step-bubble--done': step.status === 'done',
+					'step-bubble--active': step.status === 'active',
+					'step-bubble--open': step.expanded,
+					'step-bubble--report': step.isReport,
+				}"
+				role="listitem"
 			>
-				<!-- Step header: clickable to toggle -->
-				<div class="step-header" @click="toggleStep(step.nodeName)">
-					<div class="step-header-left">
-						<span class="step-label">{{ step.label }}</span>
-						<span v-if="step.status === 'active'" class="step-badge active">
-							<span class="badge-dot" />进行中
-						</span>
-						<span v-else-if="step.status === 'done'" class="step-badge done"
-							>完成</span
-						>
-					</div>
-					<v-icon size="16" color="#94a3b8">
+				<button type="button" class="step-bubble__head" @click="toggleStep(step.nodeName)">
+					<span class="step-bubble__status" aria-hidden="true">
+						<span v-if="step.status === 'done'">✓</span>
+						<span v-else-if="step.status === 'active'" class="step-bubble__pulse" />
+						<span v-else>·</span>
+					</span>
+					<span class="step-bubble__label">{{ step.label }}</span>
+					<span v-if="step.status === 'active'" class="step-bubble__badge">进行中</span>
+					<v-icon size="14" class="step-bubble__chevron">
 						{{ step.expanded ? 'mdi-chevron-up' : 'mdi-chevron-down' }}
 					</v-icon>
-				</div>
+				</button>
 
-				<!-- Collapsible content -->
-				<v-expand-transition>
-					<div
-						v-show="step.expanded"
-						class="step-content"
-						:class="{ 'is-muted': step.status === 'done' && !step.isReport }"
-					>
-						<!-- Result Set -->
-						<ChatResultSet
-							v-if="
-								step.block[0]?.textType === 'RESULT_SET' && step.block[0]?.text
-							"
-							:data="safeParseJson(step.block[0].text)"
-							:page-size="10"
-						/>
-						<!-- Report node: show brief status, not full content -->
-						<div v-else-if="step.isReport" class="text-body report-brief">
-							<v-icon size="14" color="#16a34a" class="mr-1"
-								>mdi-file-chart-outline</v-icon
-							>
-							<span v-if="step.status === 'active'"
-								>正在生成报告，内容在下方实时展示...</span
-							>
-							<span v-else>报告已生成完毕，查看下方报告卡片</span>
-						</div>
-						<!-- Pure code block (all items share same code type) -->
-						<div
-							v-else-if="isPureCodeBlock(step.block)"
-							v-html="renderCode(step.block)"
-						/>
-						<!-- Mixed content: text with possible embedded JSON/code -->
-						<div
-							v-else
-							class="text-body"
-							v-html="renderTextWithJsonDetection(step.block)"
-						/>
+				<div v-show="step.expanded" class="step-bubble__body">
+					<ChatResultSet
+						v-if="step.block[0]?.textType === 'RESULT_SET' && step.block[0]?.text"
+						:data="safeParseJson(step.block[0].text)"
+						:page-size="10"
+						:pending-report="!completed && !step.isReport"
+					/>
+					<div v-else-if="step.isReport" class="step-bubble__brief">
+						<span v-if="step.status === 'active'">报告生成中…内容在下方实时展示</span>
+						<span v-else>报告已生成，见下方答案</span>
 					</div>
-				</v-expand-transition>
-			</v-timeline-item>
-		</v-timeline>
+					<div v-else-if="isPureCodeBlock(step.block)" class="step-bubble__code" v-html="renderCode(step.block)" />
+					<div v-else class="step-bubble__text" v-html="renderTextWithJsonDetection(step.block)" />
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -126,11 +103,22 @@ const props = withDefaults(
 );
 
 const expandedSteps = ref<Record<string, boolean>>({});
+// R231: process tree collapsed by default
+const processOpen = ref(false);
 
 const allExpanded = computed(() => {
 	const steps = timelineSteps.value;
 	if (steps.length === 0) return false;
 	return steps.some((s) => s.expanded);
+});
+
+const doneCount = computed(
+	() => timelineSteps.value.filter((s) => s.status === 'done').length,
+);
+
+const activeLabel = computed(() => {
+	const active = timelineSteps.value.find((s) => s.status === 'active');
+	return active?.label ?? '';
 });
 
 function toggleAll() {
@@ -141,16 +129,17 @@ function toggleAll() {
 }
 
 function toggleStep(nodeName: string) {
-	const defaultExpanded = getDefaultExpanded(nodeName);
+	const step = timelineSteps.value.find((s) => s.nodeName === nodeName);
+	const defaultExpanded = getDefaultExpanded(nodeName, step?.status);
 	expandedSteps.value[nodeName] = !(
 		expandedSteps.value[nodeName] ?? defaultExpanded
 	);
 }
 
-function getDefaultExpanded(nodeName: string): boolean {
-	if (!props.completed) return true;
-	if (nodeName === 'ReportGeneratorNode') return true;
-	return false;
+function getDefaultExpanded(_nodeName: string, status?: string): boolean {
+	// 完成后全收起；执行中只展开当前 active 步（过程有界）
+	if (props.completed) return false;
+	return status === 'active';
 }
 
 interface NodeDef {
@@ -284,7 +273,7 @@ const timelineSteps = computed<TimelineStep[]>(() => {
 			...def,
 			status,
 			block,
-			expanded: expandedSteps.value[nodeName] ?? getDefaultExpanded(nodeName),
+			expanded: expandedSteps.value[nodeName] ?? getDefaultExpanded(nodeName, status),
 			isReport,
 		};
 	});
@@ -292,8 +281,8 @@ const timelineSteps = computed<TimelineStep[]>(() => {
 
 function dotColor(status: string): string {
 	if (status === 'done') return 'green';
-	if (status === 'active') return 'blue-darken-2';
-	return 'grey-lighten-1';
+	if (status === 'active') return 'primary';
+	return 'grey';
 }
 
 function dotIcon(status: string): string {
@@ -333,9 +322,14 @@ const SANITIZE_OPTIONS = {
 	RETURN_TRUSTED_TYPE: false as const,
 };
 
+function truncateProcess(text: string, limit = 1600): string {
+	if (!text || text.length <= limit) return text;
+	return text.slice(0, limit) + '\n…(过程输出已截断)';
+}
+
 function renderCode(block: GraphNodeResponse[]): string {
 	const lang = (block[0]?.textType || 'text').toLowerCase();
-	const code = block.map((n) => n.text).join('');
+	const code = truncateProcess(block.map((n) => n.text).join(''));
 	try {
 		const h = hljs.highlight(code, { language: lang });
 		return DOMPurify.sanitize(
@@ -370,7 +364,7 @@ function tryExtractJson(
 }
 
 function renderTextWithJsonDetection(block: GraphNodeResponse[]): string {
-	const fullText = block.map((n) => n.text).join('');
+	const fullText = truncateProcess(block.map((n) => n.text).join(''));
 
 	const extracted = tryExtractJson(fullText);
 	if (extracted) {
@@ -406,270 +400,267 @@ function renderTextWithJsonDetection(block: GraphNodeResponse[]): string {
 }
 
 watch(
-	() => props.nodeBlocks,
+	() => props.completed,
+	(done) => {
+		if (!done) return;
+		const next: Record<string, boolean> = {};
+		for (const s of timelineSteps.value) {
+			next[s.nodeName] = false;
+		}
+		expandedSteps.value = next;
+	},
+);
+
+watch(
+	() => props.nodeBlocks.length,
 	() => {
+		if (!processOpen.value) return;
 		nextTick(() => renderECharts(timelineRef.value));
 	},
-	{ deep: true },
 );
 </script>
 
+
 <style scoped>
-.workflow-timeline {
+/* DEEIX process: small chip + mini step bubbles */
+.process-bubble {
 	width: 100%;
+	max-width: min(100%, var(--da-answer-max, 960px));
 }
 
-/* ── Title bar ───────────────────────────────────────────────────────────────── */
-.timeline-title-bar {
-	display: flex;
+.process-chip {
+	appearance: none;
+	display: inline-flex;
 	align-items: center;
-	justify-content: space-between;
-	margin-bottom: 8px;
-	padding: 0 2px;
-}
-
-.timeline-title {
-	font-size: 15px !important;
-	font-weight: 700;
-	color: #2563eb;
-	display: flex;
-	align-items: center;
-	line-height: 1;
-}
-
-.toggle-all-btn {
-	font-size: 11px !important;
-	text-transform: none !important;
-	letter-spacing: 0 !important;
-}
-
-/* ── Step header ─────────────────────────────────────────────────────────────── */
-.step-header {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
+	gap: 6px;
+	max-width: 100%;
+	min-height: 28px;
+	padding: 4px 10px 4px 8px;
+	border-radius: 999px;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	background: color-mix(in srgb, var(--da-surface) 88%, var(--da-surface-soft));
+	box-shadow: var(--da-shadow-sm);
+	color: var(--da-muted);
+	font: inherit;
+	font-size: 12.5px;
+	font-weight: 500;
+	line-height: 1.2;
 	cursor: pointer;
-	padding: 2px 0;
-	user-select: none;
+	text-align: left;
+	transition:
+		border-color var(--da-dur-fast) var(--da-ease-out),
+		color var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
+}
+.process-chip:hover {
+	color: var(--da-ink);
+	border-color: color-mix(in srgb, var(--da-line) 80%, transparent);
+	background: var(--da-surface);
+}
+.process-chip:focus-visible {
+	outline: 2px solid var(--da-ring);
+	outline-offset: 2px;
 }
 
-.step-header-left {
+.process-bubble--live .process-chip {
+	border-color: color-mix(in srgb, var(--da-primary) 28%, transparent);
+	color: var(--da-ink);
+}
+.process-bubble--done .process-chip {
+	opacity: 0.72;
+	box-shadow: none;
+	background: transparent;
+	border-color: color-mix(in srgb, var(--da-line) 40%, transparent);
+}
+.process-bubble--done .process-chip:hover {
+	opacity: 1;
+	background: var(--da-surface);
+}
+
+.process-chip__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-success);
+	flex-shrink: 0;
+}
+.process-chip__dot.live {
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+.process-chip__title {
+	font-weight: 600;
+	color: inherit;
+	flex-shrink: 0;
+}
+.process-chip__meta {
+	font-weight: 400;
+	opacity: 0.85;
+	flex-shrink: 0;
+}
+.process-chip__active {
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	opacity: 0.8;
+	font-weight: 400;
+}
+.process-chip__chevron {
+	margin-left: 2px;
+	opacity: 0.7;
+	flex-shrink: 0;
+}
+
+.process-steps {
+	margin-top: 8px;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding-left: 2px;
+}
+.process-steps__toggle {
+	appearance: none;
+	align-self: flex-start;
+	border: none;
+	background: transparent;
+	color: var(--da-muted);
+	font: inherit;
+	font-size: 11.5px;
+	font-weight: 600;
+	cursor: pointer;
+	padding: 0 2px 2px;
+}
+.process-steps__toggle:hover {
+	color: var(--da-primary);
+}
+
+.step-bubble {
+	border-radius: 12px;
+	border: 0.5px solid color-mix(in srgb, var(--da-line-soft) 90%, transparent);
+	background: color-mix(in srgb, var(--da-surface) 70%, var(--da-surface-soft));
+	overflow: hidden;
+	transition: border-color var(--da-dur-fast) var(--da-ease-out), background var(--da-dur-fast) var(--da-ease-out);
+}
+.step-bubble--active {
+	border-color: color-mix(in srgb, var(--da-primary) 30%, transparent);
+	background: color-mix(in srgb, var(--da-primary-soft) 55%, var(--da-surface));
+}
+.step-bubble--done {
+	opacity: 0.92;
+}
+.step-bubble--open {
+	background: var(--da-surface);
+}
+
+.step-bubble__head {
+	appearance: none;
+	width: 100%;
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	min-height: 32px;
+	padding: 6px 10px;
+	border: none;
+	background: transparent;
+	color: var(--da-muted);
+	font: inherit;
+	font-size: 12.5px;
+	cursor: pointer;
+	text-align: left;
 }
-
-.step-label {
-	font-size: 13px;
-	font-weight: 600;
-	color: #1e293b;
+.step-bubble__head:hover {
+	color: var(--da-ink);
 }
-
-/* ── Badge ───────────────────────────────────────────────────────────────────── */
-.step-badge {
+.step-bubble--active .step-bubble__head {
+	color: var(--da-ink);
+}
+.step-bubble__status {
+	width: 14px;
+	height: 14px;
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	font-size: 10.5px;
-	padding: 2px 7px;
-	border-radius: 10px;
-}
-
-.step-badge.active {
-	background: #dbeafe;
-	color: #1d4ed8;
-}
-
-.step-badge.done {
-	background: #dcfce7;
-	color: #15803d;
-}
-
-.badge-dot {
-	width: 5px;
-	height: 5px;
-	background: #2563eb;
-	border-radius: 50%;
-	animation: dotBlink 1s infinite;
-}
-
-@keyframes dotBlink {
-	0%,
-	100% {
-		opacity: 1;
-	}
-	50% {
-		opacity: 0.3;
-	}
-}
-
-/* ── Step content ────────────────────────────────────────────────────────────── */
-.step-content {
-	margin-top: 6px;
-	font-size: 13px;
-	line-height: 1.65;
-	color: #1e293b;
-	min-width: 0;
-	overflow: hidden;
-}
-
-.text-body {
-	white-space: pre-wrap;
-	word-break: break-word;
-}
-
-.is-muted .text-body {
-	color: #94a3b8;
-	font-style: italic;
-}
-
-.report-body {
-	color: #1e293b !important;
-	font-style: normal !important;
-}
-
-.report-brief {
-	display: flex;
-	align-items: center;
-	color: #64748b !important;
-	font-style: normal !important;
-	font-size: 12.5px;
-}
-
-:deep(.tl-code) {
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-	padding: 10px 12px;
-	font-size: 12.5px;
-	overflow-x: auto;
-	white-space: pre;
-	margin: 4px 0 0;
-}
-
-/* ── Markdown inside step content ────────────────────────────────────────────── */
-.md-body :deep(h1),
-.md-body :deep(h2),
-.md-body :deep(h3) {
-	font-weight: 700;
-	margin: 10px 0 4px;
-}
-.md-body :deep(p) {
-	margin-bottom: 6px;
-}
-.md-body :deep(ul),
-.md-body :deep(ol) {
-	padding-left: 18px;
-	margin-bottom: 6px;
-}
-.md-body :deep(code:not(pre code)) {
-	background: #f6f8fa;
-	border: 1px solid #e1e4e8;
-	padding: 1px 5px;
-	border-radius: 3px;
-	font-size: 12px;
-	color: #e83e8c;
-}
-.md-body :deep(table) {
-	width: 100%;
-	border-collapse: collapse;
-	margin: 6px 0;
-	display: block;
-	overflow-x: auto;
-}
-.md-body :deep(thead) {
-	display: table-header-group;
-}
-.md-body :deep(tbody) {
-	display: table-row-group;
-}
-.md-body :deep(tr) {
-	display: table-row;
-	border-top: 1px solid #c6cbd1;
-}
-.md-body :deep(th) {
-	display: table-cell;
-	background: #f1f5f9;
-	padding: 6px 10px;
-	border: 1px solid #e2e8f0;
-	font-weight: 600;
-	font-size: 12px;
-}
-.md-body :deep(td) {
-	display: table-cell;
-	padding: 6px 10px;
-	border: 1px solid #e2e8f0;
-	font-size: 12px;
-}
-
-/* ── Code block with header ─────────────────────────────────────────────────── */
-.md-body :deep(.code-block-wrapper) {
-	margin: 8px 0;
-	border: 1px solid #e1e4e8;
-	border-radius: 6px;
-	overflow: auto;
-	background: #f6f8fa;
-}
-.md-body :deep(.code-block-header) {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	background: #f6f8fa;
-	padding: 4px 10px;
-	border-bottom: 1px solid #e1e4e8;
+	justify-content: center;
 	font-size: 11px;
+	font-weight: 700;
+	color: var(--da-success);
+	flex-shrink: 0;
 }
-.md-body :deep(.code-language) {
-	color: #6a737d;
+.step-bubble--active .step-bubble__status {
+	color: var(--da-primary);
+}
+.step-bubble__pulse {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--da-primary);
+	animation: processPulse 1.2s ease-in-out infinite;
+}
+.step-bubble__label {
+	flex: 1;
+	min-width: 0;
+	font-weight: 500;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+.step-bubble__badge {
+	font-size: 10.5px;
 	font-weight: 600;
-	font-family: 'Monaco', 'Menlo', monospace;
-	font-size: 10px;
-	text-transform: uppercase;
+	color: var(--da-primary);
+	background: color-mix(in srgb, var(--da-primary-soft) 80%, transparent);
+	border-radius: 999px;
+	padding: 1px 6px;
+	flex-shrink: 0;
 }
-.md-body :deep(.code-copy-button) {
-	background: transparent;
-	border: 1px solid #d1d5da;
-	padding: 2px 8px;
-	border-radius: 4px;
-	font-size: 10px;
-	cursor: pointer;
-	transition: all 0.2s;
-	color: #24292e;
+.step-bubble__chevron {
+	opacity: 0.65;
+	flex-shrink: 0;
 }
-.md-body :deep(.code-copy-button:hover) {
-	background: #f3f4f6;
-	border-color: #c6cbd1;
+
+.step-bubble__body {
+	padding: 0 10px 10px 32px;
+	font-size: 12.5px;
+	line-height: 1.55;
+	color: var(--da-ink);
 }
-.md-body :deep(.code-copy-button.copied) {
-	background: #28a745;
-	border-color: #28a745;
-	color: white;
+.step-bubble__brief {
+	color: var(--da-muted);
+	font-size: 12.5px;
 }
-.md-body :deep(pre.hljs) {
+.step-bubble__text :deep(p) {
+	margin: 0 0 6px;
+}
+.step-bubble__code :deep(pre.tl-code),
+.step-bubble__body :deep(pre.tl-code) {
 	margin: 0;
 	padding: 8px 10px;
-	overflow-x: auto;
-	overflow-y: hidden;
-	background: #f6f8fa;
-	font-size: 11px;
-	line-height: 1.35;
-	white-space: pre;
-}
-.md-body :deep(pre.hljs code) {
-	display: block;
-	padding: 0;
-	margin: 0;
-	background: transparent;
-	border: none;
-	font-family: 'Monaco', 'Menlo', monospace;
-	color: inherit;
-	white-space: pre;
-	min-width: max-content;
+	border-radius: 10px;
+	background: color-mix(in srgb, var(--da-surface-soft) 90%, #0f172a);
+	font-size: 11.5px;
+	overflow: auto;
+	max-height: 220px;
 }
 
-/* ── ECharts containers ─────────────────────────────────────────────────────── */
-:deep(.md-echarts) {
-	margin: 8px 0;
-	border-radius: 6px;
+@keyframes processPulse {
+	0%, 100% { opacity: 0.4; }
+	50% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+	.process-chip {
+		max-width: 100%;
+		font-size: 12px;
+	}
+	.step-bubble__body {
+		padding-left: 12px;
+		padding-right: 8px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.process-chip__dot.live,
+	.step-bubble__pulse {
+		animation: none;
+	}
 }
 </style>

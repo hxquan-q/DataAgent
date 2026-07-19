@@ -24,12 +24,14 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
- * Locates executables from the process {@code PATH}.
+ * 从进程的 PATH 环境变量中定位可执行程序，支持 Windows 和 Unix 平台。
  */
 public final class PathExecutableProgramLocator implements ExecutableProgramLocator {
 
+	/** PATH 环境变量值 */
 	private final String pathEnvironment;
 
+	/** 是否为 Windows 操作系统 */
 	private final boolean windows;
 
 	public PathExecutableProgramLocator() {

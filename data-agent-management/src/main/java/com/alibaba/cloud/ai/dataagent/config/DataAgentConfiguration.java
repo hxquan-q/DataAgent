@@ -15,6 +15,7 @@
  */
 package com.alibaba.cloud.ai.dataagent.config;
 
+import com.alibaba.cloud.ai.dataagent.properties.AdminAuthProperties;
 import com.alibaba.cloud.ai.dataagent.properties.CodeExecutorProperties;
 import com.alibaba.cloud.ai.dataagent.properties.DataAgentProperties;
 import com.alibaba.cloud.ai.dataagent.properties.FileStorageProperties;
@@ -78,7 +79,16 @@ import static com.alibaba.cloud.ai.graph.StateGraph.START;
 import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
 
 /**
- * DataAgent的自动配置类
+ * DataAgent 的自动配置类。
+ * <p>
+ * 集中装配 DataAgent 运行所需的全部 Bean：
+ * </p>
+ * <ul>
+ * <li>HTTP 客户端（RestClient / WebClient 超时配置）</li>
+ * <li>NL2SQL 工作流状态图（{@link StateGraph}），定义全部节点与边</li>
+ * <li>向量存储、文本分块、Embedding 批处理等 AI 组件</li>
+ * <li>MCP 工具、ChatClient 等 LLM 交互组件</li>
+ * </ul>
  *
  * @author vlsmb
  * @since 2025/9/28
@@ -86,14 +96,21 @@ import static com.alibaba.cloud.ai.graph.action.AsyncEdgeAction.edge_async;
 @Slf4j
 @Configuration
 @EnableAsync
-@EnableConfigurationProperties({ CodeExecutorProperties.class, DataAgentProperties.class, FileStorageProperties.class })
+@EnableConfigurationProperties({ CodeExecutorProperties.class, DataAgentProperties.class, FileStorageProperties.class,
+		AdminAuthProperties.class })
 public class DataAgentConfiguration implements DisposableBean {
 
 	/**
-	 * 专用线程池，用于数据库操作的并行处理
+	 * 专用线程池，用于数据库操作的并行处理（如多表 Schema 召回）。
 	 */
 	private ExecutorService dbOperationExecutor;
 
+	/**
+	 * 自定义 RestClient 超时配置。
+	 * @param connectTimeout 连接超时（秒），默认 600
+	 * @param readTimeout 读取超时（秒），默认 600
+	 * @return RestClientCustomizer
+	 */
 	@Bean
 	@ConditionalOnMissingBean(RestClientCustomizer.class)
 	public RestClientCustomizer restClientCustomizer(@Value("${rest.connect.timeout:600}") long connectTimeout,
@@ -105,6 +122,11 @@ public class DataAgentConfiguration implements DisposableBean {
 			}).build());
 	}
 
+	/**
+	 * 自定义 WebClient 超时配置（用于流式 LLM 调用）。
+	 * @param responseTimeout 响应超时（秒），默认 600
+	 * @return WebClient.Builder
+	 */
 	@Bean
 	@ConditionalOnMissingBean(WebClient.Builder.class)
 	public WebClient.Builder webClientBuilder(@Value("${webclient.response.timeout:600}") long responseTimeout) {
@@ -114,7 +136,19 @@ public class DataAgentConfiguration implements DisposableBean {
 					HttpClient.create().responseTimeout(Duration.ofSeconds(responseTimeout))));
 	}
 
+	/**
+	 * 构建 NL2SQL 工作流状态图。
+	 * <p>
+	 * 定义 DataAgent 从用户输入到生成最终报告的完整流程， 包含意图识别、Schema 召回、SQL 生成/执行、Python 分析、报告生成等节点，
+	 * 以及节点间的条件路由（Dispatcher）。
+	 * </p>
+	 * @param nodeBeanUtil 节点工具类（将节点实例转为 Graph 节点）
+	 * @param codeExecutorProperties Python 执行器配置（用于重试控制）
+	 * @return 工作流状态图
+	 * @throws GraphStateException 图构建异常
+	 */
 	@Bean
+	@org.springframework.context.annotation.Primary
 	public StateGraph nl2sqlGraph(NodeBeanUtil nodeBeanUtil, CodeExecutorProperties codeExecutorProperties)
 			throws GraphStateException {
 
@@ -178,6 +212,9 @@ public class DataAgentConfiguration implements DisposableBean {
 			keyStrategyHashMap.put(TRACE_THREAD_ID, KeyStrategy.REPLACE);
 			// Final result
 			keyStrategyHashMap.put(RESULT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_HEAL_ERRORS, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(CHART_IMAGE_MAP, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(RESULT_SANITY_RETRY, KeyStrategy.REPLACE);
 			return keyStrategyHashMap;
 		};
 
@@ -258,6 +295,100 @@ public class DataAgentConfiguration implements DisposableBean {
 				"workflow graph");
 
 		log.info("workflow in PlantUML format as follows \n\n" + graphRepresentation.content() + "\n\n");
+
+		return stateGraph;
+	}
+
+	/**
+	 * 构建 v0.2 语义层工作流状态图（NL2Semantic2SQL，双 Graph opt-in）。
+	 * <p>
+	 * 与 {@link #nl2sqlGraph} 相互独立，不修改既有 NL2SQL 图。拓扑：
+	 * </p>
+	 * <pre>
+	 *   START → SEMANTIC_PARSE_NODE
+	 *         → (SemanticParseDispatcher, 返回 "build_sql_node") → BUILD_SQL_NODE
+	 *         → (BuildSQLDispatcher, 返回 HUMAN_FEEDBACK_NODE / SQL_EXECUTE_NODE / END)
+	 *              ├─ HUMAN_FEEDBACK_NODE（人工反馈/反问）
+	 *              ├─ SQL_EXECUTE_NODE → REPORT_GENERATOR_NODE → END
+	 *              └─ END
+	 * </pre>
+	 * <p>
+	 * 复用既有 {@code SqlExecuteNode} / {@code ReportGeneratorNode} /
+	 * {@code HumanFeedbackNode}， 新增 {@link SemanticParseNode} 与 {@link BuildSQLNode} 两个
+	 * v0.2 节点。Dispatcher 返回值对齐： {@link SemanticParseDispatcher} 返回
+	 * {@code BUILD_SQL_NODE}（{@code "build_sql_node"}）； {@link BuildSQLDispatcher} 返回
+	 * {@code HUMAN_FEEDBACK_NODE} / {@code SQL_EXECUTE_NODE} / {@code StateGraph.END}。
+	 * </p>
+	 * <p>
+	 * KeyStrategy 在既有键集合基础上补齐 v0.2 语义层状态键（全部 REPLACE 策略）：
+	 * {@link SemanticParseNode#SEMANTIC_OBJECT}、{@link BuildSQLNode#CONTROLLED_SQL}、
+	 * {@link BuildSQLNode#SQL_PARAMS}、{@link BuildSQLNode#NEEDS_CLARIFICATION}、
+	 * {@link BuildSQLNode#CLARIFICATION_MESSAGE}。
+	 * </p>
+	 * @param nodeBeanUtil 节点工具类（将节点实例转为 Graph 节点）
+	 * @return v0.2 语义层工作流状态图
+	 * @throws GraphStateException 图构建异常
+	 */
+	@Bean(name = "nl2sqlSemanticGraph")
+	public StateGraph nl2sqlSemanticGraph(NodeBeanUtil nodeBeanUtil) throws GraphStateException {
+
+		KeyStrategyFactory semanticKeyStrategyFactory = () -> {
+			HashMap<String, KeyStrategy> keyStrategyHashMap = new HashMap<>();
+			// 基础与上下文（与 nl2sqlGraph 对齐）
+			keyStrategyHashMap.put(INPUT_KEY, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(AGENT_ID, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(DATASOURCE_ID, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(MULTI_TURN_CONTEXT, KeyStrategy.REPLACE);
+			// 数据库方言（SqlExecuteNode 需要）
+			keyStrategyHashMap.put(DB_DIALECT_TYPE, KeyStrategy.REPLACE);
+			// SQL 执行 / 最终结果 / 报告相关
+			keyStrategyHashMap.put(SQL_EXECUTE_NODE_OUTPUT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_GENERATE_OUTPUT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_REGENERATE_REASON, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_GENERATE_COUNT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(RESULT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(CHART_IMAGE_MAP, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(SQL_RESULT_LIST_MEMORY, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(RESULT_SANITY_RETRY, KeyStrategy.REPLACE);
+			// Human Review / 反馈
+			keyStrategyHashMap.put(HUMAN_REVIEW_ENABLED, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(HUMAN_FEEDBACK_DATA, KeyStrategy.REPLACE);
+			// Langfuse 追踪
+			keyStrategyHashMap.put(TRACE_THREAD_ID, KeyStrategy.REPLACE);
+			// v0.2 语义层状态键（η₁/η₂ 产物 + 反问控制）
+			keyStrategyHashMap.put(SemanticParseNode.SEMANTIC_OBJECT, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(BuildSQLNode.CONTROLLED_SQL, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(BuildSQLNode.SQL_PARAMS, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(BuildSQLNode.NEEDS_CLARIFICATION, KeyStrategy.REPLACE);
+			keyStrategyHashMap.put(BuildSQLNode.CLARIFICATION_MESSAGE, KeyStrategy.REPLACE);
+			return keyStrategyHashMap;
+		};
+
+		StateGraph stateGraph = new StateGraph(NL2SQL_SEMANTIC_GRAPH_NAME, semanticKeyStrategyFactory)
+			// v0.2 新增节点
+			.addNode(SEMANTIC_PARSE_NODE, nodeBeanUtil.getNodeBeanAsync(SemanticParseNode.class))
+			.addNode(BUILD_SQL_NODE, nodeBeanUtil.getNodeBeanAsync(BuildSQLNode.class))
+			// 复用既有节点
+			.addNode(SQL_EXECUTE_NODE, nodeBeanUtil.getNodeBeanAsync(SqlExecuteNode.class))
+			.addNode(REPORT_GENERATOR_NODE, nodeBeanUtil.getNodeBeanAsync(ReportGeneratorNode.class))
+			.addNode(HUMAN_FEEDBACK_NODE, nodeBeanUtil.getNodeBeanAsync(HumanFeedbackNode.class));
+
+		stateGraph.addEdge(START, SEMANTIC_PARSE_NODE)
+			// SemanticParseDispatcher 恒返回 BUILD_SQL_NODE（"build_sql_node"）
+			.addConditionalEdges(SEMANTIC_PARSE_NODE, edge_async(new SemanticParseDispatcher()),
+					Map.of(BUILD_SQL_NODE, BUILD_SQL_NODE))
+			// BuildSQLDispatcher 返回 HUMAN_FEEDBACK_NODE / SQL_EXECUTE_NODE / END
+			.addConditionalEdges(BUILD_SQL_NODE, edge_async(new BuildSQLDispatcher()),
+					Map.of(HUMAN_FEEDBACK_NODE, HUMAN_FEEDBACK_NODE, SQL_EXECUTE_NODE, SQL_EXECUTE_NODE, END, END))
+			// SQL 执行 → 报告 → 结束
+			.addEdge(SQL_EXECUTE_NODE, REPORT_GENERATOR_NODE)
+			.addEdge(REPORT_GENERATOR_NODE, END);
+
+		GraphRepresentation semanticGraphRepresentation = stateGraph.getGraph(GraphRepresentation.Type.PLANTUML,
+				"semantic workflow graph");
+
+		log.info("semantic workflow in PlantUML format as follows \n\n" + semanticGraphRepresentation.content()
+				+ "\n\n");
 
 		return stateGraph;
 	}

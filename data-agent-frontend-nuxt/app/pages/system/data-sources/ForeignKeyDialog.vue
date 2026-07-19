@@ -27,7 +27,7 @@
 			>
 				<div class="d-flex align-center">
 					<v-icon color="primary" class="mr-3">mdi-relation-one-to-many</v-icon>
-					<span class="font-weight-bold"
+					<span class="font-weight-medium"
 						>逻辑外键配置 - {{ datasourceName }}</span
 					>
 				</div>
@@ -41,14 +41,14 @@
 
 			<v-card-text class="pa-6">
 				<div class="mb-8">
-					<div class="text-overline text-grey-darken-1 mb-2">
+					<div class="text-overline text-medium-emphasis mb-2">
 						已生效的关系列表
 					</div>
 					<v-table
 						density="comfortable"
 						class="border rounded-lg overflow-hidden"
 					>
-						<thead class="bg-grey-lighten-4">
+						<thead class="bg-primary-soft">
 							<tr>
 								<th class="text-left">主表 (Source)</th>
 								<th class="text-center">关系</th>
@@ -59,7 +59,7 @@
 						<tbody>
 							<tr v-for="(fk, index) in relations" :key="index">
 								<td>
-									<div class="font-weight-bold text-blue-darken-2">
+									<div class="font-weight-bold text-primary">
 										{{ fk.sourceTableName }}
 									</div>
 									<div class="text-caption text-grey">
@@ -68,12 +68,12 @@
 								</td>
 								<td class="text-center">
 									<v-icon size="16" color="grey">mdi-link-variant</v-icon>
-									<div class="text-caption font-weight-bold text-grey-darken-2">
+									<div class="text-caption font-weight-medium text-medium-emphasis">
 										{{ fk.relationType }}
 									</div>
 								</td>
 								<td>
-									<div class="font-weight-bold text-green-darken-2">
+									<div class="font-weight-bold text-success">
 										{{ fk.targetTableName }}
 									</div>
 									<div class="text-caption text-grey">
@@ -100,7 +100,7 @@
 					</v-table>
 				</div>
 
-				<div class="bg-blue-grey-lighten-5 pa-5 rounded-lg border">
+				<div class="bg-primary-soft pa-5 rounded-lg border">
 					<v-row dense>
 						<v-col cols="12" md="5">
 							<v-select
@@ -126,7 +126,7 @@
 							/>
 						</v-col>
 						<v-col cols="12" md="2" class="d-flex align-center justify-center">
-							<v-icon color="grey-lighten-1" size="32"
+							<v-icon color="grey" size="32"
 								>mdi-arrow-right-bold</v-icon
 							>
 						</v-col>

@@ -15,6 +15,17 @@
  */
 package com.alibaba.cloud.ai.dataagent.dto.datasource;
 
+/**
+ * SQL 重试 DTO
+ *
+ * <p>
+ * 表示 SQL 执行失败后的重试上下文，区分语义校验失败和执行失败两种场景。 采用 record 形式定义不可变数据，并提供工厂方法快速构造。
+ * </p>
+ *
+ * @param reason 失败原因描述
+ * @param semanticFail 是否为语义校验失败
+ * @param sqlExecuteFail 是否为 SQL 执行失败
+ */
 public record SqlRetryDto(String reason, boolean semanticFail, boolean sqlExecuteFail) {
 
 	public static SqlRetryDto semantic(String reason) {

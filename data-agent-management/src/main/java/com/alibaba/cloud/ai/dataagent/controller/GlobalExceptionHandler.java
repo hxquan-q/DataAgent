@@ -31,6 +31,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+	/**
+	 * 处理输入参数校验异常（400 Bad Request）。
+	 * @param e 异常对象
+	 * @return 包含错误信息的统一响应
+	 */
 	@ExceptionHandler(InvalidInputException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ApiResponse<Object> handleInvalidInputException(InvalidInputException e) {
@@ -38,6 +43,11 @@ public class GlobalExceptionHandler {
 		return ApiResponse.error(e.getMessage(), e.getData());
 	}
 
+	/**
+	 * 处理服务端内部异常（500 Internal Server Error）。
+	 * @param e 异常对象
+	 * @return 包含错误信息的统一响应
+	 */
 	@ExceptionHandler(InternalServerException.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ApiResponse<Object> handleInternalServerException(InternalServerException e) {
@@ -45,6 +55,11 @@ public class GlobalExceptionHandler {
 		return ApiResponse.error(e.getMessage());
 	}
 
+	/**
+	 * 兜底处理未捕获的异常（500 Internal Server Error）。
+	 * @param e 异常对象
+	 * @return 统一错误响应
+	 */
 	@ExceptionHandler(Exception.class)
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	public ApiResponse<Object> handleGenericException(Exception e) {

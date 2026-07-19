@@ -43,7 +43,10 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * Semantic Model Configuration Controller
+ * 语义模型配置控制器。
+ * <p>
+ * 管理语义模型（字段含义描述、表用途说明等）， 用于增强 NL2SQL 时 LLM 对数据库 Schema 的语义理解。 支持 Excel 模板下载、批量导入等操作。
+ * </p>
  */
 @Slf4j
 @RestController

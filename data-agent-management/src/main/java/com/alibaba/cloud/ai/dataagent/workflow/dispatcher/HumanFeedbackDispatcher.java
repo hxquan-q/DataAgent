@@ -22,17 +22,31 @@ import static com.alibaba.cloud.ai.dataagent.constant.Constant.HUMAN_FEEDBACK_NO
 import static com.alibaba.cloud.ai.graph.StateGraph.END;
 
 /**
- * Dispatcher for human feedback node routing.
+ * 人工反馈分发器，根据人工反馈节点的处理结果决定下一个执行节点。
+ *
+ * <p>
+ * 路由规则：
+ * <ul>
+ * <li>等待反馈状态（WAIT_FOR_FEEDBACK）：返回人工反馈节点以暂停图执行</li>
+ * <li>其他状态：按人工反馈节点设置的下一个节点路由</li>
+ * </ul>
+ * </p>
  *
  * @author Makoto
  */
 public class HumanFeedbackDispatcher implements EdgeAction {
 
+	/**
+	 * 根据人工反馈结果决定下一个节点。
+	 * @param state 工作流全局状态，包含人工反馈路由信息
+	 * @return 下一个节点名称
+	 * @throws Exception 读取状态时可能抛出的异常
+	 */
 	@Override
 	public String apply(OverAllState state) throws Exception {
 		String nextNode = (String) state.value("human_next_node", END);
 
-		// 如果是等待反馈状态，返回END让图暂停
+		// 如果是等待反馈状态，返回人工反馈节点让图暂停
 		if ("WAIT_FOR_FEEDBACK".equals(nextNode)) {
 			return HUMAN_FEEDBACK_NODE;
 		}

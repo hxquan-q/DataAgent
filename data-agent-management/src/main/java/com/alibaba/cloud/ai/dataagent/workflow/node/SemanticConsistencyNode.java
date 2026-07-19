@@ -36,15 +36,22 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 import static com.alibaba.cloud.ai.dataagent.util.PlanProcessUtil.getCurrentExecutionStepInstruction;
 import static com.alibaba.cloud.ai.dataagent.prompt.PromptHelper.buildMixMacSqlDbPrompt;
+import com.alibaba.cloud.ai.dataagent.prompt.PromptHelper;
 
 /**
- * Semantic consistency validation node that checks SQL query semantic consistency.
+ * 语义一致性校验节点，位于 SQL 生成之后、SQL 执行之前。
  *
- * This node is responsible for: - Validating SQL query semantic consistency against
- * schema and evidence - Providing validation results for query refinement - Handling
- * validation failures with recommendations - Managing step progression in execution plan
+ * <p>
+ * 该节点负责校验生成的 SQL 查询在语义上是否与 Schema 和证据信息一致。 校验结果决定后续路由：
+ * <ul>
+ * <li>校验通过：进入 SQL 执行节点（{@code SqlExecuteNode}）</li>
+ * <li>校验未通过：返回 SQL 生成节点重新生成</li>
+ * </ul>
+ * </p>
  *
  * @author zhangshenghang
+ * @see SqlGenerateNode
+ * @see SqlExecuteNode
  */
 @Slf4j
 @Component
@@ -53,34 +60,48 @@ public class SemanticConsistencyNode implements NodeAction {
 
 	private final Nl2SqlService nl2SqlService;
 
+	/**
+	 * 执行语义一致性校验逻辑。
+	 * <p>
+	 * 获取证据信息、Schema、SQL 语句和用户查询，调用 NL2SQL 服务进行语义一致性校验， 最终将校验结果写入状态。
+	 * </p>
+	 * @param state 工作流全局状态
+	 * @return 包含校验结果的 Map，key 为 {@value SEMANTIC_CONSISTENCY_NODE_OUTPUT}
+	 * @throws Exception 校验过程中可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
-		// Get necessary input parameters
+		// 获取必要的输入参数
 		String evidence = StateUtil.getStringValue(state, EVIDENCE);
 		SchemaDTO schemaDTO = StateUtil.getObjectValue(state, TABLE_RELATION_OUTPUT, SchemaDTO.class);
 		String dialect = StateUtil.getStringValue(state, DB_DIALECT_TYPE);
-		// Get current execution step and SQL query
+		// 获取当前执行步骤和 SQL 查询
 		String sql = StateUtil.getStringValue(state, SQL_GENERATE_OUTPUT);
 		String userQuery = StateUtil.getCanonicalQuery(state);
 
+		// 构建语义一致性校验参数对象
+		// R36: 语义一致性入参有界（PromptHelper 出口 + 节点双保险）
 		SemanticConsistencyDTO semanticConsistencyDTO = SemanticConsistencyDTO.builder()
 			.dialect(dialect)
-			.sql(sql)
-			.executionDescription(getCurrentExecutionStepInstruction(state))
-			.schemaInfo(buildMixMacSqlDbPrompt(schemaDTO, true))
-			.userQuery(userQuery)
-			.evidence(evidence)
+			.sql(PromptHelper.boundErrorSql(sql))
+			.executionDescription(PromptHelper.boundQuery(getCurrentExecutionStepInstruction(state)))
+			.schemaInfo(PromptHelper.boundKnowledge(buildMixMacSqlDbPrompt(schemaDTO, true)))
+			.userQuery(PromptHelper.boundQuery(userQuery))
+			.evidence(PromptHelper.boundEvidence(evidence))
 			.build();
-		log.info("Starting semantic consistency validation - SQL: {}", sql);
+		log.info("开始语义一致性校验 - SQL: {}", sql);
+		// 调用 NL2SQL 服务执行语义一致性校验
 		Flux<ChatResponse> validationResultFlux = nl2SqlService.performSemanticConsistency(semanticConsistencyDTO);
 
+		// 创建流式生成器，解析校验结果
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGeneratorWithMessages(this.getClass(),
 				state, "开始语义一致性校验", "语义一致性校验完成", validationResult -> {
+					// 校验结果以"不通过"开头表示未通过
 					boolean isPassed = !validationResult.startsWith("不通过");
 					Map<String, Object> result = buildValidationResult(isPassed, validationResult);
-					log.info("[{}] Semantic consistency validation result: {}, passed: {}",
-							this.getClass().getSimpleName(), validationResult, isPassed);
+					log.info("[{}] 语义一致性校验结果: {}, 是否通过: {}", this.getClass().getSimpleName(), validationResult,
+							isPassed);
 					return result;
 				}, validationResultFlux);
 
@@ -88,7 +109,10 @@ public class SemanticConsistencyNode implements NodeAction {
 	}
 
 	/**
-	 * Build validation result
+	 * 构建语义一致性校验结果 Map。
+	 * @param passed 校验是否通过
+	 * @param validationResult 校验结果描述
+	 * @return 校验结果 Map；通过时仅包含通过标志，未通过时还包含重试原因
 	 */
 	private Map<String, Object> buildValidationResult(boolean passed, String validationResult) {
 		if (passed) {

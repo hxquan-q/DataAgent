@@ -22,23 +22,33 @@ import com.alibaba.cloud.ai.dataagent.enums.BizDataSourceTypeEnum;
 import org.springframework.stereotype.Service;
 
 /**
+ * SQL Server 数据库访问器，支持 SQL Server 数据源的元数据查询和 SQL 执行。
+ *
  * @author zihen
  * @date 2025/12/14 17:34
  */
 @Service("sqlserverAccessor")
 public class SqlServerDBAccessor extends AbstractAccessor {
 
+	/** 访问器类型标识 */
 	private final static String ACCESSOR_TYPE = "SqlServer_Accessor";
 
+	/**
+	 * 构造函数，注入 DDL 工厂和连接池工厂。
+	 * @param ddlFactory DDL 执行器工厂
+	 * @param poolFactory 连接池工厂
+	 */
 	public SqlServerDBAccessor(DdlFactory ddlFactory, DBConnectionPoolFactory poolFactory) {
 		super(ddlFactory, poolFactory.getPoolByDbType(BizDataSourceTypeEnum.SQL_SERVER.getTypeName()));
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public String getAccessorType() {
 		return ACCESSOR_TYPE;
 	}
 
+	/** {@inheritDoc} */
 	@Override
 	public boolean supportedDataSourceType(String type) {
 		return BizDataSourceTypeEnum.SQL_SERVER.getTypeName().equalsIgnoreCase(type);

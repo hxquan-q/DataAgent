@@ -22,8 +22,8 @@
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
@@ -32,7 +32,7 @@
 					刷新
 				</v-btn>
 				<v-btn
-					color="blue-darken-1"
+					color="primary"
 					prepend-icon="mdi-upload"
 					class="text-none px-6"
 					elevation="0"
@@ -41,7 +41,7 @@
 					批量导入
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -52,7 +52,7 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg mb-4 pa-4">
+		<v-card variant="flat" border class="rounded-lg mb-3 pa-3 da-toolbar">
 			<div class="d-flex flex-wrap ga-3 align-center">
 				<v-text-field
 					v-model="searchKeyword"
@@ -70,7 +70,7 @@
 				<v-btn
 					v-if="selectedModelIds.length > 0"
 					variant="tonal"
-					color="red-darken-1"
+					color="error"
 					prepend-icon="mdi-delete"
 					class="text-none"
 					@click="batchDeleteModels"
@@ -79,7 +79,7 @@
 				</v-btn>
 				<v-spacer />
 				<v-chip
-					color="blue-lighten-5"
+					color="primary"
 					variant="flat"
 					class="font-weight-medium"
 				>
@@ -140,14 +140,14 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="blue-darken-1"
+							color="primary"
 							icon="mdi-pencil"
 							@click="editModel(item)"
 						/>
 						<v-btn
 							size="small"
 							variant="text"
-							:color="item.status === 1 ? 'orange-darken-1' : 'success'"
+							:color="item.status === 1 ? 'warning' : 'success'"
 							:icon="item.status === 1 ? 'mdi-pause-circle' : 'mdi-play-circle'"
 							@click="toggleStatus(item, item.status === 1 ? 0 : 1)"
 						>
@@ -158,7 +158,7 @@
 						<v-btn
 							size="small"
 							variant="text"
-							color="red-darken-1"
+							color="error"
 							icon="mdi-delete"
 							@click="deleteModel(item)"
 						/>
@@ -166,19 +166,14 @@
 				</template>
 
 				<template #no-data>
-					<div class="d-flex flex-column align-center py-12">
-						<v-icon
-							icon="mdi-vector-intersection"
-							size="64"
-							color="blue-lighten-3"
-							class="mb-4"
-						/>
-						<p class="text-body-1 text-medium-emphasis mb-2">暂无语义模型</p>
-						<p class="text-body-2 text-disabled mb-6">
-							点击「添加语义模型」开始配置字段语义映射
-						</p>
+					<div class="d-flex flex-column align-center py-12 da-empty">
+						<div class="da-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-vector-intersection" size="26" color="primary" />
+						</div>
+						<h3 class="da-empty__title">暂无语义模型</h3>
+						<p class="da-empty__desc">点击「添加语义模型」开始配置字段语义映射</p>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-plus"
 							class="text-none"
 							elevation="0"
@@ -193,14 +188,14 @@
 
 		<v-dialog v-model="dialogVisible" max-width="760" persistent>
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						:icon="isEdit ? 'mdi-pencil-circle' : 'mdi-plus-circle'"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">{{
+					<span class="text-h6 font-weight-medium dialog-title">{{
 						isEdit ? '编辑语义模型' : '添加语义模型'
 					}}</span>
 					<v-spacer />
@@ -213,12 +208,12 @@
 				</v-card-title>
 				<v-divider />
 
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-form ref="formRef">
 						<v-row>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									表名 <span class="text-error">*</span>
 								</p>
@@ -233,7 +228,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									字段名 <span class="text-error">*</span>
 								</p>
@@ -248,7 +243,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									业务名称 <span class="text-error">*</span>
 								</p>
@@ -263,7 +258,7 @@
 							</v-col>
 							<v-col cols="12" md="6">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									数据类型 <span class="text-error">*</span>
 								</p>
@@ -278,7 +273,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									同义词
 								</p>
@@ -293,7 +288,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									业务描述
 								</p>
@@ -308,7 +303,7 @@
 							</v-col>
 							<v-col cols="12">
 								<p
-									class="text-body-2 font-weight-medium text-grey-darken-2 mb-2"
+									class="text-body-2 font-weight-medium text-medium-emphasis mb-2"
 								>
 									字段注释
 								</p>
@@ -331,7 +326,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="blue-darken-3"
+						color="primary"
 						class="text-none px-6"
 						elevation="0"
 						:loading="saveLoading"
@@ -345,14 +340,14 @@
 
 		<v-dialog v-model="batchImportDialogVisible" max-width="760">
 			<v-card rounded="lg">
-				<v-card-title class="d-flex align-center pa-6 pb-4">
+				<v-card-title class="d-flex align-center pa-5 pb-3">
 					<v-icon
 						icon="mdi-upload"
-						color="blue-darken-2"
+						color="primary"
 						class="mr-3"
 						size="28"
 					/>
-					<span class="text-h6 font-weight-bold">批量导入语义模型</span>
+					<span class="text-h6 font-weight-medium dialog-title">批量导入语义模型</span>
 					<v-spacer />
 					<v-btn
 						icon="mdi-close"
@@ -362,7 +357,7 @@
 					/>
 				</v-card-title>
 				<v-divider />
-				<v-card-text class="pa-6">
+				<v-card-text class="pa-5">
 					<v-file-input
 						v-model="importFile"
 						label="上传 Excel 文件"
@@ -376,7 +371,7 @@
 					<div class="d-flex ga-2 mt-4">
 						<v-btn
 							variant="tonal"
-							color="blue-darken-1"
+							color="primary"
 							prepend-icon="mdi-download"
 							class="text-none"
 							@click="downloadExcelTemplate"
@@ -384,7 +379,7 @@
 							下载模板
 						</v-btn>
 						<v-btn
-							color="blue-darken-3"
+							color="primary"
 							prepend-icon="mdi-upload"
 							class="text-none"
 							elevation="0"

@@ -18,12 +18,12 @@
 	<section class="page-shell">
 		<KnowledgePageHeader
 			title="新建智能体"
-			subtitle="创建你的专属数据分析智能体，统一接入知识、提示词和语义能力。"
+			subtitle="创建后将引导绑定数据源。建议先在「模型服务」配置并激活 CHAT 模型。"
 		>
 			<template #actions>
 				<v-btn
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					variant="outlined"
 					prepend-icon="mdi-arrow-left"
 					@click="goBack"
@@ -31,7 +31,7 @@
 					返回列表
 				</v-btn>
 				<v-btn
-					color="blue-darken-3"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -43,14 +43,21 @@
 			</template>
 		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg pa-6">
+		<v-alert type="info" variant="tonal" class="mb-4 agent-create-alert" density="comfortable">
+			<span class="text-body-2">创建前建议：先</span>
+			<a class="text-primary text-decoration-none font-weight-medium" href="/system/model-config">配置 CHAT 模型</a>
+			<span class="text-body-2">；创建后将引导绑定数据源。</span>
+		</v-alert>
+
+
+		<v-card variant="flat" border class="rounded-lg pa-5 agent-create-card">
 			<v-form ref="formRef">
 				<div class="mb-6">
-					<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+					<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 						头像设置
 					</p>
 					<div class="d-flex align-center ga-4 flex-wrap">
-						<v-avatar size="88" rounded="lg" class="avatar-preview">
+						<v-avatar size="72" rounded="lg" class="avatar-preview">
 							<v-img :src="agentForm.avatar" cover @error="handleImageError" />
 						</v-avatar>
 						<div class="d-flex ga-2">
@@ -84,7 +91,7 @@
 
 				<v-row>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							智能体名称 <span class="text-error">*</span>
 						</p>
 						<v-text-field
@@ -97,7 +104,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							分类 <span class="text-error">*</span>
 						</p>
 						<v-text-field
@@ -110,7 +117,7 @@
 						/>
 					</v-col>
 					<v-col cols="12">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							描述
 						</p>
 						<v-textarea
@@ -123,7 +130,7 @@
 						/>
 					</v-col>
 					<v-col cols="12">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							智能体 Prompt
 						</p>
 						<v-textarea
@@ -136,7 +143,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							标签 <span class="text-error">*</span>
 						</p>
 						<v-text-field
@@ -149,7 +156,7 @@
 						/>
 					</v-col>
 					<v-col cols="12" md="6">
-						<p class="text-body-2 font-weight-medium text-grey-darken-2 mb-2">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
 							状态
 						</p>
 						<v-select
@@ -160,6 +167,21 @@
 							variant="outlined"
 							density="compact"
 							hide-details="auto"
+						/>
+					</v-col>
+					<v-col cols="12" md="6">
+						<p class="text-body-2 font-weight-medium text-medium-emphasis mb-2">
+							工作流模式
+						</p>
+						<v-select
+							v-model="agentForm.workflowMode"
+							:items="workflowModeOptions"
+							item-title="label"
+							item-value="value"
+							variant="outlined"
+							density="compact"
+							hint="语义层模式下，LLM 从已定义指标中受控选择并拼装 SQL（需先配置指标）"
+							persistent-hint
 						/>
 					</v-col>
 				</v-row>
@@ -186,6 +208,11 @@ const statusOptions = [
 	{ label: '已下线', value: 'offline' },
 ];
 
+const workflowModeOptions = [
+	{ label: 'NL2SQL 自由生成', value: 'nl2sql' },
+	{ label: '语义层受控拼装', value: 'semantic' },
+];
+
 const agentForm = reactive({
 	name: '',
 	description: '',
@@ -193,7 +220,8 @@ const agentForm = reactive({
 	category: '',
 	tags: '',
 	prompt: '',
-	status: 'draft',
+	status: 'published',
+	workflowMode: 'nl2sql',
 	humanReviewEnabled: false,
 });
 
@@ -280,13 +308,24 @@ async function createAgent() {
 			tags: agentForm.tags.trim(),
 			prompt: agentForm.prompt.trim(),
 			status: agentForm.status,
+			workflowMode: agentForm.workflowMode,
 			humanReviewEnabled: agentForm.humanReviewEnabled ? 1 : 0,
 		};
 		const result = await agentService.create(payload);
+		// R161: 先引导绑定数据源，再进问答（避免空模型/空 DS 直接聊天）
 		$tip(
-			`智能体创建成功！状态：${payload.status === 'published' ? '已发布' : '草稿'}`,
+			`智能体创建成功（${payload.status === 'published' ? '已发布' : '草稿'}）。请绑定并激活数据源，然后进入数据问答。`,
+			{ icon: 'mdi-check-circle', color: 'success' },
 		);
-		await router.push({ path: '/chat', query: { agentId: result.id } });
+		const id = result?.id;
+		if (id != null) {
+			await router.push({
+				path: '/system/data-sources',
+				query: { agentId: String(id) },
+			});
+		} else {
+			await router.push('/system/agents');
+		}
 	} catch {
 		$tip('创建失败，请重试', { color: 'error', icon: 'mdi-alert-circle' });
 	} finally {
@@ -300,11 +339,42 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.page-shell {
-	padding: 32px;
+.agent-create-card {
+	box-shadow: none !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 48%, transparent) !important;
+	background: var(--da-surface) !important;
+	border-radius: 14px !important;
+}
+
+.agent-create-alert {
+	border-radius: 12px !important;
+	box-shadow: none !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-info) 22%, transparent) !important;
+}
+
+.agent-create-card :deep(.text-body-2.font-weight-medium) {
+	font-size: 11.5px !important;
+	font-weight: 600 !important;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: var(--da-muted) !important;
+}
+
+.agent-create-card :deep(.v-field) {
+	border-radius: 10px !important;
+}
+
+.agent-create-card :deep(.v-btn) {
+	border-radius: 10px !important;
+	text-transform: none !important;
+	letter-spacing: 0 !important;
+	font-weight: 500 !important;
 }
 
 .avatar-preview {
-	border: 2px solid #e5e7eb;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent);
+	box-shadow: none;
+	background: var(--da-surface-soft);
+	border-radius: 12px !important;
 }
 </style>

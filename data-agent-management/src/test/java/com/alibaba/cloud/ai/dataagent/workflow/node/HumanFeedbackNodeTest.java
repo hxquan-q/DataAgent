@@ -125,7 +125,7 @@ class HumanFeedbackNodeTest {
 
 		Map<String, Object> result = humanFeedbackNode.apply(state);
 
-		assertEquals("Plan rejected by user", result.get(PLAN_VALIDATION_ERROR));
+		assertEquals("用户拒绝了计划", result.get(PLAN_VALIDATION_ERROR));
 	}
 
 	@Test

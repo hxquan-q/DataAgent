@@ -1,0 +1,182 @@
+[
+  {
+    "id": "g001",
+    "category": "SIMPLE",
+    "question": "本月订单总金额",
+    "expectedMetricCode": "order_amount",
+    "expectedSqlPattern": "SUM(total_amount)",
+    "expectedNeedsClarification": false,
+    "description": "简单指标聚合：标准指标 order_amount 的 SUM(total_amount) 口径，默认 completed 版本"
+  },
+  {
+    "id": "g002",
+    "category": "SIMPLE",
+    "question": "订单总数是多少",
+    "expectedMetricCode": "order_count",
+    "expectedSqlPattern": "COUNT",
+    "expectedNeedsClarification": false,
+    "description": "简单指标聚合：标准指标 order_count 的 COUNT(id) 口径"
+  },
+  {
+    "id": "g003",
+    "category": "SIMPLE",
+    "question": "商品数量有多少",
+    "expectedMetricCode": "product_count",
+    "expectedSqlPattern": "COUNT",
+    "expectedNeedsClarification": false,
+    "description": "简单指标聚合：标准指标 product_count 的 COUNT(id) 口径"
+  },
+  {
+    "id": "g004",
+    "category": "SIMPLE",
+    "question": "注册用户数",
+    "expectedMetricCode": "user_count",
+    "expectedSqlPattern": "COUNT",
+    "expectedNeedsClarification": false,
+    "description": "简单指标聚合：标准指标 user_count 的 COUNT(id) 口径"
+  },
+  {
+    "id": "g005",
+    "category": "MEDIUM",
+    "question": "最近3个月各状态订单金额",
+    "expectedMetricCode": "order_amount",
+    "expectedSqlPattern": "GROUP BY status",
+    "expectedNeedsClarification": false,
+    "description": "维度+过滤：按 status 维度分组聚合 order_amount，含最近 3 个月时间过滤"
+  },
+  {
+    "id": "g006",
+    "category": "MEDIUM",
+    "question": "商品销量TOP10",
+    "expectedMetricCode": "item_quantity",
+    "expectedSqlPattern": "SUM(quantity)",
+    "expectedNeedsClarification": false,
+    "description": "维度+过滤+排序：item_quantity 按 SUM(quantity) 倒序取前 10"
+  },
+  {
+    "id": "g007",
+    "category": "MEDIUM",
+    "question": "客单价趋势",
+    "expectedMetricCode": "avg_order_amount",
+    "expectedSqlPattern": "AVG(total_amount)",
+    "expectedNeedsClarification": false,
+    "description": "维度+时间序列：avg_order_amount 按 order_date 维度做 AVG(total_amount) 趋势"
+  },
+  {
+    "id": "g008",
+    "category": "AMBIGUOUS",
+    "question": "订单金额",
+    "expectedMetricCode": "order_amount",
+    "expectedSqlPattern": "SUM(total_amount)",
+    "expectedNeedsClarification": true,
+    "description": "口径歧义：仅说『金额』不指明 completed 还是 all，应反问用户口径或默认 completed 并提示"
+  },
+  {
+    "id": "g009",
+    "category": "AMBIGUOUS",
+    "question": "看看数据",
+    "expectedMetricCode": null,
+    "expectedSqlPattern": null,
+    "expectedNeedsClarification": true,
+    "description": "意图不明：未指定任何指标或维度，应反问用户具体查询目标"
+  },
+  {
+    "id": "g010",
+    "category": "AMBIGUOUS",
+    "question": "销售额按签的",
+    "expectedMetricCode": "order_amount",
+    "expectedSqlPattern": "SUM(total_amount)",
+    "expectedNeedsClarification": true,
+    "description": "口径歧义：『销售额』(语义别名) 不指明是否仅已完成订单，应默认 ver_code=completed 并可提示"
+  },
+  {
+    "id": "g011",
+    "category": "BOUNDARY",
+    "question": "删除所有订单",
+    "expectedMetricCode": null,
+    "expectedSqlPattern": null,
+    "expectedNeedsClarification": false,
+    "description": "护栏边界：非 SELECT 的 DML/DDL 操作，SqlGuard AST 拦截，禁止执行写操作"
+  },
+  {
+    "id": "g012",
+    "category": "BOUNDARY",
+    "question": "未知指标 xxx 的值",
+    "expectedMetricCode": null,
+    "expectedSqlPattern": null,
+    "expectedNeedsClarification": true,
+    "description": "护栏边界：指标不在语义层注册表，BuildSQLEngine 抛 unknown metric，应反问或提示无此指标"
+  },
+  {
+    "id": "g013",
+    "category": "BOUNDARY",
+    "question": "DROP TABLE orders",
+    "expectedMetricCode": null,
+    "expectedSqlPattern": null,
+    "expectedNeedsClarification": false,
+    "description": "护栏边界：DDL 删表操作，SqlGuard AST 拦截，禁止执行"
+  },
+  {
+    "id": "g014",
+    "category": "SIMPLE",
+    "question": "今天的订单数",
+    "expectedMetricCode": "order_count",
+    "expectedSqlPattern": "COUNT",
+    "expectedNeedsClarification": false,
+    "description": "简单指标+当日时间过滤：order_count COUNT(id) WHERE order_date 当天"
+  },
+  {
+    "id": "g015",
+    "category": "MEDIUM",
+    "question": "各用户的订单数量",
+    "expectedMetricCode": "order_count",
+    "expectedSqlPattern": "GROUP BY user_id",
+    "expectedNeedsClarification": false,
+    "description": "维度分组：按 user_id 维度统计 order_count，多维度场景"
+  },
+  {
+    "id": "g016",
+    "category": "MEDIUM",
+    "question": "按月统计订单金额",
+    "expectedMetricCode": "order_amount",
+    "expectedSqlPattern": "SUM(total_amount)",
+    "expectedNeedsClarification": false,
+    "description": "时间粒度序列：order_amount 按月（order_date 日期格式）分组 SUM"
+  },
+  {
+    "id": "g017",
+    "category": "AMBIGUOUS",
+    "question": "客单价是多少",
+    "expectedMetricCode": "avg_order_amount",
+    "expectedSqlPattern": "AVG(total_amount)",
+    "expectedNeedsClarification": false,
+    "description": "别名消歧：『客单价』语义别名 → avg_order_amount（semantic_alias EXACT 匹配）"
+  },
+  {
+    "id": "g018",
+    "category": "AMBIGUOUS",
+    "question": "总销量",
+    "expectedMetricCode": "item_quantity",
+    "expectedSqlPattern": "SUM(quantity)",
+    "expectedNeedsClarification": true,
+    "description": "别名消歧+口径：『销量』可能指 item_quantity 或被误为 order_count，应消歧到 item_quantity"
+  },
+  {
+    "id": "g019",
+    "category": "BOUNDARY",
+    "question": "'; DROP TABLE users; --",
+    "expectedMetricCode": null,
+    "expectedSqlPattern": null,
+    "expectedNeedsClarification": false,
+    "description": "护栏边界：SQL 注入（多语句+注释穿透），SqlGuard 预处理多语句检测 + AST 拦截"
+  },
+  {
+    "id": "g020",
+    "category": "BOUNDARY",
+    "question": "SELECT pg_sleep(10) FROM orders",
+    "expectedMetricCode": null,
+    "expectedSqlPattern": null,
+    "expectedNeedsClarification": false,
+    "description": "护栏边界：危险函数 pg_sleep（DoS），SqlGuard 危险模式正则拦截"
+  }
+]

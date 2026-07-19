@@ -26,18 +26,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * SQL 查询结果集业务对象。
+ * <p>
+ * 封装 SQL 执行后的列名列表和数据行（每行为列名到值的映射）， 同时支持深拷贝以便在工作流中安全传递。
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public final class ResultSetBO implements Cloneable {
 
+	/** 列名列表 */
 	private List<String> column;
 
+	/** 数据行列表，每行为列名到值的映射 */
 	private List<Map<String, String>> data;
 
+	/** 错误信息（执行失败时设置） */
 	private String errorMsg;
 
+	/**
+	 * 深拷贝当前结果集。
+	 * @return 新的结果集实例，包含所有列和数据的副本
+	 */
 	@Override
 	public ResultSetBO clone() {
 		return ResultSetBO.builder()

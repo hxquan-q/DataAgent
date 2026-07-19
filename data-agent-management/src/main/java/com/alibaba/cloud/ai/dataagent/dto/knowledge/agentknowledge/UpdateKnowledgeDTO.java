@@ -17,6 +17,13 @@ package com.alibaba.cloud.ai.dataagent.dto.knowledge.agentknowledge;
 
 import lombok.Data;
 
+/**
+ * 更新知识 DTO
+ *
+ * <p>
+ * 用于更新智能体知识内容的请求数据传输对象。注意：不更新 question 字段， 如需修改问题请直接创建新知识。
+ * </p>
+ */
 @Data
 public class UpdateKnowledgeDTO {
 

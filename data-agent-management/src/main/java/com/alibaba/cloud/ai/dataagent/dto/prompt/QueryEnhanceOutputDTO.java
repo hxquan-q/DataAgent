@@ -22,6 +22,13 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+/**
+ * 查询增强输出 DTO
+ *
+ * <p>
+ * 对应模板 query-enhancement.txt 的输出结果，包含规范化查询和扩展查询列表。
+ * </p>
+ */
 // 对应 模板query-enhancement.txt的输出
 @Data
 @NoArgsConstructor

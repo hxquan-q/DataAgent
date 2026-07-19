@@ -23,54 +23,74 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 模型配置 DTO
+ *
+ * <p>
+ * 用于创建和更新大语言模型（LLM）配置的请求数据传输对象。包含厂商标识、API 地址、 模型名称、类型、温度、代理等配置信息。
+ * </p>
+ */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ModelConfigDTO {
 
+	/** 主键ID（更新时必填） */
 	private Integer id;
 
+	/** 厂商标识（例如 "openai"、"deepseek"） */
 	@NotBlank(message = "provider must not be empty")
-	private String provider; // e.g. "openai", "deepseek"
+	private String provider;
 
-	private String apiKey; // e.g. "https://api.openai.com"
+	/** API 密钥 */
+	private String apiKey;
 
+	/** API 基础地址（例如 "https://api.openai.com"） */
 	@NotBlank(message = "baseUrl must not be empty")
 	private String baseUrl;
 
+	/** 模型名称 */
 	@NotBlank(message = "modelName must not be empty")
 	private String modelName;
 
+	/** 模型类型：CHAT-对话模型，EMBEDDING-向量模型 */
 	@NotBlank(message = "modelType must not be empty")
 	@InEnum(value = ModelType.class, message = "CHAT/EMBEDDING 之一")
 	private String modelType;
 
-	// 仅当厂商路径非标准时填写，例如 "/custom/chat"
+	/** 对话补全路径（仅当厂商路径非标准时填写，例如 "/custom/chat"） */
 	private String completionsPath;
 
-	// 仅当厂商路径非标准时填写
+	/** 向量化路径（仅当厂商路径非标准时填写） */
 	private String embeddingsPath;
 
+	/** 温度参数（控制生成随机性，默认 0.0） */
 	@Builder.Default
 	private Double temperature = 0.0;
 
+	/** 最大生成 token 数（默认 1536，兼顾速度） */
 	@Builder.Default
-	private Integer maxTokens = 2000;
+	private Integer maxTokens = 1536;
 
+	/** 是否启用该模型配置 */
 	@Builder.Default
 	private Boolean isActive = true;
 
-	// 模型代理配置，默认关闭（使用直连）
+	/** 是否启用模型代理（默认关闭，使用直连） */
 	@Builder.Default
 	private Boolean proxyEnabled = false;
 
+	/** 代理主机地址 */
 	private String proxyHost;
 
+	/** 代理端口 */
 	private Integer proxyPort;
 
+	/** 代理用户名 */
 	private String proxyUsername;
 
+	/** 代理密码 */
 	private String proxyPassword;
 
 }

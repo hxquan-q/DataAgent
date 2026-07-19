@@ -43,13 +43,26 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 
+/**
+ * 动态模型工厂，根据模型配置动态创建 ChatModel 和 EmbeddingModel 实例。
+ *
+ * <p>
+ * 统一使用 OpenAI 兼容的模型类（{@link OpenAiChatModel}、{@link OpenAiEmbeddingModel}）， 通过 baseUrl
+ * 实现对多家厂商（DeepSeek、通义千问等）的兼容。支持代理配置。
+ * </p>
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class DynamicModelFactory {
 
+	/** 无代理时默认响应超时（与 webclient.response.timeout 默认 600s 同量级，避免裸 builder 无超时）。 */
+	private static final java.time.Duration DEFAULT_RESPONSE_TIMEOUT = java.time.Duration.ofSeconds(180);
+
 	/**
-	 * 统一使用 OpenAiChatModel，通过 baseUrl 实现多厂商兼容
+	 * 根据配置创建 ChatModel，统一使用 OpenAiChatModel 通过 baseUrl 实现多厂商兼容。
+	 * @param config 模型配置 DTO
+	 * @return 创建的 ChatModel 实例
 	 */
 	public ChatModel createChatModel(ModelConfigDTO config) {
 
@@ -74,8 +87,8 @@ public class DynamicModelFactory {
 		// 3. 构建运行时选项 (设置默认的模型名称，如 "deepseek-chat" 或 "gpt-4")
 		OpenAiChatOptions openAiChatOptions = OpenAiChatOptions.builder()
 			.model(config.getModelName())
-			.temperature(config.getTemperature())
-			.maxTokens(config.getMaxTokens())
+			.temperature(config.getTemperature() != null ? config.getTemperature() : 0.0)
+			.maxTokens(resolveMaxTokens(config.getMaxTokens()))
 			.streamUsage(true)
 			.build();
 		// 4. 返回统一的 OpenAiChatModel
@@ -83,7 +96,9 @@ public class DynamicModelFactory {
 	}
 
 	/**
-	 * Embedding 同理
+	 * 根据配置创建 EmbeddingModel，与 ChatModel 同理使用 OpenAI 兼容接口。
+	 * @param config 模型配置 DTO
+	 * @return 创建的 EmbeddingModel 实例
 	 */
 	public EmbeddingModel createEmbeddingModel(ModelConfigDTO config) {
 		log.info("Creating NEW EmbeddingModel instance. Provider: {}, Model: {}, BaseUrl: {}", config.getProvider(),
@@ -107,12 +122,23 @@ public class DynamicModelFactory {
 				RetryUtils.DEFAULT_RETRY_TEMPLATE);
 	}
 
-	private static void checkBasic(ModelConfigDTO config) {
-		Assert.hasText(config.getBaseUrl(), "baseUrl must not be empty");
-		if (!"custom".equalsIgnoreCase(config.getProvider())) {
-			Assert.hasText(config.getApiKey(), "apiKey must not be empty");
+
+	/** R208: 默认 1536，上限 8192，防止异常配置拖垮延迟。 */
+	static int resolveMaxTokens(Integer maxTokens) {
+		if (maxTokens == null || maxTokens <= 0) {
+			return 1536;
 		}
-		Assert.hasText(config.getModelName(), "modelName must not be empty");
+		return Math.min(maxTokens, 8192);
+	}
+
+	private static void checkBasic(ModelConfigDTO config) {
+		// R176: 校验信息面向运维/前端展示
+		Assert.notNull(config, "模型配置不能为空");
+		Assert.hasText(config.getBaseUrl(), "模型 Base URL 不能为空");
+		if (!"custom".equalsIgnoreCase(config.getProvider())) {
+			Assert.hasText(config.getApiKey(), "模型 API Key 不能为空");
+		}
+		Assert.hasText(config.getModelName(), "模型名称不能为空");
 	}
 
 	private RestClient.Builder getProxiedRestClientBuilder(ModelConfigDTO config) {
@@ -141,14 +167,16 @@ public class DynamicModelFactory {
 	}
 
 	private WebClient.Builder getProxiedWebClientBuilder(ModelConfigDTO config) {
+		// 始终自建带 responseTimeout 的 Netty 客户端（不依赖注入 Builder，避免 JRebel 热更字段为 null）
 		if (config.getProxyEnabled() == null || !config.getProxyEnabled()) {
-			return WebClient.builder();
+			HttpClient nettyClient = HttpClient.create().responseTimeout(DEFAULT_RESPONSE_TIMEOUT);
+			return WebClient.builder().clientConnector(new ReactorClientHttpConnector(nettyClient));
 		}
 
 		log.info("【Proxy-Init】Model [{}] is using ASYNC (Netty) proxy -> {}:{}", config.getModelName(),
 				config.getProxyHost(), config.getProxyPort());
 
-		HttpClient nettyClient = HttpClient.create().responseTimeout(java.time.Duration.ofMinutes(3)).proxy(p -> {
+		HttpClient nettyClient = HttpClient.create().responseTimeout(java.time.Duration.ofSeconds(180)).proxy(p -> {
 			ProxyProvider.Builder proxyBuilder = p.type(ProxyProvider.Proxy.HTTP)
 				.host(config.getProxyHost())
 				.port(config.getProxyPort());

@@ -20,24 +20,35 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Agent Preset Question Entity Class
+ * 智能体预设问题实体类
+ *
+ * <p>
+ * 存储智能体的预设推荐问题，用于在对话界面中向用户展示常用问题入口。 每个预设问题关联一个智能体，并按排序值排列。
+ * </p>
  */
 @Data
 @NoArgsConstructor
 public class AgentPresetQuestion {
 
+	/** 主键ID */
 	private Long id;
 
+	/** 关联的智能体ID */
 	private Long agentId;
 
+	/** 预设问题内容 */
 	private String question;
 
+	/** 排序值（数值越小越靠前） */
 	private Integer sortOrder;
 
+	/** 是否启用 */
 	private Boolean isActive;
 
+	/** 创建时间 */
 	private LocalDateTime createTime;
 
+	/** 更新时间 */
 	private LocalDateTime updateTime;
 
 	public AgentPresetQuestion(Long agentId, String question, Integer sortOrder) {

@@ -16,20 +16,19 @@
 
 <template>
 	<section class="page-shell">
-		<header class="d-flex align-center justify-space-between mb-8">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">数据源配置</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					管理全局数据库连接资源，配置连接信息与逻辑外键。
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+		<KnowledgePageHeader
+			title="数据源配置"
+			:subtitle="agentId
+				? `为智能体 #${agentId} 管理/绑定数据源：连接配置、激活与表选择。`
+				: '管理全局数据库连接资源，配置连接信息与逻辑外键。'"
+		>
+			<template #actions>
 				<v-btn
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
-					class="text-none bg-white"
-					style="border-color: #e2e8f0"
+					class="text-none"
+					style="border-color: var(--da-line-soft)"
 					@click="fetchDatasources"
 				>
 					刷新
@@ -50,14 +49,84 @@
 					class="text-none px-6"
 					elevation="0"
 					:loading="initStatus"
+					:disabled="activeSelectedTableCount === 0"
+					:title="activeSelectedTableCount === 0 ? '请先选择数据表' : '初始化当前智能体数据源'"
 					@click="handleInitDatasource"
 				>
 					{{ initStatus ? '初始化中...' : '初始化当前智能体数据源' }}
 				</v-btn>
-			</div>
-		</header>
+			</template>
+		</KnowledgePageHeader>
 
-		<v-card variant="flat" border class="rounded-lg">
+		<!-- R153: agent-scoped binding context -->
+		<v-alert
+			v-if="agentId"
+			type="info"
+			variant="tonal"
+			border="start"
+			class="mb-4"
+			density="comfortable"
+			icon="mdi-robot-outline"
+		>
+			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
+				<span class="text-body-2">
+					正在为智能体 <strong>#{{ agentId }}</strong> 绑定数据源：在操作列点击「设为当前」激活，再「初始化」同步表结构。
+					<span v-if="activeDatasourceId">
+						当前激活 ID：{{ activeDatasourceId }}
+						<span v-if="activeSelectedTableCount != null">，已选表 {{ activeSelectedTableCount }} 张</span>
+						<span v-if="activeSelectedTableCount === 0" class="text-warning">（未选表将无法初始化）</span>。
+					</span>
+					<span v-else class="text-warning">尚未激活任何数据源。</span>
+				</span>
+				<div class="d-flex ga-2 flex-wrap">
+					<v-btn
+						v-if="!activeDatasourceId && datasourceList.length"
+						size="small"
+						color="primary"
+						variant="flat"
+						class="text-none"
+						@click="hintBindFirst"
+					>
+						如何绑定
+					</v-btn>
+					<v-btn
+						v-if="activeDatasourceId"
+						size="small"
+						color="primary"
+						variant="flat"
+						class="text-none"
+						prepend-icon="mdi-upload"
+						:loading="initStatus"
+						:disabled="activeSelectedTableCount === 0"
+						:title="activeSelectedTableCount === 0 ? '请先选择数据表' : '初始化表结构到向量库'"
+						@click="handleInitDatasource"
+					>
+						初始化表结构
+					</v-btn>
+					<v-btn
+						v-if="activeDatasourceId && agentId"
+						size="small"
+						variant="outlined"
+						class="text-none"
+						prepend-icon="mdi-message-text-outline"
+						@click="goChatForAgent"
+					>
+						进入数据问答
+					</v-btn>
+					<v-btn
+						v-if="agentId"
+						size="small"
+						variant="text"
+						class="text-none"
+						@click="navigateTo('/system/agents')"
+					>
+						返回智能体
+					</v-btn>
+				</div>
+			</div>
+		</v-alert>
+
+		<v-card variant="flat" border class="rounded-lg ds-table-card">
 			<v-data-table
 				v-model:expanded="expandedRows"
 				:headers="headers"
@@ -108,7 +177,7 @@
 				<template #item.name="{ item }">
 					<div class="d-flex align-center py-2">
 						<v-avatar
-							color="blue-lighten-5"
+							color="primary"
 							rounded="lg"
 							size="36"
 							class="mr-3"
@@ -118,7 +187,7 @@
 							}}</v-icon>
 						</v-avatar>
 						<div>
-							<div class="font-weight-bold">{{ item.name }}</div>
+							<div class="font-weight-medium text-subtitle-2">{{ item.name }}</div>
 							<div class="text-caption text-medium-emphasis">
 								{{ item.host }}:{{ item.port }}
 							</div>
@@ -148,7 +217,7 @@
 					<v-chip
 						:color="
 							item.testStatus === 'success'
-								? 'blue'
+								? 'primary'
 								: item.testStatus === 'fail'
 									? 'error'
 									: 'default'
@@ -175,7 +244,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							:loading="bindingDatasourceId === item.id"
 							:disabled="activeDatasourceId === item.id"
 							@click="handleBindDatasource(item)"
@@ -186,7 +255,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							:loading="togglingStatusId === item.id"
 							@click="handleToggleStatus(item)"
 						>
@@ -196,7 +265,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							:loading="testingId === item.id"
 							@click="handleTestConnection(item)"
 						>
@@ -206,7 +275,7 @@
 							variant="text"
 							size="small"
 							color="primary"
-							class="text-none font-weight-bold"
+							class="text-none font-weight-medium"
 							@click="openFkDialog(item)"
 						>
 							逻辑外键
@@ -230,7 +299,7 @@
 
 				<template #expanded-row="{ columns, item }">
 					<tr>
-						<td :colspan="columns.length" class="bg-grey-lighten-5 pa-0">
+						<td :colspan="columns.length" class="bg-primary-soft pa-0">
 							<ExpandedTableManager
 								v-model:selected-tables="selectedTables[item.id!]"
 								:all-tables="tableLists[item.id!] ?? []"
@@ -242,6 +311,34 @@
 							/>
 						</td>
 					</tr>
+				</template>
+
+				<!-- R152: empty state -->
+				<template #no-data>
+					<div class="text-center py-12 ds-empty">
+						<div class="ds-empty__icon" aria-hidden="true">
+							<v-icon icon="mdi-database-off-outline" size="28" color="primary" />
+						</div>
+						<h3 class="ds-empty__title">尚未配置数据源</h3>
+						<p class="ds-empty__desc">
+							{{
+								agentId
+									? `智能体 #${agentId} 需要可用连接：请先添加数据库并测试通过，再「设为当前」并初始化。`
+									: '全局数据源是 NL2SQL 的连接入口。请先添加数据库连接并测试通过，再在智能体中绑定并激活。'
+							}}
+						</p>
+						<p class="ds-empty__hint">
+							聊天页若提示「未绑定数据源」，请先完成此页配置，再到智能体详情关联。
+						</p>
+						<div class="d-flex justify-center ga-2 flex-wrap ds-empty__actions">
+							<v-btn color="primary" variant="flat" class="text-none ds-empty__btn" prepend-icon="mdi-plus" @click="openFormDialog('create')">
+								添加数据源
+							</v-btn>
+							<v-btn variant="text" class="text-none ds-empty__btn" prepend-icon="mdi-robot-outline" @click="navigateTo('/system/agents')">
+								管理智能体绑定
+							</v-btn>
+						</div>
+					</div>
 				</template>
 			</v-data-table>
 		</v-card>
@@ -282,11 +379,18 @@ const datasourceList = ref<Datasource[]>([]);
 const expandedRows = ref<readonly string[]>([]);
 const tableLists = ref<Record<number, string[]>>({});
 const selectedTables = ref<Record<number, string[]>>({});
+
 const loadingTablesId = ref<number | null>(null);
 const tableFetchError = ref<Record<number, boolean>>({});
 const updatingTablesId = ref<number | null>(null);
 const initStatus = ref(false);
 const activeDatasourceId = ref<number | null>(null);
+
+const activeSelectedTableCount = computed(() => {
+	if (activeDatasourceId.value == null) return null;
+	const tables = selectedTables.value[activeDatasourceId.value];
+	return tables ? tables.length : null;
+});
 
 const agentId = computed(() => {
 	const id = route.params.agentId || route.query.agentId;
@@ -349,6 +453,18 @@ async function fetchActiveDatasourceForAgent() {
 	}
 }
 
+function goChatForAgent() {
+	if (!agentId.value) return;
+	navigateTo({ path: '/chat', query: { agentId: String(agentId.value) } });
+}
+
+function hintBindFirst() {
+	$tip('请在表格「操作」列点击「设为当前智能体数据源」，然后使用右上角「初始化当前智能体数据源」。', {
+		icon: 'mdi-information',
+		color: 'info',
+	});
+}
+
 function openFormDialog(mode: 'create' | 'edit', item?: Datasource) {
 	formDialogMode.value = mode;
 	formDialogTarget.value = mode === 'edit' && item ? { ...item } : null;
@@ -388,7 +504,10 @@ async function handleBindDatasource(item: Datasource) {
 		const res = await agentDatasourceService.addDatasourceToAgent(agentId.value, item.id);
 		if (res.success) {
 			activeDatasourceId.value = item.id;
-			$tip('已设为当前智能体数据源');
+			$tip('已设为当前智能体数据源。建议下一步：初始化表结构，然后进入数据问答。', {
+				icon: 'mdi-check-circle',
+				color: 'success',
+			});
 		} else {
 			$tip(res.message || '绑定失败', { color: 'error', icon: 'mdi-alert-circle' });
 		}
@@ -619,19 +738,25 @@ async function handleInitDatasource() {
 			!activeDatasource.selectTables ||
 			activeDatasource.selectTables.length === 0
 		) {
-			$tip('当前绑定的数据源没有选择相应的数据表！请先选择数据表并更新', {
+			$tip('当前绑定的数据源未选择数据表。请展开数据源行勾选表并「更新表」，再初始化。', {
 				color: 'error',
 				icon: 'mdi-alert-circle',
 			});
 			return;
 		}
 		const res = await agentDatasourceService.initSchema(agentId.value);
-		if (res.success) $tip('初始化数据源成功');
-		else
+		if (res.success) {
+			// R168: 不自动强跳，由横幅「进入数据问答」用户确认（可继续调表）
+			$tip('初始化数据源成功。可点击上方「进入数据问答」开始提问。', {
+				icon: 'mdi-check-circle',
+				color: 'success',
+			});
+		} else {
 			$tip(res.message || '初始化数据源失败', {
 				color: 'error',
 				icon: 'mdi-alert-circle',
 			});
+		}
 	} catch (error: unknown) {
 		const errMsg = error instanceof Error ? error.message : '初始化数据源失败';
 		$tip(errMsg, { color: 'error', icon: 'mdi-alert-circle' });
@@ -650,5 +775,60 @@ onMounted(() => {
 .expand-disabled {
 	opacity: 0.4;
 	cursor: not-allowed;
+}
+.ds-table-card {
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	box-shadow: none !important;
+	border-radius: 12px !important;
+	overflow: hidden;
+}
+.ds-empty {
+	padding: 48px 24px 40px;
+	border: none;
+	border-radius: 0;
+	background: transparent;
+	margin: 8px;
+}
+.ds-empty__icon {
+	width: 52px;
+	height: 52px;
+	margin: 0 auto 14px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 14px;
+	background: var(--da-surface);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 48%, transparent);
+	box-shadow: var(--da-shadow-sm);
+}
+.ds-empty__title {
+	margin: 0 0 8px;
+	font-family: var(--da-font-display);
+	font-size: 1.2rem;
+	font-weight: 500;
+	letter-spacing: -0.02em;
+	color: var(--da-ink);
+}
+.ds-empty__desc {
+	max-width: 420px;
+	margin: 0 auto 8px;
+	line-height: 1.6;
+	font-size: 13.5px;
+	color: var(--da-muted);
+}
+.ds-empty__hint {
+	max-width: 420px;
+	margin: 0 auto 20px;
+	font-size: 12px;
+	color: color-mix(in srgb, var(--da-muted) 88%, transparent);
+	line-height: 1.5;
+}
+.ds-empty__actions :deep(.v-btn),
+.ds-empty__btn {
+	border-radius: 10px !important;
+	min-height: 36px !important;
+	font-weight: 500 !important;
+	letter-spacing: 0 !important;
+	box-shadow: none !important;
 }
 </style>

@@ -15,28 +15,24 @@
  */
 
 <template>
-	<v-container fluid class="pa-8 model-config-container">
-		<!-- Header Section -->
-		<header class="d-flex align-center justify-space-between mb-8">
-			<div>
-				<h1 class="text-h4 font-weight-bold mb-1 text-slate-900">模型服务</h1>
-				<p class="text-body-2 text-medium-emphasis">
-					连接 LLM 供应商，支持对话生成与向量检索。
-				</p>
-			</div>
-			<div class="d-flex ga-3">
+	<section class="page-shell model-config-container">
+		<KnowledgePageHeader
+			title="模型服务"
+			subtitle="连接 LLM 供应商，支持对话生成与向量检索。"
+		>
+			<template #actions>
 				<v-btn
 					variant="outlined"
 					prepend-icon="mdi-refresh"
 					:loading="loading"
 					@click="fetchConfigs"
 					class="text-none"
-					style="border-color: #e2e8f0"
+					style="border-color: var(--da-line-soft)"
 				>
 					刷新
 				</v-btn>
 				<v-btn
-					color="black"
+					color="primary"
 					prepend-icon="mdi-plus"
 					class="text-none px-6"
 					elevation="0"
@@ -44,11 +40,11 @@
 				>
 					{{ activeTab === 'CHAT' ? '添加对话模型' : '添加嵌入模型' }}
 				</v-btn>
-			</div>
-		</header>
+			</template>
+		</KnowledgePageHeader>
 
 		<!-- Tab Navigation (Segmented Toggle) -->
-		<div class="d-flex justify-center mb-8">
+		<div class="d-flex justify-center mb-5">
 			<v-btn-toggle
 				v-model="activeTab"
 				mandatory
@@ -61,17 +57,37 @@
 				<v-btn
 					value="CHAT"
 					variant="flat"
-					class="px-8 text-none font-weight-bold"
+					class="px-8 text-none font-weight-medium"
 					>对话模型</v-btn
 				>
 				<v-btn
 					value="EMBEDDING"
 					variant="flat"
-					class="px-8 text-none font-weight-bold"
+					class="px-8 text-none font-weight-medium"
 					>嵌入模型</v-btn
 				>
 			</v-btn-toggle>
 		</div>
+
+
+		<!-- R150: readiness banner -->
+		<v-alert
+			v-if="!loading && readiness && !readiness.chatModelReady"
+			type="warning"
+			variant="tonal"
+			class="mb-4"
+			border="start"
+			density="comfortable"
+		>
+			<div class="d-flex flex-wrap align-center justify-space-between ga-2">
+				<span class="text-body-2">
+					当前无激活的对话模型：数据问答无法生成回答。请在下方添加并激活 CHAT 模型。
+				</span>
+				<v-btn size="small" color="warning" variant="flat" class="text-none" @click="openCreateDialog('CHAT')">
+					添加对话模型
+				</v-btn>
+			</div>
+		</v-alert>
 
 		<v-row justify="center">
 			<v-col cols="12" xl="10">
@@ -81,7 +97,7 @@
 					v-if="activeTab === 'EMBEDDING'"
 					icon="mdi-information-outline"
 					variant="tonal"
-					color="blue-grey"
+					color="grey"
 					class="mb-6 rounded-lg text-body-2"
 					border="start"
 				>
@@ -114,14 +130,15 @@
 								:class="{ 'is-active': model.isActive }"
 								rounded="lg"
 							>
-								<div class="pa-5 d-flex align-center">
+								<div class="pa-4 d-flex align-center">
 									<!-- Icon -->
 									<v-avatar
-										:color="model.isActive ? 'primary' : 'grey-lighten-4'"
+										:color="model.isActive ? 'primary' : 'primary'"
+										:variant="model.isActive ? 'flat' : 'tonal'"
 										:class="{ 'text-white': model.isActive }"
-										size="48"
+										size="40"
 										rounded="lg"
-										class="mr-4"
+										class="mr-4 model-avatar"
 									>
 										<v-icon
 											:icon="
@@ -144,7 +161,7 @@
 												size="x-small"
 												color="primary"
 												variant="flat"
-												class="px-2 font-weight-bold d-inline-flex align-center"
+												class="px-2 font-weight-medium d-inline-flex align-center"
 											>
 												<span class="breathing-dot"></span>
 												默认
@@ -171,7 +188,7 @@
 											variant="outlined"
 											color="primary"
 											size="small"
-											class="text-none font-weight-bold"
+											class="text-none font-weight-medium"
 											style="border-width: 1px"
 											:loading="activatingId === model.id"
 											@click="handleActivate(model)"
@@ -183,7 +200,7 @@
 											variant="outlined"
 											size="small"
 											class="text-none"
-											style="border-color: #e2e8f0"
+											style="border-color: var(--da-line-soft)"
 											@click="handleTestConnection(model)"
 											:loading="testingId === model.id"
 										>
@@ -197,7 +214,7 @@
 												icon="mdi-pencil-outline"
 												variant="text"
 												size="small"
-												color="grey-darken-1"
+												color="grey"
 												@click="handleEdit(model)"
 											></v-btn>
 											<v-btn
@@ -213,30 +230,39 @@
 							</v-card>
 						</div>
 
-						<!-- Empty State (Inside TransitionGroup) -->
+						<!-- Empty State (R150: actionable copy) -->
 						<div
 							v-if="filteredModels.length === 0"
 							:key="activeTab + 'empty'"
-							class="text-center py-16 border-dashed rounded-xl bg-white"
+							class="text-center py-12 border-dashed rounded-xl model-empty"
 						>
 							<v-icon
-								icon="mdi-robot-vacuum-variant-off"
-								size="64"
-								color="grey-lighten-2"
-								class="mb-4"
+								icon="mdi-robot-outline"
+								size="56"
+								color="grey"
+								class="mb-3"
 							></v-icon>
-							<h3 class="text-h6 font-weight-medium text-grey-darken-1">
-								暂无配置
+							<h3 class="text-h6 font-weight-medium text-medium-emphasis mb-2">
+								{{ activeTab === 'CHAT' ? '尚未配置对话模型' : '尚未配置嵌入模型' }}
 							</h3>
-							<p class="text-body-2 text-grey mb-6">
-								您还没有在该分类下添加任何供应商
+							<p class="text-body-2 text-medium-emphasis mb-2 model-empty__desc">
+								{{
+									activeTab === 'CHAT'
+										? '数据问答依赖激活的 CHAT 模型。请添加供应商（OpenAI 兼容 / DashScope 等），填写 Base URL、API Key 与模型名，并点击「激活」。'
+										: '向量检索依赖激活的 EMBEDDING 模型。未配置时将使用占位向量，召回质量会下降。'
+								}}
+							</p>
+							<p class="text-caption text-medium-emphasis mb-5">
+								配置后请返回「数据问答」发送问题验证。
 							</p>
 							<v-btn
-								color="black"
+								color="primary"
 								variant="flat"
+								class="text-none"
 								@click="openCreateDialog(activeTab)"
-								>立即添加</v-btn
 							>
+								{{ activeTab === 'CHAT' ? '添加对话模型' : '添加嵌入模型' }}
+							</v-btn>
 						</div>
 					</TransitionGroup>
 				</div>
@@ -249,7 +275,7 @@
 				<v-card-title
 					class="d-flex align-center justify-space-between px-4 pt-4"
 				>
-					<span class="text-h6 font-weight-bold">{{ dialogTitle }}</span>
+					<span class="text-h6 font-weight-medium dialog-title">{{ dialogTitle }}</span>
 					<v-btn
 						icon="mdi-close"
 						variant="text"
@@ -328,20 +354,21 @@
 
 							<v-col cols="6">
 								<span class="custom-label"
-									>温度系数: {{ form.temperature }}</span
+									>温度系数: {{ form.temperature }}（问答建议 0–0.3）</span
 								>
 								<v-slider
 									v-model="form.temperature"
 									min="0"
 									max="2"
 									step="0.1"
-									color="black"
+									color="primary"
 									density="compact"
 									hide-details
 								/>
 							</v-col>
 							<v-col cols="6">
 								<span class="custom-label">最大 Token 数</span>
+								<p class="text-caption text-medium-emphasis mb-1">默认 1536，过大会拖慢回答</p>
 								<v-text-field
 									v-model.number="form.maxTokens"
 									type="number"
@@ -361,7 +388,7 @@
 						>取消</v-btn
 					>
 					<v-btn
-						color="black"
+						color="primary"
 						class="text-none px-8"
 						elevation="0"
 						:loading="saving"
@@ -371,7 +398,7 @@
 				</v-card-actions>
 			</v-card>
 		</v-dialog>
-	</v-container>
+	</section>
 </template>
 
 <script setup lang="ts">
@@ -399,6 +426,7 @@ const providerBaseUrlMap: Record<string, string> = {
 	custom: '',
 };
 
+const readiness = ref<{ chatModelReady?: boolean; embeddingModelReady?: boolean; ready?: boolean } | null>(null);
 const loading = ref(false);
 const configs = ref<ModelConfig[]>([]);
 const activeTab = ref<ModelType>('CHAT');
@@ -417,7 +445,7 @@ const form = reactive<ModelConfig>({
 	modelName: '',
 	modelType: 'CHAT',
 	temperature: 0,
-	maxTokens: 2000,
+	maxTokens: 1536,
 	completionsPath: '',
 	embeddingsPath: '',
 	isActive: false,
@@ -463,7 +491,7 @@ const resetForm = (type: ModelType) => {
 	form.modelName = '';
 	form.modelType = type;
 	form.temperature = 0;
-	form.maxTokens = 2000;
+	form.maxTokens = 1536;
 	form.completionsPath = '';
 	form.embeddingsPath = '';
 	form.isActive = false;
@@ -473,6 +501,11 @@ const fetchConfigs = async () => {
 	loading.value = true;
 	try {
 		const response = await modelConfigService.list();
+		try {
+			readiness.value = await modelConfigService.checkReady();
+		} catch {
+			readiness.value = null;
+		}
 		console.log(response);
 		configs.value = response || [];
 	} catch {
@@ -516,7 +549,14 @@ const submitConfig = async (isUpdate: boolean) => {
 		}
 
 		if (result.success) {
-			$tip(isUpdate ? '配置更新成功' : '配置创建成功');
+			const createdChat = !isUpdate && form.modelType === 'CHAT';
+			$tip(
+				isUpdate
+					? '配置更新成功'
+					: createdChat
+						? '配置创建成功。请点击「激活」设为默认对话模型，然后去数据问答。'
+						: '配置创建成功。嵌入模型需激活后用于向量召回。',
+			);
 			closeDialog();
 			fetchConfigs();
 		} else {
@@ -580,8 +620,18 @@ const handleActivate = async (model: ModelConfig) => {
 	try {
 		const result = await modelConfigService.activate(model.id);
 		if (result.success) {
-			$tip('已设置为默认模型');
+			$tip(
+				model.modelType === 'CHAT'
+					? '已激活对话模型。可到智能体列表进入数据问答。'
+					: '已设置为默认嵌入模型。',
+			);
 			fetchConfigs();
+			// 刷新 readiness 横幅
+			try {
+				readiness.value = await modelConfigService.checkReady();
+			} catch {
+				/* ignore */
+			}
 		} else {
 			$tip(result.message || '设置失败', {
 				icon: 'mdi-alert-circle',
@@ -633,37 +683,41 @@ onMounted(fetchConfigs);
 
 <style scoped>
 .model-config-container {
-	background-color: #f8fafc;
+	background: transparent;
 	min-height: 100%;
 }
 
-.text-slate-900 {
-	color: #0f172a;
-}
+
 
 .model-item-card {
-	transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-	border: 1px solid #e2e8f0 !important;
-	background-color: #ffffff !important;
+	transition: border-color var(--da-dur-fast) var(--da-ease-out),
+		background var(--da-dur-fast) var(--da-ease-out);
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 50%, transparent) !important;
+	background-color: var(--da-surface) !important;
+	box-shadow: none !important;
+	border-radius: 12px !important;
+	overflow: hidden;
 }
 
 .model-item-card:hover {
-	border-color: #94a3b8 !important;
-	transform: translateY(-2px);
-	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+	border-color: color-mix(in srgb, var(--da-line) 70%, var(--da-primary)) !important;
+	transform: none;
+	box-shadow: none !important;
+	background: color-mix(in srgb, var(--da-surface-soft) 40%, var(--da-surface)) !important;
 }
 
 .model-item-card.is-active {
-	border-color: #2563eb !important;
-	background-color: #f0f7ff !important;
+	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent) !important;
+	background: color-mix(in srgb, var(--da-primary-soft) 45%, var(--da-surface)) !important;
+	box-shadow: none !important;
 }
 
 .border-dashed {
-	border: 2px dashed #e2e8f0 !important;
+	border: 2px dashed var(--da-line-soft) !important;
 }
 
 .v-tabs {
-	border-bottom: 1px solid #e2e8f0;
+	border-bottom: 1px solid var(--da-line-soft);
 }
 
 .v-tab {
@@ -675,6 +729,15 @@ onMounted(fetchConfigs);
 /* 列表容器需要相对定位，方便子元素离开时绝对定位 */
 .list-container {
 	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+.list-item-wrap {
+	width: 100%;
+}
+.model-avatar {
+	box-shadow: none;
 }
 
 /* 所有的过渡和位移都在 0.4s 内完成 */
@@ -703,24 +766,47 @@ onMounted(fetchConfigs);
 }
 
 /* 分段开关样式优化 */
-.segmented-control {
-	background-color: #f1f5f9 !important;
-	padding: 4px !important;
-	height: 48px !important;
-	border: none !important;
+.segmented-control,
+.segmented-toggle {
+	background-color: color-mix(in srgb, var(--da-surface-soft) 80%, var(--da-surface)) !important;
+	padding: 3px !important;
+	height: 36px !important;
+	border: 0.5px solid color-mix(in srgb, var(--da-line) 45%, transparent) !important;
+	border-radius: 10px !important;
 }
 
-.segmented-control .v-btn {
+.segmented-control .v-btn,
+.segmented-toggle .v-btn {
 	border: none !important;
-	height: 40px !important;
-	font-weight: 600 !important;
-	letter-spacing: 0.02em !important;
-	color: #64748b !important;
+	height: 30px !important;
+	min-height: 30px !important;
+	font-weight: 500 !important;
+	letter-spacing: 0 !important;
+	text-transform: none !important;
+	color: var(--da-muted) !important;
+	border-radius: 8px !important;
+	font-size: 13px !important;
 }
 
-.segmented-control .v-btn--selected {
-	background-color: #ffffff !important;
-	color: #0f172a !important;
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05) !important;
+.segmented-control .v-btn--selected,
+.segmented-toggle .v-btn--selected,
+.segmented-toggle .v-btn--active {
+	background-color: var(--da-surface) !important;
+	color: var(--da-primary) !important;
+	box-shadow: var(--da-shadow-sm) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+.model-item-card:hover {
+	transform: none;
+}
+.list-enter-active,
+.list-leave-active,
+.list-move {
+	transition: none !important;
+}
+}
+.dialog-title {
+	font-family: var(--da-font-display);
+	letter-spacing: -0.01em;
 }
 </style>

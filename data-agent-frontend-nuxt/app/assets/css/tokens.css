@@ -1,0 +1,150 @@
+/*
+ * Copyright 2026 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+/*
+ * Design tokens — DataAgent UI shell rebuild · DEEIX azure paper (Nuxt/Vuetify).
+ * Philosophy: light paper shell, soft borders, calm blue primary, answer-first chat.
+ * Change color here first, then mirror static hex in nuxt.config Vuetify theme.
+ * Do not introduce new business primary hex in components.
+ */
+
+:root {
+	/* ── Color: surfaces & text (DEEIX azure paper) ──────────────────────────── */
+	--da-ink: #1a2332;
+	--da-muted: #64748b;
+	--da-line: #c9d7e4;
+	--da-line-soft: #e4edf5;
+	--da-surface: #ffffff;
+	--da-surface-soft: #f4f8fb;
+	--da-primary: #2f84d6;
+	--da-primary-soft: #e8f3fc;
+	--da-accent: #3b9eea;
+	--da-on-primary: #ffffff;
+	--da-danger: #dc2626;
+	--da-on-danger: #ffffff;
+	--da-success: #16a34a;
+	--da-warning: #d97706;
+	--da-info: #3b9eea;
+
+	/* ── Sidebar (light rail · DEEIX workspace) ──────────────────────────────── */
+	--da-sidebar-bg: #f4f8fb;
+	--da-sidebar-ink: #1a2332;
+	--da-sidebar-muted: #64748b;
+	--da-sidebar-line: #e4edf5;
+	--da-sidebar-field: #ffffff;
+	--da-sidebar-accent: #2f84d6;
+	--da-sidebar-chip-bg: rgba(47, 132, 214, 0.1);
+	--da-sidebar-chip-ink: #1e5fa8;
+	--da-sidebar-chip-line: rgba(47, 132, 214, 0.18);
+	--da-sidebar-hover: rgba(47, 132, 214, 0.08);
+	--da-sidebar-active: rgba(47, 132, 214, 0.14);
+
+	/* ── Focus ──────────────────────────────────────────────────────────────── */
+	--da-ring: #2f84d6;
+	--da-ring-offset: #ffffff;
+
+	/* ── Density ────────────────────────────────────────────────────────────── */
+	--da-space-1: 4px;
+	--da-space-2: 8px;
+	--da-space-3: 12px;
+	--da-space-4: 16px;
+	--da-space-5: 24px;
+	--da-space-6: 32px;
+	--da-control-height-sm: 32px;
+	--da-header-height: 48px;
+	--da-control-height-md: 40px;
+	--da-table-row-density: 32px;
+	--da-chat-max: 1080px;
+	--da-composer-radius: 26px;
+	--da-bp-mobile: 768px;
+	--da-safe-top: env(safe-area-inset-top, 0px);
+	--da-safe-bottom: env(safe-area-inset-bottom, 0px);
+	--da-safe-left: env(safe-area-inset-left, 0px);
+	--da-safe-right: env(safe-area-inset-right, 0px);
+	--da-rail-width: 272px;
+	--da-admin-rail-width: 272px;
+
+	/* ── Radius & shadow (softer DEEIX elevation) ───────────────────────────── */
+	--da-radius-sm: 8px;
+	--da-radius-md: 12px;
+	--da-radius-lg: 18px;
+	--da-shadow-sm: 0 1px 3px rgba(15, 35, 55, 0.06);
+	--da-shadow-md: 0 4px 14px rgba(15, 35, 55, 0.08);
+	--da-shadow-lg: 0 10px 28px rgba(15, 35, 55, 0.1);
+	/* DEEIX InputGroup: soft xs shadow */
+	--da-shadow-composer: 0 1px 3px rgba(15, 35, 55, 0.08), 0 1px 2px -1px rgba(15, 35, 55, 0.06);
+
+	/* ── Motion ─────────────────────────────────────────────────────────────── */
+	--da-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+	--da-spring: cubic-bezier(0.34, 1.2, 0.64, 1);
+	--da-dur-fast: 150ms;
+	--da-dur-base: 220ms;
+	--da-dur-slow: 300ms;
+	--da-dur: var(--da-dur-slow);
+
+	/* ── Z-index scale ──────────────────────────────────────────────────────── */
+	--da-z-dropdown: 1000;
+	--da-z-dialog: 2000;
+	--da-z-toast: 3000;
+	--da-z-fullscreen-report: 4000;
+
+	/* ── Overlay & disabled ─────────────────────────────────────────────────── */
+	--da-overlay: rgba(15, 35, 55, 0.4);
+	--da-disabled-opacity: 0.5;
+
+	/* ── Typography ─────────────────────────────────────────────────────────── */
+	--da-font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+		'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+	--da-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+	--da-font-chat: var(--da-font-sans);
+	--da-chat-font-size: 15px;
+	--da-chat-line-height: 1.75;
+	--da-answer-max: 960px;
+	--da-font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', Georgia,
+		'Noto Serif SC', 'Songti SC', serif;
+}
+
+/* Optional dark product theme */
+.dark {
+	--da-ink: #e8eef5;
+	--da-muted: #94a3b8;
+	--da-line: #334155;
+	--da-line-soft: #1e293b;
+	--da-surface: #0f172a;
+	--da-surface-soft: #111827;
+	--da-primary: #3b9eea;
+	--da-primary-soft: #0f2740;
+	--da-accent: #60b8f5;
+	--da-on-primary: #0b1220;
+	--da-ring: #3b9eea;
+	--da-ring-offset: #0f172a;
+	--da-overlay: rgba(0, 0, 0, 0.55);
+	--da-sidebar-bg: #111827;
+	--da-sidebar-ink: #e8eef5;
+	--da-sidebar-muted: #94a3b8;
+	--da-sidebar-line: #1e293b;
+	--da-sidebar-field: #0f172a;
+	--da-sidebar-accent: #60b8f5;
+	--da-sidebar-chip-bg: rgba(59, 158, 234, 0.15);
+	--da-sidebar-chip-ink: #93c5fd;
+	--da-sidebar-chip-line: rgba(59, 158, 234, 0.25);
+	--da-sidebar-hover: rgba(255, 255, 255, 0.06);
+	--da-sidebar-active: rgba(59, 158, 234, 0.16);
+	--da-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+	--da-shadow-md: 0 4px 14px rgba(0, 0, 0, 0.4);
+	--da-shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.45);
+	--da-shadow-composer: 0 8px 28px rgba(0, 0, 0, 0.45);
+}

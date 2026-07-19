@@ -21,6 +21,13 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+/**
+ * 证据查询重写 DTO
+ *
+ * <p>
+ * 表示将多轮对话中的上下文依赖查询重写为独立完整句子后的输出结果。
+ * </p>
+ */
 @NoArgsConstructor
 @Setter
 @Getter

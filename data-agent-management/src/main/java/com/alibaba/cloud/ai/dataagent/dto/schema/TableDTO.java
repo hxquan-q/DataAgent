@@ -24,16 +24,27 @@ import lombok.NoArgsConstructor;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 数据库表信息 DTO
+ *
+ * <p>
+ * 描述数据库中单张表的元数据，包括表名、描述、字段列表和主键列表。 主要用于向大模型提供表级别的上下文信息。
+ * </p>
+ */
 @Data
 @NoArgsConstructor
 public class TableDTO {
 
+	/** 表名 */
 	private String name;
 
+	/** 表描述 */
 	private String description;
 
+	/** 字段列表 */
 	private List<ColumnDTO> column = new ArrayList<ColumnDTO>();
 
+	/** 主键字段列表 */
 	private List<String> primaryKeys;
 
 	@Override

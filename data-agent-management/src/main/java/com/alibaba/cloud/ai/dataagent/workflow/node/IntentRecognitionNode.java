@@ -38,7 +38,18 @@ import java.util.Map;
 import static com.alibaba.cloud.ai.dataagent.constant.Constant.*;
 
 /**
- * 意图识别节点，用于识别用户输入是闲聊还是数据分析请求
+ * 意图识别节点，位于工作流的起始位置。
+ *
+ * <p>
+ * 该节点负责识别用户输入的意图类型，判断当前请求是闲聊或无关指令， 还是数据分析请求。识别结果将作为后续工作流路由的依据：
+ * <ul>
+ * <li>闲聊或无关指令：直接结束流程</li>
+ * <li>数据分析请求：进入证据召回节点（{@code EvidenceRecallNode}）</li>
+ * </ul>
+ * 该节点通过调用大模型（LLM）完成意图识别，并以流式方式向用户输出处理进度。
+ * </p>
+ *
+ * @see EvidenceRecallNode
  */
 @Slf4j
 @Component
@@ -49,22 +60,32 @@ public class IntentRecognitionNode implements NodeAction {
 
 	private final JsonParseUtil jsonParseUtil;
 
+	/**
+	 * 执行意图识别逻辑。
+	 * <p>
+	 * 主要流程：从全局状态中获取用户输入与多轮对话上下文， 构建意图识别提示词并调用大模型，最终将识别结果写入状态。
+	 * </p>
+	 * @param state 工作流全局状态，包含用户输入与多轮对话上下文
+	 * @return 包含意图识别结果的 Map，key 为 {@value INTENT_RECOGNITION_NODE_OUTPUT}， value 为流式生成器
+	 * @throws Exception 调用大模型或解析结果时可能抛出的异常
+	 */
 	@Override
 	public Map<String, Object> apply(OverAllState state) throws Exception {
 
-		// 获取用户输入
+		// 获取用户输入与多轮对话上下文
 		String userInput = StateUtil.getStringValue(state, INPUT_KEY);
-		log.info("User input for intent recognition: {}", userInput);
+		log.info("意图识别节点接收到的用户输入: {}", userInput);
 
 		String multiTurn = StateUtil.getStringValue(state, MULTI_TURN_CONTEXT, "(无)");
 
-		// 构建意图识别提示
-		String prompt = PromptHelper.buildIntentRecognitionPrompt(multiTurn, userInput);
-		log.debug("Built intent recognition prompt as follows \n {} \n", prompt);
+		// 构建意图识别提示词
+		String prompt = PromptHelper.buildIntentRecognitionPrompt(PromptHelper.boundMultiTurn(multiTurn), PromptHelper.boundQuery(userInput));
+		log.debug("构建的意图识别提示词如下 \n {} \n", prompt);
 
-		// 调用LLM进行意图识别
+		// 调用大模型进行意图识别
 		Flux<ChatResponse> responseFlux = llmService.callUser(prompt);
 
+		// 创建流式生成器，前置/后置提示信息 + 结果解析回调
 		Flux<GraphResponse<StreamingOutput>> generator = FluxUtil.createStreamingGenerator(this.getClass(), state,
 				responseFlux,
 				Flux.just(ChatResponseUtil.createResponse("正在进行意图识别..."),
@@ -72,7 +93,7 @@ public class IntentRecognitionNode implements NodeAction {
 				Flux.just(ChatResponseUtil.createPureResponse(TextType.JSON.getEndSign()),
 						ChatResponseUtil.createResponse("\n意图识别完成！")),
 				result -> {
-					// 使用JsonParseUtil解析JSON并转换为IntentRecognitionOutputDTO对象
+					// 解析大模型返回的 JSON，并转换为意图识别输出对象
 					IntentRecognitionOutputDTO intentRecognitionOutput = jsonParseUtil.tryConvertToObject(result,
 							IntentRecognitionOutputDTO.class);
 					return Map.of(INTENT_RECOGNITION_NODE_OUTPUT, intentRecognitionOutput);
