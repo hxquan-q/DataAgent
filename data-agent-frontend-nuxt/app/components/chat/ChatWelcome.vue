@@ -45,8 +45,6 @@
 				<button v-if="!hasDatasource" type="button" class="ready-link" @click="goDatasource">去绑定</button>
 			</li>
 		</ul>
-		<p v-else class="ready-ok da-reveal da-reveal-delay-2" role="status">已就绪 · 直接提问或点下方推荐</p>
-
 		<div
 			v-if="chips.length"
 			class="preset-row da-reveal da-reveal-delay-3"
@@ -223,7 +221,7 @@ watch(
 }
 
 .welcome-desc {
-	margin: 14px 0 0;
+	margin: 12px 0 0;
 	max-width: 28rem;
 	font-family: var(--da-font-chat, var(--da-font-sans));
 	font-size: 14px;
@@ -238,7 +236,7 @@ watch(
 	flex-wrap: wrap;
 	justify-content: center;
 	gap: 8px;
-	margin-top: 28px;
+	margin-top: 20px;
 	max-width: 36rem;
 	width: 100%;
 }

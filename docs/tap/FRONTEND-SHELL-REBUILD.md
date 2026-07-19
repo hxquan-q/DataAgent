@@ -57,3 +57,17 @@ cd data-agent-frontend-nuxt && pnpm build
 | D 聊天 | done | composer InputGroup 重写 · 状态条 live-only |
 | E 管理 | partial | page-shell 既有；持续密度对齐 |
 | F 收尾 | in_progress | 截图回归 + embed 对齐 |
+
+
+## 交付记录
+
+| Commit | 内容 |
+|--------|------|
+| 9a8b1fe | A 归档 WIP + 方案文档 |
+| e669c0d | B/C 基座 token + 双壳宽度 |
+| b813b75 | D composer InputGroup 重写 |
+| 06785f2 | D 消息区 chrome 次要化 |
+| 9100996 | E/F 管理壳 + embed send |
+| b834afc | 发送流截图验收 |
+
+后端：`BACKEND-API-CHANGE-LOG.md` 仍为空（未改接口）。
