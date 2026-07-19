@@ -92,7 +92,7 @@ const cssVars = computed(() => ({
 	display: flex;
 	flex-direction: column;
 	border-right: 1px solid var(--da-sidebar-line, #e4edf5);
-	box-shadow: var(--da-shadow-sm);
+	box-shadow: none;
 	flex-shrink: 0;
 	white-space: nowrap;
 }
@@ -110,13 +110,13 @@ const cssVars = computed(() => ({
 }
 
 .base-drawer__header {
-	height: var(--da-header-height, 52px);
+	height: var(--da-header-height, 48px);
 	border-bottom: 0.5px solid color-mix(in srgb, var(--da-line) 42%, transparent);
 	background-color: color-mix(in srgb, var(--da-surface, #ffffff) 88%, transparent);
 	backdrop-filter: blur(12px);
 	display: flex;
 	align-items: center;
-	padding: 0 16px;
+	padding: 0 14px;
 	flex-shrink: 0;
 }
 

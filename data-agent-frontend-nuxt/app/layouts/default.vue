@@ -15,7 +15,7 @@
  */
 
 <template>
-	<v-app id="app">
+	<v-app id="app" class="admin-app">
 		<v-main>
 			<BaseDrawer v-model="drawer" :drawer-width="280">
 				<template #drawer>
@@ -649,6 +649,10 @@ watch(
 </script>
 
 <style scoped>
+.admin-app {
+	background: var(--da-surface-soft) !important;
+}
+
 .border-white-5 {
 	border-color: var(--da-sidebar-line, #e4edf5) !important;
 }

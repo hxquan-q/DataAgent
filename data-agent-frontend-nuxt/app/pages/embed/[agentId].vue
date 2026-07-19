@@ -726,11 +726,22 @@ onBeforeUnmount(() => {
 					type="button"
 					class="input-shell__send"
 					:disabled="!ready || !input.trim()"
+					aria-label="发送"
+					title="发送"
 					@click="send()"
 				>
-					发送
+					↑
 				</button>
-				<button v-else type="button" class="input-shell__send stop" @click="stop">停止</button>
+				<button
+					v-else
+					type="button"
+					class="input-shell__send stop"
+					aria-label="停止"
+					title="停止"
+					@click="stop"
+				>
+					■
+				</button>
 			</div>
 		</footer>
 	</div>
@@ -1136,28 +1147,36 @@ onBeforeUnmount(() => {
 }
 .input-shell__send {
 	flex-shrink: 0;
-	border: none;
-	border-radius: 12px;
-	padding: 0 14px;
+	width: 36px;
 	height: 36px;
-	min-width: 64px;
+	min-width: 36px;
+	padding: 0;
+	border: none;
+	border-radius: 50%;
 	background: var(--embed-primary);
-	color: white;
-	font-size: 13.5px;
-	font-weight: 600;
+	color: #fff;
+	font-size: 16px;
+	font-weight: 700;
+	line-height: 1;
 	cursor: pointer;
-	transition: opacity 0.15s ease;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	transition: opacity 0.15s ease, transform 0.15s ease;
 	box-shadow: none;
 }
 .input-shell__send:disabled {
-	opacity: 0.45;
+	opacity: 0.35;
 	cursor: not-allowed;
 }
 .input-shell__send.stop {
-	background: var(--da-muted);
+	background: var(--da-ink);
+	color: var(--da-surface);
+	font-size: 12px;
 }
 .input-shell__send:not(:disabled):hover {
-	filter: brightness(0.96);
+	opacity: 0.92;
+	transform: translateY(-1px);
 }
 
 /* ── Markdown（对齐 WeKnora chat-markdown 关键） ──────────────── */
