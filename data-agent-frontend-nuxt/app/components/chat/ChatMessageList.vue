@@ -108,9 +108,9 @@
 
 				</template>
 
-				<!-- Streaming: minimal status + MD answer only -->
+				<!-- Streaming: status until text arrives, then MD -->
 				<div
-					v-if="store.isStreaming && !store.isReportStreaming"
+					v-if="store.isStreaming && !liveAnswerText"
 					class="row ai-row"
 				>
 					<div class="thinking-chip" role="status" aria-live="polite">
@@ -119,12 +119,9 @@
 					</div>
 				</div>
 
-				<div
-					v-if="store.isReportStreaming && store.streamingReportContent"
-					class="row ai-row"
-				>
+				<div v-if="liveAnswerText" class="row ai-row">
 					<div class="ai-answer report-card">
-						<ChatStreamingReport :content="store.streamingReportContent" />
+						<ChatStreamingReport :content="liveAnswerText" />
 					</div>
 				</div>
 			</div>
@@ -144,9 +141,9 @@ import ChatResultSet from './ChatResultSet.vue';
 import ChatMarkdownReport from './ChatMarkdownReport.vue';
 import ChatStreamingReport from './ChatStreamingReport.vue';
 
+// Do NOT absorb markdown-report — it is the primary answer surface
 const TIMELINE_ABSORBED_TYPES = new Set([
 	'result-set',
-	'markdown-report',
 	'html',
 ]);
 
@@ -163,6 +160,28 @@ const showWelcome = computed(
 		!store.isReportStreaming &&
 		(!store.currentSession || store.currentMessages.length === 0),
 );
+
+/** Live answer while streaming: report first, else process TEXT lines */
+const liveAnswerText = computed(() => {
+	const report = store.streamingReportContent || '';
+	if (report) return report;
+	const blocks = store.nodeBlocks || [];
+	const lines: string[] = [];
+	const nl = String.fromCharCode(10);
+	for (const block of blocks) {
+		for (const node of block || []) {
+			if (!node?.text) continue;
+			const tt = String(node.textType || '').toUpperCase();
+			if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
+			const s = String(node.text).trim();
+			if (!s || s.length > 4000) continue;
+			if (/^报告生成中/.test(s) && s.length < 80) continue;
+			if ((s.startsWith('{') || s.startsWith('[')) && s.length < 120) continue;
+			lines.push(s);
+		}
+	}
+	return lines.slice(-8).join(nl + nl);
+});
 
 const filteredMessages = computed<ChatMessage[]>(() => {
 	const msgs = store.currentMessages;
@@ -235,16 +254,22 @@ function fallbackTimelineText(timelineJson: string): string {
 		for (const block of blocks) {
 			for (const node of block || []) {
 				if (!node?.text) continue;
-				if (node.nodeName === 'ReportGeneratorNode') continue;
 				const tt = String(node.textType || '').toUpperCase();
 				if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
 				const s = String(node.text).trim();
-				if (s && s.length < 2000) parts.push(s);
+				if (!s || s.length > 8000) continue;
+				if (/^报告生成中/.test(s) && s.length < 80) continue;
+				if ((s.startsWith('{') || s.startsWith('[')) && s.length < 200) continue;
+				parts.push(s);
 			}
 		}
-		return parts.slice(-3).join('\n\n') || '（无文本报告）';
+		const text = parts.join('\n\n').trim();
+		return (
+			text ||
+			'未生成分析报告。请提问与数据相关的问题。'
+		);
 	} catch {
-		return '（无文本报告）';
+		return '未生成分析报告。请提问与数据相关的问题。';
 	}
 }
 
@@ -253,16 +278,44 @@ function extractReportContent(timelineJson: string): string | null {
 		const blocks = JSON.parse(
 			timelineJson,
 		) as import('~/services/graph/index').GraphNodeResponse[][];
-		// R215: 兼容 textType 大小写/别名，并扫描 block 内任意节点
+		let best: string | null = null;
 		for (const block of blocks) {
 			for (const node of block || []) {
-				if (node?.nodeName !== 'ReportGeneratorNode' || !node?.text) continue;
+				if (!node?.text) continue;
+				const name = String(node.nodeName || '');
 				const tt = String(node.textType || '').toUpperCase();
-				if (tt === 'MARK_DOWN' || tt === 'MARKDOWN' || tt === 'MD' || tt === 'HTML' || !tt) {
-					return node.text;
+				const text = String(node.text);
+				// Prefer explicit report nodes
+				if (name === 'ReportGeneratorNode') {
+					// skip transient brief status
+					if (/^报告生成中/.test(text) && text.length < 80) continue;
+					if (
+						tt === 'MARK_DOWN' ||
+						tt === 'MARKDOWN' ||
+						tt === 'MD' ||
+						tt === 'HTML' ||
+						tt === 'TEXT' ||
+						!tt ||
+						text.length > 80
+					) {
+						// longest wins
+						if (!best || text.length > best.length) best = text;
+					}
 				}
 			}
 		}
+		if (best) return best;
+		// Fallback: longest TEXT/MARKDOWN blob in timeline (non code)
+		for (const block of blocks) {
+			for (const node of block || []) {
+				if (!node?.text) continue;
+				const tt = String(node.textType || '').toUpperCase();
+				if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
+				const text = String(node.text).trim();
+				if (text.length > 120 && (!best || text.length > best.length)) best = text;
+			}
+		}
+		return best;
 	} catch {
 		/* ignore */
 	}

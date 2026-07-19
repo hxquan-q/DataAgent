@@ -506,23 +506,28 @@ export const useChatStore = defineStore('chat', () => {
 							sessionState.nodeBlocks.push([
 								{ ...response, text: `正在收集HTML报告...` },
 							]);
-					} else if (response.textType === 'MARK_DOWN') {
-						sessionState.markdownReportContent += response.text;
-						scheduleReportSync();
-						// Keep process chip light: only brief status in nodeBlocks
-						// (full MD is streamed via streamingReportContent → ChatStreamingReport)
+					} else if (
+						['MARK_DOWN', 'MARKDOWN', 'MD', 'TEXT', ''].includes(
+							String(response.textType || '').toUpperCase(),
+						)
+					) {
+						if (response.text) {
+							sessionState.markdownReportContent += response.text;
+							scheduleReportSync();
+						}
 						const rn = sessionState.nodeBlocks.find(
-							(b) =>
-								b.length > 0 &&
-								b[0].nodeName === 'ReportGeneratorNode' &&
-								b[0].textType === 'MARK_DOWN',
+							(b) => b.length > 0 && b[0].nodeName === 'ReportGeneratorNode',
 						);
-						const brief = `报告生成中… ${sessionState.markdownReportContent.length} 字`;
-						if (rn) rn[0].text = brief;
-						else
+						const brief =
+							'报告生成中… ' + sessionState.markdownReportContent.length + ' 字';
+						if (rn) {
+							rn[0].text = brief;
+							rn[0].textType = 'MARK_DOWN';
+						} else {
 							sessionState.nodeBlocks.push([
-								{ ...response, text: brief },
+								{ ...response, text: brief, textType: TextType.MARK_DOWN },
 							]);
+						}
 					}
 				} else if (response.textType === TextType.RESULT_SET) {
 					currentNodeName = 'result_set';
@@ -596,10 +601,7 @@ export const useChatStore = defineStore('chat', () => {
 				// Finalize report text into timeline so history can extract full MD
 				if (sessionState.markdownReportContent) {
 					const rn = sessionState.nodeBlocks.find(
-						(b) =>
-							b.length > 0 &&
-							b[0].nodeName === 'ReportGeneratorNode' &&
-							(b[0].textType === 'MARK_DOWN' || b[0].textType === 'MARKDOWN'),
+						(b) => b.length > 0 && b[0].nodeName === 'ReportGeneratorNode',
 					);
 					if (rn) {
 						rn[0].text = sessionState.markdownReportContent;
@@ -619,7 +621,13 @@ export const useChatStore = defineStore('chat', () => {
 					}
 				}
 
-				if (sessionState.nodeBlocks.length > 0) {
+				const hasMd =
+					!!sessionState.markdownReportContent &&
+					sessionState.markdownReportContent.length > 40 &&
+					!/^报告生成中/.test(sessionState.markdownReportContent);
+
+				if (hasMd && sessionState.nodeBlocks.length > 0) {
+					// Real analysis: timeline embeds full MD for history extract
 					const timelineMsg: ChatMessage = {
 						sessionId,
 						role: 'assistant',
@@ -634,6 +642,45 @@ export const useChatStore = defineStore('chat', () => {
 						});
 					if (savedTimeline && currentSession.value?.id === sessionId)
 						currentMessages.value.push(savedTimeline);
+				} else {
+					// No report (chitchat / early end): pure MD message only
+					const parts: string[] = [];
+					for (const block of sessionState.nodeBlocks) {
+						for (const node of block || []) {
+							if (!node?.text) continue;
+							const tt = String(node.textType || '').toUpperCase();
+							if (tt === 'JSON' || tt === 'SQL' || tt === 'PYTHON' || tt === 'RESULT_SET')
+								continue;
+							const s = String(node.text).trim();
+							if (!s || (s.startsWith('{') && s.length < 120)) continue;
+							if (/^报告生成中/.test(s)) continue;
+							parts.push(s);
+						}
+					}
+					const nl = String.fromCharCode(10);
+					const body =
+						(sessionState.markdownReportContent &&
+						!/^报告生成中/.test(sessionState.markdownReportContent)
+							? sessionState.markdownReportContent
+							: '') ||
+						parts.join(nl + nl).trim() ||
+						'未生成分析报告。若是闲聊/无关问题，系统只会完成意图识别；请改问与数据相关的问题。';
+					const savedAns = await chatService
+						.saveMessage(sessionId, {
+							sessionId,
+							role: 'assistant',
+							content: body,
+							messageType: 'markdown-report',
+						})
+						.catch((e) => {
+							console.error(e);
+							return null;
+						});
+					if (savedAns && currentSession.value?.id === sessionId) {
+						currentMessages.value.push(savedAns);
+						// keep visible until reload
+						streamingReportContent.value = body;
+					}
 				}
 
 				if (requestOptions.value.humanFeedback && _rejectedPlan) {
