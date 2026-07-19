@@ -54,7 +54,7 @@ const API_BASE_URL = '/api';
 
 class GraphService {
 	/**
-	 * @returns 手动关闭流的函数
+	 * @returns 手动关闭流的函数（用户停止：不触发 onError/onComplete）
 	 */
 	async streamSearch(
 		request: GraphRequest,
@@ -74,36 +74,38 @@ class GraphService {
 		}
 
 		const url = `${API_BASE_URL}/stream/search?${params.toString()}`;
+		/** terminal: complete | error | user-stop */
 		let finished = false;
+		let stoppedByUser = false;
+
+		const markFinished = () => {
+			finished = true;
+		};
 
 		const close = openSseStream(url, {
+			retryOnEmptyNetwork: 1,
 			onMessage: async (msg) => {
-				// named complete event or data.complete flag
+				if (finished || stoppedByUser) return;
+
 				if (msg.event === 'complete') {
-					if (!finished) {
-						finished = true;
-						if (onComplete) await onComplete();
-					}
+					markFinished();
+					if (onComplete) await onComplete();
 					return;
 				}
+
 				if (msg.event === 'error') {
 					let text = msg.data || 'Stream error';
 					try {
 						const parsed = JSON.parse(msg.data) as GraphNodeResponse;
 						if (parsed?.text) text = parsed.text;
-						// still forward payload for partial UI if needed
-						if (parsed && !parsed.error) {
-							/* ignore */
-						} else if (parsed) {
-							await onMessage(parsed);
+						if (parsed?.error) {
+							// surface as stream error only
 						}
 					} catch {
 						/* plain text */
 					}
-					if (!finished && onError) {
-						finished = true;
-						await onError(new Error(text));
-					}
+					markFinished();
+					if (onError) await onError(new Error(text));
 					return;
 				}
 
@@ -111,15 +113,13 @@ class GraphService {
 				try {
 					const nodeResponse = JSON.parse(msg.data) as GraphNodeResponse;
 					if (nodeResponse.complete) {
-						if (!finished) {
-							finished = true;
-							if (onComplete) await onComplete();
-						}
+						markFinished();
+						if (onComplete) await onComplete();
 						return;
 					}
 					if (nodeResponse.error) {
-						if (!finished && onError) {
-							finished = true;
+						markFinished();
+						if (onError) {
 							await onError(new Error(nodeResponse.text || 'Stream error'));
 						}
 						return;
@@ -127,27 +127,28 @@ class GraphService {
 					await onMessage(nodeResponse);
 				} catch (parseError) {
 					console.error('Failed to parse SSE data:', parseError);
-					if (!finished && onError) {
-						finished = true;
-						await onError(new Error('Failed to parse server response'));
+					if (!finished && !stoppedByUser) {
+						markFinished();
+						if (onError) await onError(new Error('Failed to parse server response'));
 					}
 				}
 			},
 			onError: async (error) => {
-				if (finished) return;
-				finished = true;
+				if (finished || stoppedByUser) return;
+				markFinished();
 				if (onError) await onError(error);
 			},
 			onDone: async () => {
-				// stream ended without explicit complete — treat as complete if we got data
-				if (!finished) {
-					finished = true;
-					if (onComplete) await onComplete();
-				}
+				// body ended without explicit complete event
+				if (finished || stoppedByUser) return;
+				markFinished();
+				if (onComplete) await onComplete();
 			},
 		});
 
 		return () => {
+			// user stop: silence callbacks, abort fetch
+			stoppedByUser = true;
 			finished = true;
 			close();
 		};

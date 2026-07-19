@@ -123,7 +123,7 @@
 				>
 					<div class="thinking-chip" role="status" aria-live="polite">
 						<span class="thinking-chip__dot" aria-hidden="true" />
-						<span>分析中</span>
+						<span>思考中…</span>
 					</div>
 				</div>
 

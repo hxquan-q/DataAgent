@@ -632,12 +632,37 @@ export const useChatStore = defineStore('chat', () => {
 		const sessionState = getSessionState(sessionId);
 		if (!sessionState.closeStream) return;
 
+		// Snapshot partial work before abort (abort must not fire onError)
+		const partialBlocks = [...sessionState.nodeBlocks];
+		const partialReport = sessionState.markdownReportContent || '';
+
 		sessionState.closeStream();
 		sessionState.closeStream = null;
 		sessionState.isStreaming = false;
-		sessionState.nodeBlocks = [];
 
-		// Save user-terminated warning message
+		// Persist partial timeline so stop is not a total loss
+		if (partialBlocks.length > 0) {
+			const timelineMsg: ChatMessage = {
+				sessionId,
+				role: 'assistant',
+				content: JSON.stringify(partialBlocks),
+				messageType: 'timeline',
+			};
+			await chatService
+				.saveMessage(sessionId, timelineMsg)
+				.catch((e) => console.error(e));
+		} else if (partialReport) {
+			const reportMsg: ChatMessage = {
+				sessionId,
+				role: 'assistant',
+				content: partialReport,
+				messageType: 'markdown-report',
+			};
+			await chatService
+				.saveMessage(sessionId, reportMsg)
+				.catch((e) => console.error(e));
+		}
+
 		const warningMsg: ChatMessage = {
 			sessionId,
 			role: 'assistant',
@@ -647,6 +672,10 @@ export const useChatStore = defineStore('chat', () => {
 		await chatService
 			.saveMessage(sessionId, warningMsg)
 			.catch((e) => console.error(e));
+
+		sessionState.nodeBlocks = [];
+		sessionState.markdownReportContent = '';
+		sessionState.htmlReportContent = '';
 
 		if (currentSession.value?.id === sessionId) {
 			isStreaming.value = false;
