@@ -263,35 +263,48 @@ function escapeHtml(text: string): string {
 	return div.innerHTML;
 }
 
-let scrollRafId: number | null = null;
-function scrollToBottom() {
-	if (scrollRafId) cancelAnimationFrame(scrollRafId);
-	scrollRafId = requestAnimationFrame(() => {
-		if (listRef.value) listRef.value.scrollTop = listRef.value.scrollHeight;
-		scrollRafId = null;
-	});
+const isMobileUi =
+	typeof window !== 'undefined' &&
+	(window.matchMedia('(max-width: 768px)').matches ||
+		window.matchMedia('(pointer: coarse)').matches);
+
+let scrollTimer: ReturnType<typeof setTimeout> | null = null;
+function scrollToBottom(force = false) {
+	const delay = force ? 0 : isMobileUi && store.isStreaming ? 200 : 50;
+	if (scrollTimer && !force) return;
+	if (scrollTimer) clearTimeout(scrollTimer);
+	scrollTimer = setTimeout(() => {
+		scrollTimer = null;
+		const el = listRef.value;
+		if (!el) return;
+		const dist = el.scrollHeight - el.scrollTop - el.clientHeight;
+		if (!force && dist > 120) return;
+		el.scrollTop = el.scrollHeight;
+	}, delay);
 }
 
 watch(
 	() => store.currentMessages.length,
 	() => {
-		scrollToBottom();
-		nextTick(() => renderECharts(listRef.value));
+		scrollToBottom(true);
+		if (!store.isStreaming) {
+			nextTick(() => renderECharts(listRef.value));
+		}
 	},
 );
 watch(
-	() => store.nodeBlocks,
+	() => store.nodeBlocks.length,
 	() => scrollToBottom(),
-	{ deep: true },
 );
 watch(
-	() => store.streamingReportContent,
+	() => store.streamingReportContent.length,
 	() => scrollToBottom(),
 );
 watch(
 	() => store.isStreaming,
 	(v) => {
-		if (v) scrollToBottom();
+		if (v) scrollToBottom(true);
+		else nextTick(() => renderECharts(listRef.value));
 	},
 );
 </script>

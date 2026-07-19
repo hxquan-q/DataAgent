@@ -425,22 +425,28 @@ export const useChatStore = defineStore('chat', () => {
 		let currentNodeName: string | null = null;
 		let currentBlockIndex = -1;
 
-		let viewSyncRafId: number | null = null;
+		// Mobile: process/report UI updates must be throttled — full MD re-render
+		// every SSE tick freezes Safari/Chrome on phone (page feels unrefreshable).
+		const isCoarse =
+			typeof window !== 'undefined' &&
+			(window.matchMedia('(max-width: 768px)').matches ||
+				window.matchMedia('(pointer: coarse)').matches);
+		const VIEW_SYNC_MS = isCoarse ? 220 : 100;
+		const REPORT_SYNC_MS = isCoarse ? 200 : 120;
+
+		let viewSyncTimer: ReturnType<typeof setTimeout> | null = null;
 		function scheduleViewSync() {
-			if (viewSyncRafId) return;
-			viewSyncRafId = requestAnimationFrame(() => {
-				viewSyncRafId = null;
+			if (viewSyncTimer) return;
+			viewSyncTimer = setTimeout(() => {
+				viewSyncTimer = null;
 				if (currentSession.value?.id === sessionId) {
-					nodeBlocks.value = [...sessionState.nodeBlocks];
+					// shallow copy of blocks only (step shells); report body lives in streamingReportContent
+					nodeBlocks.value = sessionState.nodeBlocks.map((b) => b.slice());
 				}
-			});
+			}, VIEW_SYNC_MS);
 		}
 
-		// Throttle report content pushes: batch SSE chunks and push at most
-		// once every ~80ms. This prevents excessive re-renders while keeping
-		// the typewriter animation looking smooth on the frontend.
 		let reportSyncTimer: ReturnType<typeof setTimeout> | null = null;
-		const REPORT_SYNC_INTERVAL = 80; // ms
 		function scheduleReportSync() {
 			if (reportSyncTimer) return;
 			reportSyncTimer = setTimeout(() => {
@@ -449,20 +455,20 @@ export const useChatStore = defineStore('chat', () => {
 					isReportStreaming.value = true;
 					streamingReportContent.value = sessionState.markdownReportContent;
 				}
-			}, REPORT_SYNC_INTERVAL);
+			}, REPORT_SYNC_MS);
 		}
 
 		function flushPendingSync() {
-			if (viewSyncRafId) {
-				cancelAnimationFrame(viewSyncRafId);
-				viewSyncRafId = null;
+			if (viewSyncTimer) {
+				clearTimeout(viewSyncTimer);
+				viewSyncTimer = null;
 			}
 			if (reportSyncTimer) {
 				clearTimeout(reportSyncTimer);
 				reportSyncTimer = null;
 			}
 			if (currentSession.value?.id === sessionId) {
-				nodeBlocks.value = [...sessionState.nodeBlocks];
+				nodeBlocks.value = sessionState.nodeBlocks.map((b) => b.slice());
 				if (sessionState.markdownReportContent) {
 					isReportStreaming.value = true;
 					streamingReportContent.value = sessionState.markdownReportContent;
@@ -503,16 +509,19 @@ export const useChatStore = defineStore('chat', () => {
 					} else if (response.textType === 'MARK_DOWN') {
 						sessionState.markdownReportContent += response.text;
 						scheduleReportSync();
+						// Keep process chip light: only brief status in nodeBlocks
+						// (full MD is streamed via streamingReportContent → ChatStreamingReport)
 						const rn = sessionState.nodeBlocks.find(
 							(b) =>
 								b.length > 0 &&
 								b[0].nodeName === 'ReportGeneratorNode' &&
 								b[0].textType === 'MARK_DOWN',
 						);
-						if (rn) rn[0].text = sessionState.markdownReportContent;
+						const brief = `报告生成中… ${sessionState.markdownReportContent.length} 字`;
+						if (rn) rn[0].text = brief;
 						else
 							sessionState.nodeBlocks.push([
-								{ ...response, text: response.text },
+								{ ...response, text: brief },
 							]);
 					}
 				} else if (response.textType === TextType.RESULT_SET) {
@@ -583,6 +592,32 @@ export const useChatStore = defineStore('chat', () => {
 			},
 			async () => {
 				flushPendingSync();
+
+				// Finalize report text into timeline so history can extract full MD
+				if (sessionState.markdownReportContent) {
+					const rn = sessionState.nodeBlocks.find(
+						(b) =>
+							b.length > 0 &&
+							b[0].nodeName === 'ReportGeneratorNode' &&
+							(b[0].textType === 'MARK_DOWN' || b[0].textType === 'MARKDOWN'),
+					);
+					if (rn) {
+						rn[0].text = sessionState.markdownReportContent;
+						rn[0].textType = 'MARK_DOWN';
+					} else {
+						sessionState.nodeBlocks.push([
+							{
+								agentId: String(currentAgentId.value || ''),
+								threadId: sessionState.lastRequest?.threadId || '',
+								nodeName: 'ReportGeneratorNode',
+								textType: TextType.MARK_DOWN,
+								text: sessionState.markdownReportContent,
+								error: false,
+								complete: true,
+							},
+						]);
+					}
+				}
 
 				if (sessionState.nodeBlocks.length > 0) {
 					const timelineMsg: ChatMessage = {

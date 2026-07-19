@@ -22,8 +22,13 @@ import { ref, onBeforeUnmount } from 'vue';
  * Stream complete should still call flush().
  */
 
-const BASE_CHARS = 20;
-const MAX_CHARS = 64;
+const isCoarse =
+	typeof window !== 'undefined' &&
+	(window.matchMedia('(max-width: 768px)').matches ||
+		window.matchMedia('(pointer: coarse)').matches);
+// Mobile: catch up hard so UI stays interactive
+const BASE_CHARS = isCoarse ? 48 : 20;
+const MAX_CHARS = isCoarse ? 160 : 64;
 
 export function useTypewriter() {
 	const displayedText = ref('');

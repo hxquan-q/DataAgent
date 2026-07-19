@@ -140,9 +140,11 @@ onUnmounted(() => {
 }
 @media (max-width: 768px) {
 	.chat-page {
-		/* fill workspace-main under mobile bar */
 		min-height: 0;
 		flex: 1;
+		height: 100%;
+		/* isolate layout thrash from process/report updates */
+		contain: layout style;
 	}
 	.chat-empty-stage {
 		padding: 12px 12px calc(16px + var(--da-safe-bottom, 0px));

@@ -688,8 +688,10 @@ watch(
 		min-width: 0;
 		min-height: 100dvh;
 		height: 100dvh;
+		max-height: 100dvh;
 		display: flex;
 		flex-direction: column;
+		overflow: hidden;
 	}
 	.ws-mobile-bar {
 		display: flex;
@@ -699,9 +701,8 @@ watch(
 		flex-shrink: 0;
 		height: calc(48px + var(--da-safe-top, 0px));
 		padding: var(--da-safe-top, 0px) 8px 0;
-		background: color-mix(in srgb, var(--da-surface) 92%, transparent);
+		background: var(--da-surface);
 		border-bottom: 0.5px solid var(--da-line-soft);
-		backdrop-filter: blur(10px);
 		z-index: 5;
 	}
 	.ws-mobile-bar__title {

@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed, nextTick, onBeforeUnmount } from 'vue';
+import { ref, watch, nextTick, onBeforeUnmount } from 'vue';
 import DOMPurify from 'dompurify';
 import { renderMarkdownContent } from '~/utils/markdown';
 import { transformTableTagsInHtml } from '~/utils/tableTag';
@@ -51,15 +51,6 @@ const { renderECharts } = useEchartsRenderer();
 
 // Track what we've already fed to the typewriter
 let lastFedLength = 0;
-
-// 流结束时同步清空队列，避免组件卸载前继续等待打字机动画。
-watch(
-	() => store.isReportStreaming,
-	(isStreaming) => {
-		if (!isStreaming) flush();
-	},
-	{ flush: 'sync' },
-);
 
 watch(
 	() => props.content,
@@ -87,22 +78,86 @@ const SANITIZE_OPTIONS = {
 	ADD_ATTR: ['style', 'class', 'data-echarts-config'],
 };
 
-const renderedHtml = computed(() => {
-	const text = displayedText.value;
-	if (!text) return '';
-	return DOMPurify.sanitize(
+// Throttled markdown: mobile cannot afford md+DOMPurify every typewriter frame.
+const isMobile =
+	typeof window !== 'undefined' &&
+	(window.matchMedia('(max-width: 768px)').matches ||
+		window.matchMedia('(pointer: coarse)').matches);
+const RENDER_MS = isMobile ? 280 : 120;
+
+const renderedHtml = ref('');
+let renderTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingText = '';
+
+function paintMarkdown(text: string, force = false) {
+	if (!text) {
+		renderedHtml.value = '';
+		return;
+	}
+	// On mobile while streaming: prefer cheap pre-wrap until force flush
+	if (isMobile && store.isReportStreaming && !force) {
+		// Escape + simple newlines — keeps UI responsive; force=true does full MD
+		const esc = text
+			.replace(/&/g, '&amp;')
+			.replace(/</g, '&lt;')
+			.replace(/>/g, '&gt;');
+		renderedHtml.value = `<pre class="stream-plain">${esc}</pre>`;
+		return;
+	}
+	renderedHtml.value = DOMPurify.sanitize(
 		transformTableTagsInHtml(renderMarkdownContent(text)),
 		SANITIZE_OPTIONS,
 	) as string;
-});
+}
 
-// After each render, try to initialize any completed echarts blocks
+function scheduleRender(text: string) {
+	pendingText = text;
+	if (renderTimer) return;
+	renderTimer = setTimeout(() => {
+		renderTimer = null;
+		paintMarkdown(pendingText, !store.isReportStreaming);
+	}, RENDER_MS);
+}
+
+watch(
+	displayedText,
+	(text) => {
+		scheduleRender(text || '');
+	},
+	{ immediate: true },
+);
+
+// Stream end: flush typewriter + full markdown once
+watch(
+	() => store.isReportStreaming,
+	(isStreaming) => {
+		if (isStreaming) return;
+		flush();
+		if (renderTimer) {
+			clearTimeout(renderTimer);
+			renderTimer = null;
+		}
+		paintMarkdown(displayedText.value || props.content || '', true);
+		nextTick(() => renderECharts(bodyRef.value));
+	},
+	{ flush: 'sync' },
+);
+
+// ECharts only after full paint / sparse while desktop streaming
+let echartsTimer: ReturnType<typeof setTimeout> | null = null;
 watch(renderedHtml, () => {
-	nextTick(() => renderECharts(bodyRef.value));
+	if (isMobile && store.isReportStreaming) return;
+	if (echartsTimer) return;
+	echartsTimer = setTimeout(() => {
+		echartsTimer = null;
+		nextTick(() => renderECharts(bodyRef.value));
+	}, isMobile ? 400 : 200);
 });
 
 onBeforeUnmount(() => {
 	lastFedLength = 0;
+	if (renderTimer) clearTimeout(renderTimer);
+	if (echartsTimer) clearTimeout(echartsTimer);
 });
 </script>
 
@@ -166,6 +221,18 @@ onBeforeUnmount(() => {
  * Markdown renders block elements (p, h, li), so we target the last child.
  * The dot stays inline at the end of the last line of text.
  */
+.stream-plain {
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	background: transparent;
+	border: none;
+}
 .markdown-body.streaming :deep(> :last-child::after) {
 	content: '';
 	display: inline-block;
@@ -413,12 +480,36 @@ onBeforeUnmount(() => {
 .typing-dot {
 	background: var(--da-accent);
 }
+.stream-plain {
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	background: transparent;
+	border: none;
+}
 .markdown-body.streaming :deep(> :last-child::after) {
 	background: var(--da-accent);
 }
 @media (prefers-reduced-motion: reduce) {
 	.typing-dot,
-	.markdown-body.streaming :deep(> :last-child::after) {
+	.stream-plain {
+	margin: 0;
+	padding: 0;
+	white-space: pre-wrap;
+	word-break: break-word;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: var(--da-chat-font-size, 15px);
+	line-height: var(--da-chat-line-height, 1.75);
+	color: var(--da-ink);
+	background: transparent;
+	border: none;
+}
+.markdown-body.streaming :deep(> :last-child::after) {
 		animation: none !important;
 		opacity: 0.85;
 	}

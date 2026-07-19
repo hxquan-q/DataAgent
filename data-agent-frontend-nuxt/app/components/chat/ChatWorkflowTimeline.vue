@@ -412,11 +412,11 @@ watch(
 );
 
 watch(
-	() => props.nodeBlocks,
+	() => props.nodeBlocks.length,
 	() => {
+		if (!processOpen.value) return;
 		nextTick(() => renderECharts(timelineRef.value));
 	},
-	{ deep: true },
 );
 </script>
 
