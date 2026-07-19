@@ -1,30 +1,30 @@
-/*
- * Copyright 2026 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 <template>
-	<div class="input-area">
-		<!-- Status / Info bar (R228: keyboard-accessible selectors) -->
-		<div class="status-bar">
-			<div class="status-chips">
+	<div class="composer" :class="{ 'composer--streaming': store.isStreaming }">
+		<!-- DEEIX InputGroup: textarea body first -->
+		<div class="composer__body">
+			<textarea
+				ref="textareaRef"
+				v-model="inputText"
+				class="composer__textarea"
+				:disabled="store.isStreaming || store.showHumanFeedback"
+				:placeholder="composerPlaceholder"
+				rows="2"
+				@keydown.enter.exact.prevent="handleSend"
+				@input="autoResize"
+			/>
+			<p v-if="inputText.length > 200" class="composer__count" aria-live="polite">
+				{{ inputText.length }}
+			</p>
+		</div>
 
-				<!-- Datasource selector (R151: empty-datasource guidance) -->
-				<div class="ds-chip-wrap" @click.stop>
+		<!-- Bottom toolbar: tools · options · send -->
+		<div class="composer__toolbar">
+			<div class="composer__tools">
+				<!-- Datasource -->
+				<div class="tool-wrap" @click.stop>
 					<button
 						type="button"
-						class="status-chip status-chip--ds"
+						class="tool-chip"
 						:class="{ warn: store.allDatasources.length === 0 }"
 						:disabled="store.isStreaming"
 						:aria-expanded="showDsMenu"
@@ -32,50 +32,41 @@
 						:aria-label="dsChipAriaLabel"
 						@click="toggleDsMenu"
 					>
-						<v-icon size="13" :color="store.allDatasources.length ? 'grey' : 'warning'" aria-hidden="true">mdi-database-outline</v-icon>
-						<span>{{
+						<v-icon size="14" aria-hidden="true">mdi-database-outline</v-icon>
+						<span class="tool-chip__text">{{
 							store.activeDatasource?.name
-								|| (store.allDatasources.length ? '选择数据库' : '未绑定数据源')
+								|| (store.allDatasources.length ? '数据源' : '未绑定')
 						}}</span>
-						<v-icon size="13" color="grey" aria-hidden="true">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+						<v-icon size="12" aria-hidden="true">{{ showDsMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</button>
-					<div
-						v-if="showDsMenu"
-						class="chip-dropdown"
-						role="listbox"
-						aria-label="数据源列表"
-					>
+					<div v-if="showDsMenu" class="tool-menu" role="listbox" aria-label="数据源列表">
 						<template v-if="store.allDatasources.length">
 							<button
 								v-for="ds in store.allDatasources"
 								:key="ds.id"
 								type="button"
-								class="chip-dropdown-item"
+								class="tool-menu__item"
 								role="option"
 								:class="{ active: store.activeDatasource?.id === ds.id }"
 								:aria-selected="store.activeDatasource?.id === ds.id"
 								@click="selectDs(ds)"
 							>
-								<span class="item-name">{{ ds.name }}</span>
-								<span class="item-tag">{{ ds.type?.toUpperCase() }}</span>
+								<span>{{ ds.name }}</span>
+								<span class="tool-menu__tag">{{ ds.type?.toUpperCase() }}</span>
 							</button>
 						</template>
-						<div v-else class="chip-dropdown-empty" role="presentation">
-							<p class="chip-dropdown-empty__text">
-								当前智能体未绑定可用数据源，NL2SQL 无法查库。请到「数据源配置」关联并激活。
-							</p>
-							<button type="button" class="chip-dropdown-empty__cta" @click="goAgentDatasource">
-								去绑定数据源
-							</button>
+						<div v-else class="tool-menu__empty">
+							<p>当前智能体未绑定数据源</p>
+							<button type="button" class="tool-menu__cta" @click="goAgentDatasource">去绑定</button>
 						</div>
 					</div>
 				</div>
 
-				<!-- Model selector (R149: empty-model guidance) -->
-				<div class="ds-chip-wrap" @click.stop>
+				<!-- Model -->
+				<div class="tool-wrap" @click.stop>
 					<button
 						type="button"
-						class="status-chip status-chip--model"
+						class="tool-chip tool-chip--model"
 						:class="{ warn: store.chatModels.length === 0 }"
 						:disabled="store.isStreaming"
 						:aria-expanded="showModelMenu"
@@ -83,105 +74,60 @@
 						:aria-label="modelChipAriaLabel"
 						@click="toggleModelMenu"
 					>
-						<v-icon size="13" :color="store.chatModels.length ? 'primary' : 'warning'" aria-hidden="true">mdi-lightning-bolt</v-icon>
-						<span>{{
+						<v-icon size="14" aria-hidden="true">mdi-lightning-bolt</v-icon>
+						<span class="tool-chip__text">{{
 							store.activeModelConfig?.modelName
-								|| (store.chatModels.length ? '选择AI模型' : '未配置模型')
+								|| (store.chatModels.length ? '模型' : '未配置')
 						}}</span>
-						<v-icon size="13" color="grey" aria-hidden="true">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
+						<v-icon size="12" aria-hidden="true">{{ showModelMenu ? 'mdi-chevron-up' : 'mdi-chevron-down' }}</v-icon>
 					</button>
-					<div
-						v-if="showModelMenu"
-						class="chip-dropdown"
-						role="listbox"
-						aria-label="模型列表"
-					>
+					<div v-if="showModelMenu" class="tool-menu" role="listbox" aria-label="模型列表">
 						<template v-if="store.chatModels.length">
 							<button
 								v-for="m in store.chatModels"
 								:key="m.id"
 								type="button"
-								class="chip-dropdown-item"
+								class="tool-menu__item"
 								role="option"
 								:class="{ active: store.activeModelConfig?.id === m.id }"
 								:aria-selected="store.activeModelConfig?.id === m.id"
 								@click="selectModel(m)"
 							>
-								<span class="item-name">{{ m.modelName }}</span>
-								<span class="item-tag">{{ m.provider }}</span>
+								<span>{{ m.modelName }}</span>
+								<span class="tool-menu__tag">{{ m.provider }}</span>
 							</button>
 						</template>
-						<div v-else class="chip-dropdown-empty" role="presentation">
-							<p class="chip-dropdown-empty__text">尚未配置 CHAT 模型，无法生成回答。</p>
-							<button type="button" class="chip-dropdown-empty__cta" @click="goModelConfig">
-								去配置模型
-							</button>
+						<div v-else class="tool-menu__empty">
+							<p>尚未配置 CHAT 模型</p>
+							<button type="button" class="tool-menu__cta" @click="goModelConfig">去配置</button>
 						</div>
 					</div>
 				</div>
 
-			</div>
-		</div>
-
-		<!-- Textarea -->
-		<div class="textarea-wrap">
-			<textarea
-				ref="textareaRef"
-				v-model="inputText"
-				class="chat-textarea"
-				:disabled="store.isStreaming || store.showHumanFeedback"
-				:placeholder="composerPlaceholder"
-				rows="3"
-				@keydown.enter.exact.prevent="handleSend"
-				@input="autoResize"
-			/>
-			<p v-if="inputText.length > 200" class="input-char-count" aria-live="polite">
-				{{ inputText.length }} 字
-			</p>
-		</div>
-
-		<!-- Bottom action bar -->
-		<div class="action-bar">
-			<div class="action-bar-left">
-				<div class="extra-options">
-					<label class="option-chip" :class="{ active: store.requestOptions.showSqlResults }">
-						<input
-							v-model="store.requestOptions.showSqlResults"
-							type="checkbox"
-							:disabled="store.isStreaming"
-							class="hidden-checkbox"
-						/>
-						<v-icon size="11">mdi-table-eye</v-icon>
-						显示SQL结果
-					</label>
-					<label class="option-chip" :class="{ active: store.requestOptions.nl2sqlOnly }">
-						<input
-							v-model="store.requestOptions.nl2sqlOnly"
-							type="checkbox"
-							:disabled="store.requestOptions.nl2sqlOnly || store.isStreaming"
-							class="hidden-checkbox"
-						/>
-						<v-icon size="11">mdi-database-search-outline</v-icon>
-						仅NL2SQL
-					</label>
-					<label class="option-chip" :class="{ active: store.requestOptions.humanFeedback }">
-						<input
-							v-model="store.requestOptions.humanFeedback"
-							type="checkbox"
-							:disabled="store.requestOptions.humanFeedback || store.isStreaming"
-							class="hidden-checkbox"
-						/>
-						<v-icon size="11">mdi-account-check-outline</v-icon>
-						人工反馈
-					</label>
-				</div>
+				<label class="opt" :class="{ on: store.requestOptions.showSqlResults }" title="显示 SQL 结果">
+					<input v-model="store.requestOptions.showSqlResults" type="checkbox" :disabled="store.isStreaming" class="sr" />
+					SQL
+				</label>
+				<label class="opt" :class="{ on: store.requestOptions.nl2sqlOnly }" title="仅 NL2SQL">
+					<input v-model="store.requestOptions.nl2sqlOnly" type="checkbox" :disabled="store.isStreaming" class="sr" />
+					NL2SQL
+				</label>
+				<label class="opt" :class="{ on: store.requestOptions.humanFeedback }" title="人工反馈">
+					<input
+						v-model="store.requestOptions.humanFeedback"
+						type="checkbox"
+						:disabled="store.requestOptions.humanFeedback || store.isStreaming"
+						class="sr"
+					/>
+					反馈
+				</label>
 			</div>
 
-			<div class="action-bar-right">
+			<div class="composer__send">
 				<button
 					v-if="!store.isStreaming"
 					type="button"
-					class="send-btn"
+					class="send"
 					:disabled="!canSend"
 					aria-label="发送"
 					title="发送"
@@ -192,7 +138,7 @@
 				<button
 					v-else
 					type="button"
-					class="stop-btn"
+					class="stop"
 					aria-label="停止生成"
 					title="停止生成"
 					@click="handleStop"
@@ -201,53 +147,49 @@
 				</button>
 			</div>
 		</div>
-		<p v-if="sendBlockReason" class="send-block-hint" role="status">
+
+		<p v-if="sendBlockReason" class="composer__hint" role="status">
 			<span>{{ sendBlockReason }}</span>
 			<button
 				v-if="sendBlockReason.includes('模型')"
 				type="button"
-				class="send-block-hint__link"
+				class="composer__hint-link"
 				@click="showModelMenu = true"
 			>
-				打开模型菜单
+				打开模型
 			</button>
 			<button
 				v-else-if="sendBlockReason.includes('数据源')"
 				type="button"
-				class="send-block-hint__link"
+				class="composer__hint-link"
 				@click="showDsMenu = true"
 			>
-				打开数据源菜单
+				打开数据源
 			</button>
 		</p>
 
-		<!-- Human Feedback Panel -->
-		<Transition name="slide-up">
-			<div v-if="store.showHumanFeedback" class="human-feedback-panel">
-				<div class="feedback-header">
-					<v-icon color="warning" size="16" class="mr-1">mdi-account-question-outline</v-icon>
-					<span>请确认执行计划</span>
-				</div>
-				<textarea
-					v-model="store.feedbackContent"
-					class="feedback-textarea"
-					maxlength="1200"
-					rows="2"
-					placeholder="输入您的反馈意见（留空表示接受计划）"
-				/>
-				<p class="feedback-count" aria-live="polite">
-					{{ (store.feedbackContent || '').length }}/1200
-				</p>
-				<div class="feedback-actions">
-					<v-btn class="feedback-btn feedback-btn--accept" @click="store.submitFeedback(false, store.feedbackContent)">
-						<v-icon size="14" class="mr-1">mdi-check</v-icon>接受计划
-					</v-btn>
-					<v-btn class="feedback-btn feedback-btn--reject" @click="store.submitFeedback(true, store.feedbackContent)">
-						<v-icon size="14" class="mr-1">mdi-close</v-icon>拒绝重规划
-					</v-btn>
-				</div>
+		<!-- Human feedback -->
+		<div v-if="store.showHumanFeedback" class="feedback-panel">
+			<div class="feedback-panel__head">
+				<span>需要人工确认</span>
 			</div>
-		</Transition>
+			<textarea
+				v-model="store.feedbackContent"
+				class="feedback-panel__input"
+				placeholder="输入反馈或修改意见…"
+				rows="3"
+				maxlength="1200"
+			/>
+			<p class="feedback-panel__count">{{ (store.feedbackContent || '').length }}/1200</p>
+			<div class="feedback-panel__actions">
+				<button type="button" class="feedback-panel__btn" @click="store.submitFeedback(true, store.feedbackContent)">
+					拒绝
+				</button>
+				<button type="button" class="feedback-panel__btn feedback-panel__btn--primary" @click="store.submitFeedback(false, store.feedbackContent)">
+					接受并继续
+				</button>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -400,481 +342,368 @@ onMounted(() => document.addEventListener('click', closeMenus));
 onUnmounted(() => document.removeEventListener('click', closeMenus));
 </script>
 
+
 <style scoped>
-/* DEEIX dock: pure floating composer (rounded-3xl / border 0.5 / soft shadow) */
-.input-area {
+/* DEEIX floating InputGroup composer */
+.composer {
 	position: relative;
 	flex-shrink: 0;
 	z-index: 5;
+	width: calc(100% - 40px);
+	max-width: min(100%, var(--da-chat-max, 1080px));
+	margin: 0 auto 20px;
+	padding: 12px 14px 10px;
+	box-sizing: border-box;
 	background: var(--da-surface);
 	border: 0.5px solid color-mix(in srgb, var(--da-line) 70%, transparent);
-	border-radius: var(--da-composer-radius, 24px);
-	padding: 10px 12px 10px;
-	max-width: min(100%, var(--da-chat-max, 1080px));
-	width: calc(100% - 40px);
-	margin: 0 auto 20px;
-	box-sizing: border-box;
+	border-radius: var(--da-composer-radius, 26px);
 	box-shadow: var(--da-shadow-composer, var(--da-shadow-sm));
 	transition:
 		border-color var(--da-dur-fast) var(--da-ease-out),
-		box-shadow var(--da-dur-fast) var(--da-ease-out),
-		background var(--da-dur-fast) var(--da-ease-out);
+		box-shadow var(--da-dur-fast) var(--da-ease-out);
 }
-.input-area:focus-within {
-	border-color: color-mix(in srgb, var(--da-line) 85%, transparent);
-	background: var(--da-surface);
+.composer:focus-within {
+	border-color: color-mix(in srgb, var(--da-line) 90%, transparent);
 	box-shadow: var(--da-shadow-md);
 }
 
-/* ── Status bar ──────────────────────────────────────────────────────────────── */
-.status-bar {
-	margin-bottom: 6px;
-}
-.status-chips {
-	display: flex;
-	align-items: center;
-	gap: var(--da-space-2, 8px);
-	flex-wrap: wrap;
-}
-
-.ds-chip-wrap {
+.composer__body {
 	position: relative;
+	min-height: 48px;
 }
-
-/* R228: native button reset + density tokens */
-.status-chip {
-	display: inline-flex;
-	align-items: center;
-	gap: 4px;
-	min-height: 28px;
-	padding: 3px 9px;
-	background: transparent;
-	border: 1px solid color-mix(in srgb, var(--da-line-soft) 90%, transparent);
-	border-radius: 999px;
-	font: inherit;
-	font-size: 11.5px;
-	color: var(--da-muted);
-	cursor: pointer;
-	user-select: none;
-	white-space: nowrap;
-	transition: border-color var(--da-dur-fast, 0.1s), background var(--da-dur-fast, 0.1s);
-}
-.status-chip:hover:not(:disabled) {
-	border-color: var(--da-muted);
-}
-.status-chip:disabled {
-	opacity: var(--da-disabled-opacity, 0.5);
-	cursor: not-allowed;
-}
-.status-chip:focus-visible {
-	outline: 2px solid var(--da-ring, var(--da-primary));
-	outline-offset: 2px;
-}
-.status-chip.warn {
-	border-color: color-mix(in srgb, var(--da-warning) 45%, transparent);
-}
-.status-chip--model {
-	background: var(--da-primary-soft);
-	border-color: color-mix(in srgb, var(--da-primary) 35%, transparent);
-	color: var(--da-primary);
-}
-.status-chip--model:hover:not(:disabled) {
-	border-color: color-mix(in srgb, var(--da-primary) 45%, transparent);
-}
-
-.chip-dropdown {
-	position: absolute;
-	top: calc(100% + 4px);
-	left: 0;
-	z-index: var(--da-z-dropdown, 999);
-	background: var(--da-surface, #fff);
-	border: 1px solid var(--da-line-soft);
-	border-radius: var(--da-radius-md, 8px);
-	box-shadow: var(--da-shadow-md);
-	min-width: 180px;
-	max-width: 300px;
-	max-height: 220px;
-	overflow-y: auto;
-	padding: 4px 0;
-}
-
-.chip-dropdown-item {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 6px;
-	width: 100%;
-	min-height: var(--da-control-height-sm, 32px);
-	padding: 6px 10px;
-	border: none;
-	background: transparent;
-	font: inherit;
-	font-size: 12.5px;
-	text-align: left;
-	color: var(--da-ink);
-	cursor: pointer;
-	transition: background var(--da-dur-fast, 0.1s);
-}
-.chip-dropdown-item:hover {
-	background: var(--da-surface-soft);
-}
-.chip-dropdown-item:focus-visible {
-	outline: 2px solid var(--da-ring, var(--da-primary));
-	outline-offset: -2px;
-	background: var(--da-primary-soft);
-}
-.chip-dropdown-item.active {
-	background: var(--da-primary-soft);
-	color: var(--da-primary);
-	font-weight: 500;
-}
-.item-name {
-	font-size: 12.5px;
-	flex: 1;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-.item-tag {
-	flex-shrink: 0;
-	font-size: 10.5px;
-	color: var(--da-muted);
-	background: var(--da-surface-soft);
-	border-radius: var(--da-radius-sm, 4px);
-	padding: 1px 4px;
-}
-
-.chip-dropdown-empty {
-	padding: 10px 12px;
-	max-width: 260px;
-}
-.chip-dropdown-empty__text {
-	margin: 0 0 8px;
-	font-size: 12px;
-	line-height: 1.45;
-	color: var(--da-muted);
-}
-.chip-dropdown-empty__cta {
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--da-control-height-sm, 32px);
-	padding: 4px 10px;
-	border: 1px solid var(--da-primary);
-	border-radius: 999px;
-	background: var(--da-primary-soft);
-	color: var(--da-primary);
-	font: inherit;
-	font-size: 12px;
-	font-weight: 600;
-	cursor: pointer;
-}
-.chip-dropdown-empty__cta:focus-visible {
-	outline: 2px solid var(--da-ring, var(--da-primary));
-	outline-offset: 2px;
-}
-
-/* ── Textarea ────────────────────────────────────────────────────────────────── */
-.textarea-wrap {
-	background: transparent;
-	border: none;
-	border-radius: 0;
-	overflow: hidden;
-}
-.textarea-wrap:focus-within {
-	background: transparent;
-	box-shadow: none;
-}
-.chat-textarea {
+.composer__textarea {
 	display: block;
 	width: 100%;
-	padding: 10px 14px 4px;
-	background: none;
+	min-height: 48px;
+	max-height: 200px;
+	resize: none;
 	border: none;
 	outline: none;
-	resize: none;
-	font-family: var(--da-font-chat, var(--da-font-sans));
-	font-size: var(--da-chat-font-size, 15px);
-	line-height: 1.55;
+	background: transparent;
 	color: var(--da-ink);
-	min-height: 52px;
-	max-height: 220px;
+	font: inherit;
+	font-family: var(--da-font-chat, var(--da-font-sans));
+	font-size: 15px;
+	line-height: 1.55;
+	letter-spacing: -0.01em;
+	padding: 4px 4px 8px;
 }
-.chat-textarea::placeholder {
-	color: var(--da-muted);
+.composer__textarea::placeholder {
+	color: color-mix(in srgb, var(--da-muted) 78%, transparent);
 }
-.chat-textarea:disabled {
-	opacity: 0.6;
+.composer__textarea:disabled {
+	opacity: 0.55;
 	cursor: not-allowed;
 }
+.composer__count {
+	position: absolute;
+	right: 4px;
+	bottom: 0;
+	margin: 0;
+	font-size: 11px;
+	color: var(--da-muted);
+}
 
-/* ── Action bar ──────────────────────────────────────────────────────────────── */
-.action-bar {
+.composer__toolbar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	padding: 4px 4px 0;
+	gap: 10px;
+	padding-top: 4px;
 }
-.action-bar-left {
+.composer__tools {
 	display: flex;
 	align-items: center;
-	gap: 4px;
 	flex-wrap: wrap;
+	gap: 6px;
+	min-width: 0;
+	flex: 1;
 }
-/* ── Extra options ───────────────────────────────────────────────────────────── */
-.extra-options {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	flex-wrap: wrap;
+.composer__send {
+	flex-shrink: 0;
 }
-.option-chip {
+
+.tool-wrap {
+	position: relative;
+}
+.tool-chip {
+	appearance: none;
 	display: inline-flex;
 	align-items: center;
-	gap: 3px;
-	padding: 2px 8px;
-	min-height: 28px;
+	gap: 4px;
+	min-height: 30px;
+	max-width: 160px;
+	padding: 4px 10px;
+	border-radius: 999px;
+	border: 1px solid color-mix(in srgb, var(--da-line-soft) 95%, transparent);
 	background: transparent;
-	border: 1px solid transparent;
-	border-radius: 8px;
-	font-size: 11.5px;
 	color: var(--da-muted);
+	font: inherit;
+	font-size: 12px;
+	font-weight: 500;
 	cursor: pointer;
-	transition: border-color 0.1s, background 0.1s, color 0.1s;
-	user-select: none;
+	transition: background var(--da-dur-fast) var(--da-ease-out), border-color var(--da-dur-fast) var(--da-ease-out);
 }
-.option-chip:hover {
+.tool-chip:hover:not(:disabled) {
 	background: var(--da-surface-soft);
 	color: var(--da-ink);
 }
-.option-chip:focus-within {
+.tool-chip:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.tool-chip:focus-visible {
 	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
-.option-chip.active {
+.tool-chip.warn {
+	border-color: color-mix(in srgb, var(--da-warning) 45%, transparent);
+	color: var(--da-warning);
+}
+.tool-chip--model {
 	background: var(--da-primary-soft);
-	border-color: color-mix(in srgb, var(--da-primary) 22%, transparent);
+	border-color: color-mix(in srgb, var(--da-primary) 28%, transparent);
 	color: var(--da-primary);
 }
-.hidden-checkbox {
+.tool-chip__text {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	max-width: 110px;
+}
+
+.tool-menu {
+	position: absolute;
+	bottom: calc(100% + 6px);
+	left: 0;
+	z-index: var(--da-z-dropdown, 1000);
+	min-width: 200px;
+	max-width: 300px;
+	max-height: 240px;
+	overflow: auto;
+	padding: 4px;
+	background: var(--da-surface);
+	border: 1px solid var(--da-line-soft);
+	border-radius: var(--da-radius-md);
+	box-shadow: var(--da-shadow-md);
+}
+.tool-menu__item {
+	appearance: none;
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 34px;
+	padding: 6px 10px;
+	border: none;
+	border-radius: 8px;
+	background: transparent;
+	color: var(--da-ink);
+	font: inherit;
+	font-size: 13px;
+	text-align: left;
+	cursor: pointer;
+}
+.tool-menu__item:hover,
+.tool-menu__item.active {
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
+}
+.tool-menu__tag {
+	font-size: 10.5px;
+	color: var(--da-muted);
+}
+.tool-menu__empty {
+	padding: 10px 12px;
+	font-size: 12.5px;
+	color: var(--da-muted);
+}
+.tool-menu__cta {
+	appearance: none;
+	margin-top: 8px;
+	border: none;
+	background: var(--da-primary);
+	color: var(--da-on-primary);
+	border-radius: 8px;
+	padding: 6px 10px;
+	font: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.opt {
+	display: inline-flex;
+	align-items: center;
+	min-height: 28px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	border: 1px solid transparent;
+	color: var(--da-muted);
+	font-size: 11.5px;
+	font-weight: 600;
+	cursor: pointer;
+	user-select: none;
+}
+.opt:hover {
+	background: var(--da-surface-soft);
+	color: var(--da-ink);
+}
+.opt.on {
+	background: var(--da-primary-soft);
+	color: var(--da-primary);
+	border-color: color-mix(in srgb, var(--da-primary) 22%, transparent);
+}
+.sr {
 	position: absolute;
 	opacity: 0;
 	width: 0;
 	height: 0;
+	pointer-events: none;
 }
 
-/* ── Send / stop · DEEIX circular icon controls ─────────────────────────────── */
-.send-btn,
-.stop-btn {
+.send,
+.stop {
 	appearance: none;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	border: none;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 32px;
-	height: 32px;
-	min-width: 32px;
-	min-height: 32px;
-	padding: 0;
-	border: none;
-	border-radius: 10px;
 	cursor: pointer;
-	flex-shrink: 0;
-	transition:
-		background var(--da-dur-fast) var(--da-ease-out),
-		opacity var(--da-dur-fast) var(--da-ease-out),
-		color var(--da-dur-fast) var(--da-ease-out),
-		box-shadow var(--da-dur-fast) var(--da-ease-out);
+	transition: transform var(--da-dur-fast) var(--da-ease-out), opacity var(--da-dur-fast) var(--da-ease-out);
 }
-.send-btn {
+.send {
 	background: var(--da-primary);
 	color: var(--da-on-primary);
-	box-shadow: 0 4px 12px color-mix(in srgb, var(--da-primary) 28%, transparent);
+	box-shadow: 0 1px 2px rgba(15, 35, 55, 0.12);
 }
-.send-btn:hover:not(:disabled) {
-	background: color-mix(in srgb, var(--da-primary) 88%, #000);
+.send:hover:not(:disabled) {
+	transform: translateY(-1px);
 }
-.send-btn:disabled {
+.send:disabled {
 	opacity: 0.35;
 	cursor: not-allowed;
-	box-shadow: none;
 }
-.send-btn:focus-visible,
-.stop-btn:focus-visible {
-	outline: 2px solid var(--da-ring);
-	outline-offset: 2px;
-}
-.stop-btn {
+.stop {
 	background: var(--da-ink);
 	color: var(--da-surface);
-	box-shadow: var(--da-shadow-sm);
 }
-.stop-btn:hover {
-	background: color-mix(in srgb, var(--da-ink) 88%, #000);
-}
-
-/* ── Human feedback ──────────────────────────────────────────────────────────── */
-.human-feedback-panel {
-	margin-top: 8px;
-	background: color-mix(in srgb, var(--da-warning) 10%, white);
-	border: 1px solid color-mix(in srgb, var(--da-warning) 35%, white);
-	border-radius: var(--da-radius-md);
-	padding: 10px 12px;
-	box-shadow: var(--da-shadow-sm);
-}
-.feedback-header {
-	display: flex;
-	align-items: center;
-	font-size: 13px;
-	font-weight: 600;
-	color: var(--da-warning);
-	margin-bottom: 8px;
-}
-.feedback-count {
-	margin: 4px 0 0;
-	font-size: 11px;
-	color: var(--da-muted);
-	text-align: right;
-}
-.feedback-textarea {
-	width: 100%;
-	background: var(--da-surface);
-	border: 1px solid color-mix(in srgb, var(--da-warning) 35%, white);
-	border-radius: var(--da-radius-sm);
-	padding: 8px 10px;
-	font-size: 12.5px;
-	resize: none;
-	outline: none;
-	color: var(--da-ink);
-	font-family: inherit;
-	margin-bottom: 8px;
-}
-.feedback-textarea:focus-visible {
-	outline: 2px solid var(--da-ring);
-	outline-offset: 1px;
-}
-.feedback-actions {
-	display: flex;
-	gap: 8px;
-	flex-wrap: wrap;
-}
-.feedback-btn {
-	display: inline-flex;
-	align-items: center;
-	min-height: var(--da-control-height-sm);
-	padding: 5px 12px;
-	border-radius: 999px;
-	font-size: 12.5px;
-	font-weight: 600;
-	border: none;
-	cursor: pointer;
-	transition: opacity var(--da-dur-fast) var(--da-ease-out);
-}
-.feedback-btn--accept {
-	background: var(--da-success);
-	color: var(--da-on-primary);
-}
-.feedback-btn--reject {
-	background: var(--da-surface);
-	color: var(--da-danger);
-	border: 1px solid var(--da-danger);
-}
-.feedback-btn:hover {
-	opacity: 0.9;
-}
-.feedback-btn:focus-visible {
+.send:focus-visible,
+.stop:focus-visible {
 	outline: 2px solid var(--da-ring);
 	outline-offset: 2px;
 }
 
-/* ── Transitions ─────────────────────────────────────────────────────────────── */
-.fade-enter-active, .fade-leave-active { transition: opacity var(--da-dur-fast, 0.15s); }
-.fade-enter-from, .fade-leave-to { opacity: 0; }
-.slide-up-enter-active, .slide-up-leave-active { transition: all var(--da-dur-base, 0.2s) var(--da-ease-out, ease); }
-.slide-up-enter-from, .slide-up-leave-to { transform: translateY(10px); opacity: 0; }
-
-.send-block-hint {
-	margin: 8px 4px 4px;
-	padding: 8px 12px;
-	font-size: 12px;
-	line-height: 1.45;
-	color: var(--da-warning);
+.composer__hint {
 	display: flex;
 	align-items: center;
-	gap: 8px;
 	flex-wrap: wrap;
-	background: color-mix(in srgb, var(--da-warning) 10%, white);
-	border: 1px solid color-mix(in srgb, var(--da-warning) 28%, white);
-	border-radius: var(--da-radius-md);
+	gap: 8px;
+	margin: 8px 2px 0;
+	font-size: 12px;
+	color: var(--da-warning);
 }
-.send-block-hint__link {
+.composer__hint-link {
+	appearance: none;
 	border: none;
 	background: transparent;
-	padding: 0;
+	color: var(--da-primary);
 	font: inherit;
 	font-size: 12px;
 	font-weight: 600;
-	color: var(--da-primary);
 	cursor: pointer;
 	text-decoration: underline;
 }
-.send-block-hint__link:focus-visible {
-	outline: 2px solid var(--da-ring, var(--da-primary));
-	outline-offset: 2px;
-	border-radius: var(--da-radius-sm);
-}
 
-.input-char-count {
-	margin: 4px 8px 0;
-	font-size: 11px;
+.feedback-panel {
+	margin-top: 10px;
+	padding: 12px;
+	border-radius: var(--da-radius-md);
+	border: 1px solid var(--da-line-soft);
+	background: var(--da-surface-soft);
+}
+.feedback-panel__head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--da-ink);
+}
+.feedback-panel__close {
+	appearance: none;
+	border: none;
+	background: transparent;
 	color: var(--da-muted);
-	text-align: right;
+	cursor: pointer;
+	width: 28px;
+	height: 28px;
+	border-radius: 8px;
 }
-
+.feedback-panel__input {
+	width: 100%;
+	min-height: 72px;
+	resize: vertical;
+	border: 1px solid var(--da-line-soft);
+	border-radius: 10px;
+	padding: 8px 10px;
+	font: inherit;
+	font-size: 13.5px;
+	background: var(--da-surface);
+	color: var(--da-ink);
+	box-sizing: border-box;
+}
+.feedback-panel__actions {
+	display: flex;
+	justify-content: flex-end;
+	gap: 8px;
+	margin-top: 8px;
+}
+.feedback-panel__btn {
+	appearance: none;
+	min-height: 32px;
+	padding: 4px 12px;
+	border-radius: 999px;
+	border: 1px solid var(--da-line-soft);
+	background: var(--da-surface);
+	color: var(--da-ink);
+	font: inherit;
+	font-size: 12.5px;
+	font-weight: 600;
+	cursor: pointer;
+}
+.feedback-panel__btn--primary {
+	background: var(--da-primary);
+	border-color: var(--da-primary);
+	color: var(--da-on-primary);
+}
 
 @media (max-width: 640px) {
-	.input-area {
+	.composer {
 		width: calc(100% - 20px);
-		margin-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-		padding: 8px 10px 10px;
-		border-radius: 20px;
+		margin-bottom: 12px;
+		padding: 10px 10px 8px;
+	}
+	.tool-chip__text {
+		max-width: 72px;
+	}
+	.opt {
+		display: none;
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.status-chip,
-	.chip-dropdown-item,
-	.send-btn,
-	.stop-btn,
-	.fade-enter-active,
-	.fade-leave-active,
-	.slide-up-enter-active,
-	.slide-up-leave-active {
-		transition: none !important;
+	.composer,
+	.send {
+		transition: none;
 	}
-	.slide-up-enter-from,
-	.slide-up-leave-to {
+	.send:hover:not(:disabled) {
 		transform: none;
 	}
-}
-
-/* R231: closer to DEEIX InputGroup pure surface */
-.input-area {
-	background: #fff !important;
-}
-.status-chip {
-	border-color: transparent !important;
-	background: color-mix(in srgb, var(--da-surface-soft) 80%, transparent) !important;
-}
-.status-chip--model {
-	background: color-mix(in srgb, var(--da-primary) 8%, transparent) !important;
-}
-.option-chip {
-	border: none !important;
-	background: transparent !important;
-	color: var(--da-muted) !important;
-	opacity: 0.9;
-}
-.option-chip.active {
-	color: var(--da-primary) !important;
-	background: color-mix(in srgb, var(--da-primary) 8%, transparent) !important;
 }
 </style>

@@ -193,7 +193,7 @@ onUnmounted(() => {
 	margin-top: 4px;
 }
 
-.chat-empty-stage__composer :deep(.input-area) {
+.chat-empty-stage__composer :deep(.composer) {
 	width: 100%;
 	margin: 0;
 	max-width: 100%;
