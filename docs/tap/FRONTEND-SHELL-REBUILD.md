@@ -73,3 +73,10 @@ cd data-agent-frontend-nuxt && pnpm build
 | (latest) | workspace CTA 克制化 · 消息列间距 · 终态截图 |
 
 后端：`BACKEND-API-CHANGE-LOG.md` 仍为空（未改接口）。
+
+
+## 验证（最新）
+
+- `pnpm build` ✅（nitro node-server）
+- Playwright 路由 smoke：/chat · /system/agents · model-config · eval · security · embed · 无 pageerror
+- 后端 API 变更台账：空（未改接口）

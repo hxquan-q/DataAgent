@@ -259,12 +259,15 @@ async function downloadHtml() {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 4px 0 8px;
+	padding: 0 0 6px;
 	background: transparent;
 	border-bottom: none;
 	flex-wrap: wrap;
 	gap: 6px;
-	opacity: 0.9;
+	opacity: 0.72;
+}
+.report-header:hover {
+	opacity: 1;
 }
 .report-title {
 	display: flex;
@@ -319,7 +322,7 @@ async function downloadHtml() {
 
 /* ── Body ────────────────────────────────────────────────────────────────────── */
 .report-body {
-	padding: 16px 18px 20px;
+	padding: 4px 0 8px;
 }
 .html-iframe {
 	display: block;

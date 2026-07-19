@@ -15,7 +15,7 @@
 -->
 <!-- 评测游乐场：在线计算 NL2SQL 检索/生成质量指标（Recall/MRR/NDCG + BLEU/ROUGE）。参考 WeKnora 缺失的评测可视化。 -->
 <template>
-	<div class="page-shell pa-4 pa-md-5">
+	<div class="page-shell">
 		<KnowledgePageHeader title="评测游乐场" description="在线计算 NL2SQL 检索/生成质量指标（召回率/MRR/NDCG + BLEU/ROUGE），辅助语义层与召回调优">
 			<template #actions>
 				<v-chip color="primary" variant="tonal" size="small">v0.2 · eval</v-chip>

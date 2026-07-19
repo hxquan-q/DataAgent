@@ -15,7 +15,7 @@
  */
 
 <template>
-	<v-container fluid class="page-shell pa-6 agents-container">
+	<v-container fluid class="page-shell agents-container">
 		<KnowledgePageHeader
 			title="智能体管理"
 			subtitle="创建、配置与发布问数智能体，管理绑定数据源与运行参数。"

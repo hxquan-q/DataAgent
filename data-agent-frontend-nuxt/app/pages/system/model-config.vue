@@ -15,7 +15,7 @@
  */
 
 <template>
-	<v-container fluid class="page-shell pa-6 model-config-container">
+	<v-container fluid class="page-shell model-config-container">
 		<KnowledgePageHeader
 			title="模型服务"
 			subtitle="连接 LLM 供应商，支持对话生成与向量检索。"
