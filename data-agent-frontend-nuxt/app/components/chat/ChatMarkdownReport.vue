@@ -16,76 +16,9 @@
 
 <template>
 	<div class="markdown-report">
-		<!-- Header -->
-		<div class="report-header report-header--quiet">
-			<div class="report-title">
-				<v-icon color="primary" size="18" class="mr-2"
-					>mdi-file-document-outline</v-icon
-				>
-				<span>报告已生成</span>
-				<v-btn-toggle
-					v-model="format"
-					mandatory
-					density="compact"
-					class="format-toggle ml-3"
-				>
-					<v-btn value="markdown" size="x-small" variant="text" class="fmt-btn"
-						>Markdown</v-btn
-					>
-					<v-btn value="html" size="x-small" variant="text" class="fmt-btn"
-						>HTML</v-btn
-					>
-				</v-btn-toggle>
-			</div>
-			<div class="report-actions">
-				<v-btn
-					size="x-small"
-					variant="outlined"
-					class="text-none report-action-btn"
-					prepend-icon="mdi-download"
-					title="下载 MD"
-					@click="downloadMd"
-				>
-					MD
-				</v-btn>
-				<v-btn
-					size="x-small"
-					variant="outlined"
-					color="success"
-					class="text-none report-action-btn"
-					prepend-icon="mdi-download"
-					title="下载 HTML"
-					@click="downloadHtml"
-				>
-					HTML
-				</v-btn>
-				<v-btn
-					size="x-small"
-					variant="tonal"
-					color="primary"
-					class="report-action-btn"
-					icon="mdi-fullscreen"
-					title="全屏查看"
-					@click="store.openReportFullscreen(content)"
-				/>
-			</div>
-		</div>
-		<div class="report-hairline" aria-hidden="true" />
-
-		<!-- Body -->
-		<div ref="reportBodyRef" class="report-body">
-			<div
-				v-if="format === 'markdown'"
-				class="markdown-body"
-				v-html="renderedContent"
-			/>
-			<iframe
-				v-else
-				ref="htmlIframeRef"
-				class="html-iframe"
-				sandbox="allow-scripts"
-				title="HTML报告预览"
-			/>
+		<!-- MD only — no chrome -->
+		<div ref="reportBodyRef" class="report-body report-body--bare">
+			<div class="markdown-body" v-html="renderedContent" />
 		</div>
 
 		<!-- Fullscreen dialog -->

@@ -63,14 +63,8 @@
 								<ChatMarkdownReport :content="message.content" />
 							</v-card>
 
-							<!-- DEEIX: tiny process chip, then open answer -->
+							<!-- Answer only: pure MD (process hidden) -->
 							<template v-else-if="message.messageType === 'timeline'">
-								<div class="process-slot process-slot--above">
-									<ChatWorkflowTimeline
-										:node-blocks="safeParseBlocks(message.content)"
-										:completed="true"
-									/>
-								</div>
 								<div
 									v-if="extractReportContent(message.content)"
 									class="ai-answer report-card"
@@ -79,6 +73,12 @@
 										:content="extractReportContent(message.content)!"
 									/>
 								</div>
+								<!-- no report text: fall back to plain assistant text from blocks -->
+								<div
+									v-else
+									class="ai-answer md-body"
+									v-html="renderMarkdown(fallbackTimelineText(message.content))"
+								/>
 							</template>
 
 							<!-- Warning (user stopped) -->
@@ -108,22 +108,14 @@
 
 				</template>
 
-				<!-- Streaming: process chip · answer open canvas -->
+				<!-- Streaming: minimal status + MD answer only -->
 				<div
-					v-if="store.isStreaming && store.nodeBlocks.length > 0"
-					class="row ai-row process-row"
-				>
-					<div class="process-slot process-slot--above">
-						<ChatWorkflowTimeline :node-blocks="store.nodeBlocks" />
-					</div>
-				</div>
-				<div
-					v-else-if="store.isStreaming && store.nodeBlocks.length === 0"
+					v-if="store.isStreaming && !store.isReportStreaming"
 					class="row ai-row"
 				>
 					<div class="thinking-chip" role="status" aria-live="polite">
 						<span class="thinking-chip__dot" aria-hidden="true" />
-						<span>思考中…</span>
+						<span>生成中…</span>
 					</div>
 				</div>
 
@@ -150,7 +142,6 @@ import type { ResultData } from '~/services/resultSet/index';
 import type { ChatMessage } from '~/services/chat/index';
 import ChatResultSet from './ChatResultSet.vue';
 import ChatMarkdownReport from './ChatMarkdownReport.vue';
-import ChatWorkflowTimeline from './ChatWorkflowTimeline.vue';
 import ChatStreamingReport from './ChatStreamingReport.vue';
 
 const TIMELINE_ABSORBED_TYPES = new Set([
@@ -233,6 +224,27 @@ function safeParseBlocks(content: string) {
 		) as import('~/services/graph/index').GraphNodeResponse[][];
 	} catch {
 		return [];
+	}
+}
+
+
+function fallbackTimelineText(timelineJson: string): string {
+	try {
+		const blocks = JSON.parse(timelineJson) as import('~/services/graph/index').GraphNodeResponse[][];
+		const parts: string[] = [];
+		for (const block of blocks) {
+			for (const node of block || []) {
+				if (!node?.text) continue;
+				if (node.nodeName === 'ReportGeneratorNode') continue;
+				const tt = String(node.textType || '').toUpperCase();
+				if (tt === 'RESULT_SET' || tt === 'SQL' || tt === 'PYTHON' || tt === 'JSON') continue;
+				const s = String(node.text).trim();
+				if (s && s.length < 2000) parts.push(s);
+			}
+		}
+		return parts.slice(-3).join('\n\n') || '（无文本报告）';
+	} catch {
+		return '（无文本报告）';
 	}
 }
 
@@ -875,5 +887,20 @@ watch(
 	.process-slot {
 		max-width: 100%;
 	}
+}
+
+.ai-answer .markdown-body,
+.ai-answer :deep(.markdown-body) {
+	font-size: 15px;
+	line-height: 1.75;
+}
+.ai-answer :deep(.report-body) {
+	padding: 0 !important;
+}
+/* hide leftover report chrome if any */
+.ai-answer :deep(.report-header),
+.ai-answer :deep(.report-hairline),
+.ai-answer :deep(.report-actions) {
+	display: none !important;
 }
 </style>

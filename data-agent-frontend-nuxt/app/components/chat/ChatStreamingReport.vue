@@ -16,18 +16,7 @@
 
 <template>
 	<div class="streaming-report">
-		<div class="report-header">
-			<v-icon color="primary" size="18" class="mr-2"
-				>mdi-file-document-edit-outline</v-icon
-			>
-			<span>报告生成中（结论优先）...</span>
-			<span class="typing-indicator">
-				<span class="typing-dot" />
-				<span class="typing-dot typing-dot--2" />
-				<span class="typing-dot typing-dot--3" />
-			</span>
-		</div>
-		<div ref="bodyRef" class="report-body">
+		<div ref="bodyRef" class="report-body report-body--bare">
 			<div class="markdown-body streaming" v-html="renderedHtml" />
 		</div>
 	</div>
@@ -83,27 +72,18 @@ const isMobile =
 	typeof window !== 'undefined' &&
 	(window.matchMedia('(max-width: 768px)').matches ||
 		window.matchMedia('(pointer: coarse)').matches);
-const RENDER_MS = isMobile ? 280 : 120;
+const RENDER_MS = isMobile ? 320 : 140;
 
 const renderedHtml = ref('');
 let renderTimer: ReturnType<typeof setTimeout> | null = null;
 let pendingText = '';
 
-function paintMarkdown(text: string, force = false) {
+function paintMarkdown(text: string, _force = false) {
 	if (!text) {
 		renderedHtml.value = '';
 		return;
 	}
-	// On mobile while streaming: prefer cheap pre-wrap until force flush
-	if (isMobile && store.isReportStreaming && !force) {
-		// Escape + simple newlines — keeps UI responsive; force=true does full MD
-		const esc = text
-			.replace(/&/g, '&amp;')
-			.replace(/</g, '&lt;')
-			.replace(/>/g, '&gt;');
-		renderedHtml.value = `<pre class="stream-plain">${esc}</pre>`;
-		return;
-	}
+	// Always MD — throttle via scheduleRender so mobile stays responsive
 	renderedHtml.value = DOMPurify.sanitize(
 		transformTableTagsInHtml(renderMarkdownContent(text)),
 		SANITIZE_OPTIONS,
@@ -115,7 +95,7 @@ function scheduleRender(text: string) {
 	if (renderTimer) return;
 	renderTimer = setTimeout(() => {
 		renderTimer = null;
-		paintMarkdown(pendingText, !store.isReportStreaming);
+		paintMarkdown(pendingText, true);
 	}, RENDER_MS);
 }
 
@@ -162,6 +142,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
+.report-body--bare {
+	padding: 0 !important;
+}
+
 .streaming-report {
 	background: transparent;
 }
