@@ -15,7 +15,7 @@
  */
 
 /*
- * Design tokens — DataAgent UI (rebuild-ui · DEEIX azure-inspired).
+ * Design tokens — DataAgent UI shell rebuild · DEEIX azure paper (Nuxt/Vuetify).
  * Philosophy: light paper shell, soft borders, calm blue primary, answer-first chat.
  * Change color here first, then mirror static hex in nuxt.config Vuetify theme.
  * Do not introduce new business primary hex in components.
@@ -64,11 +64,11 @@
 	--da-space-5: 24px;
 	--da-space-6: 32px;
 	--da-control-height-sm: 32px;
-	--da-header-height: 52px;
+	--da-header-height: 48px;
 	--da-control-height-md: 40px;
 	--da-table-row-density: 32px;
-	--da-chat-max: 960px;
-	--da-composer-radius: 24px;
+	--da-chat-max: 1080px;
+	--da-composer-radius: 26px;
 
 	/* ── Radius & shadow (softer DEEIX elevation) ───────────────────────────── */
 	--da-radius-sm: 8px;
@@ -105,7 +105,7 @@
 	--da-font-chat: var(--da-font-sans);
 	--da-chat-font-size: 15px;
 	--da-chat-line-height: 1.75;
-	--da-answer-max: 880px;
+	--da-answer-max: 960px;
 	--da-font-display: 'Iowan Old Style', 'Palatino Linotype', Palatino, 'Times New Roman', Georgia,
 		'Noto Serif SC', 'Songti SC', serif;
 }

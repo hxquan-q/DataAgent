@@ -934,20 +934,24 @@ watch(
 
 .header-back-chat {
 	appearance: none;
-	border: 0.5px solid color-mix(in srgb, var(--da-primary) 28%, transparent);
-	background: transparent;
-	color: var(--da-primary);
+	border: 1px solid color-mix(in srgb, var(--da-line) 55%, transparent);
+	background: var(--da-surface);
+	color: var(--da-ink);
 	border-radius: 999px;
-	min-height: 30px;
-	padding: 0 12px;
+	min-height: 32px;
+	padding: 4px 14px;
 	font: inherit;
 	font-size: 12.5px;
 	font-weight: 600;
+	letter-spacing: -0.01em;
 	cursor: pointer;
-	letter-spacing: 0;
+	box-shadow: var(--da-shadow-sm);
+	transition: border-color var(--da-dur-fast) var(--da-ease-out), background var(--da-dur-fast) var(--da-ease-out);
 }
 .header-back-chat:hover {
+	border-color: color-mix(in srgb, var(--da-primary) 40%, transparent);
 	background: var(--da-primary-soft);
+	color: var(--da-primary);
 }
 .header-back-chat:focus-visible {
 	outline: 2px solid var(--da-ring);

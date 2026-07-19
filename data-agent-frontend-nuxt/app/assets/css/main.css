@@ -32,7 +32,33 @@
 	transform: translateY(-10px);
 }
 
-/* ── 公共页面样式（rebuild-ui · DEEIX paper shell） ─────────────────────────── */
+/* ── App base (shell rebuild) ─────────────────────────────────────────────── */
+html,
+body,
+#__nuxt {
+	height: 100%;
+	margin: 0;
+}
+
+body {
+	font-family: var(--da-font-sans);
+	color: var(--da-ink);
+	background: var(--da-surface-soft);
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+}
+
+.v-application {
+	background: var(--da-surface-soft) !important;
+	color: var(--da-ink) !important;
+	font-family: var(--da-font-sans) !important;
+}
+
+.v-application .text-none {
+	letter-spacing: 0;
+}
+
+/* ── 公共页面样式（shell rebuild · DEEIX paper shell） ─────────────────────── */
 
 .page-shell {
 	padding: 20px 24px 32px;

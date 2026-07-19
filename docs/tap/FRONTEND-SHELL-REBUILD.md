@@ -43,3 +43,15 @@
 cd data-agent-frontend-nuxt && pnpm build
 # /chat 空态 · 发送/停止 · 侧栏折叠 · 管理列表 · embed
 ```
+
+
+## 进度
+
+| 阶段 | 状态 | 备注 |
+|------|------|------|
+| A 归档 | done | `9a8b1fe` + push |
+| B 基座 | done | tokens chat-max 1080 / answer 960 · app base |
+| C 布局 | done | workspace 272 rail · admin 返回问答 pill |
+| D 聊天 | done | 空态同宽 · 消息列对齐 composer · welcome 紧凑 |
+| E 管理 | done | page-shell / da-empty 既有 primitive 延续 |
+| F 收尾 | in_progress | build + 截图验收 |

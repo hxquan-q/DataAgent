@@ -176,8 +176,8 @@ watch(
 	align-items: center;
 	justify-content: center;
 	text-align: center;
-	padding: clamp(48px, 10vh, 96px) 20px 28px;
-	min-height: min(56vh, 480px);
+	padding: clamp(24px, 6vh, 64px) 16px 16px;
+	min-height: 0;
 	max-width: min(100%, var(--da-answer-max, 880px));
 	margin: 0 auto;
 	box-sizing: border-box;

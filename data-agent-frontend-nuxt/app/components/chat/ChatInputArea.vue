@@ -410,7 +410,7 @@ onUnmounted(() => document.removeEventListener('click', closeMenus));
 	border: 0.5px solid color-mix(in srgb, var(--da-line) 70%, transparent);
 	border-radius: var(--da-composer-radius, 24px);
 	padding: 10px 12px 10px;
-	max-width: min(100%, var(--da-chat-max, 960px));
+	max-width: min(100%, var(--da-chat-max, 1080px));
 	width: calc(100% - 40px);
 	margin: 0 auto 20px;
 	box-sizing: border-box;

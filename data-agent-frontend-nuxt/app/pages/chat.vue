@@ -182,14 +182,14 @@ onUnmounted(() => {
 }
 
 .chat-empty-stage__inner {
-	width: min(100%, 720px);
+	width: min(100%, var(--da-chat-max, 1080px));
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 }
 
 .chat-empty-stage__composer {
-	width: min(100%, var(--da-chat-max, 960px));
+	width: min(100%, var(--da-chat-max, 1080px));
 	margin-top: 4px;
 }
 

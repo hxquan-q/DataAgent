@@ -294,8 +294,8 @@ watch(
 
 .workspace-rail {
 	position: relative;
-	width: 260px;
-	min-width: 260px;
+	width: 272px;
+	min-width: 272px;
 	height: 100%;
 	flex-shrink: 0;
 	transition:
@@ -311,7 +311,7 @@ watch(
 .workspace-rail__panel {
 	display: flex;
 	flex-direction: column;
-	width: 260px;
+	width: 272px;
 	height: 100%;
 	background: color-mix(in srgb, var(--da-surface-soft) 55%, var(--da-surface));
 	border-right: 1px solid var(--da-line-soft);
@@ -329,8 +329,8 @@ watch(
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
-	padding: 10px 10px 6px 14px;
-	min-height: 40px;
+	padding: 12px 12px 8px 16px;
+	min-height: 44px;
 	flex-shrink: 0;
 }
 

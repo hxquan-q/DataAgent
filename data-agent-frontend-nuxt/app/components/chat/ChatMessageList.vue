@@ -411,7 +411,7 @@ watch(
 	flex-direction: column;
 	gap: 28px;
 	width: 100%;
-	max-width: min(100%, var(--da-answer-max, 880px));
+	max-width: min(100%, var(--da-chat-max, 1080px));
 	margin: 0 auto;
 }
 
@@ -463,7 +463,7 @@ watch(
 	font-size: var(--da-chat-font-size, 15px);
 	font-weight: 400;
 	line-height: var(--da-chat-line-height, 1.75);
-	max-width: min(100%, var(--da-answer-max, 880px));
+	max-width: min(100%, var(--da-answer-max, 960px));
 	word-break: break-word;
 	color: var(--da-ink, #1a2332);
 	background: transparent !important;
@@ -759,7 +759,7 @@ watch(
 	gap: 8px;
 	flex-wrap: wrap;
 	padding: 6px 4px 2px;
-	max-width: min(100%, var(--da-answer-max, 880px));
+	max-width: min(100%, var(--da-answer-max, 960px));
 	width: calc(100% - 40px);
 	margin: 8px auto 0;
 	box-sizing: border-box;
